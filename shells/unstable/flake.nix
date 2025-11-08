@@ -7,13 +7,13 @@
   description = "Use stable and unstable packages";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-${var.version}";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable }:
     let
-      system = "x86_64-linux";
+      system = "${vars.system_arch}";
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;

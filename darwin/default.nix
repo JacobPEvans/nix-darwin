@@ -27,7 +27,7 @@ in
   # MacBook8,1 "Core M" 1.2 12" (2015) A1534
   MacBookIntel =
     let
-      inherit (systemConfig "x86_64-darwin") system pkgs stable;
+      inherit (systemConfig "${vars.system_arch}") system pkgs stable;
     in
     darwin.lib.darwinSystem {
       inherit system;

@@ -60,6 +60,9 @@
         user = "jevans";
         location = "$HOME/.setup";
         editor = "vim";
+        system_arch = "aarch64-darwin";
+#        system_arch = "aarch64-linux";
+#        system_arch = "arm64";
       };
     in
     {

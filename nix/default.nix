@@ -11,7 +11,7 @@
 { inputs, nixpkgs, home-manager, vars, ... }:
 
 let
-  system = "x86_64-linux";
+  system = "${vars.system_arch}";
   pkgs = nixpkgs.legacyPackages.${system};
 in
 {

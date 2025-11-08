@@ -12,18 +12,18 @@
 
   outputs = inputs:
     let
-      pkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
+      pkgs = import inputs.nixpkgs { system = "${vars.system_arch}"; };
       pypi = with pkgs; (ps: with ps; [
         pip
       ]);
     in
     {
       # default host
-      devShells.x86_64-linux.default = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
+      devShells.${vars.system_arch}.default = inputs.nixpkgs.legacyPackages.${vars.system_arch}.mkShell {
         buildInputs = [ (pkgs.python310.withPackages pypi) ];
       };
       # py311 host
-      devShells.x86_64-linux.py311 = inputs.nixpkgs.legacyPackages.x86_64-linux.mkShell {
+      devShells.${vars.system_arch}.py311 = inputs.nixpkgs.legacyPackages.${vars.system_arch}.mkShell {
         buildInputs = [ (pkgs.python311.withPackages pypi) ];
       };
     };
