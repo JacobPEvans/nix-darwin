@@ -12,19 +12,19 @@
 
   outputs = inputs:
     let
-      pkgs = import inputs.nixpkgs { system = "${vars.system_arch}"; };
+      pkgs = import inputs.nixpkgs { system = "aarch64-darwin"; };
       pypi = with pkgs; (ps: with ps; [
         pip
       ]);
     in
     {
       # default host
-      devShells.${vars.system_arch}.default = inputs.nixpkgs.legacyPackages.${vars.system_arch}.mkShell {
-        buildInputs = [ (pkgs.python310.withPackages pypi) ];
+      devShells.aarch64-darwin.py312 = inputs.nixpkgs.legacyPackages.aarch64-darwin.mkShell {
+        buildInputs = [ (pkgs.python312.withPackages pypi) ];
       };
-      # py311 host
-      devShells.${vars.system_arch}.py311 = inputs.nixpkgs.legacyPackages.${vars.system_arch}.mkShell {
-        buildInputs = [ (pkgs.python311.withPackages pypi) ];
+      # py313 host
+      devShells.aarch64-darwin.py313 = inputs.nixpkgs.legacyPackages.aarch64-darwin.mkShell {
+        buildInputs = [ (pkgs.python313.withPackages pypi) ];
       };
     };
 }

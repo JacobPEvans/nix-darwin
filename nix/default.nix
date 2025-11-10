@@ -11,7 +11,8 @@
 { inputs, nixpkgs, home-manager, vars, ... }:
 
 let
-  system = "${vars.system_arch}";
+  system = "aarch64-darwin";
+#  system = "${vars.system_arch}";
   pkgs = nixpkgs.legacyPackages.${system};
 in
 {

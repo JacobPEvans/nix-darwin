@@ -40,13 +40,14 @@
     settings = {
       auto-optimise-store = true;
     };
-    package = pkgs.nixFlakes;
+#    package = pkgs.nixFlakes;
     registry.nixpkgs.flake = inputs.nixpkgs;
     extraOptions = ''
       experimental-features = nix-command flakes
       keep-outputs          = true
       keep-derivations      = true
     '';
+    package = pkgs.nixFlakes;
   };
   nixpkgs.config.allowUnfree = true;
 }
