@@ -16,10 +16,8 @@
   # Enable zsh
   programs.zsh.enable = true;
 
-  # Nix configuration
-  nix.settings = {
-    experimental-features = "nix-command flakes";
-  };
+  # Disable nix-darwin's Nix management (using Determinate Nix installer instead)
+  nix.enable = false;
 
   # macOS system version (required for nix-darwin)
   system.stateVersion = 5;
