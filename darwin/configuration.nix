@@ -19,6 +19,9 @@
   # Disable nix-darwin's Nix management (using Determinate Nix installer instead)
   nix.enable = false;
 
+  # Disable documentation to suppress builtins.toFile warnings
+  documentation.enable = false;
+
   # macOS system version (required for nix-darwin)
   system.stateVersion = 5;
 }
