@@ -10,6 +10,7 @@
   # Minimal system packages
   environment.systemPackages = with pkgs; [
     git
+    gh      # GitHub CLI for PR management
     vim
   ];
 
