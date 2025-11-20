@@ -46,9 +46,9 @@
           return 1
         fi
 
-        git checkout $1
-        git merge $2
-        git branch -D $2
+        git checkout "$1"
+        git merge "$2"
+        git branch -D "$2"
       }
 
       # Session logging
