@@ -7,7 +7,7 @@
   ### WILL OVERWRITE ANYTHING LOCAL ###
   programs.vscode = {
     enable = true;
-    userSettings = {
+    profiles.default.userSettings = {
       "editor.formatOnSave" = true;
     };
   };
