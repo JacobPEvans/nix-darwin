@@ -2,6 +2,8 @@
 
 Guidelines for AI agents (Claude, etc.) when modifying nix, nix-darwin, or home-manager configurations.
 
+**This is a flakes-only configuration.** Do not use nix-channels or non-flake commands.
+
 ## Architecture Overview
 
 This setup uses multiple tools working together:

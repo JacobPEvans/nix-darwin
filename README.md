@@ -2,6 +2,8 @@
 
 Declarative macOS system management for M4 Max MacBook Pro.
 
+**This is a flakes-only configuration.** All nix commands use flakes. No channels.
+
 ## How It Works
 
 | Component | What It Does |
