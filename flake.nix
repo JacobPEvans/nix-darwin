@@ -15,8 +15,6 @@
     };
   };
 
-  nixpkgs.config.allowUnfree = true;
-
   outputs = { self, nixpkgs, darwin, home-manager, ... }: {
     darwinConfigurations.default = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
@@ -24,6 +22,9 @@
         ./darwin/configuration.nix
         home-manager.darwinModules.home-manager
         {
+          # Allow unfree packages (for proprietary software)
+          nixpkgs.config.allowUnfree = true;
+
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "backup";
