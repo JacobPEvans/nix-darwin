@@ -9,7 +9,7 @@
     enable = true;
     userSettings = {
       "editor.formatOnSave" = true;
-    }
+    };
   };
 
   # Shell configuration
