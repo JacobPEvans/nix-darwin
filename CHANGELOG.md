@@ -5,6 +5,51 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-21
+
+### Added
+
+- **Complete Package Management via Nix**: Successfully transitioned all package management to nix/nix-darwin with homebrew as fallback only.
+  - Added claude-code 2.0.44 from nixpkgs (system package)
+  - Added gemini-cli 0.15.3 from nixpkgs (system package)
+  - Added gnupg 2.4.8 from nixpkgs (system package)
+  - Added nodejs 24.11.1 (nodejs_latest) from nixpkgs (system package)
+  - Added VS Code 1.106.0 via home-manager declarative configuration
+- **AI Agent Instructions**: Enhanced CLAUDE.md with comprehensive guidance for handling duplicate packages and PATH prioritization issues.
+
+### Changed
+
+- **VS Code Configuration**: Updated from deprecated `programs.vscode.userSettings` to `programs.vscode.profiles.default.userSettings` in home.nix to resolve home-manager deprecation warning.
+- **Package Management Philosophy**: Enforced nixpkgs-first approach with comprehensive documentation of why packages "disappear" when installed outside nix.
+
+### Fixed
+
+- **Duplicate Package Management**: Resolved conflicts between homebrew and nix-managed packages by removing all homebrew duplicates:
+  - Uninstalled homebrew: gemini-cli, gnupg, node (and 18 dependency packages)
+  - Uninstalled homebrew cask: claude-code 2.0.49
+  - System now uses exclusively nix-managed versions
+- **PATH Priority Issues**: Fixed PATH prioritization where `/opt/homebrew/bin` took precedence over `/run/current-system/sw/bin`, causing old homebrew versions to be found before nix versions.
+- **GPG Directory Permissions**: Fixed ownership and permissions on `~/.gnupg` directory (700 for directories, 600 for files) to resolve "unsafe ownership" warnings.
+- **home.nix File Loss**: Recovered from accidental file truncation by restoring from backup file (home.nix~) created during darwin-rebuild.
+
+### Verified
+
+- All packages now resolve to nix store paths:
+  - claude: `/run/current-system/sw/bin/claude` (v2.0.44)
+  - gemini: `/run/current-system/sw/bin/gemini` (v0.15.3)
+  - gpg: `/run/current-system/sw/bin/gpg` (v2.4.8)
+  - node: `/run/current-system/sw/bin/node` (v24.11.1)
+  - code: `/etc/profiles/per-user/jevans/bin/code` (v1.106.0)
+- GPG keys preserved and functional after transition from homebrew to nix
+- VS Code launches successfully with declarative settings management
+
+### Documentation
+
+- Updated CLAUDE.md with package management best practices
+- Streamlined README.md to focus on quick reference (removed setup duplication)
+- Enhanced SETUP.md with comprehensive troubleshooting for duplicate packages and PATH issues
+- Updated PLANNING.md to reflect completed work and current system state
+
 ## 2025-11-20
 
 ### Added

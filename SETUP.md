@@ -155,6 +155,175 @@ sudo mv /etc/conflicting-file /etc/conflicting-file.before-nix-darwin
 ### Home-manager activation fails
 Add backup extension to flake configuration (already done in this setup).
 
+## Advanced Troubleshooting (2025-11-21)
+
+### Issue: Duplicate Packages (Homebrew vs Nix)
+
+**Problem**: After adding packages to nix-darwin, `which <package>` still shows homebrew versions from `/opt/homebrew/bin` instead of nix versions from `/run/current-system/sw/bin`.
+
+**Root Cause**: Homebrew packages installed manually before nix-darwin was managing packages. PATH prioritizes `/opt/homebrew/bin` over `/run/current-system/sw/bin` in some shell configurations.
+
+**Solution**:
+
+1. **Verify the duplicate**:
+   ```bash
+   which claude  # Shows /opt/homebrew/bin/claude (wrong)
+   ls -la /run/current-system/sw/bin/claude  # Verify nix version exists
+   ```
+
+2. **Check for homebrew installations**:
+   ```bash
+   brew list --formula  # List all formulas
+   brew list --cask     # List all casks
+   ```
+
+3. **Backup important configurations**:
+   - GPG keys: `~/.gnupg` (already user-owned, preserved automatically)
+   - App settings: `~/Library/Application Support/<app>`
+   - Create backup if needed: `cp -R ~/.config/app ~/backup/app-$(date +%Y-%m-%d)/`
+
+4. **Remove homebrew versions as user** (not root):
+   ```bash
+   # For command-line tools (formulas)
+   sudo -u jevans brew uninstall gemini-cli gnupg node
+
+   # For GUI applications (casks)
+   sudo -u jevans brew uninstall --cask claude-code
+   ```
+
+5. **Verify nix versions are now found**:
+   ```bash
+   which claude   # Should show /run/current-system/sw/bin/claude
+   which gemini   # Should show /run/current-system/sw/bin/gemini
+   which gpg      # Should show /run/current-system/sw/bin/gpg
+   which node     # Should show /run/current-system/sw/bin/node
+   ```
+
+6. **Test functionality**:
+   ```bash
+   claude --version
+   gemini --version
+   gpg --list-keys  # Verify keys still accessible
+   node --version
+   ```
+
+**Packages Successfully Migrated (2025-11-21)**:
+- claude-code: 2.0.49 (homebrew cask) → 2.0.44 (nix)
+- gemini-cli: 0.16.0 (homebrew) → 0.15.3 (nix)
+- gnupg: 2.4.8 (homebrew) → 2.4.8 (nix)
+- node: 25.2.1 (homebrew) → 24.11.1 (nix, nodejs_latest)
+
+### Issue: GPG "unsafe ownership" Warning
+
+**Problem**: After migrating GPG from homebrew to nix, `gpg` shows warning:
+```
+gpg: WARNING: unsafe ownership on homedir '/Users/jevans/.gnupg'
+```
+
+**Root Cause**: Directory permissions or extended attributes on `~/.gnupg` not strict enough for GPG's security requirements.
+
+**Solution**:
+```bash
+# Fix ownership
+sudo chown -R jevans:staff ~/.gnupg
+
+# Fix directory permissions (700)
+sudo -u jevans find ~/.gnupg -type d -exec chmod 700 {} \;
+
+# Fix file permissions (600)
+sudo -u jevans find ~/.gnupg -type f -exec chmod 600 {} \;
+
+# Verify GPG works
+gpg --list-keys
+```
+
+**Note**: GPG keys and trust database in `~/.gnupg` are preserved automatically during package transitions since they're in the home directory, not managed by package managers.
+
+### Issue: home.nix File Became Empty
+
+**Problem**: After rebuild, `home/home.nix` was truncated to 0 bytes, losing all configuration.
+
+**Root Cause**: Unknown (possibly editor or build process issue).
+
+**Solution**:
+
+1. **Check for backup files**:
+   ```bash
+   ls -la ~/.config/nix/home/
+   # Look for home.nix~ or home.nix.backup
+   ```
+
+2. **Restore from backup**:
+   ```bash
+   cp ~/.config/nix/home/home.nix~ ~/.config/nix/home/home.nix
+   ```
+
+3. **Or restore from git**:
+   ```bash
+   cd ~/.config/nix
+   git restore home/home.nix
+   # Or from specific commit:
+   git show HEAD:home/home.nix > home/home.nix
+   ```
+
+**Prevention**: Always commit changes before rebuilding. Flakes require git tracking anyway, so regular commits provide automatic recovery points.
+
+### Issue: VS Code userSettings Deprecation
+
+**Problem**: Build shows warning:
+```
+warning: jevans profile: The option `programs.vscode.userSettings' defined in `<unknown-file>'
+has been renamed to `programs.vscode.profiles.default.userSettings'.
+```
+
+**Solution**: Update `home/home.nix`:
+
+```nix
+# OLD (deprecated):
+programs.vscode = {
+  enable = true;
+  userSettings = {
+    "editor.formatOnSave" = true;
+  };
+};
+
+# NEW (correct):
+programs.vscode = {
+  enable = true;
+  profiles.default.userSettings = {
+    "editor.formatOnSave" = true;
+  };
+};
+```
+
+### Issue: PATH Priority (Homebrew Before Nix)
+
+**Problem**: `echo $PATH` shows `/opt/homebrew/bin` before `/run/current-system/sw/bin`, causing homebrew packages to shadow nix packages.
+
+**Expected PATH Order**:
+```
+/opt/homebrew/bin            ← WRONG: Should not be first
+/run/current-system/sw/bin   ← Nix packages should come first
+```
+
+**Correct PATH Order**:
+```
+/Users/jevans/.nix-profile/bin
+/etc/profiles/per-user/jevans/bin
+/run/current-system/sw/bin          ← Nix packages here
+/nix/var/nix/profiles/default/bin
+/opt/homebrew/bin                   ← Homebrew fallback only
+```
+
+**Solution**:
+
+1. Check `~/.zprofile` for homebrew shellenv initialization
+2. Remove or comment out manual homebrew PATH additions
+3. Let nix-darwin manage PATH via `/etc/zshenv`
+4. Open new terminal to get updated PATH
+
+**Why This Happens**: macOS's `/etc/zshenv` (managed by nix-darwin) sets up nix paths, but `~/.zprofile` (sourced later) may add homebrew first, overriding the correct order.
+
 ## Resources
 - [nix-darwin documentation](https://github.com/LnL7/nix-darwin)
 - [Home Manager manual](https://nix-community.github.io/home-manager/)

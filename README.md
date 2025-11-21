@@ -31,20 +31,9 @@ nix flake update ~/.config/nix
 
 # Rollback if something breaks
 darwin-rebuild --rollback
-```
 
-### First-Time Setup
-
-If nix-darwin isn't initialized yet:
-
-```bash
-cd ~/.config/nix
-
-# Build the system
-nix build .#darwinConfigurations.default.system
-
-# Activate (first time requires this path)
-sudo ./result/sw/bin/darwin-rebuild switch --flake .#default
+# List all generations
+darwin-rebuild --list-generations
 ```
 
 ### Adding Packages
@@ -61,10 +50,7 @@ sudo ./result/sw/bin/darwin-rebuild switch --flake .#default
 ### Rollback & Recovery
 
 ```bash
-# List all generations
-darwin-rebuild --list-generations
-
-# Rollback to previous
+# Rollback to previous generation
 darwin-rebuild --rollback
 
 # Switch to specific generation
@@ -82,20 +68,35 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ├── home/
 │   └── home.nix           # User shell config, aliases, functions
 ├── CLAUDE.md              # Instructions for AI agents
-└── README.md              # This file
+├── SETUP.md               # Detailed setup and troubleshooting
+└── CHANGELOG.md           # Version history
 ```
+
+## Current Packages
+
+**System packages** (darwin/configuration.nix):
+- claude-code 2.0.44 - Anthropic's AI coding assistant
+- gemini-cli 0.15.3 - Google's Gemini CLI
+- gh - GitHub CLI
+- git - Version control
+- gnupg 2.4.8 - GPG encryption
+- nodejs 24.11.1 - Node.js runtime (nodejs_latest)
+- vim - Text editor
+
+**User packages** (home/home.nix):
+- VS Code 1.106.0 - Code editor with declarative settings
 
 ## Why Packages "Disappear"
 
-If you install packages outside of nix (manual `brew install`, `npm -g`, etc.), they are NOT tracked by nix-darwin. After system updates or profile switches, these packages may vanish because:
+Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NOT tracked by nix-darwin. After system updates or profile switches, these packages may vanish because:
 
 1. They weren't in the nix store
-2. PATH changes to prioritize nix-managed paths
+2. PATH changes to prioritize nix-managed paths (`/run/current-system/sw/bin`)
 3. Homebrew state isn't preserved by nix
 
-**Solution**: Always add packages to `darwin/configuration.nix` and rebuild.
+**Solution**: Always add packages to `darwin/configuration.nix` or `home/home.nix` and rebuild.
 
-## Troubleshooting
+## Quick Troubleshooting
 
 ### "error: attribute 'package-name' missing"
 Package name differs in nixpkgs. Search for it:
@@ -108,16 +109,16 @@ nix search nixpkgs <partial-name>
 2. Run: `darwin-rebuild switch --flake ~/.config/nix#default`
 3. Open a new terminal
 
-### "nix-darwin requires macOS ..." errors
-Your system.stateVersion may need updating after macOS upgrades.
+### Package conflict (homebrew vs nix)
+If `which <package>` shows `/opt/homebrew/bin` instead of `/run/current-system/sw/bin`:
+```bash
+# Remove homebrew version
+sudo -u jevans brew uninstall <package>
+# Verify nix version now found
+which <package>
+```
 
-## Current Packages
-
-Managed by nix-darwin (in `darwin/configuration.nix`):
-- claude-code - Anthropic's AI coding assistant
-- gemini-cli - Google's Gemini CLI
-- gh - GitHub CLI
-- git, gnupg, vim, nodejs
+For detailed setup instructions and comprehensive troubleshooting, see [SETUP.md](SETUP.md).
 
 ## Resources
 

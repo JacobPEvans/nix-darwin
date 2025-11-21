@@ -117,9 +117,75 @@ nix search nixpkgs <partial-name>
 Packages installed outside nix (manual brew, npm -g) are NOT managed by nix.
 They may disappear after system updates. Always add packages to the nix config.
 
+### Duplicate Packages (Homebrew vs Nix)
+When adding packages to nix that were previously installed via homebrew:
+
+1. **Check for duplicates first**:
+   ```bash
+   which <package>  # See which version is found first
+   brew list --formula | grep <package>
+   brew list --cask | grep <package>
+   ```
+
+2. **Verify existing configurations**:
+   - GPG: `~/.gnupg` directory (preserve keys and trust database)
+   - App settings: Check `~/Library/Application Support/<app>`
+   - Backup important configs before uninstalling
+
+3. **Remove homebrew version as user** (not root):
+   ```bash
+   sudo -u jevans brew uninstall <package>       # For formulas
+   sudo -u jevans brew uninstall --cask <package> # For casks
+   ```
+
+4. **Verify nix version is now found**:
+   ```bash
+   which <package>  # Should show /run/current-system/sw/bin/<package>
+   <package> --version  # Verify correct version
+   ```
+
+### PATH Priority Issues
+If homebrew packages are found before nix packages:
+
+1. **Check PATH order**:
+   ```bash
+   echo $PATH
+   ```
+
+2. **Expected order** (nix should come before homebrew):
+   - `/Users/jevans/.nix-profile/bin`
+   - `/etc/profiles/per-user/jevans/bin`
+   - `/run/current-system/sw/bin` ← nix packages here
+   - `/nix/var/nix/profiles/default/bin`
+   - `/opt/homebrew/bin` ← homebrew packages here (fallback only)
+
+3. **If homebrew comes first**, check:
+   - `~/.zshrc` or `~/.zprofile` for homebrew shellenv
+   - Remove manual PATH additions that prioritize homebrew
+   - Let nix-darwin manage PATH via `/etc/zshenv`
+
+### VS Code Configuration Deprecation
+If you see "programs.vscode.userSettings has been renamed":
+
+```nix
+# OLD (deprecated):
+programs.vscode = {
+  enable = true;
+  userSettings = { ... };
+};
+
+# NEW (correct):
+programs.vscode = {
+  enable = true;
+  profiles.default.userSettings = { ... };
+};
+```
+
 ## Important Notes
 
 - Git commits are required before rebuild (flakes track git state)
 - `/run/current-system/sw/bin` contains nix-managed binaries
 - `~/.nix-profile` is the user's nix profile symlink
 - Determinate Nix config is at `/etc/nix/nix.conf` (don't modify directly)
+- Homebrew should only contain packages NOT available in nixpkgs
+- Always backup configuration files before uninstalling packages
