@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     darwin = {
-      url = "github:LnL7/nix-darwin";
+      url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -14,6 +14,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  nixpkgs.config.allowUnfree = true;
 
   outputs = { self, nixpkgs, darwin, home-manager, ... }: {
     darwinConfigurations.default = darwin.lib.darwinSystem {

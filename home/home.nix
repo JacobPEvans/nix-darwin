@@ -3,14 +3,23 @@
 {
   home.stateVersion = "24.05";
 
+  # VS Code configuration
+  ### WILL OVERWRITE ANYTHING LOCAL ###
+  programs.vscode = {
+    enable = true;
+    userSettings = {
+      "editor.formatOnSave" = true;
+    }
+  };
+
   # Shell configuration
   programs.zsh = {
     enable = true;
 
-    # Environment variables
-    sessionVariables = {
-      PATH = "/opt/homebrew/opt/python@3.12/bin:$PATH";
-    };
+    ## Environment variables
+    #sessionVariables = {
+    #  PATH = "/opt/homebrew/opt/python@3.12/bin:$PATH";
+    #};
 
     # Aliases from your .zshrc
     shellAliases = {
