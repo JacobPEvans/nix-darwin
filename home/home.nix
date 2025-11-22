@@ -38,64 +38,18 @@
       tgz = "tar --disable-copyfile --exclude='.DS_Store' -czf";
     };
 
-    # Init content - for custom functions and scripts
+    # Init content - source modular shell configuration files
+    # Files are sourced in order; session-logging.zsh MUST be last
     initContent = ''
-      # Set tabs to 2 spaces
-      tabs -2
+      # Load function libraries
+      source ${./zsh/git-functions.zsh}
+      source ${./zsh/docker-functions.zsh}
 
-      # gitmd function - merge and delete branch
-      gitmd() {
-        # $1 - Target Branch
-        # $2 - Source Branch
+      # macOS-specific setup and cleanup
+      source ${./zsh/macos-setup.zsh}
 
-        # Exit on failure
-        set -e
-
-        if [[ "$2" == "main" ]]; then
-          echo "ERROR: Cannot delete main branch"
-          return 1
-        fi
-
-        git checkout "$1"
-        git merge "$2"
-        git branch -D "$2"
-      }
-
-      # Docker functions
-      # $1 is the container name (e.g. splunk)
-      docker-exec() {
-        docker exec -it "$1" /bin/bash
-      }
-
-      # $1 is the password. Special characters are allowed due to the single quotes
-      docker-run-splunk() {
-        docker run -d --rm --name splunk -p 8000:8000 \
-          -e SPLUNK_START_ARGS='--accept-license' \
-          -e SPLUNK_PASSWORD="$1" \
-          -e SPLUNK_GENERAL_TERMS='--accept-sgt-current-at-splunk-com' \
-          splunk/splunk:latest
-      }
-
-      # $1 is the password, $2 is the version
-      docker-run-splunk-v() {
-        docker run -d --rm --name splunk -p 8000:8000 \
-          -e SPLUNK_START_ARGS='--accept-license' \
-          -e SPLUNK_PASSWORD="$1" \
-          -e SPLUNK_GENERAL_TERMS='--accept-sgt-current-at-splunk-com' \
-          splunk/splunk:"$2"
-      }
-
-      # Session logging
-      if [ -z "$SCRIPT_SESSION" ]; then
-        export SCRIPT_SESSION=1
-        script -r ~/logs/terminal_$(date +%Y-%m-%d_%H-%M).log
-      fi
-
-      # Clean up .DS_Store files
-      find ~/.config/  -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
-      find ~/git/      -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
-      find ~/obsidian/ -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
-
+      # Session logging MUST be last (takes over terminal)
+      source ${./zsh/session-logging.zsh}
     '';
   };
 
