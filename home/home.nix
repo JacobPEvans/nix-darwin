@@ -23,6 +23,7 @@
 
     # Aliases from your .zshrc
     shellAliases = {
+      # Everyday shell aliases
       ll = "ls -ahlFG -D '%Y-%m-%d %H:%M:%S'";
       llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'";
       lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'";
@@ -60,6 +61,30 @@
         git branch -D "$2"
       }
 
+      # Docker functions
+      # $1 is the container name (e.g. splunk)
+      docker-exec() {
+        docker exec -it "$1" /bin/bash
+      }
+
+      # $1 is the password. Special characters are allowed due to the single quotes
+      docker-run-splunk() {
+        docker run -d --rm --name splunk -p 8000:8000 \
+          -e SPLUNK_START_ARGS='--accept-license' \
+          -e SPLUNK_PASSWORD="$1" \
+          -e SPLUNK_GENERAL_TERMS='--accept-sgt-current-at-splunk-com' \
+          splunk/splunk:latest
+      }
+
+      # $1 is the password, $2 is the version
+      docker-run-splunk-v() {
+        docker run -d --rm --name splunk -p 8000:8000 \
+          -e SPLUNK_START_ARGS='--accept-license' \
+          -e SPLUNK_PASSWORD="$1" \
+          -e SPLUNK_GENERAL_TERMS='--accept-sgt-current-at-splunk-com' \
+          splunk/splunk:"$2"
+      }
+
       # Session logging
       if [ -z "$SCRIPT_SESSION" ]; then
         export SCRIPT_SESSION=1
@@ -70,6 +95,7 @@
       find ~/.config/  -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
       find ~/git/      -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
       find ~/obsidian/ -name ".DS_Store" -depth -exec rm {} \; 2>/dev/null
+
     '';
   };
 
