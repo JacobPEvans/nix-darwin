@@ -5,6 +5,28 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-22
+
+### Added
+
+- **Declarative Claude Code Permission Management**: Implemented layered configuration strategy for Claude Code auto-approved commands.
+  - Created `home/claude-permissions.nix` with 277+ safe commands organized into 24 categories
+  - Nix manages baseline permissions in `~/.claude/settings.json` (version controlled, reproducible)
+  - `~/.claude/settings.local.json` remains writable for interactive "accept indefinitely" approvals
+  - Categories include: Git/GitHub, Nix, Python, JavaScript/TypeScript, Rust, Docker, Kubernetes, AWS, databases, file operations, and more
+  - 36 explicitly denied dangerous operations (destructive commands, sensitive files, write HTTP methods, privilege escalation)
+
+### Changed
+
+- **home/home.nix**: Added Claude Code settings.json generation with permissions from claude-permissions.nix
+- **CLAUDE.md**: Added comprehensive section on Claude Code configuration management strategy
+
+### Documentation
+
+- Updated file structure documentation across README.md, CLAUDE.md, and PLANNING.md
+- Added detailed explanation of layered configuration approach and workflow
+- Documented security deny list and command organization strategy
+
 ## 2025-11-21
 
 ### Added

@@ -19,7 +19,7 @@
 - `CLAUDE.md` - AI agent instructions for modifying this configuration
 - `PLANNING.md` - This file, tracking current status and roadmap
 
-## Current System State (2025-11-21)
+## Current System State (2025-11-22)
 
 ### ✅ Fully Operational
 
@@ -29,23 +29,25 @@
 - No duplicate packages between nix and homebrew
 
 **System Packages** (darwin/configuration.nix):
-- claude-code 2.0.44 - AI coding assistant
-- gemini-cli 0.15.3 - Google Gemini CLI
+- claude-code - AI coding assistant
+- gemini-cli - Google Gemini CLI
 - gh - GitHub CLI
 - git - Version control
-- gnupg 2.4.8 - GPG encryption (keys preserved)
-- nodejs 24.11.1 - Node.js runtime (nodejs_latest)
+- gnupg - GPG encryption (keys preserved)
+- nodejs_latest - Node.js runtime
 - vim - Text editor
 
 **User Packages** (home/home.nix):
-- VS Code 1.106.0 - Declarative settings management
+- VS Code - Declarative settings management
 - Complete zsh configuration (aliases, functions, logging)
+- Claude Code permissions - 277+ auto-approved commands (declarative)
 
 **Configuration Health**:
 - ✅ All packages resolve to nix store paths
 - ✅ PATH correctly prioritizes nix over homebrew
 - ✅ GPG keys preserved and functional
 - ✅ VS Code settings managed declaratively
+- ✅ Claude Code permissions managed declaratively
 - ✅ All documentation up to date
 
 ## Completed Work
@@ -69,6 +71,14 @@
 - ✅ Fixed GPG permissions and preserved keys
 - ✅ Fixed VS Code userSettings deprecation
 - ✅ Enhanced documentation with troubleshooting guides
+
+### Phase 4: Declarative Configuration Management (2025-11-22)
+- ✅ Implemented layered Claude Code permission management
+- ✅ Created home/claude-permissions.nix with 277+ categorized commands
+- ✅ Configured Nix-managed settings.json with user-writable settings.local.json
+- ✅ Organized commands into 24 categories with security deny list
+- ✅ Documented configuration strategy in CLAUDE.md
+- ✅ Updated all documentation files for accuracy
 
 ## Near-Term Enhancements (Next 1-2 Months)
 
