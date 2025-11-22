@@ -61,30 +61,35 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 
 ```
 ~/.config/nix/
-├── flake.nix              # Entry point - defines inputs and system config
-├── flake.lock             # Locked versions (auto-managed)
+├── flake.nix                  # Entry point - defines inputs and system config
+├── flake.lock                 # Locked versions (auto-managed)
 ├── darwin/
-│   └── configuration.nix  # System packages, homebrew, macOS settings
+│   └── configuration.nix      # System packages, homebrew, macOS settings
 ├── home/
-│   └── home.nix           # User shell config, aliases, functions
-├── CLAUDE.md              # Instructions for AI agents
-├── SETUP.md               # Detailed setup and troubleshooting
-└── CHANGELOG.md           # Version history
+│   ├── home.nix               # User shell config, aliases, Claude settings
+│   ├── claude-permissions.nix # Claude Code auto-approved commands
+│   └── zsh/                   # Modular shell configuration files
+├── CLAUDE.md                  # Instructions for AI agents
+├── README.md                  # This file - quick reference
+├── SETUP.md                   # Detailed setup and troubleshooting
+├── CHANGELOG.md               # Version history
+└── PLANNING.md                # Roadmap and future work
 ```
 
 ## Current Packages
 
 **System packages** (darwin/configuration.nix):
-- claude-code 2.0.44 - Anthropic's AI coding assistant
-- gemini-cli 0.15.3 - Google's Gemini CLI
+- claude-code - Anthropic's AI coding assistant
+- gemini-cli - Google's Gemini CLI
 - gh - GitHub CLI
 - git - Version control
-- gnupg 2.4.8 - GPG encryption
-- nodejs 24.11.1 - Node.js runtime (nodejs_latest)
+- gnupg - GPG encryption
+- nodejs_latest - Node.js runtime (latest stable)
 - vim - Text editor
 
 **User packages** (home/home.nix):
-- VS Code 1.106.0 - Code editor with declarative settings
+- VS Code - Code editor with declarative settings
+- Claude Code permissions - 277+ auto-approved commands (declarative)
 
 ## Why Packages "Disappear"
 
