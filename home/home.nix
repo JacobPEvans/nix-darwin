@@ -4,6 +4,15 @@ let
   # Import Claude Code permission definitions
   claudePerms = import ./claude-permissions.nix { };
   claudeAsks = import ./claude-permissions-ask.nix { };
+
+  # Import Gemini CLI permission definitions
+  geminiPerms = import ./gemini-permissions.nix { };
+
+  # Import Copilot CLI configuration
+  copilotConfig = import ./copilot-permissions.nix { inherit config; };
+
+  # Import VS Code Copilot settings
+  vscodeGithubCopilotSettings = import ./vscode-copilot-settings.nix { };
 in
 {
   home.stateVersion = "24.05";
@@ -14,7 +23,7 @@ in
     enable = true;
     profiles.default.userSettings = {
       "editor.formatOnSave" = true;
-    };
+    } // vscodeGithubCopilotSettings; # Merge GitHub Copilot settings
   };
 
   # Shell configuration
@@ -94,4 +103,54 @@ in
   # NOTE: settings.local.json is intentionally NOT managed by Nix
   # This allows Claude to write interactive approvals there
   # If you want FULL Nix control, add it here and it will become read-only
+
+  # ====================================================================
+  # Gemini CLI Configuration
+  # ====================================================================
+  # Strategy: Managed configuration for Google Gemini Code Assist CLI
+  #
+  # Configuration format:
+  # - coreTools: List of allowed built-in tools and shell commands
+  # - excludeTools: List of permanently blocked commands
+  #
+  # See home/gemini-permissions.nix for categorized command lists
+  # Mirrors Claude Code permission structure for consistency
+  # ====================================================================
+
+  home.file.".gemini/settings.json".text = builtins.toJSON {
+    # Allowed tools (safe, read-focused operations)
+    coreTools = geminiPerms.coreTools;
+
+    # Blocked tools (catastrophic operations)
+    excludeTools = geminiPerms.excludeTools;
+
+    # Additional Gemini CLI settings can be added here
+    # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
+  };
+
+  # ====================================================================
+  # GitHub Copilot CLI Configuration
+  # ====================================================================
+  # Strategy: Directory trust model with runtime permission flags
+  #
+  # Configuration format:
+  # - config.json: Contains trusted_folders array
+  # - CLI flags: --allow-tool and --deny-tool (runtime only)
+  #
+  # Note: Unlike Claude/Gemini, Copilot's permission system is primarily
+  # CLI-flag based. The config file only manages directory trust.
+  #
+  # See home/copilot-permissions.nix for:
+  # - Trusted folder list
+  # - Recommended CLI flag patterns
+  # - Implementation examples
+  # ====================================================================
+
+  home.file.".copilot/config.json".text = builtins.toJSON {
+    # Trusted directories where Copilot can operate without confirmation
+    trusted_folders = copilotConfig.trusted_folders;
+
+    # Additional Copilot CLI settings can be added here
+    # Note: Tool-level permissions require CLI flags, not config settings
+  };
 }

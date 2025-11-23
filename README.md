@@ -61,20 +61,23 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 
 ```
 ~/.config/nix/
-├── flake.nix                  # Entry point - defines inputs and system config
-├── flake.lock                 # Locked versions (auto-managed)
+├── flake.nix                      # Entry point - defines inputs and system config
+├── flake.lock                     # Locked versions (auto-managed)
 ├── darwin/
-│   └── configuration.nix      # System packages, homebrew, macOS settings
+│   └── configuration.nix          # System packages, homebrew, macOS settings
 ├── home/
-│   ├── home.nix               # User shell config, aliases, Claude settings
-│   ├── claude-permissions.nix # Claude Code auto-approved commands (allow list)
-│   ├── claude-permissions-ask.nix # Claude Code user-prompted operations (ask list)
-│   └── zsh/                   # Modular shell configuration files
-├── CLAUDE.md                  # Instructions for AI agents
-├── README.md                  # This file - quick reference
-├── SETUP.md                   # Detailed setup and troubleshooting
-├── CHANGELOG.md               # Version history
-└── PLANNING.md                # Roadmap and future work
+│   ├── home.nix                   # User shell config, aliases, AI CLI settings
+│   ├── claude-permissions.nix     # Claude Code: allow list (277+ commands)
+│   ├── claude-permissions-ask.nix # Claude Code: ask list (user-prompted)
+│   ├── gemini-permissions.nix     # Gemini CLI: coreTools & excludeTools
+│   ├── copilot-permissions.nix    # Copilot CLI: trusted_folders config
+│   ├── vscode-copilot-settings.nix # VS Code Copilot: comprehensive settings
+│   └── zsh/                       # Modular shell configuration files
+├── CLAUDE.md                      # Instructions for AI agents
+├── README.md                      # This file - quick reference
+├── SETUP.md                       # Detailed setup and troubleshooting
+├── CHANGELOG.md                   # Version history
+└── PLANNING.md                    # Roadmap and future work
 ```
 
 ## Current Packages
@@ -89,11 +92,34 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 - vim - Text editor
 
 **User packages** (home/home.nix):
-- VS Code - Code editor with declarative settings
-- Claude Code permissions - Three-tier strategy with allow/ask/deny lists
-  - **Allow list**: 277+ safe auto-approved commands (claude-permissions.nix)
-  - **Ask list**: Potentially dangerous operations requiring user approval (claude-permissions-ask.nix)
-  - **Deny list**: 36 explicitly blocked dangerous operations
+- VS Code - Code editor with declarative settings (including GitHub Copilot configuration)
+
+**AI CLI Configurations** (fully Nix-managed):
+
+1. **Claude Code** - Three-tier permission strategy
+   - **Allow list**: 277+ safe auto-approved commands (claude-permissions.nix)
+   - **Ask list**: Potentially dangerous operations requiring user approval (claude-permissions-ask.nix)
+   - **Deny list**: 36 explicitly blocked dangerous operations
+   - Config location: `~/.claude/settings.json`
+
+2. **Gemini CLI** - coreTools/excludeTools model
+   - **coreTools**: Mirrors Claude's allow list with ShellTool() syntax
+   - **excludeTools**: Mirrors Claude's deny list
+   - Config location: `~/.gemini/settings.json`
+   - See: gemini-permissions.nix
+
+3. **GitHub Copilot CLI** - Directory trust + runtime flags
+   - **trusted_folders**: Approved project directories
+   - **CLI flags**: Runtime tool permissions (--allow-tool, --deny-tool)
+   - Config location: `~/.copilot/config.json`
+   - See: copilot-permissions.nix
+
+4. **VS Code GitHub Copilot** - Comprehensive editor integration
+   - 50+ settings for completions, chat, agents, and security
+   - Merged into VS Code settings.json
+   - See: vscode-copilot-settings.nix
+
+**Design philosophy**: All AI CLIs share the same categorized command structure and principle of least privilege, adapted to each tool's native format.
 
 ## Why Packages "Disappear"
 
