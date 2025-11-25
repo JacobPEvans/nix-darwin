@@ -13,7 +13,7 @@ Declarative macOS system management for M4 Max MacBook Pro.
 | **home-manager** | Manages user config - shell, aliases, dotfiles |
 | **nixpkgs** | The package repository - ALL packages come from here |
 
-**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
+**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only (with auto-updates enabled).
 
 ## Quick Reference
 
@@ -29,7 +29,7 @@ nix search nixpkgs <name>
 # Update all flake inputs (nixpkgs, home-manager, etc.)
 nix flake update ~/.config/nix
 
-# Update Homebrew casks (for packages like Claude Code)
+# Update Homebrew casks manually (auto-updates run every 24 hours)
 brew upgrade --cask
 
 # Rollback if something breaks
@@ -90,8 +90,8 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 - nodejs_latest - Node.js runtime (latest stable)
 - vim - Text editor
 
-**Homebrew casks** (darwin/configuration.nix - exceptions only):
-- claude-code - Anthropic's AI coding assistant (rapidly-evolving developer tool, needs frequent updates)
+**Homebrew casks** (darwin/configuration.nix - auto-updated exceptions):
+- claude-code - Anthropic's AI coding assistant (auto-updates every 24h via `brew autoupdate`)
 
 **User packages** (home/home.nix):
 - VS Code - Code editor with declarative settings

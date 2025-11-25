@@ -23,12 +23,13 @@
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
   # Prefer nixpkgs for everything - only use homebrew when absolutely necessary
+  # Auto-updates enabled: packages stay current without manual intervention
   homebrew = {
     enable = true;
     onActivation = {
-      autoUpdate = true;   # Don't auto-update homebrew on rebuild
+      autoUpdate = true;    # Update homebrew itself on darwin-rebuild
       cleanup = "none";     # Don't remove manually installed packages
-      upgrade = false;      # Don't auto-upgrade packages
+      upgrade = true;       # Upgrade outdated packages on darwin-rebuild
     };
     taps = [
       # "homebrew/cask"   # Example: additional taps

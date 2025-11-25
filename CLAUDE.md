@@ -14,18 +14,24 @@
 - `nix.enable = false` must remain in darwin/configuration.nix
 - Determinate Nix manages the daemon and nix itself
 
-### 3. Nixpkgs First, Always
+### 3. Nixpkgs First, Auto-Updates Preferred
 - **ALL packages from nixpkgs unless impossible**
-- Homebrew is fallback ONLY for packages not in nixpkgs or severely outdated
+- Homebrew is fallback ONLY for packages not in nixpkgs or requiring frequent updates
 - Search first: `nix search nixpkgs <package>`
+- **Favor auto-updates**: For rapidly-evolving tools, prefer Homebrew cask with autoupdate
 - Document why homebrew was needed if used
 
+**Auto-Update Strategy:**
+- Homebrew `onActivation.upgrade = true` upgrades packages on darwin-rebuild
+- `brew autoupdate` runs every 24 hours for background updates
+- Nix packages update via `nix flake update` (manual, less frequent)
+
 **Current Homebrew Exceptions:**
-- `claude-code` - Rapidly-evolving developer tool requiring frequent updates
+- `claude-code` - Rapidly-evolving developer tool (auto-updates every 24h)
   - Nixpkgs version lags behind releases
   - Can't auto-update from read-only nix store
-  - Update manually: `brew upgrade --cask claude-code`
-  - Homebrew's background updater handles automatic updates
+  - Background updates via `brew autoupdate`
+  - Manual: `brew upgrade --cask claude-code`
 
 ### 4. Code Style for Learning
 - **Keep comments** - user is learning Nix
