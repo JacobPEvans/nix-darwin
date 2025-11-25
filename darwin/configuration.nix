@@ -13,7 +13,6 @@
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
   environment.systemPackages = with pkgs; [
-    claude-code     # Anthropic's AI coding assistant
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
     git
@@ -27,7 +26,7 @@
   homebrew = {
     enable = true;
     onActivation = {
-      autoUpdate = false;   # Don't auto-update homebrew on rebuild
+      autoUpdate = true;   # Don't auto-update homebrew on rebuild
       cleanup = "none";     # Don't remove manually installed packages
       upgrade = false;      # Don't auto-upgrade packages
     };
@@ -39,6 +38,11 @@
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
+
+      # claude-code: Rapidly-evolving developer tool that benefits from auto-updates.
+      # Nixpkgs version lags behind and can't auto-update from read-only nix store.
+      # Exception approved: Frequently updated developer tool with new features.
+      "claude-code"
     ];
   };
 
@@ -54,3 +58,4 @@
   # macOS system version (required for nix-darwin)
   system.stateVersion = 5;
 }
+

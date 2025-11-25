@@ -33,6 +33,11 @@ in
       llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'";
       lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'";
 
+      # Quick docker aliases
+      dps = "docker ps -a";
+      dcu = "docker compose up -d";
+      dcd = "docker compose down";
+
       # Python alias - use macOS built-in python3
       python = "python3";
 

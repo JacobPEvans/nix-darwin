@@ -29,6 +29,9 @@ nix search nixpkgs <name>
 # Update all flake inputs (nixpkgs, home-manager, etc.)
 nix flake update ~/.config/nix
 
+# Update Homebrew casks (for packages like Claude Code)
+brew upgrade --cask
+
 # Rollback if something breaks
 darwin-rebuild --rollback
 
@@ -80,13 +83,15 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ## Current Packages
 
 **System packages** (darwin/configuration.nix):
-- claude-code - Anthropic's AI coding assistant
 - gemini-cli - Google's Gemini CLI
 - gh - GitHub CLI
 - git - Version control
 - gnupg - GPG encryption
 - nodejs_latest - Node.js runtime (latest stable)
 - vim - Text editor
+
+**Homebrew casks** (darwin/configuration.nix - exceptions only):
+- claude-code - Anthropic's AI coding assistant (rapidly-evolving developer tool, needs frequent updates)
 
 **User packages** (home/home.nix):
 - VS Code - Code editor with declarative settings

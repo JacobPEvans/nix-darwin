@@ -20,6 +20,13 @@
 - Search first: `nix search nixpkgs <package>`
 - Document why homebrew was needed if used
 
+**Current Homebrew Exceptions:**
+- `claude-code` - Rapidly-evolving developer tool requiring frequent updates
+  - Nixpkgs version lags behind releases
+  - Can't auto-update from read-only nix store
+  - Update manually: `brew upgrade --cask claude-code`
+  - Homebrew's background updater handles automatic updates
+
 ### 4. Code Style for Learning
 - **Keep comments** - user is learning Nix
 - Show empty sections with examples (even if commented out)
