@@ -13,6 +13,9 @@ let
 
   # Import VS Code Copilot settings
   vscodeGithubCopilotSettings = import ./vscode-copilot-settings.nix { };
+
+  # Import VS Code general settings (git, terminal, python, etc.)
+  vscodeGeneralSettings = import ./vscode-settings.nix { };
 in
 {
   home.stateVersion = "24.05";
@@ -23,7 +26,8 @@ in
     enable = true;
     profiles.default.userSettings = {
       "editor.formatOnSave" = true;
-    } // vscodeGithubCopilotSettings; # Merge GitHub Copilot settings
+    } // vscodeGeneralSettings // vscodeGithubCopilotSettings;
+    # Settings merge order: base -> general -> copilot (copilot wins on conflict)
   };
 
   # Shell configuration

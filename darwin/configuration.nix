@@ -21,6 +21,7 @@
     gnupg
     nodejs_latest   # Node.js runtime
     vim
+    vscode          # Visual Studio Code editor
   ];
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
