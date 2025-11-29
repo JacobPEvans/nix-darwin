@@ -16,6 +16,7 @@
     claude-code     # Anthropic's AI coding assistant
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
+    tree
     git
     gnupg
     nodejs_latest   # Node.js runtime

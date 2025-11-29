@@ -21,7 +21,7 @@ Declarative macOS system management for M4 Max MacBook Pro.
 
 ```bash
 # Rebuild after config changes (most common)
-darwin-rebuild switch --flake ~/.config/nix#default
+sudo darwin-rebuild switch --flake ~/.config/nix#default
 
 # Search for a package
 nix search nixpkgs <name>
@@ -45,7 +45,7 @@ darwin-rebuild --list-generations
      new-package  # Description of what it does
    ];
    ```
-3. Rebuild: `darwin-rebuild switch --flake ~/.config/nix#default`
+3. Rebuild: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 
 ### Rollback & Recovery
 
@@ -141,7 +141,7 @@ nix search nixpkgs <partial-name>
 
 ### Changes not applying
 1. Commit your changes to git (flakes require this)
-2. Run: `darwin-rebuild switch --flake ~/.config/nix#default`
+2. Run: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 3. Open a new terminal
 
 ### Package conflict (homebrew vs nix)
