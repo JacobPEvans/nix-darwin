@@ -9,10 +9,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
 
 ### Added
 
+- **Phase 2: Application Migration**
+  - Added `ripgrep` (v15.1.0) to system packages - fast grep alternative
+  - Added `raycast` (v1.103.2) to system packages - productivity launcher (replaces native install)
+  - Configured Oh My Zsh via `programs.zsh.oh-my-zsh` with plugins: git, docker, macos, z, colored-man-pages
+  - Added zsh enhancements: autosuggestions, syntax highlighting, completion, 100k history
+
 - **Nix-Managed Git Configuration**: Full git configuration via home-manager `programs.git`
   - GPG signing enabled by default (`commit.gpgsign = true`, `tag.gpgSign = true`)
   - Created `home/user-config.nix` for centralized user variables (name, email, GPG key ID)
-  - Created `home/git-aliases.nix` with 20 common git aliases (st, ll, lg, co, etc.)
+  - Created `home/git-aliases.nix` with 20 common git aliases (st, lo, lg, co, etc.)
   - Created `home/shell-aliases.nix` with macOS-specific shell aliases
   - Migrated to new `programs.git.settings` syntax (from deprecated `extraConfig`)
   - Comprehensive git settings: histogram diff, rerere, fetch pruning, rebase on pull
@@ -36,6 +42,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - `d-r` alias for `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 
 ### Changed
+
+- **PR Review Fixes**:
+  - Renamed git alias `ll` to `lo` to avoid conflict with shell `ll` alias
+  - Updated `ss` alias from deprecated `stash save` to modern `stash push` (Git 2.16+)
+  - Removed redundant `home` attribute from `user-config.nix` (use `config.home.homeDirectory`)
 
 - **Permission Accuracy Improvements**:
   - Split `fileCommands` into `fileReadCommands` (read-only) + `fileCreationCommands` (mkdir, touch)

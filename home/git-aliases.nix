@@ -6,7 +6,7 @@
 {
   # Status & info
   st = "status -sb";              # Short status with branch info
-  ll = "log --oneline -20";       # Quick log view
+  lo = "log --oneline -20";       # Quick log view (renamed from ll to avoid shell alias conflict)
   lg = "log --graph --oneline --decorate --all";  # Visual branch graph
   last = "log -1 HEAD --stat";    # Show last commit with stats
 
@@ -35,7 +35,7 @@
   undo = "reset --soft HEAD~1";   # Undo last commit, keep changes staged
 
   # Stash shortcuts
-  ss = "stash save";
+  ss = "stash push";              # Modern syntax (stash save deprecated since Git 2.16)
   sp = "stash pop";
   sl = "stash list";
 

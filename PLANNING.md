@@ -23,12 +23,14 @@
 - [x] Document sudo requirements in TROUBLESHOOTING.md
 - [x] Test signed commits (verified via PR)
 
-### Phase 2: Application Migration (NEXT)
-- [ ] Migrate ripgrep to nixpkgs
-- [ ] Migrate raycast (evaluate: nixpkgs vs homebrew cask)
-- [ ] Migrate oh-my-zsh to `programs.zsh.oh-my-zsh`
+### Phase 2: Application Migration ✅ COMPLETE
+- [x] Migrate ripgrep to nixpkgs
+- [x] Migrate raycast to nixpkgs (v1.103.2)
+- [x] Migrate oh-my-zsh to `programs.zsh.oh-my-zsh`
+- [x] Add zsh enhancements (autosuggestions, syntax highlighting, history)
+- [x] Fix PR review comments (ll alias conflict, stash push, redundant home attr)
 
-### Phase 3: macOS Customization Audit
+### Phase 3: macOS Customization Audit (NEXT)
 - [ ] Review all System Preferences changes
 - [ ] Audit backup/ directory for missed configs
 - [ ] Add customizations to `system.defaults`
