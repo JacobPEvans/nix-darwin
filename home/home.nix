@@ -83,7 +83,7 @@ in
   #
   # To add more approved commands:
   # - Edit home/claude-permissions.nix
-  # - Run: darwin-rebuild switch --flake ~/.config/nix#default
+  # - Run: sudo darwin-rebuild switch --flake ~/.config/nix#default
   # ====================================================================
 
   home.file.".claude/settings.json".text = builtins.toJSON {

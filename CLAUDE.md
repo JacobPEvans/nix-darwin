@@ -7,7 +7,7 @@
 ### 1. Flakes-Only Configuration
 - **NEVER use nix-channels or non-flake commands**
 - All changes must be committed to git before rebuild
-- Use: `darwin-rebuild switch --flake ~/.config/nix#default`
+- Use: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 
 ### 2. Determinate Nix Compatibility
 - **NEVER enable nix-darwin's Nix management**

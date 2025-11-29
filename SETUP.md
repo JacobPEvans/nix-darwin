@@ -100,7 +100,7 @@ sudo ./result/sw/bin/darwin-rebuild switch --flake ~/.config/nix#default
 
 ### Or use darwin-rebuild directly (after first activation)
 ```bash
-darwin-rebuild switch --flake ~/.config/nix#default
+sudo darwin-rebuild switch --flake ~/.config/nix#default
 ```
 
 ### Check Current Configuration
