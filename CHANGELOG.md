@@ -5,6 +5,44 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-29
+
+### Added
+
+- **VS Code Nix Migration**: Migrated VS Code from native macOS install to Nix-managed
+  - Added `vscode` to `darwin/configuration.nix` system packages
+  - Created `home/vscode-settings.nix` with migrated general settings (git, terminal, Python, extensions)
+  - VS Code now at `/Applications/Nix Apps/Visual Studio Code.app`
+  - Settings properly symlinked to Nix store via Home Manager
+
+- **Claude Code Status Line**: Added custom status line configuration
+  - Created `statusline-command.sh` showing directory, git branch, model, and output style
+  - Configured in `home/home.nix` via `home.file` declarations
+
+- **Shell Aliases**: Added darwin-rebuild convenience alias
+  - `d-r` alias for `sudo darwin-rebuild switch --flake ~/.config/nix#default`
+
+### Changed
+
+- **Permission Accuracy Improvements**:
+  - Split `fileCommands` into `fileReadCommands` (read-only) + `fileCreationCommands` (mkdir, touch)
+  - Fixed comment claiming "read-only" while containing file creation commands
+  - Applied same fix to both `claude-permissions.nix` and `gemini-permissions.nix`
+
+- **Gemini CLI sed/awk Permissions**:
+  - Moved `sed` and `awk` from excludeTools to coreTools (allow general text processing)
+  - Added `sed -i` and `sed --in-place` to excludeTools (block only destructive variants)
+  - Created new `textProcessingCommands` category in coreTools
+
+- **VS Code Copilot Settings**: Updated model selection comment from "February 2025+" to "Introduced February 2025" for clarity
+
+### Documentation
+
+- Reduced D-R-Y violations across documentation files
+- Updated file organization in CLAUDE.md to include `vscode-settings.nix`
+- Simplified README.md by referencing CLAUDE.md for detailed information
+- Removed duplicate directory structure and resource sections
+
 ## 2025-11-22
 
 ### Added

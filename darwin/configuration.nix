@@ -15,15 +15,17 @@
   environment.systemPackages = with pkgs; [
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
+    tree
     git
     gnupg
     nodejs_latest   # Node.js runtime
     vim
+    vscode          # Visual Studio Code editor
   ];
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
   # Prefer nixpkgs for everything - only use homebrew when absolutely necessary
-  # Auto-updates enabled: packages stay current without manual intervention
+  # Packages upgraded on darwin-rebuild via onActivation.upgrade = true
   homebrew = {
     enable = true;
     onActivation = {

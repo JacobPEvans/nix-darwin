@@ -1,29 +1,6 @@
 # Project Planning & Roadmap
 
-**Future work and in-progress tasks only. For completed work, see CHANGELOG.md.**
-
-## Recently Completed (2025-11-22)
-
-### Security Hardening for Claude Code Permissions
-
-Implemented principle of least privilege in Claude Code permission management after PR #2 security review:
-
-**Changes Made**:
-1. Created `home/claude-permissions-ask.nix` - User-prompted operations requiring explicit approval
-2. Moved dangerous operations from allow list to ask list:
-   - osascript (arbitrary AppleScript execution)
-   - system_profiler (system information disclosure)
-   - defaults read (system configuration exposure)
-   - chmod, rm, rmdir (file permission/deletion risks)
-   - docker exec/run (arbitrary container execution)
-   - kubectl delete (destructive Kubernetes operations)
-   - sqlite3/mongosh (database write operations)
-   - AWS destructive commands (s3 rm, ec2 terminate)
-
-3. Fixed database command syntax issues identified by reviewers
-4. Implemented three-tier permission strategy: allow (auto) → ask (prompt) → deny (block)
-
-**Result**: Baseline configuration now follows principle of least privilege while maintaining flexibility for interactive approvals.
+**Future work and in-progress tasks only. For completed work, see [CHANGELOG.md](CHANGELOG.md).**
 
 ## Repository Context
 
@@ -210,10 +187,6 @@ system.defaults = {
 - Update documentation for accuracy
 - Consider new features and enhancements
 
-## Resources and References
+## Resources
 
-- [nix-darwin documentation](https://github.com/LnL7/nix-darwin)
-- [Home Manager manual](https://nix-community.github.io/home-manager/)
-- [Determinate Nix](https://determinate.systems/nix-installer/)
-- [nixpkgs search](https://search.nixos.org/packages)
-- [Nix language basics](https://nix.dev/tutorials/nix-language)
+See [README.md](README.md) for documentation links and references.

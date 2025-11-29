@@ -21,7 +21,7 @@ Declarative macOS system management for M4 Max MacBook Pro.
 
 ```bash
 # Rebuild after config changes (most common)
-darwin-rebuild switch --flake ~/.config/nix#default
+sudo darwin-rebuild switch --flake ~/.config/nix#default
 
 # Search for a package
 nix search nixpkgs <name>
@@ -29,7 +29,7 @@ nix search nixpkgs <name>
 # Update all flake inputs (nixpkgs, home-manager, etc.)
 nix flake update ~/.config/nix
 
-# Update Homebrew casks manually (auto-updates run every 24 hours)
+# Update Homebrew casks (upgraded automatically on darwin-rebuild)
 brew upgrade --cask
 
 # Rollback if something breaks
@@ -48,7 +48,7 @@ darwin-rebuild --list-generations
      new-package  # Description of what it does
    ];
    ```
-3. Rebuild: `darwin-rebuild switch --flake ~/.config/nix#default`
+3. Rebuild: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 
 ### Rollback & Recovery
 
@@ -64,20 +64,29 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 
 ```
 ~/.config/nix/
-├── flake.nix                  # Entry point - defines inputs and system config
-├── flake.lock                 # Locked versions (auto-managed)
+├── flake.nix                      # Entry point - darwinConfigurations.default
+├── flake.lock                     # Locked dependency versions (auto-managed)
 ├── darwin/
-│   └── configuration.nix      # System packages, homebrew, macOS settings
+│   └── configuration.nix          # System packages, homebrew, macOS settings
 ├── home/
-│   ├── home.nix               # User shell config, aliases, Claude settings
-│   ├── claude-permissions.nix # Claude Code auto-approved commands (allow list)
-│   ├── claude-permissions-ask.nix # Claude Code user-prompted operations (ask list)
-│   └── zsh/                   # Modular shell configuration files
-├── CLAUDE.md                  # Instructions for AI agents
-├── README.md                  # This file - quick reference
-├── SETUP.md                   # Detailed setup and troubleshooting
-├── CHANGELOG.md               # Version history
-└── PLANNING.md                # Roadmap and future work
+│   ├── home.nix                   # Main entry - imports all modules below
+│   ├── ai-cli/                    # AI CLI configurations (home.file entries)
+│   │   ├── claude.nix             # Claude Code settings + status line
+│   │   ├── gemini.nix             # Gemini CLI settings
+│   │   └── copilot.nix            # GitHub Copilot CLI config
+│   ├── claude-permissions.nix     # Claude Code: allow/deny permission lists
+│   ├── claude-permissions-ask.nix # Claude Code: user-prompted commands
+│   ├── gemini-permissions.nix     # Gemini CLI: coreTools & excludeTools
+│   ├── copilot-permissions.nix    # Copilot CLI: trusted_folders config
+│   ├── vscode-settings.nix        # VS Code: general editor settings
+│   ├── vscode-copilot-settings.nix # VS Code: GitHub Copilot settings
+│   └── zsh/                       # Modular shell configuration files
+├── CLAUDE.md                      # AI agent instructions (for Claude Code)
+├── README.md                      # This file - project overview
+├── SETUP.md                       # Initial setup and configuration decisions
+├── TROUBLESHOOTING.md             # Common issues and solutions
+├── CHANGELOG.md                   # Completed work history
+└── PLANNING.md                    # Future roadmap and tasks
 ```
 
 ## Current Packages
@@ -87,18 +96,27 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 - gh - GitHub CLI
 - git - Version control
 - gnupg - GPG encryption
-- nodejs_latest - Node.js runtime (latest stable)
+- nodejs_latest - Node.js runtime
 - vim - Text editor
+- vscode - Visual Studio Code editor
 
-**Homebrew casks** (darwin/configuration.nix - auto-updated exceptions):
-- claude-code - Anthropic's AI coding assistant (auto-updates every 24h via `brew autoupdate`)
+**Homebrew casks** (darwin/configuration.nix):
+- claude-code - Anthropic's AI coding assistant (upgraded on `darwin-rebuild switch`)
 
-**User packages** (home/home.nix):
-- VS Code - Code editor with declarative settings
-- Claude Code permissions - Three-tier strategy with allow/ask/deny lists
-  - **Allow list**: 277+ safe auto-approved commands (claude-permissions.nix)
-  - **Ask list**: Potentially dangerous operations requiring user approval (claude-permissions-ask.nix)
-  - **Deny list**: 36 explicitly blocked dangerous operations
+**User configuration** (home/home.nix):
+- VS Code settings merged from `vscode-settings.nix` and `vscode-copilot-settings.nix`
+- Zsh shell with aliases and functions from `zsh/` directory
+
+**AI CLI Configurations** (fully Nix-managed):
+
+| Tool | Config File | Nix Source |
+|------|-------------|------------|
+| Claude Code | `~/.claude/settings.json` | `claude-permissions.nix`, `claude-permissions-ask.nix` |
+| Gemini CLI | `~/.gemini/settings.json` | `gemini-permissions.nix` |
+| Copilot CLI | `~/.copilot/config.json` | `copilot-permissions.nix` |
+| VS Code Copilot | VS Code `settings.json` | `vscode-copilot-settings.nix` |
+
+All AI tools follow principle of least privilege with categorized command structures.
 
 ## Why Packages "Disappear"
 
@@ -120,7 +138,7 @@ nix search nixpkgs <partial-name>
 
 ### Changes not applying
 1. Commit your changes to git (flakes require this)
-2. Run: `darwin-rebuild switch --flake ~/.config/nix#default`
+2. Run: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 3. Open a new terminal
 
 ### Package conflict (homebrew vs nix)
@@ -132,7 +150,8 @@ sudo -u jevans brew uninstall <package>
 which <package>
 ```
 
-For detailed setup instructions and comprehensive troubleshooting, see [SETUP.md](SETUP.md).
+For comprehensive troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+For initial setup and configuration decisions, see [SETUP.md](SETUP.md).
 
 ## Resources
 
