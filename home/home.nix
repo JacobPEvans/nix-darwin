@@ -63,6 +63,27 @@ in
   };
 
   # ==========================================================================
+  # Git
+  # ==========================================================================
+  # Replaces ~/.gitconfig - fully Nix-managed
+  programs.git = {
+    enable = true;
+    userName = "JacobPEvans";
+    userEmail = "20714140+JacobPEvans@users.noreply.github.com";
+
+    # GPG signing configuration
+    signing = {
+      key = "31652F22BF6AC286";
+      signByDefault = true;  # Sign all commits
+    };
+
+    extraConfig = {
+      tag.gpgSign = true;           # Sign all tags
+      push.autoSetupRemote = true;  # Auto-setup remote tracking
+    };
+  };
+
+  # ==========================================================================
   # Home Manager
   # ==========================================================================
   programs.home-manager.enable = true;

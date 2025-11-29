@@ -9,54 +9,122 @@
 - **Approach**: Clean slate, minimal initial setup, incremental enhancement
 - **Tools**: nix-darwin 25.05, home-manager 25.05, Determinate Nix 2.31.2
 
-## Near-Term Goals (Next 1-2 Months)
+## Current Work: System Config Migration
 
-### 1. Profile Development
+**Branch**: `feat/system-config-migration`
 
-**Goal**: Implement multiple system profiles for different use cases
+### Phase 1: Fix Git/GPG Configuration (IN PROGRESS)
+- [ ] Add `programs.git` to home-manager
+- [ ] Enable GPG signing (`commit.gpgsign = true`)
+- [ ] Configure signing key
+- [ ] Test signed commits
 
-**Profiles to Create**:
+### Phase 2: Application Migration
+- [ ] Migrate ripgrep to nixpkgs
+- [ ] Migrate raycast (evaluate: nixpkgs vs homebrew cask)
+- [ ] Migrate oh-my-zsh to `programs.zsh.oh-my-zsh`
 
-1. **work**: Professional development environment
-   - Communication apps (Slack, Zoom)
-   - Productivity tools
-   - Lighter weight than dev profile
+### Phase 3: macOS Customization Audit
+- [ ] Review all System Preferences changes
+- [ ] Audit backup/ directory for missed configs
+- [ ] Add customizations to `system.defaults`
 
-2. **dev**: Full development environment
-   - Language runtimes (Python, Go, Rust)
+### Phase 4: Multi-Profile Architecture
+- [ ] Create profile directory structure
+- [ ] Implement common base profile
+- [ ] Create default, development, work, minimal profiles
+- [ ] Test profile switching
+
+### Phase 5: Cleanup
+- [ ] Verify all backup/ configs migrated
+- [ ] Delete backup/ directory
+- [ ] Update documentation
+
+---
+
+## Profile Architecture
+
+**Goal**: Consistent profile names across all configuration levels
+
+### Standard Profiles
+
+| Profile | Purpose | Inherits From |
+|---------|---------|---------------|
+| **common** | Shared base configuration | - |
+| **default** | Personal/everyday use | common |
+| **development** | Extended dev tools, IDEs, debugging | common |
+| **work** | Work-specific apps, VPNs, contexts | common |
+| **minimal** | Bare essentials for troubleshooting | - |
+
+### Profile Contents
+
+1. **common** - Shared base (all profiles inherit except minimal)
+   - Core CLI tools (git, vim, tree)
+   - Shell configuration (zsh, aliases)
+   - Basic system preferences
+   - AI CLI configurations
+
+2. **default** - Personal/everyday use
+   - Personal applications
+   - Media and entertainment
+   - Personal git config (if different)
+
+3. **development** - Full development environment
+   - Language runtimes (Python, Go, Rust, Node)
    - Development tools and IDEs
    - Database clients
    - Container tools (Docker, Colima)
+   - Debugging and profiling tools
 
-3. **ai-research**: Machine learning and AI development
-   - Ollama and model management
-   - Python ML libraries
-   - Jupyter and data science tools
-   - Separate APFS volume for models (optional)
+4. **work** - Professional environment
+   - Communication apps (Slack, Zoom)
+   - Productivity tools
+   - Work-specific VPN/network configs
+   - Separate work contexts
 
-4. **minimal**: Bare essentials only
-   - Shell tools only
-   - For clean environment testing
-   - Quick switching for troubleshooting
+5. **minimal** - Bare essentials
+   - Shell only (zsh)
+   - Core tools (git, vim)
+   - For troubleshooting and recovery
+   - Does NOT inherit from common
 
-**Implementation**:
-```nix
-darwinConfigurations = {
-  default = ...;
-  work = ...;
-  dev = ...;
-  ai-research = ...;
-  minimal = ...;
-};
+### Implementation Structure
+
+```
+~/.config/nix/
+├── flake.nix                 # Defines all darwinConfigurations
+├── profiles/
+│   ├── common.nix            # Shared base
+│   ├── default.nix           # Personal (imports common)
+│   ├── development.nix       # Dev tools (imports common)
+│   ├── work.nix              # Work env (imports common)
+│   └── minimal.nix           # Standalone minimal
+├── darwin/
+│   └── configuration.nix     # System-level settings
+└── home/
+    ├── home.nix              # User-level settings
+    └── profiles/             # Home-manager profile overrides
+        ├── default.nix
+        ├── development.nix
+        ├── work.nix
+        └── minimal.nix
 ```
 
-**Switching Profiles**:
+### Switching Profiles
+
 ```bash
+# Switch to different profiles
+darwin-rebuild switch --flake ~/.config/nix#default
+darwin-rebuild switch --flake ~/.config/nix#development
 darwin-rebuild switch --flake ~/.config/nix#work
-darwin-rebuild switch --flake ~/.config/nix#dev
+darwin-rebuild switch --flake ~/.config/nix#minimal
 ```
 
-### 2. Essential Application Installation
+---
+
+## Near-Term Goals (Next 1-2 Months)
+
+### 1. Essential Application Installation
 
 **Goal**: Install and configure essential applications via Nix
 
@@ -71,15 +139,9 @@ darwin-rebuild switch --flake ~/.config/nix#dev
 2. Add to appropriate profile (some may be profile-specific)
 3. Configure declaratively where possible
 
-### 3. macOS System Preferences
+### 2. macOS System Preferences
 
-**Goal**: Declaratively manage macOS system settings
-
-**Priority Settings**:
-- Dock preferences (size, auto-hide, position)
-- Finder settings (show hidden files, default view)
-- Trackpad and mouse settings
-- Keyboard shortcuts
+**Goal**: Declaratively manage macOS system settings (covered in Phase 3 above)
 
 **Implementation Example**:
 ```nix
@@ -158,15 +220,15 @@ system.defaults = {
 
 2. **Single Profile**: Only default profile exists
    - Impact: Cannot test profile switching yet
-   - Resolution: Implement additional profiles (planned)
+   - Resolution: Multi-profile architecture in progress (Phase 4)
 
 3. **GPG Warning Persists**: "unsafe ownership" warning still appears
    - Impact: None (GPG fully functional, keys work)
    - Resolution: May be false positive, not blocking functionality
 
-4. **Empty Homebrew**: Homebrew configured but no packages
-   - Impact: None (intended state - nix-first approach)
-   - Status: Working as designed
+4. **Homebrew Exceptions**: Some packages via Homebrew cask
+   - Impact: None (intentional for rapidly-evolving tools)
+   - Status: claude-code via homebrew for auto-updates
 
 ## Maintenance Plan
 
