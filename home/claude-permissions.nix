@@ -373,6 +373,12 @@ let
     "TodoRead"
   ];
 
+  # WebFetch permissions for documentation and GitHub
+  webFetchCommands = [
+    "WebFetch(domain:github.com)"
+    "WebFetch(domain:raw.githubusercontent.com)"
+  ];
+
 in
 {
   # Export the complete allow list
@@ -395,7 +401,8 @@ in
     ++ systemCommands
     ++ processCommands
     ++ macosCommands
-    ++ claudeTools;
+    ++ claudeTools
+    ++ webFetchCommands;
 
   # Explicitly DENIED commands - absolutely catastrophic operations
   # These are blocked permanently and cannot be approved interactively
