@@ -101,11 +101,63 @@ in
       deny = claudePerms.denyList;
       ask = claudeAsks.askList;
     };
+
+    # Status line configuration
+    statusLine = {
+      type = "command";
+      command = "${config.home.homeDirectory}/.claude/statusline-command.sh";
+    };
   };
 
   # NOTE: settings.local.json is intentionally NOT managed by Nix
   # This allows Claude to write interactive approvals there
   # If you want FULL Nix control, add it here and it will become read-only
+
+  # ====================================================================
+  # Claude Code Status Line
+  # ====================================================================
+  # Custom status line script that displays:
+  # - Current directory (with ~ for home)
+  # - Git branch (if in a git repo)
+  # - Model display name
+  # - Output style (if not default)
+  # ====================================================================
+
+  home.file.".claude/statusline-command.sh" = {
+    text = ''
+      #!/bin/bash
+
+      # Read JSON input from stdin
+      input=$(cat)
+
+      # Extract values from JSON
+      cwd=$(echo "$input" | ${pkgs.jq}/bin/jq -r '.workspace.current_dir')
+      model=$(echo "$input" | ${pkgs.jq}/bin/jq -r '.model.display_name')
+      style=$(echo "$input" | ${pkgs.jq}/bin/jq -r '.output_style.name')
+
+      # Shorten home directory to ~
+      cwd_display=''${cwd/#$HOME/\~}
+
+      # Get git branch if in a git repo (skip optional locks for safety)
+      git_branch=""
+      if ${pkgs.git}/bin/git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
+        git_branch=$(${pkgs.git}/bin/git -C "$cwd" --no-optional-locks branch --show-current 2>/dev/null)
+        if [ -n "$git_branch" ]; then
+          git_branch=" on $git_branch"
+        fi
+      fi
+
+      # Only show style if it's not "default"
+      style_display=""
+      if [ "$style" != "default" ]; then
+        style_display=" [$style]"
+      fi
+
+      # Output the status line
+      printf "%s%s | %s%s" "$cwd_display" "$git_branch" "$model" "$style_display"
+    '';
+    executable = true;
+  };
 
   # ====================================================================
   # Gemini CLI Configuration
