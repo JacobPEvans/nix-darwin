@@ -75,8 +75,6 @@ in
   # User values from user-config.nix
   programs.git = {
     enable = true;
-    userName = userConfig.user.fullName;
-    userEmail = userConfig.user.email;
 
     # GPG signing configuration
     # NOTE: Key ID is a public identifier, not the private key (safe to commit)
@@ -85,7 +83,14 @@ in
       signByDefault = true;  # Sign all commits
     };
 
-    extraConfig = {
+    # All git settings (new unified syntax)
+    settings = {
+      # User identity
+      user = {
+        name = userConfig.user.fullName;
+        email = userConfig.user.email;
+      };
+
       # Core settings
       core = {
         editor = userConfig.git.editor;
@@ -136,10 +141,10 @@ in
       status.showStash = true;        # Show stash count in git status
       log.date = "iso";               # Use ISO date format in logs
       branch.sort = "-committerdate"; # Sort branches by recent commits
-    };
 
-    # Git aliases - see git-aliases.nix for full list
-    aliases = gitAliases;
+      # Git aliases - see git-aliases.nix for full list
+      alias = gitAliases;
+    };
   };
 
   # ==========================================================================
