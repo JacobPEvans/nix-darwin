@@ -30,13 +30,13 @@
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
   # Prefer nixpkgs for everything - only use homebrew when absolutely necessary
-  # Packages upgraded on darwin-rebuild via onActivation.upgrade = true
   homebrew = {
     enable = true;
     onActivation = {
-      autoUpdate = true;    # Update homebrew itself on darwin-rebuild
+      autoUpdate = false;   # Don't download 45MB index on every rebuild (fast)
       cleanup = "none";     # Don't remove manually installed packages
-      upgrade = true;       # Upgrade outdated packages on darwin-rebuild
+      upgrade = true;       # Upgrade packages based on cached index
+      # To get new versions: run `brew update` then `darwin-rebuild switch`
     };
     taps = [
       # "homebrew/cask"   # Example: additional taps
@@ -47,9 +47,10 @@
     casks = [
       # GUI applications (only if not available in nixpkgs)
 
-      # claude-code: Rapidly-evolving developer tool that benefits from auto-updates.
-      # Nixpkgs version lags behind and can't auto-update from read-only nix store.
-      # Exception approved: Frequently updated developer tool with new features.
+      # claude-code: Rapidly-evolving developer tool
+      # - Nixpkgs version lags behind releases
+      # - Can't auto-update from read-only nix store
+      # - Manual upgrade: brew upgrade --cask claude-code
       "claude-code"
     ];
   };

@@ -25,23 +25,28 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - `nix.enable = false` must remain in darwin/configuration.nix
 - Determinate Nix manages the daemon and nix itself
 
-### 3. Nixpkgs First, Auto-Updates Preferred
+### 3. Nixpkgs First, Manual Homebrew Updates
 - **ALL packages from nixpkgs unless impossible**
-- Homebrew is fallback ONLY for packages not in nixpkgs or requiring frequent updates
+- Homebrew is fallback ONLY for packages not in nixpkgs or when the nixpkgs version is severely outdated.
 - Search first: `nix search nixpkgs <package>`
-- **Favor auto-updates**: For rapidly-evolving tools, prefer Homebrew cask with autoupdate
 - Document why homebrew was needed if used
 
 **Update Strategy:**
-- Homebrew `onActivation.upgrade = true` upgrades packages on `darwin-rebuild switch`
-- Nix packages update via `nix flake update` (manual, less frequent)
+- Homebrew `autoUpdate = false` - skip slow 45MB index download
+- Homebrew `upgrade = true` - upgrade packages based on cached index
+- Nix packages update via `nix flake update` (manual)
+- To get latest Homebrew versions: `brew update` then `darwin-rebuild switch`
+
+**Why this setup?**
+- `darwin-rebuild switch` is fast (no 45MB download every time)
+- Packages still auto-upgrade when cached index has newer versions
+- Run `brew update` periodically to refresh the index
 
 **Current Homebrew Exceptions:**
 - `claude-code` - Rapidly-evolving developer tool
   - Nixpkgs version lags behind releases
   - Can't auto-update from read-only nix store
-  - Upgraded on `darwin-rebuild switch` via Homebrew
-  - Manual: `brew upgrade --cask claude-code`
+  - Manual upgrade: `brew upgrade --cask claude-code`
 
 ### 4. Code Style for Learning
 - **Keep comments** - user is learning Nix
@@ -236,10 +241,35 @@ runtime flags. The config file only manages directory trust.
 - Nix ensures reproducible, version-controlled configuration
 - Different syntax, same security approach
 
+## Pull Request Workflow
+
+**CRITICAL: NEVER auto-merge PRs without explicit user approval.**
+
+### Standard PR Process
+1. Create feature branch
+2. Make changes, commit
+3. Push branch and create PR
+4. **STOP AND WAIT** - User must review and approve
+5. Only merge when user explicitly requests it
+
+### What "Explicit Request" Means
+- User says "merge it" or "go ahead and merge"
+- User clicks merge button themselves
+- User explicitly approves in PR comments
+
+### What is NOT Approval
+- Silence or no response
+- User asking to create the PR
+- Completing the code changes
+- PR passing CI checks
+
+**Rule**: When in doubt, ask before merging.
+
 ## Workflow
 
 1. Make changes to nix files
 2. **Commit to git** (flakes requirement)
 3. Test build: `nix build ~/.config/nix#darwinConfigurations.default.system`
-4. Apply: `darwin-rebuild switch --flake ~/.config/nix#default`
-5. Update CHANGELOG.md for significant changes
+4. Create PR and **wait for user approval**
+5. After merge, apply: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
+6. Update CHANGELOG.md for significant changes
