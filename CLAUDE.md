@@ -27,7 +27,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### 3. Nixpkgs First, Manual Homebrew Updates
 - **ALL packages from nixpkgs unless impossible**
-- Homebrew is fallback ONLY for packages not in nixpkgs
+- Homebrew is fallback ONLY for packages not in nixpkgs or when the nixpkgs version is severely outdated.
 - Search first: `nix search nixpkgs <package>`
 - Document why homebrew was needed if used
 
