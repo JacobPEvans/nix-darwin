@@ -13,13 +13,18 @@
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
   environment.systemPackages = with pkgs; [
+    # CLI tools
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
-    tree
     git
     gnupg
     nodejs_latest   # Node.js runtime
+    ripgrep         # Fast grep alternative (rg)
+    tree
     vim
+
+    # GUI applications
+    raycast         # Productivity launcher (replaces Spotlight)
     vscode          # Visual Studio Code editor
   ];
 

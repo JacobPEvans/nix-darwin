@@ -16,8 +16,8 @@
     # System username (matches macOS account)
     name = "jevans";
 
-    # Home directory path
-    home = "/Users/jevans";
+    # NOTE: Home directory path removed - use config.home.homeDirectory instead
+    # This avoids duplication with darwin/configuration.nix
 
     # Full name for git commits and other identity purposes
     fullName = "JacobPEvans";

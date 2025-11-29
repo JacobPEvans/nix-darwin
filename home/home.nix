@@ -43,6 +43,32 @@ in
     # Shell aliases - see shell-aliases.nix for full list and sudo requirements
     shellAliases = shellAliases;
 
+    # Shell enhancements
+    autosuggestion.enable = true;     # Fish-like autosuggestions
+    syntaxHighlighting.enable = true; # Syntax highlighting for commands
+    enableCompletion = true;          # Tab completion
+    history = {
+      size = 100000;                  # Large history for better recall
+      save = 100000;
+      ignoreDups = true;              # Don't save duplicate commands
+      ignoreAllDups = true;           # Remove older duplicates
+      ignoreSpace = true;             # Don't save commands starting with space
+    };
+
+    # Oh My Zsh - framework for managing zsh configuration
+    # Provides themes, plugins, and helper functions
+    oh-my-zsh = {
+      enable = true;
+      theme = "robbyrussell";  # Default theme, clean and informative
+      plugins = [
+        "git"           # Git aliases and functions (ga, gc, gp, etc.)
+        "docker"        # Docker command completion
+        "macos"         # macOS utilities (ofd, cdf, etc.)
+        "z"             # Jump to frequently used directories
+        "colored-man-pages"  # Colorize man pages for readability
+      ];
+    };
+
     # Source modular shell functions
     # NOTE: session-logging.zsh MUST be last (takes over terminal)
     initContent = ''
