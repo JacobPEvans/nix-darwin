@@ -33,9 +33,10 @@
   homebrew = {
     enable = true;
     onActivation = {
-      autoUpdate = false;   # Don't update Homebrew on every darwin-rebuild (slow)
+      autoUpdate = false;   # Don't download 45MB index on every rebuild (fast)
       cleanup = "none";     # Don't remove manually installed packages
-      upgrade = false;      # Don't auto-upgrade - user controls when to upgrade
+      upgrade = true;       # Upgrade packages based on cached index
+      # To get new versions: run `brew update` then `darwin-rebuild switch`
     };
     taps = [
       # "homebrew/cask"   # Example: additional taps

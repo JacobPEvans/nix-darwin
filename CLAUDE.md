@@ -32,14 +32,15 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Document why homebrew was needed if used
 
 **Update Strategy:**
-- Homebrew `autoUpdate = false` and `upgrade = false` - no automatic updates
+- Homebrew `autoUpdate = false` - skip slow 45MB index download
+- Homebrew `upgrade = true` - upgrade packages based on cached index
 - Nix packages update via `nix flake update` (manual)
-- Homebrew packages update manually: `brew upgrade --cask <package>`
+- To get latest Homebrew versions: `brew update` then `darwin-rebuild switch`
 
-**Why no auto-updates?**
-- `darwin-rebuild switch` should be fast and predictable
-- Downloading Homebrew index (30+ MB) on every rebuild is slow
-- User controls when to upgrade (avoids surprise breaking changes)
+**Why this setup?**
+- `darwin-rebuild switch` is fast (no 45MB download every time)
+- Packages still auto-upgrade when cached index has newer versions
+- Run `brew update` periodically to refresh the index
 
 **Current Homebrew Exceptions:**
 - `claude-code` - Rapidly-evolving developer tool
