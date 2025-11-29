@@ -7,6 +7,9 @@ let
   # Git aliases (cross-platform)
   gitAliases = import ./git-aliases.nix;
 
+  # Shell aliases (macOS - see file for sudo requirements)
+  shellAliases = import ./shell-aliases.nix;
+
   # VS Code settings imports
   vscodeGeneralSettings = import ./vscode-settings.nix { inherit config; };
   vscodeGithubCopilotSettings = import ./vscode-copilot-settings.nix { };
@@ -37,26 +40,8 @@ in
   programs.zsh = {
     enable = true;
 
-    shellAliases = {
-      # Directory listing
-      ll = "ls -ahlFG -D '%Y-%m-%d %H:%M:%S'";
-      llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'";
-      lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'";
-
-      # Docker
-      dps = "docker ps -a";
-      dcu = "docker compose up -d";
-      dcd = "docker compose down";
-
-      # Nix
-      d-r = "sudo darwin-rebuild switch --flake ~/.config/nix#default";
-
-      # Python (use macOS built-in)
-      python = "python3";
-
-      # Tar (macOS-friendly)
-      tgz = "tar --disable-copyfile --exclude='.DS_Store' -czf";
-    };
+    # Shell aliases - see shell-aliases.nix for full list and sudo requirements
+    shellAliases = shellAliases;
 
     # Source modular shell functions
     # NOTE: session-logging.zsh MUST be last (takes over terminal)

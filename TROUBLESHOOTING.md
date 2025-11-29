@@ -2,6 +2,65 @@
 
 Common issues and solutions for this nix-darwin configuration.
 
+## Sudo Requirements
+
+Understanding when `sudo` is needed prevents permission issues.
+
+### Commands That REQUIRE sudo
+
+| Command | Why |
+|---------|-----|
+| `darwin-rebuild switch` | Modifies system-level configs in /etc, /run |
+| `chown` on system files | Changing ownership requires root |
+| `mv/rm` in /etc | System config directory |
+
+**Correct usage**:
+```bash
+sudo darwin-rebuild switch --flake ~/.config/nix#default
+```
+
+### Commands That Should NOT Use sudo
+
+| Command | Why |
+|---------|-----|
+| `nix build` | Builds to user-accessible store |
+| `nix flake update` | Updates user's flake.lock |
+| `git commit/push` | User's repository |
+| Editing files in `~/.config/nix` | User's config directory |
+| `brew install/uninstall` | Homebrew runs as user |
+
+**Warning**: Running these as sudo creates root-owned files that break later operations.
+
+### Fixing Root-Owned Files in User Directories
+
+**Problem**: Files in `~/.config/nix` owned by root (usually from running editor as sudo).
+
+**Solution**:
+```bash
+# Fix ownership of entire nix config directory
+sudo chown -R $(whoami):staff ~/.config/nix
+
+# Verify
+ls -la ~/.config/nix
+```
+
+### AI CLI Tools and sudo
+
+**Claude Code, Gemini CLI, etc.**:
+- Should run as your user, NOT as sudo
+- Running as sudo causes:
+  - GPG signing failures (root can't access user's keychain)
+  - Root-owned files in user directories
+  - Home directory set to /var/root
+
+**If you ran `sudo claude`**:
+```bash
+# Fix any root-owned files it created
+sudo chown -R $(whoami):staff ~/.config/nix ~/.claude ~/.gitconfig
+```
+
+---
+
 ## Quick Fixes
 
 ### "command not found: nix"
