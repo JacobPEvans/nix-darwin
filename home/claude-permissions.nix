@@ -225,23 +225,26 @@ let
     "Bash(helm search:*)"
   ];
 
-  # AWS CLI (read-only operations only)
+  # AWS CLI (read-only operations)
   # NOTE: Removed write operations - moved to ask list:
   #       - aws s3 cp/sync (can overwrite files, exfiltrate data)
   #       - aws s3 rm (destructive)
   #       - aws ec2 terminate (destructive)
   #       - aws lambda invoke (can trigger arbitrary Lambda functions)
+  # SECURITY: Credential-returning commands are commented out to prevent
+  # accidental secret exposure. AI should not have direct credential access.
+  # Future: integrate with secure keystore for temporary credentials.
   awsCommands = [
     "Bash(aws --version:*)"
     "Bash(aws sts get-caller-identity:*)"
     "Bash(aws s3 ls:*)"
     "Bash(aws ec2 describe-instances:*)"
-    "Bash(aws ecr get-login-password:*)"
+    # "Bash(aws ecr get-login-password:*)"  # Returns ECR auth token
     "Bash(aws lambda list-functions:*)"
     "Bash(aws cloudformation list-stacks:*)"
     "Bash(aws cloudformation describe-stacks:*)"
     "Bash(aws logs tail:*)"
-    "Bash(aws ssm get-parameter:*)"
+    # "Bash(aws ssm get-parameter:*)"  # Can return secrets from Parameter Store
   ];
 
   # Database clients (read-focused operations only)

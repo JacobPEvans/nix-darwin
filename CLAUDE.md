@@ -219,7 +219,7 @@ runtime flags. The config file only manages directory trust.
 | **Security model** | Three-tier (allow/ask/deny) | Two-tier (allow/exclude) | Trust + runtime flags | Per-language enable |
 
 **Consistency philosophy**:
-- All three CLIs use same categorized command structure
+- CLI tools (Claude, Gemini, Copilot) use same categorized command structure
 - Same principle of least privilege across all tools
 - Nix ensures reproducible, version-controlled configuration
 - Different syntax, same security approach

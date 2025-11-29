@@ -102,9 +102,7 @@
   "chat.useNestedAgentsMdFiles" = true;
   "chat.agentSessionsViewLocation" = "view";
 
-  # Copilot chat features
-  "github.copilot.chat.agent.thinkingTool" = true;
-  "github.copilot.chat.executePrompt.enabled" = true;
+  # NOTE: Copilot-specific settings (github.copilot.*) are in vscode-copilot-settings.nix
 
   # Auto-approve safe terminal commands in chat
   "chat.tools.terminal.autoApprove" = {

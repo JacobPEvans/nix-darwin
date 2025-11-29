@@ -6,7 +6,7 @@ let
   claudeAsks = import ./claude-permissions-ask.nix { };
 
   # Import Gemini CLI permission definitions
-  geminiPerms = import ./gemini-permissions.nix { };
+  geminiPerms = import ./gemini-permissions.nix { inherit config; };
 
   # Import Copilot CLI configuration
   copilotConfig = import ./copilot-permissions.nix { inherit config; };

@@ -20,9 +20,12 @@
 # - GrepTool instead of Grep
 # - ShellTool(cmd) for shell commands with restrictions
 
-{ ... }:
+{ config, ... }:
 
 let
+  # Username for sudo commands (from home-manager config)
+  username = config.home.username;
+
   # Core read-only tools (always safe)
   coreReadTools = [
     "ReadFileTool"
@@ -104,9 +107,9 @@ let
     "ShellTool(brew config)"
     "ShellTool(brew outdated)"
     "ShellTool(brew deps)"
-    "ShellTool(sudo -u jevans brew list)"
-    "ShellTool(sudo -u jevans brew search)"
-    "ShellTool(sudo -u jevans brew info)"
+    "ShellTool(sudo -u ${username} brew list)"
+    "ShellTool(sudo -u ${username} brew search)"
+    "ShellTool(sudo -u ${username} brew info)"
   ];
 
   # Python ecosystem
@@ -226,18 +229,21 @@ let
     "ShellTool(helm search)"
   ];
 
-  # AWS CLI (read-only operations only)
+  # AWS CLI (read-only operations)
+  # SECURITY: Credential-returning commands are commented out to prevent
+  # accidental secret exposure. AI should not have direct credential access.
+  # Future: integrate with secure keystore for temporary credentials.
   awsCommands = [
     "ShellTool(aws --version)"
     "ShellTool(aws sts get-caller-identity)"
     "ShellTool(aws s3 ls)"
     "ShellTool(aws ec2 describe-instances)"
-    "ShellTool(aws ecr get-login-password)"
+    # "ShellTool(aws ecr get-login-password)"  # Returns ECR auth token
     "ShellTool(aws lambda list-functions)"
     "ShellTool(aws cloudformation list-stacks)"
     "ShellTool(aws cloudformation describe-stacks)"
     "ShellTool(aws logs tail)"
-    "ShellTool(aws ssm get-parameter)"
+    # "ShellTool(aws ssm get-parameter)"  # Can return secrets from Parameter Store
   ];
 
   # Database clients (read-focused operations only)

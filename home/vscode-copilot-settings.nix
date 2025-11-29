@@ -103,6 +103,8 @@
   "chat.sendElementsToChat.enabled" = false;
 
   # Use AGENTS.md files in subfolders (experimental)
+  # NOTE: Also set in vscode-settings.nix (true). This value (false) takes
+  # precedence due to merge order in home.nix ("copilot wins on conflict").
   "chat.useNestedAgentsMdFiles" = false;
 
   # Configure custom OpenAI-compatible models (experimental)
@@ -113,6 +115,12 @@
 
   # Automatically diagnose and fix issues in generated code
   "github.copilot.chat.agent.autoFix" = true;
+
+  # Enable thinking tool for more thorough reasoning
+  "github.copilot.chat.agent.thinkingTool" = true;
+
+  # Enable execute prompt feature
+  "github.copilot.chat.executePrompt.enabled" = true;
 
   # Additional instruction folders for workspace
   # "chat.instructionsFilesLocations" = [];
