@@ -2,17 +2,17 @@
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
-  userConfig = import ./user-config.nix;
+  userConfig = import ../../lib/user-config.nix;
 
   # Git aliases (cross-platform)
-  gitAliases = import ./git-aliases.nix;
+  gitAliases = import ./git/aliases.nix;
 
   # Shell aliases (macOS - see file for sudo requirements)
-  shellAliases = import ./shell-aliases.nix;
+  shellAliases = import ./zsh/aliases.nix;
 
   # VS Code settings imports
-  vscodeGeneralSettings = import ./vscode-settings.nix { inherit config; };
-  vscodeGithubCopilotSettings = import ./vscode-copilot-settings.nix { };
+  vscodeGeneralSettings = import ./vscode/settings.nix { inherit config; };
+  vscodeGithubCopilotSettings = import ./vscode/copilot-settings.nix { };
 
   # AI CLI configuration imports (home.file entries)
   claudeFiles = import ./ai-cli/claude.nix { inherit config pkgs; };

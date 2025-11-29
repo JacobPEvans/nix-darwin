@@ -1,5 +1,5 @@
 {
-  description = "Minimal nix-darwin configuration for M4 Max MacBook Pro";
+  description = "nix-darwin configuration for M4 Max MacBook Pro";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -19,16 +19,14 @@
     darwinConfigurations.default = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
-        ./darwin/configuration.nix
+        ./hosts/macbook-m4/default.nix
         home-manager.darwinModules.home-manager
         {
-          # Allow unfree packages (for proprietary software)
           nixpkgs.config.allowUnfree = true;
-
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "backup";
-          home-manager.users.jevans = import ./home/home.nix;
+          home-manager.users.jevans = import ./hosts/macbook-m4/home.nix;
         }
       ];
     };

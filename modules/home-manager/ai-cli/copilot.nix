@@ -15,7 +15,7 @@
 { config, ... }:
 
 let
-  copilotConfig = import ../copilot-permissions.nix { inherit config; };
+  copilotConfig = import ../permissions/copilot-permissions.nix { inherit config; };
 in
 {
   ".copilot/config.json".text = builtins.toJSON {

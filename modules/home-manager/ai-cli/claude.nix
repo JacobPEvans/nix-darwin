@@ -11,8 +11,8 @@
 { config, pkgs, ... }:
 
 let
-  claudePerms = import ../claude-permissions.nix { };
-  claudeAsks = import ../claude-permissions-ask.nix { };
+  claudePerms = import ../permissions/claude-permissions.nix { };
+  claudeAsks = import ../permissions/claude-permissions-ask.nix { };
 in
 {
   # Claude Code settings.json
