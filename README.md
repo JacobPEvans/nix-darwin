@@ -13,7 +13,7 @@ Declarative macOS system management for M4 Max MacBook Pro.
 | **home-manager** | Manages user config - shell, aliases, dotfiles |
 | **nixpkgs** | The package repository - ALL packages come from here |
 
-**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
+**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only (with auto-updates enabled).
 
 ## Quick Reference
 
@@ -28,6 +28,9 @@ nix search nixpkgs <name>
 
 # Update all flake inputs (nixpkgs, home-manager, etc.)
 nix flake update ~/.config/nix
+
+# Update Homebrew casks (upgraded automatically on darwin-rebuild)
+brew upgrade --cask
 
 # Rollback if something breaks
 darwin-rebuild --rollback
@@ -66,8 +69,12 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ├── darwin/
 │   └── configuration.nix          # System packages, homebrew, macOS settings
 ├── home/
-│   ├── home.nix                   # User environment, shell, AI CLI integration
-│   ├── claude-permissions.nix     # Claude Code: auto-approved commands
+│   ├── home.nix                   # Main entry - imports all modules below
+│   ├── ai-cli/                    # AI CLI configurations (home.file entries)
+│   │   ├── claude.nix             # Claude Code settings + status line
+│   │   ├── gemini.nix             # Gemini CLI settings
+│   │   └── copilot.nix            # GitHub Copilot CLI config
+│   ├── claude-permissions.nix     # Claude Code: allow/deny permission lists
 │   ├── claude-permissions-ask.nix # Claude Code: user-prompted commands
 │   ├── gemini-permissions.nix     # Gemini CLI: coreTools & excludeTools
 │   ├── copilot-permissions.nix    # Copilot CLI: trusted_folders config
@@ -85,7 +92,6 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ## Current Packages
 
 **System packages** (darwin/configuration.nix):
-- claude-code - Anthropic's AI coding assistant
 - gemini-cli - Google's Gemini CLI
 - gh - GitHub CLI
 - git - Version control
@@ -93,6 +99,9 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 - nodejs_latest - Node.js runtime
 - vim - Text editor
 - vscode - Visual Studio Code editor
+
+**Homebrew casks** (darwin/configuration.nix):
+- claude-code - Anthropic's AI coding assistant (upgraded on `darwin-rebuild switch`)
 
 **User configuration** (home/home.nix):
 - VS Code settings merged from `vscode-settings.nix` and `vscode-copilot-settings.nix`
