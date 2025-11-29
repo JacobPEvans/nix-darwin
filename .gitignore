@@ -2,3 +2,4 @@ result
 ./darwin/result
 **/.direnv
 backup/
+# Test GPG signing
