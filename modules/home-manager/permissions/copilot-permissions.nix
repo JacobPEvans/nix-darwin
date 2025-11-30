@@ -33,12 +33,14 @@ let
     "${homeDir}/workspace"
     "${homeDir}/src"
     "${homeDir}/dev"
+    "${homeDir}/git"
   ];
 
   # Trusted configuration directories
   trustedConfigDirs = [
     "${homeDir}/.config/nix"
     "${homeDir}/.dotfiles"
+    "${homeDir}/.config"
   ];
 
 in
@@ -123,6 +125,13 @@ in
     "shell(kubectl apply)"
     "shell(kubectl create)"
     "shell(helm uninstall)"
+    # Terraform/Terragrunt destructive operations
+    "shell(terraform apply)"
+    "shell(terraform destroy)"
+    "shell(terragrunt apply)"
+    "shell(terragrunt destroy)"
+    "shell(terragrunt run-all apply)"
+    "shell(terragrunt run-all destroy)"
   ];
 
   # === IMPLEMENTATION NOTES ===
