@@ -22,7 +22,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### 2. Determinate Nix Compatibility
 - **NEVER enable nix-darwin's Nix management**
-- `nix.enable = false` must remain in darwin/configuration.nix
+- `nix.enable = false` must remain in `modules/darwin/common.nix`
 - Determinate Nix manages the daemon and nix itself
 
 ### 3. Nixpkgs First, Manual Homebrew Updates
@@ -100,7 +100,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 **Layered Strategy**: Nix manages baseline, settings.local.json for ad-hoc approvals
 
 **Nix-managed** (`~/.claude/settings.json`):
-- Defined in `home/claude-permissions.nix`
+- Defined in `modules/home-manager/permissions/claude-permissions.nix`
 - 277+ commands in 24 categories
 - Version controlled, reproducible
 - Updated via darwin-rebuild
@@ -111,7 +111,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Machine-local only
 
 **To add commands permanently**:
-1. Edit `home/claude-permissions.nix`
+1. Edit `modules/home-manager/permissions/claude-permissions.nix`
 2. Add to appropriate category
 3. Commit and rebuild
 
@@ -123,7 +123,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Configuration location**: `~/.gemini/settings.json`
 
-**Nix-managed** (`home/gemini-permissions.nix`):
+**Nix-managed** (`modules/home-manager/permissions/gemini-permissions.nix`):
 - `coreTools`: List of allowed built-in tools and shell commands
 - `excludeTools`: List of permanently blocked commands
 - Mirrors Claude Code's permission structure for consistency
@@ -137,7 +137,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - **WebFetchTool**: Web fetching capabilities
 
 **To add commands permanently**:
-1. Edit `home/gemini-permissions.nix`
+1. Edit `modules/home-manager/permissions/gemini-permissions.nix`
 2. Add to appropriate category in `coreTools` or `excludeTools`
 3. Use format: `ShellTool(command)` for shell commands
 4. Commit and rebuild
@@ -154,7 +154,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Configuration location**: `~/.copilot/config.json`
 
-**Nix-managed** (`home/copilot-permissions.nix`):
+**Nix-managed** (`modules/home-manager/permissions/copilot-permissions.nix`):
 - `trusted_folders`: Array of directory paths where Copilot can operate
 - Default trusted directories: `~/projects`, `~/repos`, `~/.config/nix`
 - Recommended CLI flag patterns documented in comments
@@ -180,7 +180,7 @@ copilot --deny-tool 'My-MCP-Server(tool_name)'
 ```
 
 **To modify trusted directories**:
-1. Edit `home/copilot-permissions.nix`
+1. Edit `modules/home-manager/permissions/copilot-permissions.nix`
 2. Add/remove paths in `trustedDevelopmentDirs` or `trustedConfigDirs`
 3. Commit and rebuild
 
@@ -198,9 +198,9 @@ runtime flags. The config file only manages directory trust.
 
 **Configuration location**: Merged into VS Code `settings.json`
 
-**Nix-managed** (`home/vscode-copilot-settings.nix`):
+**Nix-managed** (`modules/home-manager/vscode/copilot-settings.nix`):
 - Comprehensive GitHub Copilot settings for VS Code editor
-- Merged with other VS Code settings in `home.nix`
+- Merged with other VS Code settings in common.nix
 - All settings fully declarative and version controlled
 
 **Key settings categories**:
@@ -211,7 +211,7 @@ runtime flags. The config file only manages directory trust.
 - **Experimental**: Preview features, model selection
 
 **To modify settings**:
-1. Edit `home/vscode-copilot-settings.nix`
+1. Edit `modules/home-manager/vscode/copilot-settings.nix`
 2. Update settings following VS Code's `github.copilot.*` namespace
 3. Commit and rebuild
 
@@ -231,7 +231,7 @@ runtime flags. The config file only manages directory trust.
 | **Permission model** | allow/ask/deny lists | coreTools/excludeTools | trusted_folders + flags | settings-based |
 | **Command format** | `Bash(cmd:*)` | `ShellTool(cmd)` | `shell(cmd)` patterns | N/A (editor-based) |
 | **Runtime control** | settings.local.json | settings.json | CLI flags | VS Code UI |
-| **Nix file** | `claude-permissions.nix` | `gemini-permissions.nix` | `copilot-permissions.nix` | `vscode-copilot-settings.nix` |
+| **Nix file** | `permissions/claude-*.nix` | `permissions/gemini-*.nix` | `permissions/copilot-*.nix` | `vscode/copilot-settings.nix` |
 | **Categories** | 24 categories, 277+ cmds | Mirrors Claude structure | Directory trust only | 50+ settings |
 | **Security model** | Three-tier (allow/ask/deny) | Two-tier (allow/exclude) | Trust + runtime flags | Per-language enable |
 

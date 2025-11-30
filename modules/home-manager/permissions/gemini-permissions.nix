@@ -54,6 +54,7 @@ let
     "ShellTool(git tag)"
     "ShellTool(git config)"
     "ShellTool(git clone)"
+    "ShellTool(git mv)"
   ];
 
   # GitHub CLI (PR management, issues, etc.)
@@ -85,10 +86,13 @@ let
     "ShellTool(nix search nixpkgs)"
     "ShellTool(nix flake update)"
     "ShellTool(nix flake metadata)"
+    "ShellTool(nix flake show)"
     "ShellTool(nix build)"
     "ShellTool(nix develop)"
     "ShellTool(nix shell)"
     "ShellTool(nix run)"
+    "ShellTool(nix eval)"
+    "ShellTool(nix-env)"
     "ShellTool(nix-env -q)"
     "ShellTool(nix-env --query)"
     "ShellTool(darwin-rebuild switch)"
@@ -110,6 +114,20 @@ let
     "ShellTool(sudo -u ${username} brew list)"
     "ShellTool(sudo -u ${username} brew search)"
     "ShellTool(sudo -u ${username} brew info)"
+  ];
+
+  # Modern CLI tools (installed via nixpkgs)
+  # These are enhanced alternatives to traditional Unix tools
+  modernCliCommands = [
+    "ShellTool(bat)"       # Better cat with syntax highlighting
+    "ShellTool(delta)"     # Better git diff viewer
+    "ShellTool(eza)"       # Modern ls replacement
+    "ShellTool(fd)"        # Fast find alternative
+    "ShellTool(fzf)"       # Fuzzy finder
+    "ShellTool(htop)"      # Interactive process viewer
+    "ShellTool(ncdu)"      # NCurses disk usage
+    "ShellTool(tldr)"      # Simplified man pages
+    "ShellTool(rg)"        # ripgrep (fast grep)
   ];
 
   # Python ecosystem
@@ -211,6 +229,7 @@ let
     "ShellTool(docker tag)"
     "ShellTool(docker compose)"
     "ShellTool(docker info)"
+    "ShellTool(docker cp)"
   ];
 
   # Kubernetes commands
@@ -374,6 +393,7 @@ in
     ++ githubCommands
     ++ nixCommands
     ++ homebrewCommands
+    ++ modernCliCommands
     ++ pythonCommands
     ++ nodeCommands
     ++ rustCommands

@@ -27,6 +27,14 @@
   };
 
   # ==========================================================================
+  # Host Configuration
+  # ==========================================================================
+  host = {
+    # Network hostname (used for networking.hostName, ComputerName, etc.)
+    name = "jevans-mbp";
+  };
+
+  # ==========================================================================
   # GPG Configuration
   # ==========================================================================
   # NOTE: These are PUBLIC key identifiers, NOT private keys.

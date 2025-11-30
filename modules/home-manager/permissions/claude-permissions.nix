@@ -48,6 +48,7 @@ let
     "Bash(git tag:*)"
     "Bash(git config:*)"
     "Bash(git clone:*)"
+    "Bash(git mv:*)"
   ];
 
   # GitHub CLI (PR management, issues, etc.)
@@ -79,10 +80,13 @@ let
     "Bash(nix search nixpkgs:*)"
     "Bash(nix flake update:*)"
     "Bash(nix flake metadata:*)"
+    "Bash(nix flake show:*)"
     "Bash(nix build:*)"
     "Bash(nix develop:*)"
     "Bash(nix shell:*)"
     "Bash(nix run:*)"
+    "Bash(nix eval:*)"
+    "Bash(nix-env:*)"
     "Bash(nix-env -q:*)"
     "Bash(nix-env --query:*)"
     "Bash(darwin-rebuild switch:*)"
@@ -104,6 +108,20 @@ let
     "Bash(sudo -u jevans brew list:*)"
     "Bash(sudo -u jevans brew search:*)"
     "Bash(sudo -u jevans brew info:*)"
+  ];
+
+  # Modern CLI tools (installed via nixpkgs)
+  # These are enhanced alternatives to traditional Unix tools
+  modernCliCommands = [
+    "Bash(bat:*)"       # Better cat with syntax highlighting
+    "Bash(delta:*)"     # Better git diff viewer
+    "Bash(eza:*)"       # Modern ls replacement
+    "Bash(fd:*)"        # Fast find alternative
+    "Bash(fzf:*)"       # Fuzzy finder
+    "Bash(htop:*)"      # Interactive process viewer
+    "Bash(ncdu:*)"      # NCurses disk usage
+    "Bash(tldr:*)"      # Simplified man pages
+    "Bash(rg:*)"        # ripgrep (fast grep)
   ];
 
   # Python ecosystem
@@ -206,6 +224,7 @@ let
     "Bash(docker tag:*)"
     "Bash(docker compose:*)"
     "Bash(docker info:*)"
+    "Bash(docker cp:*)"
   ];
 
   # Kubernetes commands
@@ -377,6 +396,7 @@ let
   webFetchCommands = [
     "WebFetch(domain:github.com)"
     "WebFetch(domain:raw.githubusercontent.com)"
+    "WebFetch(domain:docs.orbstack.dev)"
   ];
 
 in
@@ -387,6 +407,7 @@ in
     ++ githubCommands
     ++ nixCommands
     ++ homebrewCommands
+    ++ modernCliCommands
     ++ pythonCommands
     ++ nodeCommands
     ++ rustCommands

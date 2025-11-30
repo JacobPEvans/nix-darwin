@@ -12,7 +12,7 @@
 { config, ... }:
 
 let
-  geminiPerms = import ../gemini-permissions.nix { inherit config; };
+  geminiPerms = import ../permissions/gemini-permissions.nix { inherit config; };
 in
 {
   ".gemini/settings.json".text = builtins.toJSON {
