@@ -28,7 +28,7 @@
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # Python with common packages
+            # Python 3.12 with common packages
             (python312.withPackages (ps: with ps; [
               pip
               virtualenv

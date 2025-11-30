@@ -32,7 +32,7 @@ in
     # --------------------------------------------------------------------------
     # Git & Pre-commit
     # --------------------------------------------------------------------------
-    pre-commit                      # Framework for managing pre-commit hooks
+    pre-commit                      # Framework for managing git pre-commit hooks
 
     # --------------------------------------------------------------------------
     # Universal Linters (useful on all systems)
