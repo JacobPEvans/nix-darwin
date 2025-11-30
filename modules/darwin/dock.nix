@@ -5,11 +5,8 @@
 #
 # Reference: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/defaults/dock.nix
 
-{ config, lib, ... }:
+{ ... }:
 
-let
-  userConfig = import ../../lib/user-config.nix;
-in
 {
   system.defaults.dock = {
     # ==========================================================================
@@ -26,7 +23,6 @@ in
 
     # Magnified icon size (16-128 pixels)
     # Default: 128
-    # NOTE: Your current value is 30 which seems very small - consider 80-96
     largesize = 80;
 
     # Dock position on screen: "bottom", "left", or "right"

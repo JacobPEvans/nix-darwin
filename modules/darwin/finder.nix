@@ -5,9 +5,10 @@
 #
 # Reference: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/defaults/finder.nix
 
-{ config, lib, ... }:
+{ ... }:
 
 let
+  # Available for customization (see NewWindowTargetPath example below)
   userConfig = import ../../lib/user-config.nix;
 in
 {

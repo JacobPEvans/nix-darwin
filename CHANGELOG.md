@@ -5,7 +5,7 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
-## 2025-11-29 (Evening)
+## 2025-11-30 (Evening)
 
 ### Added
 
