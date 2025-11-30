@@ -8,6 +8,10 @@
 
 { config, pkgs, lib, ... }:
 
+let
+  # Universal packages (pre-commit, linters) shared across all systems
+  commonPackages = import ../common/packages.nix { inherit pkgs; };
+in
 {
   # ==========================================================================
   # Linux-Specific Home-Manager Settings
@@ -28,7 +32,7 @@
   # These are installed to user profile, not system-wide.
   # For system packages, use apt/dnf on the host.
 
-  home.packages = with pkgs; [
+  home.packages = commonPackages ++ (with pkgs; [
     # Core CLI tools (same as darwin common)
     bat
     delta
@@ -44,7 +48,7 @@
 
     # Development tools
     gnupg
-  ];
+  ]);
 
   # ==========================================================================
   # Linux-Specific Settings

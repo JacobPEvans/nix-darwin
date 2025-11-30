@@ -15,13 +15,6 @@
 **Branch**: `feat/system-config-migration`
 
 ### Phase 3: Application Management (In Progress)
-- [x] Audit installed applications (/Applications)
-- [x] Add Obsidian to nix (darwin/common.nix)
-- [x] Add zoom-us to nix (darwin/common.nix)
-- [x] Add Ollama CLI to nix (removed - nixpkgs build fails, using manual install)
-- [x] Add mas (Mac App Store CLI) with masApps pattern
-- [x] Add direnv + nix-direnv for per-project shells
-- [x] Create shells/ directory with Python, Python-data, JS, Go templates
 - [ ] Review remaining login items (Raycast already nix-managed)
 - [ ] Evaluate launchd services for custom scripts
 

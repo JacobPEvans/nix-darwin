@@ -15,13 +15,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Added `mas` (Mac App Store CLI) with masApps pattern template
   - NOTE: `ollama` CLI not added - nixpkgs build fails; using manual Ollama.app
 
-- **Pre-commit & Linting Tools** (home-manager/common.nix - all platforms):
-  - Added `pre-commit` for git hooks framework
-  - Added `shellcheck` for shell script analysis
-  - Added `shfmt` for shell script formatting
-  - Added `markdownlint-cli2` for Markdown linting
-  - Added `actionlint` for GitHub Actions workflow linting
-  - Added `nixfmt-classic` for Nix code formatting
+- **System-Level Packages Architecture** (`modules/common/packages.nix`):
+  - Created `modules/common/` directory for packages shared across ALL platforms
+  - These packages are system-level (not user-specific) on darwin
+  - On Linux (home-manager standalone), they go to user profile
+  - Packages: `pre-commit`, `shellcheck`, `shfmt`, `markdownlint-cli2`, `actionlint`, `nixfmt-classic`
+  - Updated `darwin/common.nix` to import common packages into `environment.systemPackages`
+  - Updated `linux/common.nix` to import common packages into `home.packages`
+  - Removed linters from `home-manager/common.nix` (now system-level)
 
 - **Per-Project Development Shells**:
   - Added `programs.direnv` with `nix-direnv` to home-manager/common.nix
@@ -34,9 +35,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
 
 ### Changed
 
-- **Cross-Platform Architecture**:
-  - Added `home.packages` section to home-manager/common.nix for cross-platform CLI tools
-  - Universal linters (pre-commit, shellcheck, etc.) available on all systems
+- **Module Architecture**:
+  - Created `modules/common/` for truly system-level packages across all platforms
+  - Darwin: packages go to `environment.systemPackages` (accessible by all users)
+  - Linux: packages go to `home.packages` (home-manager standalone limitation)
 
 - **Naming Consistency**:
   - Renamed `windows-server` to `windows-workstation` throughout:
