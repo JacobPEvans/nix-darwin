@@ -36,4 +36,19 @@ with pkgs; [
 
   # Nix
   nixfmt-classic                  # Nix code formatter (this repo uses Nix)
+
+  # ==========================================================================
+  # Security & Credential Management
+  # ==========================================================================
+  # Password management and secure credential storage for all environments.
+
+  bitwarden-cli                   # CLI for Bitwarden password manager (bw command)
+
+  # ==========================================================================
+  # Cloud Infrastructure (AWS)
+  # ==========================================================================
+  # AWS tooling for infrastructure management and secure credential handling.
+
+  awscli2                         # AWS CLI v2 - unified tool to manage AWS services
+  aws-vault                       # Secure AWS credential storage (uses OS keychain)
 ]
