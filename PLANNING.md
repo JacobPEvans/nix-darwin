@@ -28,6 +28,9 @@
 - [x] NSGlobalDomain settings (appearance, text, windows)
 - [x] Menu bar clock configuration
 - [x] Login window settings
+- [x] Screensaver & lock screen (password required immediately)
+- [x] Screenshots (PNG, no shadow, Desktop)
+- [x] Control center (battery %, menu bar items)
 - [x] Trim REFERENCES.md (removed verbose examples)
 
 ### Phase 3: Application Management (Next)

@@ -46,6 +46,9 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Expanded save/print panels by default
   - Menu bar clock with date and day of week
   - Guest account disabled
+  - Screensaver password required immediately
+  - Screenshots: PNG, no shadow, saved to Desktop
+  - Control center: battery %, Bluetooth, Sound, Display visible
 
 ### Changed
 

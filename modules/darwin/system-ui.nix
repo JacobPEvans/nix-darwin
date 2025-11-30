@@ -5,6 +5,11 @@
 
 { ... }:
 
+let
+  # Available for customization (see screencapture.location example)
+  userConfig = import ../../lib/user-config.nix;
+in
+
 {
   system.defaults.NSGlobalDomain = {
     # ==========================================================================
@@ -109,5 +114,52 @@
 
     # Show full name instead of username
     SHOWFULLNAME = false;
+  };
+
+  # ==========================================================================
+  # Screensaver & Lock
+  # ==========================================================================
+
+  system.defaults.screensaver = {
+    # Require password when waking from screensaver
+    askForPassword = true;
+
+    # Grace period before password required (seconds)
+    # 0 = immediately
+    askForPasswordDelay = 0;
+  };
+
+  # ==========================================================================
+  # Screenshots
+  # ==========================================================================
+
+  system.defaults.screencapture = {
+    # Save location: null = ~/Desktop (default)
+    # location = "/Users/${userConfig.user.name}/Screenshots";
+
+    # Image format: png, jpg, gif, pdf, tiff
+    type = "png";
+
+    # Disable drop shadow on window screenshots
+    disable-shadow = true;
+
+    # Include date in filename
+    include-date = true;
+  };
+
+  # ==========================================================================
+  # Control Center (Menu Bar)
+  # ==========================================================================
+
+  system.defaults.controlcenter = {
+    # Show battery percentage
+    BatteryShowPercentage = true;
+
+    # Menu bar items visibility (true = show, false = hide)
+    Bluetooth = true;
+    Sound = true;
+    Display = true;
+    FocusModes = true;
+    NowPlaying = true;
   };
 }
