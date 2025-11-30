@@ -111,7 +111,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ├── shells/                        # Development environment templates
 │   ├── python/                    # Basic Python development
 │   ├── python-data/               # Python with pandas, numpy, jupyter
-│   ├── js/                        # Node.js development
+│   ├── js/                        # Node.js 22 development
 │   └── go/                        # Go development
 │
 ├── CLAUDE.md                      # AI agent instructions

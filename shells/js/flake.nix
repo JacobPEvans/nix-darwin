@@ -27,7 +27,7 @@
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # Node.js LTS
+            # Node.js 22
             nodejs_22
 
             # Package managers (npm included with nodejs)
@@ -36,6 +36,7 @@
 
             # Development tools
             nodePackages.typescript
+            # TypeScript language server (for IDE integration)
             nodePackages.typescript-language-server
 
             # Add more as needed:
