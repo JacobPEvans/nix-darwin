@@ -14,6 +14,9 @@ let
   vscodeGeneralSettings = import ./vscode/settings.nix { inherit config; };
   vscodeGithubCopilotSettings = import ./vscode/copilot-settings.nix { };
 
+  # npm configuration (home.file entries)
+  npmFiles = import ./npm/config.nix { inherit config; };
+
   # AI CLI configuration imports (home.file entries)
   claudeFiles = import ./ai-cli/claude.nix { inherit config pkgs; };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
@@ -74,6 +77,12 @@ in
     initContent = ''
       # GPG: Required for pinentry to prompt for passphrase in terminal
       export GPG_TTY=$(tty)
+
+      # npm global packages (managed via ~/.npmrc prefix)
+      # Packages installed with: npm install -g <package>
+      # are placed in ~/.npm-packages and available in PATH
+      export PATH="$HOME/.npm-packages/bin:$PATH"
+      export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
 
       source ${./zsh/git-functions.zsh}
       source ${./zsh/docker-functions.zsh}
@@ -190,5 +199,5 @@ in
   # - claude-permissions.nix, claude-permissions-ask.nix
   # - gemini-permissions.nix
   # - copilot-permissions.nix
-  home.file = claudeFiles // geminiFiles // copilotFiles;
+  home.file = npmFiles // claudeFiles // geminiFiles // copilotFiles;
 }

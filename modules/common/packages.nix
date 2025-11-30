@@ -43,6 +43,7 @@ with pkgs; [
   # Password management and secure credential storage for all environments.
 
   bitwarden-cli                   # CLI for Bitwarden password manager (bw command)
+  bws                             # Bitwarden Secrets Manager CLI (for machine secrets)
 
   # ==========================================================================
   # Cloud Infrastructure (AWS)
