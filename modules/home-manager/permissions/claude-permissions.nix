@@ -344,11 +344,12 @@ let
     "Bash(yq:*)"
   ];
 
-  # Safe file creation commands
-  # NOTE: These create new files/directories but do NOT modify existing content
+  # Safe file creation and symlink commands
+  # NOTE: These create new files/directories or symlinks
   # - mkdir: Creates directories (fails if exists without -p, safe with -p)
   # - touch: Creates empty files or updates timestamps (non-destructive)
-  # - ln: Creates symlinks (useful for dotfiles and config management)
+  # - ln: Creates symlinks; ln -sf can overwrite existing symlinks (low risk)
+  # - readlink: Read-only, displays symlink target
   fileCreationCommands = [
     "Bash(mkdir:*)"
     "Bash(touch:*)"
