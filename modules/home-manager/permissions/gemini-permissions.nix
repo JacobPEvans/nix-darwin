@@ -67,12 +67,16 @@ let
     "ShellTool(gh pr merge)"
     "ShellTool(gh pr diff)"
     "ShellTool(gh pr comment)"
+    "ShellTool(gh pr checks)"
     "ShellTool(gh issue list)"
     "ShellTool(gh issue view)"
     "ShellTool(gh issue create)"
     "ShellTool(gh repo view)"
     "ShellTool(gh repo clone)"
     "ShellTool(gh api)"
+    "ShellTool(gh api graphql)"
+    "ShellTool(gh run list)"
+    "ShellTool(gh run view)"
     "ShellTool(gh workflow list)"
     "ShellTool(gh workflow view)"
     "ShellTool(gh release list)"
@@ -263,6 +267,42 @@ let
     "ShellTool(aws cloudformation describe-stacks)"
     "ShellTool(aws logs tail)"
     # "ShellTool(aws ssm get-parameter)"  # Can return secrets from Parameter Store
+    "ShellTool(aws dynamodb list-tables)"
+    "ShellTool(aws dynamodb scan)"
+    "ShellTool(aws dynamodb describe-table)"
+  ];
+
+  # Terraform (Infrastructure as Code)
+  # NOTE: Only read-only and validation commands auto-approved
+  terraformCommands = [
+    "ShellTool(terraform --version)"
+    "ShellTool(terraform version)"
+    "ShellTool(terraform init)"
+    "ShellTool(terraform validate)"
+    "ShellTool(terraform fmt)"
+    "ShellTool(terraform plan)"
+    "ShellTool(terraform show)"
+    "ShellTool(terraform state list)"
+    "ShellTool(terraform state show)"
+    "ShellTool(terraform providers)"
+    "ShellTool(terraform output)"
+    "ShellTool(terraform graph)"
+  ];
+
+  # Terragrunt (Terraform wrapper)
+  # NOTE: Only read-only and validation commands auto-approved
+  terragruntCommands = [
+    "ShellTool(terragrunt --version)"
+    "ShellTool(terragrunt version)"
+    "ShellTool(terragrunt init)"
+    "ShellTool(terragrunt validate)"
+    "ShellTool(terragrunt plan)"
+    "ShellTool(terragrunt show)"
+    "ShellTool(terragrunt state list)"
+    "ShellTool(terragrunt state show)"
+    "ShellTool(terragrunt output)"
+    "ShellTool(terragrunt graph-dependencies)"
+    "ShellTool(terragrunt hclfmt)"
   ];
 
   # Database clients (read-focused operations only)
@@ -301,6 +341,10 @@ let
   fileCreationCommands = [
     "ShellTool(mkdir)"
     "ShellTool(touch)"
+    "ShellTool(ln)"
+    "ShellTool(ln -s)"
+    "ShellTool(ln -sf)"
+    "ShellTool(readlink)"
   ];
 
   # Text processing tools
@@ -369,6 +413,9 @@ let
     "ShellTool(export)"
     "ShellTool(alias)"
     "ShellTool(history)"
+    "ShellTool(sleep)"
+    "ShellTool(true)"
+    "ShellTool(false)"
   ];
 
   # macOS specific
@@ -400,6 +447,8 @@ in
     ++ dockerCommands
     ++ kubernetesCommands
     ++ awsCommands
+    ++ terraformCommands
+    ++ terragruntCommands
     ++ databaseCommands
     ++ fileReadCommands
     ++ fileCreationCommands

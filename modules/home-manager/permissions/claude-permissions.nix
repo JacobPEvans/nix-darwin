@@ -61,12 +61,16 @@ let
     "Bash(gh pr merge:*)"
     "Bash(gh pr diff:*)"
     "Bash(gh pr comment:*)"
+    "Bash(gh pr checks:*)"
     "Bash(gh issue list:*)"
     "Bash(gh issue view:*)"
     "Bash(gh issue create:*)"
     "Bash(gh repo view:*)"
     "Bash(gh repo clone:*)"
     "Bash(gh api:*)"
+    "Bash(gh api graphql:*)"
+    "Bash(gh run list:*)"
+    "Bash(gh run view:*)"
     "Bash(gh workflow list:*)"
     "Bash(gh workflow view:*)"
     "Bash(gh release list:*)"
@@ -264,6 +268,44 @@ let
     "Bash(aws cloudformation describe-stacks:*)"
     "Bash(aws logs tail:*)"
     # "Bash(aws ssm get-parameter:*)"  # Can return secrets from Parameter Store
+    "Bash(aws dynamodb list-tables:*)"
+    "Bash(aws dynamodb scan:*)"
+    "Bash(aws dynamodb describe-table:*)"
+  ];
+
+  # Terraform (Infrastructure as Code)
+  # NOTE: Only read-only and validation commands auto-approved
+  # terraform apply/destroy require user approval (in ask list)
+  terraformCommands = [
+    "Bash(terraform --version:*)"
+    "Bash(terraform version:*)"
+    "Bash(terraform init:*)"
+    "Bash(terraform validate:*)"
+    "Bash(terraform fmt:*)"
+    "Bash(terraform plan:*)"
+    "Bash(terraform show:*)"
+    "Bash(terraform state list:*)"
+    "Bash(terraform state show:*)"
+    "Bash(terraform providers:*)"
+    "Bash(terraform output:*)"
+    "Bash(terraform graph:*)"
+  ];
+
+  # Terragrunt (Terraform wrapper)
+  # NOTE: Only read-only and validation commands auto-approved
+  # terragrunt apply/destroy require user approval (in ask list)
+  terragruntCommands = [
+    "Bash(terragrunt --version:*)"
+    "Bash(terragrunt version:*)"
+    "Bash(terragrunt init:*)"
+    "Bash(terragrunt validate:*)"
+    "Bash(terragrunt plan:*)"
+    "Bash(terragrunt show:*)"
+    "Bash(terragrunt state list:*)"
+    "Bash(terragrunt state show:*)"
+    "Bash(terragrunt output:*)"
+    "Bash(terragrunt graph-dependencies:*)"
+    "Bash(terragrunt hclfmt:*)"
   ];
 
   # Database clients (read-focused operations only)
@@ -306,9 +348,14 @@ let
   # NOTE: These create new files/directories but do NOT modify existing content
   # - mkdir: Creates directories (fails if exists without -p, safe with -p)
   # - touch: Creates empty files or updates timestamps (non-destructive)
+  # - ln: Creates symlinks (useful for dotfiles and config management)
   fileCreationCommands = [
     "Bash(mkdir:*)"
     "Bash(touch:*)"
+    "Bash(ln:*)"
+    "Bash(ln -s:*)"
+    "Bash(ln -sf:*)"
+    "Bash(readlink:*)"
   ];
 
   # Compression and archiving
@@ -372,6 +419,9 @@ let
     "Bash(export:*)"
     "Bash(alias:*)"
     "Bash(history:*)"
+    "Bash(sleep:*)"
+    "Bash(true:*)"
+    "Bash(false:*)"
   ];
 
   # macOS specific
@@ -392,11 +442,27 @@ let
     "TodoRead"
   ];
 
-  # WebFetch permissions for documentation and GitHub
+  # WebFetch permissions for documentation and trusted sites
   webFetchCommands = [
+    # GitHub and source code
     "WebFetch(domain:github.com)"
     "WebFetch(domain:raw.githubusercontent.com)"
+    # Documentation sites
     "WebFetch(domain:docs.orbstack.dev)"
+    "WebFetch(domain:docs.github.com)"
+    "WebFetch(domain:nix-darwin.github.io)"
+    # AI/LLM documentation
+    "WebFetch(domain:anthropic.com)"
+    "WebFetch(domain:docs.anthropic.com)"
+    # Infrastructure documentation
+    "WebFetch(domain:terraform.io)"
+    "WebFetch(domain:developer.hashicorp.com)"
+    "WebFetch(domain:proxmox.com)"
+    "WebFetch(domain:ubuntu.com)"
+    # Development tools
+    "WebFetch(domain:graphite.dev)"
+    "WebFetch(domain:nixos.org)"
+    "WebFetch(domain:nixos.wiki)"
   ];
 
 in
@@ -414,6 +480,8 @@ in
     ++ dockerCommands
     ++ kubernetesCommands
     ++ awsCommands
+    ++ terraformCommands
+    ++ terragruntCommands
     ++ databaseCommands
     ++ fileReadCommands
     ++ fileCreationCommands
