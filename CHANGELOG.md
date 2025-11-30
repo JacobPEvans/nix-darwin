@@ -5,9 +5,19 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
-## 2025-11-30 (Night)
+## 2025-11-30
 
 ### Added
+
+- **Universal Security & Cloud Tools** (`modules/common/packages.nix`):
+  - `bitwarden-cli` - CLI for Bitwarden password manager (`bw` command)
+  - `awscli2` - AWS CLI v2 for managing AWS services
+  - `aws-vault` - Secure AWS credential storage using OS keychain
+
+- **Bitwarden Desktop** (`modules/darwin/common.nix`):
+  - Added `bitwarden-desktop` to GUI applications
+  - Migrates from App Store version to nixpkgs-managed version
+  - NOTE: Remove existing App Store Bitwarden after rebuild
 
 - **Application Migration** (Phase 3):
   - Added `obsidian` to darwin/common.nix (Knowledge base / note-taking)
@@ -45,26 +55,6 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Updated Copilot trusted directories: added `~/git`, `~/.config`
   - Added terraform/terragrunt destructive commands to deny lists
 
-### Changed
-
-- **Module Architecture**:
-  - Created `modules/common/` for truly system-level packages across all platforms
-  - Darwin: packages go to `environment.systemPackages` (accessible by all users)
-  - Linux: packages go to `home.packages` (home-manager standalone limitation)
-
-- **Naming Consistency**:
-  - Renamed `windows-server` to `windows-workstation` throughout
-
-### Documentation
-
-- Streamlined README.md - moved troubleshooting to TROUBLESHOOTING.md
-- Added documentation table to README.md for easier navigation
-- Updated shells/README.md with generic version references
-
-## 2025-11-30 (Evening)
-
-### Added
-
 - **SSH/Remote Login**: Enabled via `services.openssh.enable = true` in macbook-m4 host config
   - Declaratively manages macOS Remote Login setting via launchd
 
@@ -83,8 +73,6 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Disabled .DS_Store on network/USB volumes
   - Auto-remove trash items after 30 days
   - CustomUserPreferences for additional settings
-
-- **REFERENCES.md**: External documentation hub (links only, minimal examples)
 
 - **Keyboard Configuration** (`modules/darwin/keyboard.nix`):
   - Fast key repeat (KeyRepeat=5, InitialKeyRepeat=25)
@@ -107,29 +95,13 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Control center: battery %, Bluetooth, Sound, Display visible
 
 - **Security Policies** (`lib/security-policies.nix`):
-  - NEW: Policy document for git security requirements
+  - Policy document for git security requirements
   - Documents what we want (signed commits/tags, fsck checks)
   - Implemented via home-manager's native git options
 
 - **GPG Shell Integration**:
   - Added `export GPG_TTY=$(tty)` to zsh initContent
   - Required for pinentry to prompt for passphrase in terminal
-
-### Changed
-
-- **Git Configuration** (Nix-native approach):
-  - `programs.git.signing.signByDefault = true` in home-manager
-  - `settings.tag.gpgSign = true` for signed tags
-  - Removed conflicting `~/.gitconfig` (was overriding Nix-managed config)
-
-- **REFERENCES.md**: Trimmed from 284 to 70 lines (removed verbose examples)
-- **modules/darwin/common.nix**: Now imports keyboard, trackpad, system-ui modules
-
----
-
-## 2025-11-30
-
-### Added
 
 - **Hosts + Modules Architecture**: Major refactoring to support multi-host configurations
   - Created `hosts/` directory with host-specific configurations:
@@ -164,6 +136,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - `CONTAINER_DATA` environment variable for OrbStack (`/Volumes/ContainerData`)
 
 ### Changed
+
+- **Module Architecture**:
+  - Created `modules/common/` for truly system-level packages across all platforms
+  - Darwin: packages go to `environment.systemPackages` (accessible by all users)
+  - Linux: packages go to `home.packages` (home-manager standalone limitation)
+
+- **Naming Consistency**:
+  - Renamed `windows-server` to `windows-workstation` throughout
 
 - **DRY Improvements**: Centralized all hardcoded values
   - Username from `userConfig.user.name` everywhere
