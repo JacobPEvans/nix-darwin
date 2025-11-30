@@ -7,6 +7,8 @@
 #   2. Create .envrc with "use flake"
 #   3. Run: direnv allow
 #
+# Or manually: nix develop
+#
 # Note: Project dependencies still use package.json/npm install
 
 {
