@@ -43,10 +43,17 @@ let
     "${homeDir}/.config"
   ];
 
+  # Generic home directory access
+  # Allows Copilot to operate anywhere under home directory
+  trustedHomeDir = [
+    homeDir
+  ];
+
 in
 {
   # Export trusted_folders list for config.json
-  trusted_folders = trustedDevelopmentDirs ++ trustedConfigDirs;
+  # Includes home dir for generic access across all user directories
+  trusted_folders = trustedHomeDir ++ trustedDevelopmentDirs ++ trustedConfigDirs;
 
   # === COPILOT CLI FLAGS REFERENCE ===
   # These are NOT part of config.json - they must be passed as CLI arguments

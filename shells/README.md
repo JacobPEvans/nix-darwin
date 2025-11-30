@@ -29,6 +29,7 @@ The environment will now load automatically when you `cd` into the project.
 | `python-data/` | Data science / ML | Python, pandas, numpy, jupyter |
 | `js/` | Node.js development | Node.js, npm, yarn, pnpm |
 | `go/` | Go development | Go, gopls, delve |
+| `terraform/` | Infrastructure as Code | Terraform, Terragrunt, OpenTofu, tflint, checkov, tfsec, trivy, infracost |
 
 ## Customization
 
