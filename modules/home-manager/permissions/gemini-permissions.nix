@@ -35,6 +35,7 @@ let
 
   # Git operations (version control)
   # Format: ShellTool(git subcommand)
+  # NOTE: git reset is in excludeTools (potentially destructive)
   gitCommands = [
     "ShellTool(git status)"
     "ShellTool(git log)"
@@ -91,6 +92,7 @@ let
     "ShellTool(nix flake update)"
     "ShellTool(nix flake metadata)"
     "ShellTool(nix flake show)"
+    "ShellTool(nix flake check)"
     "ShellTool(nix build)"
     "ShellTool(nix develop)"
     "ShellTool(nix shell)"
@@ -99,6 +101,7 @@ let
     "ShellTool(nix-env)"
     "ShellTool(nix-env -q)"
     "ShellTool(nix-env --query)"
+    "ShellTool(nix profile)"
     "ShellTool(darwin-rebuild switch)"
     "ShellTool(darwin-rebuild build)"
     "ShellTool(darwin-rebuild --list-generations)"
@@ -183,6 +186,7 @@ let
     "ShellTool(npm run start)"
     "ShellTool(npm outdated)"
     "ShellTool(npm audit)"
+    "ShellTool(npm view)"
     "ShellTool(yarn --version)"
     "ShellTool(yarn install)"
     "ShellTool(yarn add)"
@@ -425,6 +429,7 @@ let
     "ShellTool(mdfind)"
     "ShellTool(pbcopy)"
     "ShellTool(pbpaste)"
+    "ShellTool(log show)"        # macOS unified logging
   ];
 
   # Gemini-specific web tools
@@ -509,6 +514,13 @@ in
     "ShellTool(osascript)"
     "ShellTool(sqlite3)"
     "ShellTool(mongosh)"
+
+    # === VERSION CONTROL DESTRUCTIVE ===
+    "ShellTool(git reset)"
+
+    # === SECURITY & CRYPTOGRAPHY ===
+    "ShellTool(gpg)"
+    "ShellTool(chown)"
 
     # === DESTRUCTIVE FILE OPERATIONS ===
     "ShellTool(chmod)"

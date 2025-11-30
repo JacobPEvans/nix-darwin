@@ -85,6 +85,7 @@ let
     "Bash(nix flake update:*)"
     "Bash(nix flake metadata:*)"
     "Bash(nix flake show:*)"
+    "Bash(nix flake check:*)"
     "Bash(nix build:*)"
     "Bash(nix develop:*)"
     "Bash(nix shell:*)"
@@ -93,6 +94,7 @@ let
     "Bash(nix-env:*)"
     "Bash(nix-env -q:*)"
     "Bash(nix-env --query:*)"
+    "Bash(nix profile:*)"
     "Bash(darwin-rebuild switch:*)"
     "Bash(darwin-rebuild build:*)"
     "Bash(darwin-rebuild --list-generations:*)"
@@ -177,6 +179,7 @@ let
     "Bash(npm run start:*)"
     "Bash(npm outdated:*)"
     "Bash(npm audit:*)"
+    "Bash(npm view:*)"
     "Bash(yarn --version:*)"
     "Bash(yarn install:*)"
     "Bash(yarn add:*)"
@@ -359,6 +362,7 @@ let
     "Bash(readlink:*)"
   ];
 
+
   # Compression and archiving
   archiveCommands = [
     "Bash(tar -tzf:*)"
@@ -434,6 +438,7 @@ let
     "Bash(mdfind:*)"
     "Bash(pbcopy:*)"
     "Bash(pbpaste:*)"
+    "Bash(log show:*)"        # macOS unified logging
   ];
 
   # Claude-specific tools (generally safe)
@@ -455,6 +460,7 @@ let
     # AI/LLM documentation
     "WebFetch(domain:anthropic.com)"
     "WebFetch(domain:docs.anthropic.com)"
+    "WebFetch(domain:google-gemini.github.io)"
     # Infrastructure documentation
     "WebFetch(domain:terraform.io)"
     "WebFetch(domain:developer.hashicorp.com)"
@@ -464,6 +470,7 @@ let
     "WebFetch(domain:graphite.dev)"
     "WebFetch(domain:nixos.org)"
     "WebFetch(domain:nixos.wiki)"
+    "WebFetch(domain:www.npmjs.com)"
   ];
 
 in

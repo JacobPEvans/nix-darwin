@@ -27,6 +27,15 @@ in
       allow = claudePerms.allowList;
       deny = claudePerms.denyList;
       ask = claudeAsks.askList;
+
+      # Directory-level read access
+      # Grants Claude access to files outside the current working directory
+      # This prevents "allow reading from X/" prompts for common locations
+      additionalDirectories = [
+        "~/"              # Full home directory access
+        "~/.claude/"      # Claude configuration
+        "~/.config/"      # XDG config directory
+      ];
     };
 
     # Status line configuration

@@ -72,11 +72,8 @@
             # === COST ESTIMATION ===
             infracost              # Cloud cost estimates
 
-            # === GIT HOOKS & LINTING ===
-            pre-commit             # Git hooks framework
-            markdownlint-cli2      # Markdown linter
-
             # === UTILITIES ===
+            # NOTE: pre-commit and markdownlint-cli2 are in common system packages
             jq                     # JSON processor
             yq                     # YAML processor
           ];

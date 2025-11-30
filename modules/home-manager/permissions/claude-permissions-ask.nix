@@ -39,6 +39,21 @@ let
     "Bash(defaults read:*)"
   ];
 
+  # === VERSION CONTROL DESTRUCTIVE OPERATIONS ===
+  # git reset can discard commits and lose work if misused
+  # Moderate risk: can lose uncommitted/committed work
+  gitDestructiveOperations = [
+    "Bash(git reset:*)"
+  ];
+
+  # === SECURITY & CRYPTOGRAPHY ===
+  # gpg can sign/encrypt/decrypt files, manage keys
+  # chown can change file ownership (can cause permission issues)
+  securityOperations = [
+    "Bash(gpg:*)"
+    "Bash(chown:*)"
+  ];
+
   # === FILE SYSTEM OPERATIONS ===
   # These can modify file permissions, delete files, copy/move with overwrites
   # High risk: unintended file modification, data loss, permission changes
@@ -122,6 +137,8 @@ in
   askList = systemScriptCommands
     ++ systemInfoDisclosureCommands
     ++ macosConfigCommands
+    ++ gitDestructiveOperations
+    ++ securityOperations
     ++ dangerousFileOperations
     ++ dockerPrivilegedOperations
     ++ kubernetesDestructiveOperations

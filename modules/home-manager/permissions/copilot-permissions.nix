@@ -139,6 +139,13 @@ in
     "shell(terragrunt destroy)"
     "shell(terragrunt run-all apply)"
     "shell(terragrunt run-all destroy)"
+
+    # Version control destructive operations
+    "shell(git reset)"
+
+    # Security & cryptography
+    "shell(gpg)"
+    "shell(chown)"
   ];
 
   # === IMPLEMENTATION NOTES ===

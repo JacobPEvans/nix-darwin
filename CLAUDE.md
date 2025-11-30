@@ -101,7 +101,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Nix-managed** (`~/.claude/settings.json`):
 - Defined in `modules/home-manager/permissions/claude-permissions.nix`
-- 277+ commands in 24 categories
+- 280+ commands in 25 categories
 - Version controlled, reproducible
 - Updated via darwin-rebuild
 
@@ -109,6 +109,12 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - NOT managed by Nix (intentionally writable)
 - Claude writes here on "accept indefinitely"
 - Machine-local only
+
+**Directory Access** (`additionalDirectories`):
+- Configured in `modules/home-manager/ai-cli/claude.nix`
+- Grants Claude read access to directories outside working directory
+- Prevents "allow reading from X/" prompts
+- Default: `~/`, `~/.claude/`, `~/.config/`
 
 **To add commands permanently**:
 1. Edit `modules/home-manager/permissions/claude-permissions.nix`
