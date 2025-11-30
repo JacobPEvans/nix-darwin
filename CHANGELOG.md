@@ -5,6 +5,44 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-29 (Evening)
+
+### Added
+
+- **SSH/Remote Login**: Enabled via `services.openssh.enable = true` in macbook-m4 host config
+  - Declaratively manages macOS Remote Login setting via launchd
+
+- **Comprehensive Dock Configuration** (`modules/darwin/dock.nix`):
+  - 30+ documented options with defaults and explanations
+  - Icon size: 64px (cleaned from 71), magnification: 80px
+  - Hot corners configured: Mission Control, Notification Center, App Windows, Quick Note
+  - Disabled recent apps, enabled minimize-to-application
+  - Fixed space ordering (mru-spaces = false)
+  - All gesture settings documented
+
+- **Power-User Finder Configuration** (`modules/darwin/finder.nix`):
+  - Show hidden files, all extensions, full POSIX path in title
+  - Folders sorted first, search defaults to current folder
+  - List view default, status bar and path bar visible
+  - Disabled .DS_Store on network/USB volumes
+  - Auto-remove trash items after 30 days
+  - CustomUserPreferences for additional settings
+
+- **REFERENCES.md**: Comprehensive external documentation hub
+  - nix-darwin options with raw GitHub source links
+  - home-manager documentation links
+  - macOS defaults exploration commands and resources
+  - AI CLI tool documentation (Claude, Gemini, Copilot)
+  - Quick reference code blocks for Dock and Finder options
+  - Package search resources
+
+### Changed
+
+- **README.md**: Updated to reference REFERENCES.md, added to directory structure
+- **modules/darwin/common.nix**: Now imports dock.nix and finder.nix
+
+---
+
 ## 2025-11-30
 
 ### Added
