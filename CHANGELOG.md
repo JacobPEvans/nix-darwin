@@ -5,6 +5,50 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-30 (Night)
+
+### Added
+
+- **Application Migration** (Phase 3):
+  - Added `obsidian` to darwin/common.nix (Knowledge base / note-taking)
+  - Added `zoom-us` to darwin/common.nix (Video conferencing)
+  - Added `mas` (Mac App Store CLI) with masApps pattern template
+  - NOTE: `ollama` CLI not added - nixpkgs build fails; using manual Ollama.app
+
+- **Pre-commit & Linting Tools** (home-manager/common.nix - all platforms):
+  - Added `pre-commit` for git hooks framework
+  - Added `shellcheck` for shell script analysis
+  - Added `shfmt` for shell script formatting
+  - Added `markdownlint-cli2` for Markdown linting
+  - Added `actionlint` for GitHub Actions workflow linting
+  - Added `nixfmt-classic` for Nix code formatting
+
+- **Per-Project Development Shells**:
+  - Added `programs.direnv` with `nix-direnv` to home-manager/common.nix
+  - Created `shells/` directory with development environment templates:
+    - `python/` - Basic Python 3.12 with pip, venv
+    - `python-data/` - Data science: pandas, numpy, scipy, matplotlib, jupyter
+    - `js/` - Node.js 22 with npm, yarn, pnpm, TypeScript
+    - `go/` - Go with gopls, delve debugger
+  - Added `shells/README.md` with usage instructions
+
+### Changed
+
+- **Cross-Platform Architecture**:
+  - Added `home.packages` section to home-manager/common.nix for cross-platform CLI tools
+  - Universal linters (pre-commit, shellcheck, etc.) available on all systems
+
+- **Naming Consistency**:
+  - Renamed `windows-server` to `windows-workstation` throughout:
+    - Moved `hosts/windows-server/` to `hosts/windows-workstation/`
+    - Updated all references in README.md, PLANNING.md, CHANGELOG.md
+    - Updated file headers and descriptions
+
+### Documentation
+
+- Updated README.md with new packages and shells/ directory structure
+- Updated PLANNING.md with Phase 3 progress
+
 ## 2025-11-30 (Evening)
 
 ### Added
@@ -80,7 +124,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
     - `macbook-m4/` - Active M4 Max MacBook Pro (nix-darwin + home-manager)
     - `ubuntu-server/` - Template for Ubuntu server (home-manager standalone)
     - `proxmox/` - Template for Proxmox server (home-manager standalone)
-    - `windows-server/` - Placeholder for future native Windows Nix support
+    - `windows-workstation/` - Placeholder for future native Windows Nix support
   - Created `modules/` directory with reusable modules:
     - `darwin/common.nix` - macOS system packages, homebrew, settings
     - `linux/common.nix` - Linux home-manager settings (XDG, packages)

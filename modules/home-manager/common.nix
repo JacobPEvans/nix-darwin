@@ -23,6 +23,28 @@ in
   home.stateVersion = "24.05";
 
   # ==========================================================================
+  # Cross-Platform CLI Tools
+  # ==========================================================================
+  # Universal tools for all platforms (macOS, Linux, servers)
+  # NOTE: GUI apps go in darwin/common.nix; language-specific linters go in
+  # development profile (see PLANNING.md Profile Variants)
+  home.packages = with pkgs; [
+    # --------------------------------------------------------------------------
+    # Git & Pre-commit
+    # --------------------------------------------------------------------------
+    pre-commit                      # Framework for managing pre-commit hooks
+
+    # --------------------------------------------------------------------------
+    # Universal Linters (useful on all systems)
+    # --------------------------------------------------------------------------
+    shellcheck                      # Shell script static analysis
+    shfmt                           # Shell script formatter
+    markdownlint-cli2               # Markdown linter (README, docs exist everywhere)
+    actionlint                      # GitHub Actions linter (CI in most repos)
+    nixfmt-classic                  # Nix formatter (this repo uses Nix)
+  ];
+
+  # ==========================================================================
   # VS Code
   # ==========================================================================
   # Settings from vscode-settings.nix and vscode-copilot-settings.nix
@@ -160,6 +182,17 @@ in
       # Git aliases - see git-aliases.nix for full list
       alias = gitAliases;
     };
+  };
+
+  # ==========================================================================
+  # Direnv (per-project environments)
+  # ==========================================================================
+  # Automatically loads .envrc files when entering directories
+  # Usage: Create .envrc with "use flake" or "use nix" and run "direnv allow"
+  # See shells/ directory for example flake.nix files
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;  # Faster, cached nix-shell/flake loading
   };
 
   # ==========================================================================

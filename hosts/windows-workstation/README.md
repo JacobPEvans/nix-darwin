@@ -1,4 +1,4 @@
-# Windows Server Configuration
+# Windows Workstation Configuration
 
 ## Native Windows Nix Support (Coming Soon)
 
@@ -22,8 +22,9 @@ This directory contains placeholder configurations for when Windows support arri
 - `default.nix` - Windows system configuration (placeholder)
 - `home.nix` - Home-manager configuration for Windows
 
-## Services Running on Windows Server
+## Applications for Windows Workstation
 
-Document any services this Windows server will run:
-- [ ] List services planned for this machine
+Document applications planned for this workstation:
+- [ ] Development tools
+- [ ] Productivity applications
 - [ ] Note any Windows-specific requirements

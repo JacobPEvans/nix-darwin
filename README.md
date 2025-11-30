@@ -11,7 +11,7 @@ Multi-host declarative system management using nix-darwin, home-manager, and fla
 | **macbook-m4** | aarch64-darwin | Active | M4 Max MacBook Pro (primary) |
 | **ubuntu-server** | x86_64-linux | Template | Ubuntu server (home-manager standalone) |
 | **proxmox** | x86_64-linux | Template | Proxmox server (home-manager standalone) |
-| **windows-server** | windows | Placeholder | Awaiting native Windows Nix support |
+| **windows-workstation** | windows | Placeholder | Awaiting native Windows Nix support |
 
 ## How It Works
 
@@ -86,7 +86,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 │   │   └── home.nix               # home-manager config
 │   ├── proxmox/                   # Template: Proxmox server
 │   │   └── ...                    # Same structure as ubuntu-server
-│   └── windows-server/            # Placeholder: awaiting Windows Nix
+│   └── windows-workstation/       # Placeholder: awaiting Windows Nix
 │       └── ...
 │
 ├── modules/                       # Reusable configuration modules
@@ -108,6 +108,12 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 │   ├── security-policies.nix      # System-level security (git signing, etc.)
 │   └── home-manager-defaults.nix  # Shared home-manager settings
 │
+├── shells/                        # Development environment templates
+│   ├── python/                    # Basic Python development
+│   ├── python-data/               # Python with pandas, numpy, jupyter
+│   ├── js/                        # Node.js development
+│   └── go/                        # Go development
+│
 ├── CLAUDE.md                      # AI agent instructions
 ├── SETUP.md                       # Initial setup guide
 ├── TROUBLESHOOTING.md             # Common issues
@@ -124,8 +130,15 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 |----------|----------|
 | Core CLI | git, gnupg, vim |
 | Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
-| Development | gemini-cli, gh, nodejs_latest |
-| GUI | raycast, vscode |
+| Development | gemini-cli, gh, mas, nodejs_latest |
+| GUI | obsidian, raycast, vscode, zoom-us |
+
+**Cross-platform CLI** (`modules/home-manager/common.nix`):
+
+| Category | Packages |
+|----------|----------|
+| Git | pre-commit |
+| Linters | shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic |
 
 **Homebrew casks** (fallback only):
 - claude-code - Rapidly-evolving tool, needs frequent updates

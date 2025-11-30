@@ -7,39 +7,23 @@
 - **Purpose**: Multi-host declarative system management
 - **Architecture**: hosts + modules pattern with shared lib/ configs
 - **Active Host**: M4 Max MacBook Pro (128GB RAM)
-- **Templates**: Ubuntu server, Proxmox server, Windows server (placeholder)
+- **Templates**: Ubuntu server, Proxmox server, Windows workstation (placeholder)
 - **Tools**: nix-darwin 25.05, home-manager 25.05, Determinate Nix
 
-## Current Work: macOS System Preferences Audit
+## Current Work: System Configuration Migration
 
-**Branch**: `feat/macos-system-audit`
-**PR**: #10
+**Branch**: `feat/system-config-migration`
 
-### Phase 1: System Services & UI Defaults ✅ COMPLETE
-- [x] Enable SSH/Remote Login via `services.openssh.enable`
-- [x] Create `modules/darwin/dock.nix` with comprehensive settings
-- [x] Create `modules/darwin/finder.nix` with power-user settings
-- [x] Create `REFERENCES.md` with external documentation links
-- [x] Review backup/ folder for reusable configurations
-
-### Phase 2: Input & System UI ✅ COMPLETE
-- [x] Keyboard settings (KeyRepeat, InitialKeyRepeat, AppleKeyboardUIMode)
-- [x] Trackpad settings (tap-to-click, gestures, force click)
-- [x] NSGlobalDomain settings (appearance, text, windows)
-- [x] Menu bar clock configuration
-- [x] Login window settings
-- [x] Screensaver & lock screen (password required immediately)
-- [x] Screenshots (PNG, no shadow, default location)
-- [x] Control center (battery %, menu bar items)
-- [x] Trim REFERENCES.md (removed verbose examples)
-- [x] Security policies (`lib/security-policies.nix`) - system-level git signing
-- [x] GPG shell integration (GPG_TTY for pinentry)
-
-### Phase 3: Application Management (Next)
-- [ ] Audit installed applications (/Applications)
-- [ ] Add essential apps to nix: Obsidian, Brave, Slack
-- [ ] Review login items for nix management
-- [ ] Configure launchd services where applicable
+### Phase 3: Application Management (In Progress)
+- [x] Audit installed applications (/Applications)
+- [x] Add Obsidian to nix (darwin/common.nix)
+- [x] Add zoom-us to nix (cross-platform, home-manager/common.nix)
+- [x] Add Ollama CLI to nix
+- [x] Add mas (Mac App Store CLI) with masApps pattern
+- [x] Add direnv + nix-direnv for per-project shells
+- [x] Create shells/ directory with Python, Python-data, JS, Go templates
+- [ ] Review remaining login items (Raycast already nix-managed)
+- [ ] Evaluate launchd services for custom scripts
 
 ---
 
@@ -48,16 +32,19 @@
 ### Profile Variants
 Extend current architecture with profile-specific modules:
 - **development** - Language runtimes, IDEs, debugging tools
+  - Python: ruff, black, mypy
+  - JavaScript: prettier, eslint_d
+  - YAML/TOML: yamllint, yamlfmt, taplo
+  - Docker: hadolint
 - **work** - Communication apps, VPNs
 - **minimal** - Bare essentials for recovery
 
 ### Login Items Management
 Evaluate nix-darwin options for managing:
-- Raycast (currently manual)
-- Granola
-- Google Drive
-- Obsidian
-- Slack
+- Raycast (nix-managed, login managed by app)
+- Google Drive (manual, proprietary)
+- Obsidian (nix-managed, login managed by app)
+- Slack (manual for now)
 
 ---
 
@@ -72,7 +59,6 @@ Current hosts+modules architecture supports this. Next steps:
 ### Advanced Features
 - Time Machine integration
 - LaunchAgents for personal scripts
-- Per-project Nix shells with direnv
 
 ---
 

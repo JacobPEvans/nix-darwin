@@ -1,4 +1,4 @@
-# Windows Server System Configuration
+# Windows Workstation System Configuration
 #
 # PLACEHOLDER: Native Windows Nix support is in development
 # See: https://determinate.systems/posts/nix-on-windows

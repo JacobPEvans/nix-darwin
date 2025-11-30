@@ -1,5 +1,5 @@
 {
-  description = "Nix configuration for Windows Server (placeholder)";
+  description = "Nix configuration for Windows Workstation (placeholder)";
 
   # ==========================================================================
   # PLACEHOLDER: Native Windows Nix support is in development

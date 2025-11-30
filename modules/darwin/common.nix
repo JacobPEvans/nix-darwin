@@ -59,13 +59,18 @@ in
     # ========================================================================
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
+    mas             # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
     nodejs_latest   # Node.js runtime
+    # NOTE: ollama removed - nixpkgs build fails; using manual Ollama.app install instead
+    # Models symlink to /Volumes/Ollama is in hosts/macbook-m4/home.nix
 
     # ========================================================================
     # GUI applications
     # ========================================================================
+    obsidian        # Knowledge base / note-taking (Markdown)
     raycast         # Productivity launcher (replaces Spotlight)
     vscode          # Visual Studio Code editor
+    zoom-us         # Video conferencing
   ];
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
@@ -93,6 +98,13 @@ in
       # - Manual upgrade: brew upgrade --cask claude-code
       "claude-code"
     ];
+
+    # Mac App Store apps (requires signed into App Store)
+    # Find app IDs: mas search <name> or https://github.com/mas-cli/mas
+    masApps = {
+      # Example: "Xcode" = 497799835;
+      # Example: "1Password" = 1333542190;
+    };
   };
 
   # Enable zsh
