@@ -39,7 +39,7 @@
           ];
 
           shellHook = ''
-            echo "Python $(python --version | cut -d' ' -f2) environment ready"
+            echo "$(python --version) environment ready"
           '';
         };
       });

@@ -45,7 +45,7 @@
           ];
 
           shellHook = ''
-            echo "Go $(go version | cut -d' ' -f3) environment ready"
+            echo "$(go version) environment ready"
             echo "  - gopls (language server)"
             echo "  - delve (debugger)"
           '';
