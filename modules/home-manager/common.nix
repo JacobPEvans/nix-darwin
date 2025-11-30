@@ -23,28 +23,6 @@ in
   home.stateVersion = "24.05";
 
   # ==========================================================================
-  # Cross-Platform CLI Tools
-  # ==========================================================================
-  # Universal tools for all platforms (macOS, Linux, servers)
-  # NOTE: GUI apps go in darwin/common.nix; language-specific linters go in
-  # development profile (see PLANNING.md Profile Variants)
-  home.packages = with pkgs; [
-    # --------------------------------------------------------------------------
-    # Git & Pre-commit
-    # --------------------------------------------------------------------------
-    pre-commit                      # Framework for managing git pre-commit hooks
-
-    # --------------------------------------------------------------------------
-    # Universal Linters (useful on all systems)
-    # --------------------------------------------------------------------------
-    shellcheck                      # Shell script static analysis
-    shfmt                           # Shell script formatter
-    markdownlint-cli2               # Markdown linter (README, docs exist everywhere)
-    actionlint                      # GitHub Actions linter (CI in most repos)
-    nixfmt-classic                  # Nix formatter (this repo uses Nix)
-  ];
-
-  # ==========================================================================
   # VS Code
   # ==========================================================================
   # Settings from vscode-settings.nix and vscode-copilot-settings.nix

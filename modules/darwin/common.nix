@@ -2,6 +2,9 @@
 
 let
   userConfig = import ../../lib/user-config.nix;
+
+  # Universal packages (pre-commit, linters) shared across all systems
+  commonPackages = import ../common/packages.nix { inherit pkgs; };
 in
 {
   imports = [
@@ -30,7 +33,7 @@ in
 
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = commonPackages ++ (with pkgs; [
     # ========================================================================
     # Core CLI tools
     # ========================================================================
@@ -71,7 +74,7 @@ in
     raycast         # Productivity launcher (replaces Spotlight)
     vscode          # Visual Studio Code editor
     zoom-us         # Video conferencing
-  ];
+  ]);
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
   # Prefer nixpkgs for everything - only use homebrew when absolutely necessary

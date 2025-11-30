@@ -90,6 +90,8 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 │       └── ...
 │
 ├── modules/                       # Reusable configuration modules
+│   ├── common/
+│   │   └── packages.nix           # System-level packages for ALL platforms
 │   ├── darwin/
 │   │   └── common.nix             # macOS system packages, homebrew, settings
 │   ├── linux/
@@ -133,11 +135,11 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 | Development | gemini-cli, gh, mas, nodejs_latest |
 | GUI | obsidian, raycast, vscode, zoom-us |
 
-**Cross-platform CLI** (`modules/home-manager/common.nix`):
+**System-level tools** (`modules/common/packages.nix` - all platforms):
 
 | Category | Packages |
 |----------|----------|
-| Git | pre-commit |
+| Git hooks | pre-commit |
 | Linters | shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic |
 
 **Homebrew casks** (fallback only):
