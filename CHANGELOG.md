@@ -22,16 +22,28 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Packages: `pre-commit`, `shellcheck`, `shfmt`, `markdownlint-cli2`, `actionlint`, `nixfmt-classic`
   - Updated `darwin/common.nix` to import common packages into `environment.systemPackages`
   - Updated `linux/common.nix` to import common packages into `home.packages`
-  - Removed linters from `home-manager/common.nix` (now system-level)
 
 - **Per-Project Development Shells**:
   - Added `programs.direnv` with `nix-direnv` to home-manager/common.nix
   - Created `shells/` directory with development environment templates:
-    - `python/` - Basic Python 3.12 with pip, venv
+    - `python/` - Python with pip, venv
     - `python-data/` - Data science: pandas, numpy, scipy, matplotlib, jupyter
-    - `js/` - Node.js 22 with npm, yarn, pnpm, TypeScript
+    - `js/` - Node.js with npm, yarn, pnpm, TypeScript
     - `go/` - Go with gopls, delve debugger
   - Added `shells/README.md` with usage instructions
+
+- **AI CLI Permission Consolidation**:
+  - Integrated safe commands from local settings files into nix-managed permissions
+  - Added to Claude and Gemini permissions:
+    - GitHub CLI: `gh pr checks`, `gh api graphql`, `gh run list/view`
+    - AWS DynamoDB: `list-tables`, `scan`, `describe-table`
+    - Terraform: `init`, `validate`, `fmt`, `plan`, `show`, `state`, `output`, `graph`
+    - Terragrunt: `init`, `validate`, `plan`, `show`, `state`, `output`, `hclfmt`
+    - File utilities: `ln`, `readlink`
+    - Process utilities: `sleep`, `true`, `false`
+    - WebFetch domains: anthropic.com, terraform.io, proxmox.com, ubuntu.com, etc.
+  - Updated Copilot trusted directories: added `~/git`, `~/.config`
+  - Added terraform/terragrunt destructive commands to deny lists
 
 ### Changed
 
@@ -41,15 +53,13 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Linux: packages go to `home.packages` (home-manager standalone limitation)
 
 - **Naming Consistency**:
-  - Renamed `windows-server` to `windows-workstation` throughout:
-    - Moved `hosts/windows-server/` to `hosts/windows-workstation/`
-    - Updated all references in README.md, PLANNING.md, CHANGELOG.md
-    - Updated file headers and descriptions
+  - Renamed `windows-server` to `windows-workstation` throughout
 
 ### Documentation
 
-- Updated README.md with new packages and shells/ directory structure
-- Updated PLANNING.md with Phase 3 progress
+- Streamlined README.md - moved troubleshooting to TROUBLESHOOTING.md
+- Added documentation table to README.md for easier navigation
+- Updated shells/README.md with generic version references
 
 ## 2025-11-30 (Evening)
 

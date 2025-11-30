@@ -113,7 +113,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ├── shells/                        # Development environment templates
 │   ├── python/                    # Basic Python development
 │   ├── python-data/               # Python with pandas, numpy, jupyter
-│   ├── js/                        # Node.js 22 development
+│   ├── js/                        # Node.js development
 │   └── go/                        # Go development
 │
 ├── CLAUDE.md                      # AI agent instructions
@@ -132,7 +132,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 |----------|----------|
 | Core CLI | git, gnupg, vim |
 | Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
-| Development | gemini-cli, gh, mas, nodejs_latest |
+| Development | gemini-cli, gh, mas, nodejs_latest (ollama via manual install) |
 | GUI | obsidian, raycast, vscode, zoom-us |
 
 **System-level tools** (`modules/common/packages.nix` - all platforms):
@@ -156,40 +156,15 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 
 All AI tools follow principle of least privilege with categorized command structures.
 
-## Why Packages "Disappear"
+## Documentation
 
-Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NOT tracked by nix-darwin. After system updates or profile switches, these packages may vanish because:
-
-1. They weren't in the nix store
-2. PATH changes to prioritize nix-managed paths (`/run/current-system/sw/bin`)
-3. Homebrew state isn't preserved by nix
-
-**Solution**: Always add packages to `darwin/configuration.nix` or `home/home.nix` and rebuild.
-
-## Quick Troubleshooting
-
-### "error: attribute 'package-name' missing"
-Package name differs in nixpkgs. Search for it:
-```bash
-nix search nixpkgs <partial-name>
-```
-
-### Changes not applying
-1. Commit your changes to git (flakes require this)
-2. Run: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
-3. Open a new terminal
-
-### Package conflict (homebrew vs nix)
-If `which <package>` shows `/opt/homebrew/bin` instead of `/run/current-system/sw/bin`:
-```bash
-# Remove homebrew version
-sudo -u jevans brew uninstall <package>
-# Verify nix version now found
-which <package>
-```
-
-For comprehensive troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
-For initial setup and configuration decisions, see [SETUP.md](SETUP.md).
+| File | Purpose |
+|------|---------|
+| [SETUP.md](SETUP.md) | Initial setup and configuration decisions |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
+| [REFERENCES.md](REFERENCES.md) | External documentation links |
+| [PLANNING.md](PLANNING.md) | Future roadmap |
+| [CHANGELOG.md](CHANGELOG.md) | Completed work history |
 
 ## Resources
 

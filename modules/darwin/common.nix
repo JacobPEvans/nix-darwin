@@ -64,8 +64,8 @@ in
     gh              # GitHub CLI
     mas             # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
     nodejs_latest   # Node.js runtime
-    # NOTE: ollama removed - nixpkgs build fails; using manual Ollama.app install instead
-    # Models symlink to /Volumes/Ollama is in hosts/macbook-m4/home.nix
+    # NOTE: ollama not included - nixpkgs build fails; using manual Ollama.app install
+    # See hosts/macbook-m4/home.nix for models symlink to /Volumes/Ollama
 
     # ========================================================================
     # GUI applications
@@ -104,9 +104,10 @@ in
 
     # Mac App Store apps (requires signed into App Store)
     # Find app IDs: mas search <name> or https://github.com/mas-cli/mas
+    # Format: "App Name" = app_id;
     masApps = {
-      # Example: "Xcode" = 497799835;
-      # Example: "1Password" = 1333542190;
+      # "Xcode" = 497799835;
+      # "1Password" = 1333542190;
     };
   };
 

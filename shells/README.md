@@ -25,9 +25,9 @@ The environment will now load automatically when you `cd` into the project.
 
 | Template | Description | Key Packages |
 |----------|-------------|--------------|
-| `python/` | Basic Python development | Python 3.12, pip, venv |
-| `python-data/` | Data science / ML | Python 3.12, pandas, numpy, jupyter |
-| `js/` | Node.js development | Node.js 22, npm, yarn |
+| `python/` | Basic Python development | Python, pip, venv |
+| `python-data/` | Data science / ML | Python, pandas, numpy, jupyter |
+| `js/` | Node.js development | Node.js, npm, yarn, pnpm |
 | `go/` | Go development | Go, gopls, delve |
 
 ## Customization
