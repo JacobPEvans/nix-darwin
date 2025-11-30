@@ -5,6 +5,55 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-11-30
+
+### Added
+
+- **Hosts + Modules Architecture**: Major refactoring to support multi-host configurations
+  - Created `hosts/` directory with host-specific configurations:
+    - `macbook-m4/` - Active M4 Max MacBook Pro (nix-darwin + home-manager)
+    - `ubuntu-server/` - Template for Ubuntu server (home-manager standalone)
+    - `proxmox/` - Template for Proxmox server (home-manager standalone)
+    - `windows-server/` - Placeholder for future native Windows Nix support
+  - Created `modules/` directory with reusable modules:
+    - `darwin/common.nix` - macOS system packages, homebrew, settings
+    - `linux/common.nix` - Linux home-manager settings (XDG, packages)
+    - `home-manager/` - Cross-platform user configuration (shell, git, vscode, AI CLIs)
+  - Created `lib/` directory for shared configuration variables:
+    - `user-config.nix` - User info (name, email, GPG key, hostname)
+    - `server-config.nix` - Server hostnames and settings
+    - `home-manager-defaults.nix` - Shared home-manager settings (DRY)
+  - Each non-macOS host has its own `flake.nix` for standalone deployment
+
+- **Modern CLI Tools**: Added productivity tools for humans and AI assistants
+  - bat - Better cat with syntax highlighting
+  - delta - Better git diff viewer
+  - eza - Modern ls replacement with git integration
+  - fd - Faster, user-friendly find alternative
+  - fzf - Fuzzy finder for interactive selection
+  - htop - Interactive process viewer
+  - jq - JSON parsing
+  - ncdu - NCurses disk usage analyzer
+  - tldr - Simplified man pages
+  - tree - Directory visualization
+
+- **External Volume Management**:
+  - Ollama models symlink to `/Volumes/Ollama/models`
+  - `CONTAINER_DATA` environment variable for OrbStack (`/Volumes/ContainerData`)
+
+### Changed
+
+- **DRY Improvements**: Centralized all hardcoded values
+  - Username from `userConfig.user.name` everywhere
+  - Hostname from `userConfig.host.name`
+  - Home-manager settings from `lib/home-manager-defaults.nix`
+  - `nixpkgs.config.allowUnfree` moved to `modules/darwin/common.nix`
+
+- **Documentation**: Updated all docs to reflect new structure
+  - README.md - New directory structure, hosts table, package categories
+  - CLAUDE.md - Updated file paths for permissions and settings
+  - PLANNING.md - Simplified, removed completed phases
+
 ## 2025-11-29
 
 ### Added

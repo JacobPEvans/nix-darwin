@@ -8,9 +8,6 @@
 
 { config, pkgs, lib, ... }:
 
-let
-  serverConfig = import ../../lib/server-config.nix;
-in
 {
   # ==========================================================================
   # Linux-Specific Home-Manager Settings

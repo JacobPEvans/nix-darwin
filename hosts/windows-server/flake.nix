@@ -16,12 +16,14 @@
   };
 
   outputs = { self, nixpkgs, home-manager, ... }:
-    let
-      # Windows system type TBD - placeholder
-      system = "x86_64-windows";  # Future: actual Windows system type
-      # pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      # Placeholder - will be populated when Windows Nix support is available
-      # Expected: homeConfigurations.jevans or similar
+    # ==========================================================================
+    # PLACEHOLDER: This flake is non-functional until native Windows Nix support
+    # is available from Determinate Systems.
+    #
+    # "x86_64-windows" is NOT a valid Nix system type. When Windows support
+    # arrives, this will need to be updated to the actual system identifier.
+    # ==========================================================================
+    {
+      # Empty outputs - will be populated when Windows Nix support is available
     };
 }

@@ -1,8 +1,17 @@
-# Nix Darwin Configuration
+# Nix Configuration
 
-Declarative macOS system management for M4 Max MacBook Pro.
+Multi-host declarative system management using nix-darwin, home-manager, and flakes.
 
 **This is a flakes-only configuration.** All nix commands use flakes. No channels.
+
+## Hosts
+
+| Host | Platform | Status | Description |
+|------|----------|--------|-------------|
+| **macbook-m4** | aarch64-darwin | Active | M4 Max MacBook Pro (primary) |
+| **ubuntu-server** | x86_64-linux | Template | Ubuntu server (home-manager standalone) |
+| **proxmox** | x86_64-linux | Template | Proxmox server (home-manager standalone) |
+| **windows-server** | windows | Placeholder | Awaiting native Windows Nix support |
 
 ## How It Works
 
@@ -13,7 +22,7 @@ Declarative macOS system management for M4 Max MacBook Pro.
 | **home-manager** | Manages user config - shell, aliases, dotfiles |
 | **nixpkgs** | The package repository - ALL packages come from here |
 
-**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only (with auto-updates enabled).
+**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
 
 ## Quick Reference
 
@@ -42,7 +51,7 @@ darwin-rebuild --list-generations
 ### Adding Packages
 
 1. Search nixpkgs: `nix search nixpkgs <package>`
-2. Edit `darwin/configuration.nix`:
+2. Edit `modules/darwin/common.nix`:
    ```nix
    environment.systemPackages = with pkgs; [
      new-package  # Description of what it does
@@ -64,57 +73,69 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 
 ```
 ~/.config/nix/
-├── flake.nix                      # Entry point - darwinConfigurations.default
-├── flake.lock                     # Locked dependency versions (auto-managed)
-├── darwin/
-│   └── configuration.nix          # System packages, homebrew, macOS settings
-├── home/
-│   ├── home.nix                   # Main entry - imports all modules below
-│   ├── ai-cli/                    # AI CLI configurations (home.file entries)
-│   │   ├── claude.nix             # Claude Code settings + status line
-│   │   ├── gemini.nix             # Gemini CLI settings
-│   │   └── copilot.nix            # GitHub Copilot CLI config
-│   ├── claude-permissions.nix     # Claude Code: allow/deny permission lists
-│   ├── claude-permissions-ask.nix # Claude Code: user-prompted commands
-│   ├── gemini-permissions.nix     # Gemini CLI: coreTools & excludeTools
-│   ├── copilot-permissions.nix    # Copilot CLI: trusted_folders config
-│   ├── vscode-settings.nix        # VS Code: general editor settings
-│   ├── vscode-copilot-settings.nix # VS Code: GitHub Copilot settings
-│   └── zsh/                       # Modular shell configuration files
-├── CLAUDE.md                      # AI agent instructions (for Claude Code)
-├── README.md                      # This file - project overview
-├── SETUP.md                       # Initial setup and configuration decisions
-├── TROUBLESHOOTING.md             # Common issues and solutions
+├── flake.nix                      # Main entry point (macbook-m4 only)
+├── flake.lock                     # Locked dependency versions
+│
+├── hosts/                         # Host-specific configurations
+│   ├── macbook-m4/                # Active: M4 Max MacBook Pro
+│   │   ├── default.nix            # Darwin system settings
+│   │   └── home.nix               # User environment (Ollama, volumes)
+│   ├── ubuntu-server/             # Template: Ubuntu server
+│   │   ├── flake.nix              # Standalone flake for this host
+│   │   ├── default.nix            # System notes (apt-managed)
+│   │   └── home.nix               # home-manager config
+│   ├── proxmox/                   # Template: Proxmox server
+│   │   └── ...                    # Same structure as ubuntu-server
+│   └── windows-server/            # Placeholder: awaiting Windows Nix
+│       └── ...
+│
+├── modules/                       # Reusable configuration modules
+│   ├── darwin/
+│   │   └── common.nix             # macOS system packages, homebrew, settings
+│   ├── linux/
+│   │   └── common.nix             # Linux home-manager settings (XDG, packages)
+│   └── home-manager/
+│       ├── common.nix             # Cross-platform: shell, git, vscode
+│       ├── ai-cli/                # AI CLI tool configurations
+│       ├── permissions/           # AI CLI permission files
+│       ├── git/                   # Git aliases and settings
+│       ├── vscode/                # VS Code settings
+│       └── zsh/                   # Shell aliases and functions
+│
+├── lib/                           # Shared configuration variables
+│   ├── user-config.nix            # User info (name, email, GPG key)
+│   ├── server-config.nix          # Server hostnames and settings
+│   └── home-manager-defaults.nix  # Shared home-manager settings
+│
+├── CLAUDE.md                      # AI agent instructions
+├── SETUP.md                       # Initial setup guide
+├── TROUBLESHOOTING.md             # Common issues
 ├── CHANGELOG.md                   # Completed work history
-└── PLANNING.md                    # Future roadmap and tasks
+└── PLANNING.md                    # Future roadmap
 ```
 
 ## Current Packages
 
-**System packages** (darwin/configuration.nix):
-- gemini-cli - Google's Gemini CLI
-- gh - GitHub CLI
-- git - Version control
-- gnupg - GPG encryption
-- nodejs_latest - Node.js runtime
-- vim - Text editor
-- vscode - Visual Studio Code editor
+**System packages** (`modules/darwin/common.nix`):
 
-**Homebrew casks** (darwin/configuration.nix):
-- claude-code - Anthropic's AI coding assistant (upgraded on `darwin-rebuild switch`)
+| Category | Packages |
+|----------|----------|
+| Core CLI | git, gnupg, vim |
+| Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
+| Development | gemini-cli, gh, nodejs_latest |
+| GUI | raycast, vscode |
 
-**User configuration** (home/home.nix):
-- VS Code settings merged from `vscode-settings.nix` and `vscode-copilot-settings.nix`
-- Zsh shell with aliases and functions from `zsh/` directory
+**Homebrew casks** (fallback only):
+- claude-code - Rapidly-evolving tool, needs frequent updates
 
 **AI CLI Configurations** (fully Nix-managed):
 
 | Tool | Config File | Nix Source |
 |------|-------------|------------|
-| Claude Code | `~/.claude/settings.json` | `claude-permissions.nix`, `claude-permissions-ask.nix` |
-| Gemini CLI | `~/.gemini/settings.json` | `gemini-permissions.nix` |
-| Copilot CLI | `~/.copilot/config.json` | `copilot-permissions.nix` |
-| VS Code Copilot | VS Code `settings.json` | `vscode-copilot-settings.nix` |
+| Claude Code | `~/.claude/settings.json` | `modules/home-manager/permissions/` |
+| Gemini CLI | `~/.gemini/settings.json` | `modules/home-manager/permissions/` |
+| Copilot CLI | `~/.copilot/config.json` | `modules/home-manager/permissions/` |
+| VS Code Copilot | VS Code `settings.json` | `modules/home-manager/vscode/` |
 
 All AI tools follow principle of least privilege with categorized command structures.
 
