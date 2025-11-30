@@ -75,9 +75,6 @@ in
       # GPG: Required for pinentry to prompt for passphrase in terminal
       export GPG_TTY=$(tty)
 
-      # Git: Point Nix-installed git to system config (enforces security policies)
-      export GIT_CONFIG_SYSTEM=/etc/gitconfig
-
       source ${./zsh/git-functions.zsh}
       source ${./zsh/docker-functions.zsh}
       source ${./zsh/macos-setup.zsh}
@@ -88,15 +85,18 @@ in
   # ==========================================================================
   # Git
   # ==========================================================================
-  # User-level git config (~/.config/git/config)
-  # System-level security policies (commit signing required) are in /etc/gitconfig
+  # Fully Nix-managed git config (~/.config/git/config)
+  # Security policy: All commits and tags must be GPG signed
   # User values from lib/user-config.nix
   programs.git = {
     enable = true;
 
-    # GPG signing - which key to use (signing requirement is system-level)
+    # GPG signing configuration
     # NOTE: Key ID is a public identifier, not the private key (safe to commit)
-    signing.key = userConfig.gpg.signingKey;
+    signing = {
+      key = userConfig.gpg.signingKey;
+      signByDefault = true;  # Enforced by security policy
+    };
 
     # All git settings (new unified syntax)
     settings = {
@@ -148,7 +148,8 @@ in
         autoupdate = true;            # Auto-stage rerere resolutions
       };
 
-      # NOTE: tag.gpgSign is set at system level (/etc/gitconfig)
+      # Sign all tags (security policy)
+      tag.gpgSign = true;
 
       # Helpful features
       help.autocorrect = 10;          # Auto-correct typos after 1 second

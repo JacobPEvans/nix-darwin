@@ -51,12 +51,9 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Control center: battery %, Bluetooth, Sound, Display visible
 
 - **Security Policies** (`lib/security-policies.nix`):
-  - NEW: Universal security settings for all systems (macOS, Linux, Windows)
-  - System-level git config (`/etc/gitconfig`) enforces:
-    - `commit.gpgSign = true` - All commits must be signed
-    - `tag.gpgSign = true` - All tags must be signed
-    - `fsckObjects = true` - Integrity checks on transfer/fetch/receive
-  - User-level config specifies which GPG key to use
+  - NEW: Policy document for git security requirements
+  - Documents what we want (signed commits/tags, fsck checks)
+  - Implemented via home-manager's native git options
 
 - **GPG Shell Integration**:
   - Added `export GPG_TTY=$(tty)` to zsh initContent
@@ -64,9 +61,9 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
 
 ### Changed
 
-- **Git Configuration Architecture**:
-  - System-level (`/etc/gitconfig`): Security policies (cannot be bypassed)
-  - User-level (`~/.config/git/config`): Identity, GPG key, preferences
+- **Git Configuration** (Nix-native approach):
+  - `programs.git.signing.signByDefault = true` in home-manager
+  - `settings.tag.gpgSign = true` for signed tags
   - Removed conflicting `~/.gitconfig` (was overriding Nix-managed config)
 
 - **REFERENCES.md**: Trimmed from 284 to 70 lines (removed verbose examples)

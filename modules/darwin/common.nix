@@ -2,7 +2,6 @@
 
 let
   userConfig = import ../../lib/user-config.nix;
-  securityPolicies = import ../../lib/security-policies.nix;
 in
 {
   imports = [
@@ -98,13 +97,6 @@ in
 
   # Enable zsh
   programs.zsh.enable = true;
-
-  # ==========================================================================
-  # System-Level Git Configuration (/etc/gitconfig)
-  # ==========================================================================
-  # Security policies from lib/security-policies.nix - applies to ALL users.
-  # User-specific settings (GPG key, identity) are in home-manager.
-  environment.etc."gitconfig".text = securityPolicies.git.systemConfig;
 
   # Disable nix-darwin's Nix management (using Determinate Nix installer instead)
   nix.enable = false;

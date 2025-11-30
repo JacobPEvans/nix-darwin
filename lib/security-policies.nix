@@ -1,32 +1,28 @@
 # Security Policies
 #
-# Universal security settings that apply to ALL systems (macOS, Linux, Windows).
-# These are enforced at the system level and cannot be overridden by users.
+# Documents security requirements that apply across all systems.
+# These are POLICIES (what we want), not configs (how to achieve it).
 #
-# Each OS-specific module imports these and writes to the appropriate location:
-# - macOS/Linux: /etc/gitconfig
-# - Windows: C:\ProgramData\Git\config (when supported)
+# Implementation:
+# - Git: home-manager programs.git.signing.signByDefault
+#
+# This file serves as:
+# 1. Single source of truth for security requirements
+# 2. Documentation for auditing
+# 3. Values that can be imported where needed
 
 {
   # ==========================================================================
-  # Git Security Policies
+  # Git Security
   # ==========================================================================
-  # These settings enforce security best practices for all git operations.
-  # User-specific settings (like which GPG key to use) are in home-manager.
-
   git = {
-    # The actual gitconfig content to write to /etc/gitconfig
-    systemConfig = ''
-      [commit]
-        gpgSign = true
-      [tag]
-        gpgSign = true
-      [transfer]
-        fsckObjects = true
-      [fetch]
-        fsckObjects = true
-      [receive]
-        fsckObjects = true
-    '';
+    # All commits must be cryptographically signed
+    requireSignedCommits = true;
+
+    # All tags must be cryptographically signed
+    requireSignedTags = true;
+
+    # Verify object integrity on transfer operations
+    fsckObjects = true;
   };
 }
