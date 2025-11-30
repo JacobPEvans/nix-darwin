@@ -13,7 +13,7 @@
 ## Current Work: macOS System Preferences Audit
 
 **Branch**: `feat/macos-system-audit`
-**PR**: Pending
+**PR**: #10
 
 ### Phase 1: System Services & UI Defaults ✅ COMPLETE
 - [x] Enable SSH/Remote Login via `services.openssh.enable`
@@ -22,14 +22,15 @@
 - [x] Create `REFERENCES.md` with external documentation links
 - [x] Review backup/ folder for reusable configurations
 
-### Phase 2: Remaining System Preferences (Next)
-- [ ] Keyboard settings (KeyRepeat, InitialKeyRepeat, AppleKeyboardUIMode)
-- [ ] Trackpad settings (tap-to-click, gestures, force click)
-- [ ] NSGlobalDomain settings (global UI preferences)
-- [ ] Screensaver/Lock Screen settings
-- [ ] Menu bar clock configuration
+### Phase 2: Input & System UI ✅ COMPLETE
+- [x] Keyboard settings (KeyRepeat, InitialKeyRepeat, AppleKeyboardUIMode)
+- [x] Trackpad settings (tap-to-click, gestures, force click)
+- [x] NSGlobalDomain settings (appearance, text, windows)
+- [x] Menu bar clock configuration
+- [x] Login window settings
+- [x] Trim REFERENCES.md (removed verbose examples)
 
-### Phase 3: Application Management
+### Phase 3: Application Management (Next)
 - [ ] Audit installed applications (/Applications)
 - [ ] Add essential apps to nix: Obsidian, Brave, Slack
 - [ ] Review login items for nix management

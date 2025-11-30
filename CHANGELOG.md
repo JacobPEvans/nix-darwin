@@ -28,18 +28,29 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Auto-remove trash items after 30 days
   - CustomUserPreferences for additional settings
 
-- **REFERENCES.md**: Comprehensive external documentation hub
-  - nix-darwin options with raw GitHub source links
-  - home-manager documentation links
-  - macOS defaults exploration commands and resources
-  - AI CLI tool documentation (Claude, Gemini, Copilot)
-  - Quick reference code blocks for Dock and Finder options
-  - Package search resources
+- **REFERENCES.md**: External documentation hub (links only, minimal examples)
+
+- **Keyboard Configuration** (`modules/darwin/keyboard.nix`):
+  - Fast key repeat (KeyRepeat=5, InitialKeyRepeat=25)
+  - Full keyboard access (AppleKeyboardUIMode=3)
+  - Disabled press-and-hold for key repeat
+
+- **Trackpad Configuration** (`modules/darwin/trackpad.nix`):
+  - Tap-to-click enabled
+  - Two-finger right-click
+  - Natural scrolling, force click enabled
+
+- **System UI Configuration** (`modules/darwin/system-ui.nix`):
+  - Dark mode, auto-scrollbars
+  - Disabled auto-capitalization, smart quotes, spell correction
+  - Expanded save/print panels by default
+  - Menu bar clock with date and day of week
+  - Guest account disabled
 
 ### Changed
 
-- **README.md**: Updated to reference REFERENCES.md, added to directory structure
-- **modules/darwin/common.nix**: Now imports dock.nix and finder.nix
+- **REFERENCES.md**: Trimmed from 284 to 70 lines (removed verbose examples)
+- **modules/darwin/common.nix**: Now imports keyboard, trackpad, system-ui modules
 
 ---
 
