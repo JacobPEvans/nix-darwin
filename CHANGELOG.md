@@ -47,10 +47,27 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Menu bar clock with date and day of week
   - Guest account disabled
   - Screensaver password required immediately
-  - Screenshots: PNG, no shadow, saved to Desktop
+  - Screenshots: PNG, no shadow, default location
   - Control center: battery %, Bluetooth, Sound, Display visible
 
+- **Security Policies** (`lib/security-policies.nix`):
+  - NEW: Universal security settings for all systems (macOS, Linux, Windows)
+  - System-level git config (`/etc/gitconfig`) enforces:
+    - `commit.gpgSign = true` - All commits must be signed
+    - `tag.gpgSign = true` - All tags must be signed
+    - `fsckObjects = true` - Integrity checks on transfer/fetch/receive
+  - User-level config specifies which GPG key to use
+
+- **GPG Shell Integration**:
+  - Added `export GPG_TTY=$(tty)` to zsh initContent
+  - Required for pinentry to prompt for passphrase in terminal
+
 ### Changed
+
+- **Git Configuration Architecture**:
+  - System-level (`/etc/gitconfig`): Security policies (cannot be bypassed)
+  - User-level (`~/.config/git/config`): Identity, GPG key, preferences
+  - Removed conflicting `~/.gitconfig` (was overriding Nix-managed config)
 
 - **REFERENCES.md**: Trimmed from 284 to 70 lines (removed verbose examples)
 - **modules/darwin/common.nix**: Now imports keyboard, trackpad, system-ui modules

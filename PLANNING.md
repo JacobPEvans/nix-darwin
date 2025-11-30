@@ -29,9 +29,11 @@
 - [x] Menu bar clock configuration
 - [x] Login window settings
 - [x] Screensaver & lock screen (password required immediately)
-- [x] Screenshots (PNG, no shadow, Desktop)
+- [x] Screenshots (PNG, no shadow, default location)
 - [x] Control center (battery %, menu bar items)
 - [x] Trim REFERENCES.md (removed verbose examples)
+- [x] Security policies (`lib/security-policies.nix`) - system-level git signing
+- [x] GPG shell integration (GPG_TTY for pinentry)
 
 ### Phase 3: Application Management (Next)
 - [ ] Audit installed applications (/Applications)
@@ -77,8 +79,7 @@ Current hosts+modules architecture supports this. Next steps:
 ## Known Limitations
 
 1. **Nix Settings Warnings**: Harmless forward-compatibility warnings from Determinate Nix
-2. **GPG Warning**: "unsafe ownership" warning (functional, not blocking)
-3. **Homebrew Exception**: claude-code via homebrew for rapid updates
+2. **Homebrew Exception**: claude-code via homebrew for rapid updates
 
 ## Maintenance Plan
 

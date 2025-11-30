@@ -105,6 +105,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 ├── lib/                           # Shared configuration variables
 │   ├── user-config.nix            # User info (name, email, GPG key)
 │   ├── server-config.nix          # Server hostnames and settings
+│   ├── security-policies.nix      # System-level security (git signing, etc.)
 │   └── home-manager-defaults.nix  # Shared home-manager settings
 │
 ├── CLAUDE.md                      # AI agent instructions
