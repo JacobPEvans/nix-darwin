@@ -8,6 +8,8 @@
 #   2. Create .envrc with "use flake"
 #   3. Run: direnv allow
 #
+# Or manually: nix develop
+#
 # Start Jupyter: jupyter lab
 
 {
