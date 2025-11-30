@@ -70,6 +70,7 @@ in
     # ========================================================================
     # GUI applications
     # ========================================================================
+    bitwarden-desktop  # Password manager desktop app
     obsidian        # Knowledge base / note-taking (Markdown)
     raycast         # Productivity launcher (replaces Spotlight)
     vscode          # Visual Studio Code editor

@@ -133,7 +133,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 | Core CLI | git, gnupg, vim |
 | Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
 | Development | gemini-cli, gh, mas, nodejs_latest (ollama via manual install) |
-| GUI | obsidian, raycast, vscode, zoom-us |
+| GUI | bitwarden-desktop, obsidian, raycast, vscode, zoom-us |
 
 **System-level tools** (`modules/common/packages.nix` - all platforms):
 
@@ -141,6 +141,8 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 |----------|----------|
 | Git hooks | pre-commit |
 | Linters | shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic |
+| Security | bitwarden-cli |
+| Cloud (AWS) | awscli2, aws-vault |
 
 **Homebrew casks** (fallback only):
 - claude-code - Rapidly-evolving tool, needs frequent updates
