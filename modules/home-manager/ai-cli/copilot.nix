@@ -15,12 +15,12 @@
 { config, ... }:
 
 let
-  copilotConfig = import ../permissions/copilot-permissions.nix { inherit config; };
+  copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config; };
 in
 {
   ".copilot/config.json".text = builtins.toJSON {
     # Trusted directories where Copilot can operate without confirmation
-    trusted_folders = copilotConfig.trusted_folders;
+    trusted_folders = copilotAllow.trusted_folders;
 
     # Additional Copilot CLI settings can be added here
     # Note: Tool-level permissions require CLI flags, not config settings

@@ -99,11 +99,10 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Layered Strategy**: Nix manages baseline, settings.local.json for ad-hoc approvals
 
-**Nix-managed** (`~/.claude/settings.json`):
-- Defined in `modules/home-manager/permissions/claude-permissions.nix`
-- 280+ commands in 25 categories
-- Version controlled, reproducible
-- Updated via darwin-rebuild
+**Permission files** (`modules/home-manager/permissions/`):
+- `claude-permissions-allow.nix` - Auto-approved commands (280+ in 25 categories)
+- `claude-permissions-ask.nix` - Commands requiring user confirmation
+- `claude-permissions-deny.nix` - Permanently blocked (catastrophic operations)
 
 **User-managed** (`~/.claude/settings.local.json`):
 - NOT managed by Nix (intentionally writable)
@@ -117,8 +116,8 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Default: `~/`, `~/.claude/`, `~/.config/`
 
 **To add commands permanently**:
-1. Edit `modules/home-manager/permissions/claude-permissions.nix`
-2. Add to appropriate category
+1. Edit appropriate file in `modules/home-manager/permissions/`
+2. Add to appropriate category (allow, ask, or deny)
 3. Commit and rebuild
 
 **For quick approval**: Just click "accept indefinitely" in Claude UI
@@ -129,11 +128,10 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Configuration location**: `~/.gemini/settings.json`
 
-**Nix-managed** (`modules/home-manager/permissions/gemini-permissions.nix`):
-- `coreTools`: List of allowed built-in tools and shell commands
-- `excludeTools`: List of permanently blocked commands
-- Mirrors Claude Code's permission structure for consistency
-- Uses `ShellTool(command)` syntax for shell command restrictions
+**Permission files** (`modules/home-manager/permissions/`):
+- `gemini-permissions-allow.nix` - coreTools (allowed commands)
+- `gemini-permissions-ask.nix` - Reference only (Gemini has no ask mode)
+- `gemini-permissions-deny.nix` - excludeTools (permanently blocked)
 
 **Permission model**:
 - **ReadFileTool, GlobTool, GrepTool**: Core read-only tools (always allowed)
@@ -143,15 +141,14 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - **WebFetchTool**: Web fetching capabilities
 
 **To add commands permanently**:
-1. Edit `modules/home-manager/permissions/gemini-permissions.nix`
-2. Add to appropriate category in `coreTools` or `excludeTools`
+1. Edit appropriate file in `modules/home-manager/permissions/`
+2. Add to `coreTools` (allow) or `excludeTools` (deny)
 3. Use format: `ShellTool(command)` for shell commands
 4. Commit and rebuild
 
 **Security notes**:
-- Command-specific restrictions use simple string matching
-- Not a security boundary - use for workflow control
-- Explicitly list allowed commands in coreTools for safety
+- Gemini CLI has no "ask" mode - commands are either allowed or blocked
+- The ask file exists for reference to maintain sync with Claude/Copilot
 - See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
 
 ## GitHub Copilot CLI Permission Management
@@ -160,13 +157,13 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Configuration location**: `~/.copilot/config.json`
 
-**Nix-managed** (`modules/home-manager/permissions/copilot-permissions.nix`):
-- `trusted_folders`: Array of directory paths where Copilot can operate
-- Default trusted directories: `~/projects`, `~/repos`, `~/.config/nix`
-- Recommended CLI flag patterns documented in comments
+**Permission files** (`modules/home-manager/permissions/`):
+- `copilot-permissions-allow.nix` - trusted_folders (directory trust)
+- `copilot-permissions-ask.nix` - Reference only (Copilot uses CLI flags)
+- `copilot-permissions-deny.nix` - Recommended --deny-tool flags
 
 **Permission model**:
-- **Directory trust**: Copilot requires explicit directory approval
+- **Directory trust**: Copilot requires explicit directory approval (config.json)
 - **Tool permissions**: Controlled via CLI flags (NOT config file)
   - `--allow-tool 'shell'`: Allow all shell commands
   - `--allow-tool 'write'`: Allow file writes
@@ -186,17 +183,13 @@ copilot --deny-tool 'My-MCP-Server(tool_name)'
 ```
 
 **To modify trusted directories**:
-1. Edit `modules/home-manager/permissions/copilot-permissions.nix`
+1. Edit `modules/home-manager/permissions/copilot-permissions-allow.nix`
 2. Add/remove paths in `trustedDevelopmentDirs` or `trustedConfigDirs`
 3. Commit and rebuild
 
-**Implementation options**:
-- **Shell alias**: Add to ~/.zshrc or Nix shell config
-- **Wrapper script**: Create script with preferred flags
-- **Per-session**: Manually specify flags when invoking copilot
-
 **Note**: Unlike Claude/Gemini, Copilot's command-level permissions require
-runtime flags. The config file only manages directory trust.
+runtime flags. The config file only manages directory trust. The ask file
+exists for reference to maintain sync with Claude/Gemini structures.
 
 ## VS Code GitHub Copilot Configuration
 

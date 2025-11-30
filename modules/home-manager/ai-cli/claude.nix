@@ -11,8 +11,9 @@
 { config, pkgs, ... }:
 
 let
-  claudePerms = import ../permissions/claude-permissions.nix { };
-  claudeAsks = import ../permissions/claude-permissions-ask.nix { };
+  claudeAllow = import ../permissions/claude-permissions-allow.nix { };
+  claudeAsk = import ../permissions/claude-permissions-ask.nix { };
+  claudeDeny = import ../permissions/claude-permissions-deny.nix { };
 in
 {
   # Claude Code settings.json
@@ -24,9 +25,9 @@ in
     # See home/claude-permissions.nix for full categorized list
     # User-prompted commands in home/claude-permissions-ask.nix
     permissions = {
-      allow = claudePerms.allowList;
-      deny = claudePerms.denyList;
-      ask = claudeAsks.askList;
+      allow = claudeAllow.allowList;
+      deny = claudeDeny.denyList;
+      ask = claudeAsk.askList;
 
       # Directory-level read access
       # Grants Claude access to files outside the current working directory

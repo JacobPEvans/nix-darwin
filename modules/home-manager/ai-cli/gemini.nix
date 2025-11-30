@@ -7,20 +7,24 @@
 # - coreTools: List of allowed built-in tools and shell commands
 # - excludeTools: List of permanently blocked commands
 #
-# See home/gemini-permissions.nix for categorized command lists
+# Permission files:
+# - gemini-permissions-allow.nix - coreTools (allowed commands)
+# - gemini-permissions-deny.nix - excludeTools (blocked commands)
+# - gemini-permissions-ask.nix - Reference only (Gemini doesn't support ask mode)
 
 { config, ... }:
 
 let
-  geminiPerms = import ../permissions/gemini-permissions.nix { inherit config; };
+  geminiAllow = import ../permissions/gemini-permissions-allow.nix { inherit config; };
+  geminiDeny = import ../permissions/gemini-permissions-deny.nix { };
 in
 {
   ".gemini/settings.json".text = builtins.toJSON {
     # Allowed tools (safe, read-focused operations)
-    coreTools = geminiPerms.coreTools;
+    coreTools = geminiAllow.coreTools;
 
     # Blocked tools (catastrophic operations)
-    excludeTools = geminiPerms.excludeTools;
+    excludeTools = geminiDeny.excludeTools;
 
     # Additional Gemini CLI settings can be added here
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html

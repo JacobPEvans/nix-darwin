@@ -1,17 +1,21 @@
-# Claude Code User-Prompted Commands
+# Claude Code User-Prompted Commands (ASK List)
 #
 # This file defines commands that require explicit user approval.
 # These are potentially dangerous but may be necessary in specific contexts.
+#
+# FILE STRUCTURE:
+# - claude-permissions-allow.nix - Auto-approved commands
+# - claude-permissions-ask.nix (this file) - Commands requiring user confirmation
+# - claude-permissions-deny.nix - Permanently blocked commands
+#
+# NOTE: These permission lists are kept in sync across Claude, Gemini, and Copilot.
+# Currently each AI has separate files. Future improvement: DRY refactor to share
+# common command lists across all AI tools.
 #
 # SECURITY STRATEGY:
 # - User must explicitly approve each execution (not auto-approved)
 # - Useful for ad-hoc tasks but not automation
 # - Provides flexibility while maintaining baseline security
-#
-# PHILOSOPHY:
-# - Principle of least privilege in baseline (allow list)
-# - Dangerous capabilities require explicit confirmation
-# - User retains full control when needed
 #
 
 { ... }:

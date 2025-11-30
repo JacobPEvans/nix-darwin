@@ -1,11 +1,20 @@
-# Gemini CLI Auto-Approved Commands
+# Gemini CLI Auto-Approved Commands (ALLOW List / coreTools)
 #
 # This file defines baseline permissions for Gemini CLI using coreTools.
 # Commands are organized by category matching Claude Code structure.
 #
-# GEMINI CLI PERMISSION MODEL:
-# - coreTools: List of tools/commands that can be executed (this file)
-# - excludeTools: List of blocked tools/commands (excludeList below)
+# FILE STRUCTURE:
+# - gemini-permissions-allow.nix (this file) - Auto-approved commands (coreTools)
+# - gemini-permissions-ask.nix - Commands that would require confirmation (reference only)
+# - gemini-permissions-deny.nix - Permanently blocked commands (excludeTools)
+#
+# NOTE: These permission lists are kept in sync across Claude, Gemini, and Copilot.
+# Currently each AI has separate files. Future improvement: DRY refactor to share
+# common command lists across all AI tools.
+#
+# NOTE: Gemini CLI does not have an "ask" mode - commands are either allowed (coreTools)
+# or blocked (excludeTools). The gemini-permissions-ask.nix file exists for reference
+# to keep sync with Claude/Copilot permission structures.
 #
 # PRINCIPLE OF LEAST PRIVILEGE:
 # - Only include commands with minimal risk in coreTools
@@ -463,97 +472,4 @@ in
     ++ processCommands
     ++ macosCommands
     ++ geminiWebTools;
-
-  # Explicitly EXCLUDED commands - catastrophic operations
-  # These are blocked permanently using excludeTools
-  excludeTools = [
-    # === CATASTROPHIC FILE DESTRUCTION ===
-    "ShellTool(rm -rf /)"
-    "ShellTool(rm -rf /*)"
-    "ShellTool(rm -rf ~)"
-    "ShellTool(rm -fr /)"
-    "ShellTool(rm -fr /*)"
-    "ShellTool(rm --recursive --force /)"
-    "ShellTool(rm --recursive --force /*)"
-
-    # === HTTP WRITE OPERATIONS (Data Exfiltration) ===
-    "ShellTool(curl -X POST)"
-    "ShellTool(curl -X PUT)"
-    "ShellTool(curl -X DELETE)"
-    "ShellTool(curl -X PATCH)"
-    "ShellTool(curl --request POST)"
-    "ShellTool(curl --request PUT)"
-    "ShellTool(curl --request DELETE)"
-    "ShellTool(curl --request PATCH)"
-    "ShellTool(curl -d)"
-    "ShellTool(curl --data)"
-
-    # === SYSTEM-LEVEL DESTRUCTION ===
-    "ShellTool(sudo rm)"
-    "ShellTool(sudo dd)"
-    "ShellTool(mkfs)"
-    "ShellTool(fdisk)"
-    "ShellTool(diskutil)"
-
-    # === PRIVILEGE ESCALATION ===
-    "ShellTool(sudo su)"
-    "ShellTool(sudo -i)"
-    "ShellTool(sudo bash)"
-    "ShellTool(sudo -s)"
-
-    # === REVERSE SHELLS / NETWORK LISTENERS ===
-    "ShellTool(nc -l)"
-    "ShellTool(ncat -l)"
-    "ShellTool(socat)"
-
-    # === ARBITRARY CODE EXECUTION ===
-    "ShellTool(npx)"
-    "ShellTool(docker exec)"
-    "ShellTool(docker run)"
-    "ShellTool(osascript)"
-    "ShellTool(sqlite3)"
-    "ShellTool(mongosh)"
-
-    # === VERSION CONTROL DESTRUCTIVE ===
-    "ShellTool(git reset)"
-
-    # === SECURITY & CRYPTOGRAPHY ===
-    "ShellTool(gpg)"
-    "ShellTool(chown)"
-
-    # === SYSTEM INFORMATION DISCLOSURE ===
-    "ShellTool(log show)"
-
-    # === DESTRUCTIVE FILE OPERATIONS ===
-    "ShellTool(chmod)"
-    "ShellTool(rm)"
-    "ShellTool(rmdir)"
-    "ShellTool(cp)"
-    "ShellTool(mv)"
-
-    # === IN-PLACE FILE MODIFICATION ===
-    # sed/awk general use allowed in coreTools for text processing
-    # Only block the destructive in-place editing variants
-    "ShellTool(sed -i)"
-    "ShellTool(sed --in-place)"
-
-    # === CLOUD INFRASTRUCTURE DESTRUCTION ===
-    "ShellTool(aws s3 cp)"
-    "ShellTool(aws s3 sync)"
-    "ShellTool(aws s3 rm)"
-    "ShellTool(aws ec2 run-instances)"
-    "ShellTool(aws ec2 terminate-instances)"
-    "ShellTool(aws lambda invoke)"
-    "ShellTool(aws cloudformation delete-stack)"
-
-    # === KUBERNETES CLUSTER MODIFICATION ===
-    "ShellTool(kubectl apply)"
-    "ShellTool(kubectl create)"
-    "ShellTool(kubectl delete)"
-    "ShellTool(kubectl set)"
-    "ShellTool(kubectl patch)"
-    "ShellTool(helm install)"
-    "ShellTool(helm upgrade)"
-    "ShellTool(helm uninstall)"
-  ];
 }
