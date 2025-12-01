@@ -53,4 +53,21 @@
   # --disable-copyfile: don't include macOS resource forks
   # --exclude='.DS_Store': skip Finder metadata files
   tgz = "tar --disable-copyfile --exclude='.DS_Store' -czf";
+
+  # ===========================================================================
+  # AWS (aws-vault for credential management)
+  # ===========================================================================
+  # aws-vault stores credentials in macOS Keychain and provides temporary
+  # session credentials to commands. Always use aws-vault exec for AWS CLI.
+  #
+  # Usage:
+  #   av default -- aws s3 ls        # Run command with default profile
+  #   av terraform -- terraform plan # Run terraform with specific profile
+  #   avl                            # List all profiles in vault
+  #   avd aws sts get-caller-identity # Quick check with default profile
+  av = "aws-vault exec";              # Execute command with profile credentials
+  avl = "aws-vault list";             # List profiles stored in vault
+  avd = "aws-vault exec default --";  # Execute with default profile
+  ava = "aws-vault add";              # Add new profile credentials to vault
+  avr = "aws-vault remove";           # Remove profile from vault
 }
