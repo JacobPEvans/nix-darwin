@@ -47,37 +47,42 @@
 
 { config, ... }:
 
+let
+  # Default values for all profiles (change here to update all)
+  defaultRegion = "us-east-2";
+  defaultOutput = "json";
+in
 {
   # ~/.aws/config - AWS CLI configuration
   ".aws/config".text = ''
     # Default profile - used when no --profile is specified
     [default]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
 
     # Development environment
     [profile dev]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
 
     # Test environment
     [profile test]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
 
     # Terraform automation
     [profile terraform]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
 
     # Cribl environment
     [profile cribl]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
 
     # Splunk environment
     [profile splunk]
-    region = us-east-2
-    output = json
+    region = ${defaultRegion}
+    output = ${defaultOutput}
   '';
 }
