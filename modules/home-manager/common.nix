@@ -17,6 +17,9 @@ let
   # npm configuration (home.file entries)
   npmFiles = import ./npm/config.nix { inherit config; };
 
+  # AWS CLI configuration (home.file entries)
+  awsFiles = import ./aws/config.nix { inherit config; };
+
   # AI CLI configuration imports (home.file entries)
   claudeFiles = import ./ai-cli/claude.nix { inherit config pkgs; };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
@@ -199,5 +202,5 @@ in
   # - claude-permissions.nix, claude-permissions-ask.nix
   # - gemini-permissions.nix
   # - copilot-permissions.nix
-  home.file = npmFiles // claudeFiles // geminiFiles // copilotFiles;
+  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles;
 }
