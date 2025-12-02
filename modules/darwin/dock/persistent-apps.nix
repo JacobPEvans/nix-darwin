@@ -41,7 +41,7 @@ in
       "/Applications/OrbStack.app"
 
       # Browsers
-      "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+      "/Applications/Safari.app"
       "/Applications/Brave Browser.app"
       "/Applications/Google Chrome.app"
 
@@ -54,7 +54,7 @@ in
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
     persistent-others = [
-      "${homeDir}/Applications/Mind Tickle.app"
+      "${homeDir}/Applications/Mind Tickle.app"  # Sales enablement platform
       "/System/Applications/TextEdit.app"
       "/System/Applications/iPhone Mirroring.app"
       "/System/Applications/System Settings.app"

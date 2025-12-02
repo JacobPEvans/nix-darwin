@@ -70,8 +70,7 @@ let
     # Staging and committing
     "ShellTool(git add)"
     "ShellTool(git commit)"
-    "ShellTool(git reset)"
-    "ShellTool(git restore)"
+    # NOTE: git reset/restore excluded (potentially destructive, no ask mode in Gemini)
     # Remote operations
     "ShellTool(git push)"
     "ShellTool(git pull)"
@@ -81,12 +80,12 @@ let
     # Merging and rebasing
     "ShellTool(git merge)"
     "ShellTool(git rebase)"
-    "ShellTool(git cherry-pick)"
+    # NOTE: git cherry-pick excluded (can cause conflicts, no ask mode in Gemini)
     # Stash management
     "ShellTool(git stash)"
     # File operations
     "ShellTool(git mv)"
-    "ShellTool(git rm)"
+    # NOTE: git rm excluded (removes files, no ask mode in Gemini)
     # Configuration
     "ShellTool(git config)"
     # Maintenance

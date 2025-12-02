@@ -27,7 +27,7 @@ nix search nixpkgs <name>
 sudo darwin-rebuild --rollback
 
 # List all generations
-darwin-rebuild --list-generations
+sudo darwin-rebuild --list-generations
 ```
 
 ---
@@ -142,14 +142,14 @@ sudo darwin-rebuild switch --flake ~/.config/nix#default
 
 ```bash
 # Rollback to previous generation
-darwin-rebuild --rollback
+sudo darwin-rebuild --rollback
 ```
 
 ### Switch to Specific Generation
 
 ```bash
 # List available generations
-darwin-rebuild --list-generations
+sudo darwin-rebuild --list-generations
 
 # Activate specific generation
 sudo /nix/var/nix/profiles/system-<N>-link/activate

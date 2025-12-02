@@ -46,10 +46,13 @@ let
   ];
 
   # === VERSION CONTROL DESTRUCTIVE OPERATIONS ===
-  # git reset can discard commits and lose work if misused
+  # These commands can discard work or cause issues if misused
   # Moderate risk: can lose uncommitted/committed work
   gitDestructiveOperations = [
-    "Bash(git reset:*)"
+    "Bash(git reset:*)"       # Can discard commits and changes
+    "Bash(git restore:*)"     # Can discard uncommitted changes
+    "Bash(git rm:*)"          # Removes files from working tree and index
+    "Bash(git cherry-pick:*)" # Can cause merge conflicts
   ];
 
   # === SECURITY & CRYPTOGRAPHY ===

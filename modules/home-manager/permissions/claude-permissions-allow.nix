@@ -22,11 +22,11 @@
 # - Curl limited to GET requests only
 # - sed/awk without -i (no in-place file modification)
 
-{ ... }:
+{ config, ... }:
 
 let
-  userConfig = import ../../../lib/user-config.nix;
-  username = userConfig.user.name;
+  # Use config.home.username for consistency with other permission files
+  username = config.home.username;
 
   # Core read-only tools (always safe)
   coreReadTools = [
@@ -62,8 +62,7 @@ let
     # Staging and committing
     "Bash(git add:*)"
     "Bash(git commit:*)"
-    "Bash(git reset:*)"
-    "Bash(git restore:*)"
+    # NOTE: git reset and git restore moved to ask list (potentially destructive)
     # Remote operations
     "Bash(git push:*)"
     "Bash(git pull:*)"
@@ -73,12 +72,12 @@ let
     # Merging and rebasing
     "Bash(git merge:*)"
     "Bash(git rebase:*)"
-    "Bash(git cherry-pick:*)"
+    # NOTE: git cherry-pick moved to ask list (can cause conflicts/issues)
     # Stash management
     "Bash(git stash:*)"
     # File operations
     "Bash(git mv:*)"
-    "Bash(git rm:*)"
+    # NOTE: git rm moved to ask list (removes files from working tree)
     # Configuration
     "Bash(git config:*)"
     # Maintenance
