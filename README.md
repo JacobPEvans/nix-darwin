@@ -51,9 +51,8 @@ Nix flakes pin exact versions for reproducibility. To get newer package versions
 nix flake update --flake ~/.config/nix
 
 # 2. Commit the updated lock file (required for flakes)
-cd ~/.config/nix
-git add flake.lock
-git commit -m "chore: update flake inputs"
+git -C ~/.config/nix add flake.lock
+git -C ~/.config/nix commit -m "chore: update flake inputs"
 
 # 3. Rebuild with new versions
 sudo darwin-rebuild switch --flake ~/.config/nix#default
