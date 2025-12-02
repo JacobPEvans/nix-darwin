@@ -179,6 +179,39 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 
 ## Application Issues
 
+### mac-app-util Build Failure (gitlab.common-lisp.net)
+
+**Problem**: Build fails with errors like:
+```
+tar: This does not look like a tar archive
+do not know how to unpack source archive
+```
+
+**Cause**: `gitlab.common-lisp.net` has deployed Anubis anti-bot protection, which blocks Nix's automated source fetches for the `iterate` Common Lisp library.
+
+**Solution**: The flake.nix already includes a workaround using a fork with GitHub mirrors:
+```nix
+mac-app-util = {
+  url = "github:hraban/mac-app-util";
+  inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
+};
+```
+
+**Reference**: [mac-app-util issue #39](https://github.com/hraban/mac-app-util/issues/39)
+
+### macOS TCC Permissions Reset After Rebuild
+
+**Problem**: Camera, microphone, or screen recording permissions revoked after `darwin-rebuild switch`.
+
+**Cause**: macOS TCC (Transparency, Consent, Control) treats different Nix store paths as different applications. Every rebuild changes the path, revoking permissions.
+
+**Solution**: This configuration uses `mac-app-util` to create stable trampolines. If permissions still reset, verify mac-app-util is working:
+```bash
+# Check that trampolines exist in /Applications
+ls -la /Applications/*.app
+# Apps should be real directories, not symlinks to /nix/store
+```
+
 ### GPG "unsafe ownership" Warning
 
 **Problem**: `gpg: WARNING: unsafe ownership on homedir '/Users/<username>/.gnupg'`

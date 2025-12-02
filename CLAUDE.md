@@ -15,6 +15,23 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ## Command Execution Preferences
 
+### Use Simple Commands Without Flags Like -C
+- **NEVER use `git -C /path command`** - permission patterns match `git command:*`, not `git -C`
+- The working directory is already the project root - no `-C` flag needed
+- Same applies to other tools with directory flags
+
+**Bad:**
+```bash
+git -C /path/to/repo add file.txt
+git -C /path/to/repo status
+```
+
+**Good:**
+```bash
+git add file.txt
+git status
+```
+
 ### Avoid Command Chaining with &&
 - **NEVER chain commands with `&&`** - permission patterns don't match compound commands
 - Run each command separately in its own Bash tool call

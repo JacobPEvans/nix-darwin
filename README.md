@@ -21,8 +21,11 @@ Multi-host declarative system management using nix-darwin, home-manager, and fla
 | **nix-darwin** | Manages macOS packages, system settings, and homebrew integration |
 | **home-manager** | Manages user config - shell, aliases, dotfiles |
 | **nixpkgs** | The package repository - ALL packages come from here |
+| **mac-app-util** | Creates stable app trampolines to preserve macOS TCC permissions |
 
 **Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
+
+**Why mac-app-util?** Without it, macOS TCC permissions (camera, microphone, screen recording) are revoked after every rebuild because Nix store paths change. The trampolines keep the app path in `/Applications/` stable while the underlying Nix store target changes.
 
 ## Quick Start
 
