@@ -54,7 +54,7 @@ sudo darwin-rebuild --list-generations
    cd ~/.config/nix
    git add .
    git commit -m "feat: add <package>"
-   sudo darwin-rebuild switch --flake ~/.config/nix#default
+   sudo darwin-rebuild switch --flake .#default
    ```
 
 ### Adding a Homebrew Package (Fallback Only)
