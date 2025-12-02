@@ -2,6 +2,18 @@
 
 **Future work and in-progress tasks only. For completed work, see [CHANGELOG.md](CHANGELOG.md).**
 
+## Table of Contents
+
+- [Repository Context](#repository-context)
+- [Current Work: System Configuration Migration](#current-work-system-configuration-migration)
+- [Near-Term Goals](#near-term-goals)
+- [Long-Term Vision](#long-term-vision)
+- [Known Limitations](#known-limitations)
+- [Maintenance Plan](#maintenance-plan)
+- [Resources](#resources)
+
+---
+
 ## Repository Context
 
 - **Purpose**: Multi-host declarative system management

@@ -2,6 +2,18 @@
 
 Common issues and solutions for this nix-darwin configuration.
 
+## Table of Contents
+
+- [Sudo Requirements](#sudo-requirements)
+- [Quick Fixes](#quick-fixes)
+- [Why Packages "Disappear"](#why-packages-disappear)
+- [Package Management Issues](#package-management-issues)
+- [Application Issues](#application-issues)
+- [File Recovery](#file-recovery)
+- [Related Documentation](#related-documentation)
+
+---
+
 ## Sudo Requirements
 
 Understanding when `sudo` is needed prevents permission issues.

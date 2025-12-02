@@ -4,6 +4,17 @@ Multi-host declarative system management using nix-darwin, home-manager, and fla
 
 **This is a flakes-only configuration.** All nix commands use flakes. No channels.
 
+## Table of Contents
+
+- [Hosts](#hosts)
+- [How It Works](#how-it-works)
+- [Quick Start](#quick-start)
+- [Directory Structure](#directory-structure)
+- [Current Packages](#current-packages)
+- [Documentation](#documentation)
+
+---
+
 ## Hosts
 
 | Host | Platform | Status | Description |

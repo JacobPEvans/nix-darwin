@@ -2,6 +2,14 @@
 
 Detailed structure of the nix-darwin configuration.
 
+## Table of Contents
+
+- [Directory Structure](#directory-structure)
+- [Module Relationships](#module-relationships)
+- [Configuration Layers](#configuration-layers)
+
+---
+
 ## Directory Structure
 
 ```
