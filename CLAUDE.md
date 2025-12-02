@@ -32,9 +32,9 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Document why homebrew was needed if used
 
 **Update Strategy:**
+- Nix packages update via `nix flake update` (manual, recommended weekly)
 - Homebrew `autoUpdate = false` - skip slow 45MB index download
 - Homebrew `upgrade = true` - upgrade packages based on cached index
-- Nix packages update via `nix flake update` (manual)
 - To get latest Homebrew versions: `brew update` then `darwin-rebuild switch`
 
 **Why this setup?**
@@ -43,10 +43,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Run `brew update` periodically to refresh the index
 
 **Current Homebrew Exceptions:**
-- `claude-code` - Rapidly-evolving developer tool
-  - Nixpkgs version lags behind releases
-  - Can't auto-update from read-only nix store
-  - Manual upgrade: `brew upgrade --cask claude-code`
+- None - all packages successfully managed via nixpkgs
 
 ### 4. Code Style for Learning
 - **Keep comments** - user is learning Nix

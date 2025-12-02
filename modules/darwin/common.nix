@@ -60,6 +60,7 @@ in
     # ========================================================================
     # Development tools
     # ========================================================================
+    claude-code     # Anthropic's agentic coding CLI
     gemini-cli      # Google's Gemini CLI
     gh              # GitHub CLI
     mas             # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
@@ -95,12 +96,6 @@ in
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
-
-      # claude-code: Rapidly-evolving developer tool
-      # - Nixpkgs version lags behind releases
-      # - Can't auto-update from read-only nix store
-      # - Manual upgrade: brew upgrade --cask claude-code
-      "claude-code"
     ];
 
     # Mac App Store apps (requires signed into App Store)
