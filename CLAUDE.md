@@ -75,13 +75,13 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 ### Duplicate Packages (Homebrew + Nix)
 **Problem**: Adding package to nix but homebrew version still installed
 **Check**: `which <package>` should show `/run/current-system/sw/bin/<package>`
-**Fix**: `sudo -u jevans brew uninstall <package>`
+**Fix**: `sudo -u <username> brew uninstall <package>`
 **Verify**: Backup important configs first (GPG keys, app settings)
 
 ### PATH Priority
 **Correct order**: Nix paths before homebrew
-1. `/Users/jevans/.nix-profile/bin`
-2. `/etc/profiles/per-user/jevans/bin`
+1. `/Users/<username>/.nix-profile/bin`
+2. `/etc/profiles/per-user/<username>/bin`
 3. `/run/current-system/sw/bin` ← nix packages
 4. `/nix/var/nix/profiles/default/bin`
 5. `/opt/homebrew/bin` ← fallback only

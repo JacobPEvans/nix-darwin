@@ -8,16 +8,22 @@
 # - Email addresses are often public (GitHub noreply recommended)
 # - Usernames are public information
 
+let
+  # Define username once, derive everything else from it
+  username = "jevans";
+in
 {
   # ==========================================================================
   # User Identity
   # ==========================================================================
   user = {
     # System username (matches macOS account)
-    name = "jevans";
+    name = username;
 
-    # NOTE: Home directory path removed - use config.home.homeDirectory instead
-    # This avoids duplication with darwin/configuration.nix
+    # Home directory path (derived from username for macOS)
+    # Use this for paths in darwin modules where config.home.homeDirectory
+    # is not available
+    homeDir = "/Users/${username}";
 
     # Full name for git commits and other identity purposes
     fullName = "JacobPEvans";

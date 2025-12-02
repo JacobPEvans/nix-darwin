@@ -25,6 +25,9 @@
 { ... }:
 
 let
+  userConfig = import ../../../lib/user-config.nix;
+  username = userConfig.user.name;
+
   # Core read-only tools (always safe)
   coreReadTools = [
     "Read(**)"
@@ -115,9 +118,9 @@ let
     "Bash(brew config:*)"
     "Bash(brew outdated:*)"
     "Bash(brew deps:*)"
-    "Bash(sudo -u jevans brew list:*)"
-    "Bash(sudo -u jevans brew search:*)"
-    "Bash(sudo -u jevans brew info:*)"
+    "Bash(sudo -u ${username} brew list:*)"
+    "Bash(sudo -u ${username} brew search:*)"
+    "Bash(sudo -u ${username} brew info:*)"
   ];
 
   # Modern CLI tools (installed via nixpkgs)

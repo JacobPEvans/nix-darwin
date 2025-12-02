@@ -11,6 +11,10 @@
 
 { ... }:
 
+let
+  userConfig = import ../../../lib/user-config.nix;
+  homeDir = userConfig.user.homeDir;
+in
 {
   system.defaults.dock = {
     # ========================================================================
@@ -42,7 +46,7 @@
       "/Applications/Google Chrome.app"
 
       # AI Tools
-      "/Users/jevans/Applications/Gemini.app"
+      "${homeDir}/Applications/Gemini.app"
       "/Applications/Ollama.app"
     ];
 
@@ -50,7 +54,7 @@
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
     persistent-others = [
-      "/Users/jevans/Applications/Mind Tickle.app"
+      "${homeDir}/Applications/Mind Tickle.app"
       "/System/Applications/TextEdit.app"
       "/System/Applications/iPhone Mirroring.app"
       "/System/Applications/System Settings.app"

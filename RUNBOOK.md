@@ -51,7 +51,8 @@ darwin-rebuild --list-generations
 
 3. **Commit and rebuild**:
    ```bash
-   git add -A && git commit -m "feat: add <package>"
+   git -C ~/.config/nix add .
+   git -C ~/.config/nix commit -m "feat: add <package>"
    sudo darwin-rebuild switch --flake ~/.config/nix#default
    ```
 
@@ -209,7 +210,7 @@ Use `persistent-others` for folders, stacks, or utility apps:
 
 ```nix
 persistent-others = [
-  "/Users/jevans/Downloads"
+  "${homeDir}/Downloads"  # homeDir from user-config.nix
   "/System/Applications/System Settings.app"
 ];
 ```

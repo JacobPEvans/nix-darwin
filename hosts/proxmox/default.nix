@@ -24,8 +24,8 @@ in
 # 1. Install Nix on Proxmox host (Determinate installer):
 #    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh
 #
-# 2. Install home-manager:
-#    nix run home-manager -- switch --flake .#jevans
+# 2. Install home-manager (use username from lib/user-config.nix):
+#    nix run home-manager -- switch --flake .#<username>
 #
 # 3. Firewall (ensure these ports are open):
 #    - SSH: 22/tcp
