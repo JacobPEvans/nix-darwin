@@ -35,17 +35,36 @@ sudo darwin-rebuild switch --flake ~/.config/nix#default
 # Search for a package
 nix search nixpkgs <name>
 
-# Update all flake inputs (nixpkgs, home-manager, etc.)
-nix flake update ~/.config/nix
-
-# Update Homebrew casks (upgraded automatically on darwin-rebuild)
-brew upgrade --cask
-
 # Rollback if something breaks
 darwin-rebuild --rollback
 
 # List all generations
 darwin-rebuild --list-generations
+```
+
+### Keeping Packages Updated
+
+Nix flakes pin exact versions for reproducibility. To get newer package versions:
+
+```bash
+# 1. Update flake.lock to latest nixpkgs
+nix flake update --flake ~/.config/nix
+
+# 2. Commit the updated lock file (required for flakes)
+cd ~/.config/nix
+git add flake.lock
+git commit -m "chore: update flake inputs"
+
+# 3. Rebuild with new versions
+sudo darwin-rebuild switch --flake ~/.config/nix#default
+```
+
+**Recommended frequency**: Weekly or when you notice outdated packages.
+
+**If something breaks after update**:
+```bash
+git revert HEAD                    # Undo the flake.lock update
+sudo darwin-rebuild switch --flake ~/.config/nix#default  # Rebuild with old versions
 ```
 
 ### Adding Packages
@@ -132,7 +151,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 |----------|----------|
 | Core CLI | git, gnupg, vim |
 | Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
-| Development | gemini-cli, gh, mas, nodejs_latest (ollama via manual install) |
+| Development | claude-code, gemini-cli, gh, mas, nodejs_latest (ollama via manual install) |
 | GUI | bitwarden-desktop, obsidian, raycast, vscode, zoom-us |
 
 **System-level tools** (`modules/common/packages.nix` - all platforms):
@@ -145,7 +164,7 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 | Cloud (AWS) | awscli2, aws-vault |
 
 **Homebrew casks** (fallback only):
-- claude-code - Rapidly-evolving tool, needs frequent updates
+- None currently - all packages managed via nixpkgs
 
 **AI CLI Configurations** (fully Nix-managed):
 
