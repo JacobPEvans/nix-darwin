@@ -13,9 +13,21 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # mac-app-util: Create stable app trampolines to preserve macOS permissions
+    # Without this, TCC permissions (camera, microphone, screen recording) are
+    # revoked on every rebuild because Nix store paths change.
+    mac-app-util = {
+      url = "github:hraban/mac-app-util";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # WORKAROUND: gitlab.common-lisp.net has Anubis anti-bot protection
+      # blocking automated fetches. Use fork with GitHub mirror URLs.
+      # See: https://github.com/hraban/mac-app-util/issues/39
+      inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
+    };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, ... }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
@@ -25,10 +37,20 @@
         system = "aarch64-darwin";
         modules = [
           ./hosts/macbook-m4/default.nix
+
+          # mac-app-util: Creates stable trampolines for GUI apps
+          # Preserves TCC permissions (camera, mic, screen) across rebuilds
+          mac-app-util.darwinModules.default
+
           home-manager.darwinModules.home-manager
           {
             home-manager = hmDefaults // {
               users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
+
+              # mac-app-util: Also needed for home.packages if any GUI apps there
+              sharedModules = [
+                mac-app-util.homeManagerModules.default
+              ];
             };
           }
         ];

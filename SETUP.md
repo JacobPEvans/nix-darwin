@@ -1,5 +1,20 @@
 # Nix Darwin Setup - M4 Max MacBook Pro
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Setup Summary](#setup-summary)
+- [Configuration Structure](#configuration-structure)
+- [Issues Solved](#issues-solved)
+- [What Was Migrated](#what-was-migrated)
+- [Usage](#usage)
+- [Key Decisions](#key-decisions)
+- [Lessons Learned](#lessons-learned)
+- [Troubleshooting](#troubleshooting)
+- [Resources](#resources)
+
+---
+
 ## Overview
 Minimal nix-darwin configuration with home-manager for macOS system management.
 

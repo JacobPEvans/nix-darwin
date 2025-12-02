@@ -2,6 +2,23 @@
 
 **Strict guidance for AI agents modifying this nix-darwin configuration.**
 
+## Table of Contents
+
+- [Scope of This Document](#scope-of-this-document)
+- [Command Execution Preferences](#command-execution-preferences)
+- [Critical Requirements](#critical-requirements)
+- [Task Management Workflow](#task-management-workflow)
+- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+- [Claude Code Permission Management](#claude-code-permission-management)
+- [Gemini CLI Permission Management](#gemini-cli-permission-management)
+- [GitHub Copilot CLI Permission Management](#github-copilot-cli-permission-management)
+- [VS Code GitHub Copilot Configuration](#vs-code-github-copilot-configuration)
+- [AI CLI Tools Comparison](#ai-cli-tools-comparison)
+- [Pull Request Workflow](#pull-request-workflow)
+- [Workflow](#workflow)
+
+---
+
 ## Scope of This Document
 
 This file contains **AI-specific instructions only** - rules and patterns that AI agents need beyond their base training. It should NOT contain:

@@ -2,6 +2,17 @@
 
 External documentation and resources for this nix configuration.
 
+## Table of Contents
+
+- [Nix Ecosystem](#nix-ecosystem)
+- [nix-darwin](#nix-darwin)
+- [home-manager](#home-manager)
+- [macOS Defaults](#macos-defaults)
+- [AI CLI Tools](#ai-cli-tools)
+- [Package Search](#package-search)
+
+---
+
 ## Nix Ecosystem
 
 | Resource | URL |

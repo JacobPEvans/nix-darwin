@@ -51,9 +51,10 @@ sudo darwin-rebuild --list-generations
 
 3. **Commit and rebuild**:
    ```bash
-   git -C ~/.config/nix add .
-   git -C ~/.config/nix commit -m "feat: add <package>"
-   sudo darwin-rebuild switch --flake ~/.config/nix#default
+   cd ~/.config/nix
+   git add .
+   git commit -m "feat: add <package>"
+   sudo darwin-rebuild switch --flake .#default
    ```
 
 ### Adding a Homebrew Package (Fallback Only)
@@ -99,15 +100,17 @@ Only use Homebrew when:
 Nix flakes pin exact versions. To get newer versions:
 
 ```bash
+cd ~/.config/nix
+
 # 1. Update flake.lock to latest nixpkgs
-nix flake update ~/.config/nix
+nix flake update
 
 # 2. Commit the updated lock file (required for flakes)
-git -C ~/.config/nix add flake.lock
-git -C ~/.config/nix commit -m "chore: update flake inputs"
+git add flake.lock
+git commit -m "chore: update flake inputs"
 
 # 3. Rebuild with new versions
-sudo darwin-rebuild switch --flake ~/.config/nix#default
+sudo darwin-rebuild switch --flake .#default
 ```
 
 **Recommended frequency**: Weekly or when you notice outdated packages.
@@ -127,11 +130,13 @@ sudo darwin-rebuild switch --flake ~/.config/nix#default
 ### If Something Breaks After Update
 
 ```bash
+cd ~/.config/nix
+
 # Undo the flake.lock update
-git -C ~/.config/nix revert HEAD
+git revert HEAD
 
 # Rebuild with old versions
-sudo darwin-rebuild switch --flake ~/.config/nix#default
+sudo darwin-rebuild switch --flake .#default
 ```
 
 ---
