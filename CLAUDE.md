@@ -13,6 +13,45 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **Rule**: If information is useful for humans reading project docs, it belongs in README.md or other project files, not here.
 
+## Command Execution Preferences
+
+### Avoid Command Chaining with &&
+- **NEVER chain commands with `&&`** - permission patterns don't match compound commands
+- Run each command separately in its own Bash tool call
+- This ensures each command matches its permission pattern correctly
+
+**Bad:**
+```bash
+git add -A && git commit -m "message"
+```
+
+**Good:** (two separate tool calls)
+```bash
+git add -A
+```
+```bash
+git commit -m "message"
+```
+
+### Prefer Parallel Execution
+- When commands are **independent** (don't depend on each other's output), run them in parallel
+- Use multiple Bash tool calls in the same response message
+- This is faster and more efficient
+
+**Examples of parallel-safe commands:**
+- `git status` and `git log` (both read-only)
+- `nix search` and `brew search` (independent searches)
+- Multiple `grep` or `find` operations on different paths
+
+**Examples requiring sequential execution:**
+- `git add` then `git commit` (commit depends on staging)
+- `mkdir` then `touch file` inside it (file depends on directory)
+- `nix build` then `darwin-rebuild switch` (switch depends on build)
+
+### Avoid Redirects in Permission-Sensitive Commands
+- Avoid `2>&1` or `> file` when the base command is in the allow list
+- Run the command without redirects; output is captured automatically
+
 ## Critical Requirements
 
 ### 1. Flakes-Only Configuration
@@ -75,13 +114,13 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 ### Duplicate Packages (Homebrew + Nix)
 **Problem**: Adding package to nix but homebrew version still installed
 **Check**: `which <package>` should show `/run/current-system/sw/bin/<package>`
-**Fix**: `sudo -u jevans brew uninstall <package>`
+**Fix**: `sudo -u <username> brew uninstall <package>`
 **Verify**: Backup important configs first (GPG keys, app settings)
 
 ### PATH Priority
 **Correct order**: Nix paths before homebrew
-1. `/Users/jevans/.nix-profile/bin`
-2. `/etc/profiles/per-user/jevans/bin`
+1. `/Users/<username>/.nix-profile/bin`
+2. `/etc/profiles/per-user/<username>/bin`
 3. `/run/current-system/sw/bin` ← nix packages
 4. `/nix/var/nix/profiles/default/bin`
 5. `/opt/homebrew/bin` ← fallback only

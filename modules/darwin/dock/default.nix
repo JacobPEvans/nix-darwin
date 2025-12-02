@@ -8,6 +8,10 @@
 { ... }:
 
 {
+  imports = [
+    ./persistent-apps.nix
+  ];
+
   system.defaults.dock = {
     # ==========================================================================
     # Dock Appearance
@@ -166,15 +170,5 @@
     # Hold Shift for slow-motion minimize animation
     # Default: false
     # slow-motion-allowed = false;
-
-    # ==========================================================================
-    # Persistent Dock Items
-    # ==========================================================================
-    # NOTE: These are managed separately. nix-darwin can set them, but
-    # manual Dock changes will be overwritten on rebuild.
-    # Consider whether you want nix to manage your Dock apps.
-    #
-    # persistent-apps = [];
-    # persistent-others = [];
   };
 }

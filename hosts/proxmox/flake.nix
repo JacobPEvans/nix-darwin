@@ -17,7 +17,8 @@
       userConfig = import ../../lib/user-config.nix;
     in {
       # Home-manager standalone configuration
-      # Usage: home-manager switch --flake .#jevans
+      # Usage: home-manager switch --flake .#<username>
+      # Where <username> is defined in lib/user-config.nix
       homeConfigurations.${userConfig.user.name} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [

@@ -146,9 +146,9 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 4. **Remove homebrew versions as user** (not root):
    ```bash
    # For command-line tools
-   sudo -u jevans brew uninstall <package>
+   sudo -u <username> brew uninstall <package>
    # For GUI applications
-   sudo -u jevans brew uninstall --cask <package>
+   sudo -u <username> brew uninstall --cask <package>
    ```
 
 5. **Verify nix version is now found**:
@@ -162,8 +162,8 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 
 **Correct PATH Order**:
 ```
-/Users/jevans/.nix-profile/bin
-/etc/profiles/per-user/jevans/bin
+/Users/<username>/.nix-profile/bin
+/etc/profiles/per-user/<username>/bin
 /run/current-system/sw/bin          ← Nix packages here
 /nix/var/nix/profiles/default/bin
 /opt/homebrew/bin                   ← Homebrew fallback only
@@ -181,18 +181,18 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 
 ### GPG "unsafe ownership" Warning
 
-**Problem**: `gpg: WARNING: unsafe ownership on homedir '/Users/jevans/.gnupg'`
+**Problem**: `gpg: WARNING: unsafe ownership on homedir '/Users/<username>/.gnupg'`
 
 **Solution**:
 ```bash
-# Fix ownership
-sudo chown -R jevans:staff ~/.gnupg
+# Fix ownership (replace <username> with your macOS username)
+sudo chown -R <username>:staff ~/.gnupg
 
 # Fix directory permissions (700)
-sudo -u jevans find ~/.gnupg -type d -exec chmod 700 {} \;
+sudo -u <username> find ~/.gnupg -type d -exec chmod 700 {} \;
 
 # Fix file permissions (600)
-sudo -u jevans find ~/.gnupg -type f -exec chmod 600 {} \;
+sudo -u <username> find ~/.gnupg -type f -exec chmod 600 {} \;
 
 # Verify
 gpg --list-keys

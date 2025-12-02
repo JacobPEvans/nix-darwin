@@ -11,7 +11,7 @@
 { config, pkgs, ... }:
 
 let
-  claudeAllow = import ../permissions/claude-permissions-allow.nix { };
+  claudeAllow = import ../permissions/claude-permissions-allow.nix { inherit config; };
   claudeAsk = import ../permissions/claude-permissions-ask.nix { };
   claudeDeny = import ../permissions/claude-permissions-deny.nix { };
 in

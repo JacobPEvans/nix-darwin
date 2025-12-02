@@ -22,9 +22,12 @@
 # - Curl limited to GET requests only
 # - sed/awk without -i (no in-place file modification)
 
-{ ... }:
+{ config, ... }:
 
 let
+  # Use config.home.username for consistency with other permission files
+  username = config.home.username;
+
   # Core read-only tools (always safe)
   coreReadTools = [
     "Read(**)"
@@ -34,25 +37,53 @@ let
 
   # Git operations (version control)
   gitCommands = [
+    # Status and inspection
     "Bash(git status:*)"
     "Bash(git log:*)"
     "Bash(git diff:*)"
     "Bash(git show:*)"
+    "Bash(git blame:*)"
+    "Bash(git shortlog:*)"
+    "Bash(git describe:*)"
+    "Bash(git rev-parse:*)"
+    "Bash(git ls-files:*)"
+    "Bash(git ls-remote:*)"
+    "Bash(git ls-tree:*)"
+    "Bash(git cat-file:*)"
+    "Bash(git reflog:*)"
+    "Bash(git for-each-ref:*)"
+    "Bash(git name-rev:*)"
+    "Bash(git worktree list:*)"
+    # Branch and tag management
     "Bash(git branch:*)"
     "Bash(git checkout:*)"
+    "Bash(git switch:*)"
+    "Bash(git tag:*)"
+    # Staging and committing
     "Bash(git add:*)"
     "Bash(git commit:*)"
+    # NOTE: git reset and git restore moved to ask list (potentially destructive)
+    # Remote operations
     "Bash(git push:*)"
     "Bash(git pull:*)"
     "Bash(git fetch:*)"
+    "Bash(git remote:*)"
+    "Bash(git clone:*)"
+    # Merging and rebasing
     "Bash(git merge:*)"
     "Bash(git rebase:*)"
+    # NOTE: git cherry-pick moved to ask list (can cause conflicts/issues)
+    # Stash management
     "Bash(git stash:*)"
-    "Bash(git remote:*)"
-    "Bash(git tag:*)"
-    "Bash(git config:*)"
-    "Bash(git clone:*)"
+    # File operations
     "Bash(git mv:*)"
+    # NOTE: git rm moved to ask list (removes files from working tree)
+    # Configuration
+    "Bash(git config:*)"
+    # Maintenance
+    "Bash(git gc:*)"
+    "Bash(git prune:*)"
+    "Bash(git fsck:*)"
   ];
 
   # GitHub CLI (PR management, issues, etc.)
@@ -115,9 +146,9 @@ let
     "Bash(brew config:*)"
     "Bash(brew outdated:*)"
     "Bash(brew deps:*)"
-    "Bash(sudo -u jevans brew list:*)"
-    "Bash(sudo -u jevans brew search:*)"
-    "Bash(sudo -u jevans brew info:*)"
+    "Bash(sudo -u ${username} brew list:*)"
+    "Bash(sudo -u ${username} brew search:*)"
+    "Bash(sudo -u ${username} brew info:*)"
   ];
 
   # Modern CLI tools (installed via nixpkgs)

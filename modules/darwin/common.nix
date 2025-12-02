@@ -8,7 +8,7 @@ let
 in
 {
   imports = [
-    ./dock.nix
+    ./dock
     ./finder.nix
     ./keyboard.nix
     ./trackpad.nix

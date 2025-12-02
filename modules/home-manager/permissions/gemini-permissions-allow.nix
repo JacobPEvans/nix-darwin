@@ -44,27 +44,54 @@ let
 
   # Git operations (version control)
   # Format: ShellTool(git subcommand)
-  # NOTE: git reset is in excludeTools (potentially destructive)
   gitCommands = [
+    # Status and inspection
     "ShellTool(git status)"
     "ShellTool(git log)"
     "ShellTool(git diff)"
     "ShellTool(git show)"
+    "ShellTool(git blame)"
+    "ShellTool(git shortlog)"
+    "ShellTool(git describe)"
+    "ShellTool(git rev-parse)"
+    "ShellTool(git ls-files)"
+    "ShellTool(git ls-remote)"
+    "ShellTool(git ls-tree)"
+    "ShellTool(git cat-file)"
+    "ShellTool(git reflog)"
+    "ShellTool(git for-each-ref)"
+    "ShellTool(git name-rev)"
+    "ShellTool(git worktree list)"
+    # Branch and tag management
     "ShellTool(git branch)"
     "ShellTool(git checkout)"
+    "ShellTool(git switch)"
+    "ShellTool(git tag)"
+    # Staging and committing
     "ShellTool(git add)"
     "ShellTool(git commit)"
+    # NOTE: git reset/restore excluded (potentially destructive, no ask mode in Gemini)
+    # Remote operations
     "ShellTool(git push)"
     "ShellTool(git pull)"
     "ShellTool(git fetch)"
+    "ShellTool(git remote)"
+    "ShellTool(git clone)"
+    # Merging and rebasing
     "ShellTool(git merge)"
     "ShellTool(git rebase)"
+    # NOTE: git cherry-pick excluded (can cause conflicts, no ask mode in Gemini)
+    # Stash management
     "ShellTool(git stash)"
-    "ShellTool(git remote)"
-    "ShellTool(git tag)"
-    "ShellTool(git config)"
-    "ShellTool(git clone)"
+    # File operations
     "ShellTool(git mv)"
+    # NOTE: git rm excluded (removes files, no ask mode in Gemini)
+    # Configuration
+    "ShellTool(git config)"
+    # Maintenance
+    "ShellTool(git gc)"
+    "ShellTool(git prune)"
+    "ShellTool(git fsck)"
   ];
 
   # GitHub CLI (PR management, issues, etc.)
