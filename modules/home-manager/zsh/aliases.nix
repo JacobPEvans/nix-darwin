@@ -37,9 +37,8 @@
   # This activates both system (nix-darwin) and user (home-manager) configs
   d-r = "sudo darwin-rebuild switch --flake ~/.config/nix#default";
 
-  # NO SUDO: These just read/inspect
-  # nix-shell, nix develop, nix build - work as user
-  # nix flake update - works as user (updates flake.lock)
+  # NO SUDO: Updates flake.lock to latest nixpkgs (must commit before d-r)
+  nf-u = "nix flake update --flake ~/.config/nix";
 
   # ===========================================================================
   # Python
