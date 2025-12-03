@@ -35,11 +35,11 @@
     "claude-cookbooks": {
       "flake": false,
       "locked": {
-        "lastModified": 1764630539,
-        "narHash": "sha256-K81Xd561FKknuzlLus4XCALTLhs9dli7SLOUc2A2DwM=",
+        "lastModified": 1764719023,
+        "narHash": "sha256-P9vJtdJvri/Uc/k4SiPHqef9uQB2LaE8iLMl3uNCLUE=",
         "owner": "anthropics",
         "repo": "claude-cookbooks",
-        "rev": "9fadbb7baaae0cc4a7ac7a7af098f8c094565403",
+        "rev": "b4a8aae1f69cd534b71791612df6e02a333a3948",
         "type": "github"
       },
       "original": {
