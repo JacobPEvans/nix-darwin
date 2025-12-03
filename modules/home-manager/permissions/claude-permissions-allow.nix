@@ -39,6 +39,7 @@ let
   gitCommands = [
     # Status and inspection
     "Bash(git status:*)"
+    "Bash(git merge-base:*)"
     "Bash(git log:*)"
     "Bash(git diff:*)"
     "Bash(git show:*)"
@@ -110,6 +111,12 @@ let
     "Bash(gh workflow view:*)"
     "Bash(gh release list:*)"
     "Bash(gh release view:*)"
+    # Search operations
+    "Bash(gh search:*)"
+    # Gist operations
+    "Bash(gh gist view:*)"
+    # CI/CD watching
+    "Bash(gh run watch:*)"
   ];
 
   # Nix package manager and darwin-rebuild
@@ -505,6 +512,11 @@ let
     "WebFetch(domain:nixos.org)"
     "WebFetch(domain:nixos.wiki)"
     "WebFetch(domain:www.npmjs.com)"
+    # Gist content
+    "WebFetch(domain:gist.github.com)"
+    "WebFetch(domain:gist.githubusercontent.com)"
+    # Agent OS documentation
+    "WebFetch(domain:buildermethods.com)"
   ];
 
 in
