@@ -50,8 +50,9 @@
     # AI Assistant Instructions - source of truth for AI agent configuration
     # Contains permissions, commands, and instruction files
     # Consumed by claude.nix to generate settings.json
+    # NOTE: Using feature branch for testing, switch to main after merge
     ai-assistant-instructions = {
-      url = "github:JacobPEvans/ai-assistant-instructions";
+      url = "github:JacobPEvans/ai-assistant-instructions/feat/consolidate-ai-config";
       flake = false;  # Not a flake, just fetch the repo
     };
   };

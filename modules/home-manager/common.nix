@@ -32,16 +32,15 @@ let
 
   # Home directory symlinks to ai-assistant-instructions repo
   # These provide global access to AI instruction files
+  # NOTE: .copilot and .gemini directories are NOT symlinked because
+  # Nix manages files inside them (config.json, settings.json)
   aiInstructionsSymlinks = {
     # Root instruction files accessible from home directory
     "CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
     "GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
 
-    # AI instruction directories
+    # AI instruction directories (only those without Nix-managed files inside)
     ".ai-instructions".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions";
-    ".github".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.github";
-    ".copilot".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.copilot";
-    ".gemini".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.gemini";
   };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };

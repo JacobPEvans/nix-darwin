@@ -5,14 +5,31 @@
       "locked": {
         "lastModified": 1761688666,
         "narHash": "sha256-027+m1nj78zC+6IIP8IdNtnx0ARBrZE9zs6crxfoh3o=",
-        "owner": "buildermethods",
+        "owner": "JacobPEvans",
         "repo": "agent-os",
         "rev": "a543311dc0430bc1dffd12feacf087c685670873",
         "type": "github"
       },
       "original": {
-        "owner": "buildermethods",
+        "owner": "JacobPEvans",
         "repo": "agent-os",
+        "type": "github"
+      }
+    },
+    "ai-assistant-instructions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764730661,
+        "narHash": "sha256-ag1sByv1nQ49v1AHNHv9ttDafy3MuEB+G/4DeYf1q9U=",
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "rev": "0e123dbd90e70398ec5b2d7f3ca9a270fa319bf4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "ref": "feat/consolidate-ai-config",
+        "repo": "ai-assistant-instructions",
         "type": "github"
       }
     },
@@ -201,6 +218,7 @@
     "root": {
       "inputs": {
         "agent-os": "agent-os",
+        "ai-assistant-instructions": "ai-assistant-instructions",
         "claude-code-plugins": "claude-code-plugins",
         "claude-cookbooks": "claude-cookbooks",
         "darwin": "darwin",
