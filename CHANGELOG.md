@@ -5,6 +5,65 @@ All notable changes to this nix-darwin configuration will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
 
+## 2025-12-03
+
+### Added
+
+- **Comprehensive Anthropic Claude Code Ecosystem Integration**:
+  - Added 4 new plugins to `claude-plugins.nix`:
+    - `frontend-design` - UI/UX design guidance
+    - `explanatory-output-style` - Educational insights hook
+    - `learning-output-style` - Interactive learning mode
+    - `claude-opus-4-5-migration` - Model migration skill
+  - Added second plugin marketplace: `anthropics/claude-plugins-official`
+  - Total: 12 official plugins enabled from 2 marketplaces
+
+- **Anthropic Skills Integration**:
+  - Added `anthropics/skills` as flake input
+  - Created `modules/home-manager/ai-cli/claude-skills.nix` module
+  - Provides framework for document generation, code analysis, and automation skills
+  - Skills are opt-in (commented out by default, uncomment to enable)
+
+- **Cookbook Pattern References**:
+  - Created `modules/home-manager/ai-cli/claude-patterns.nix`
+  - Documents 5 agent workflow patterns from claude-cookbooks:
+    - Basic: prompt-chaining, parallelization, routing
+    - Advanced: orchestrator-workers, evaluator-optimizer
+  - Includes notebook locations and use case descriptions
+
+- **SDK Development Shells**:
+  - Created `shells/claude-sdk-python/` - Python 3.11 + Anthropic SDK
+    - Includes pytest, black, mypy, ruff for development
+    - Pre-configured virtual environment setup
+  - Created `shells/claude-sdk-typescript/` - Node.js 20 + TypeScript
+    - Includes prettier, eslint, ts-node
+    - Modern async/await patterns for agents
+  - Both shells include full documentation and quick start guides
+
+- **GitHub Actions Templates**:
+  - Created `.github/workflows/claude-review.yml.template` - Automated PR review
+  - Created `.github/workflows/claude-security.yml.template` - Security scanning
+  - Both templates based on official Anthropic actions (reference implementation)
+
+- **Documentation**:
+  - Created `docs/ANTHROPIC-ECOSYSTEM.md` - Comprehensive 350+ line reference
+    - Architecture overview, plugin management, commands/agents catalog
+    - Skills and patterns documentation, SDK usage guides
+    - GitHub Actions setup, troubleshooting, maintenance procedures
+  - Updated `CLAUDE.md` with Anthropic ecosystem quick reference
+  - Updated `shells/README.md` with Claude SDK shell descriptions
+
+### Changed
+
+- **Flake Inputs** (`flake.nix`):
+  - Added 2 new inputs: `claude-plugins-official`, `anthropic-skills`
+  - Updated outputs to pass new inputs to home-manager modules
+  - Updated extraSpecialArgs to include all Anthropic repositories
+
+- **Claude Configuration** (`modules/home-manager/ai-cli/claude.nix`):
+  - Updated imports to accept new flake inputs
+  - Passes inputs to child modules (claude-plugins.nix)
+
 ## 2025-11-30
 
 ### Added

@@ -101,6 +101,10 @@ let
 
   # Commands from claude-cookbooks to install globally
   # These are copied directly to ~/.claude/commands/
+  #
+  # Note: The commit-commands plugin already provides /commit-push-pr
+  # Additional repo-level commands (dedupe, oncall-triage) may exist in
+  # anthropics/claude-code/.claude/commands/ but need verification.
   cookbookCommands = [
     "review-pr-ci"     # CI/CD PR review (auto-posts to GitHub)
     "review-pr"        # Interactive PR review
