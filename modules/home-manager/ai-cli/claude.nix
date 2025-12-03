@@ -63,16 +63,22 @@ let
 
   # Commands from ai-assistant-instructions to symlink globally
   # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
+  #
+  # These commands live in .ai-instructions/commands/ with symlinks
+  # in .claude/commands/ for local development. Nix symlinks to the
+  # .claude/commands/ symlinks, which resolve to the source files.
   aiInstructionsCommands = [
     "commit"
+    "generate-code"
+    "infrastructure-review"
     "pull-request"
-    "review-pr-ci"
-    "rok-shape-issues"
+    "pull-request-review-feedback"
+    "review-code"
+    "review-docs"
     "rok-resolve-issues"
-    "rok-review-pr"
     "rok-respond-to-reviews"
-    "example-simple"
-    "example-advanced"
+    "rok-review-pr"
+    "rok-shape-issues"
   ];
 
   # Create symlink entries for ai-instructions commands
