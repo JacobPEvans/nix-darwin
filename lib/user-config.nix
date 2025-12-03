@@ -60,4 +60,14 @@ in
     # Default branch name for new repositories
     defaultBranch = "main";
   };
+
+  # ==========================================================================
+  # AI Assistant Configuration
+  # ==========================================================================
+  # Paths to AI assistant configuration repositories
+  ai = {
+    # Path to ai-assistant-instructions repo (must be cloned here)
+    # Used by claude.nix and common.nix for symlinks
+    instructionsRepo = "/Users/${username}/git/ai-assistant-instructions";
+  };
 }

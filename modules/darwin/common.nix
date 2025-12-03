@@ -11,6 +11,7 @@ in
     ./dock
     ./finder.nix
     ./keyboard.nix
+    ./security.nix
     ./trackpad.nix
     ./system-ui.nix
   ];

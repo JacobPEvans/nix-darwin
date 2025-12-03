@@ -23,17 +23,34 @@
 { config, pkgs, lib, claude-code-plugins, claude-cookbooks, ai-assistant-instructions, ... }:
 
 let
+  # User configuration (includes ai.instructionsRepo path)
+  userConfig = import ../../../lib/user-config.nix;
+
   # Read permissions from JSON files in ai-assistant-instructions
   # These are read at Nix evaluation time from the flake input
-  claudeAllowJson = builtins.fromJSON (
-    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json"
-  );
-  claudeAskJson = builtins.fromJSON (
-    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json"
-  );
-  claudeDenyJson = builtins.fromJSON (
-    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json"
-  );
+  #
+  # Expected JSON structure for each file:
+  # {
+  #   "permissions": [
+  #     "PermissionPattern1",
+  #     "PermissionPattern2",
+  #     ...
+  #   ]
+  # }
+  #
+  # If the file is missing, malformed, or lacks the "permissions" key,
+  # Nix evaluation will fail with a descriptive error.
+  readPermissionsJson = path:
+    let
+      json = builtins.fromJSON (builtins.readFile path);
+    in
+      if builtins.isAttrs json && json ? permissions
+      then json
+      else builtins.throw "Invalid permissions JSON at ${path}: must contain a 'permissions' key";
+
+  claudeAllowJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/allow.json";
+  claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
+  claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
   # Import plugin configuration (official Anthropic repos)
   claudePlugins = import ./claude-plugins.nix {
@@ -41,7 +58,8 @@ let
   };
 
   # Path to git repo for symlinks (live updates without rebuild)
-  aiInstructionsRepo = "${config.home.homeDirectory}/git/ai-assistant-instructions";
+  # Defined in lib/user-config.nix for DRY (also used by common.nix)
+  aiInstructionsRepo = userConfig.ai.instructionsRepo;
 
   # Commands from ai-assistant-instructions to symlink globally
   # Using mkOutOfStoreSymlink for live updates without darwin-rebuild

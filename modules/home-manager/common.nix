@@ -28,7 +28,8 @@ let
 
   # Path to ai-assistant-instructions git repo for symlinks
   # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
-  aiInstructionsRepo = "${config.home.homeDirectory}/git/ai-assistant-instructions";
+  # Defined in lib/user-config.nix for DRY (also used by claude.nix)
+  aiInstructionsRepo = userConfig.ai.instructionsRepo;
 
   # Home directory symlinks to ai-assistant-instructions repo
   # These provide global access to AI instruction files
