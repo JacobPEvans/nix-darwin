@@ -5,7 +5,6 @@
 ## Table of Contents
 
 - [Repository Context](#repository-context)
-- [Current Work: System Configuration Migration](#current-work-system-configuration-migration)
 - [Near-Term Goals](#near-term-goals)
 - [Long-Term Vision](#long-term-vision)
 - [Known Limitations](#known-limitations)
@@ -21,14 +20,6 @@
 - **Active Host**: M4 Max MacBook Pro (128GB RAM)
 - **Templates**: Ubuntu server, Proxmox server, Windows workstation (placeholder)
 - **Tools**: nix-darwin 25.05, home-manager 25.05, Determinate Nix
-
-## Current Work: System Configuration Migration
-
-**Branch**: `feat/system-config-migration`
-
-### Phase 3: Application Management (In Progress)
-- [ ] Review remaining login items (Raycast already nix-managed)
-- [ ] Evaluate launchd services for custom scripts
 
 ---
 
@@ -75,8 +66,36 @@ Current hosts+modules architecture supports this. Next steps:
 ## Maintenance Plan
 
 **Weekly**: Commit config tweaks, test darwin-rebuild
-**Monthly**: `nix flake update`, garbage collect, review CHANGELOG
-**Quarterly**: Audit packages, update documentation
+**Monthly**: 
+- `nix flake update` to update all inputs including Anthropic repositories
+- Garbage collect old generations
+- Review CHANGELOG for recent changes
+**Quarterly**: 
+- Audit packages and plugin configurations
+- Review enabled Claude Code plugins
+- Update documentation
+- Test SDK development shells
+
+### Anthropic Ecosystem Maintenance
+
+The comprehensive Anthropic Claude Code integration requires periodic updates:
+
+**Plugin Updates** (Monthly):
+```bash
+nix flake lock --update-input claude-code-plugins
+nix flake lock --update-input claude-cookbooks
+nix flake lock --update-input claude-plugins-official
+nix flake lock --update-input anthropic-skills
+darwin-rebuild switch --flake ~/.config/nix#default
+```
+
+**Verify Integration** (After Updates):
+- Run `/help` in Claude Code to verify all 12 plugins load
+- Check `~/.claude/settings.json` for marketplace configuration
+- Test cookbook commands: `/review-pr`, `/review-issue`
+- Verify SDK shells: `nix develop ~/.config/nix/shells/claude-sdk-python`
+
+**Documentation**: See [docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md) for complete reference.
 
 ## Resources
 
