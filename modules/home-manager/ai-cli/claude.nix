@@ -120,12 +120,12 @@ in
         git_branch=$(${pkgs.git}/bin/git -C "$cwd" --no-optional-locks branch --show-current 2>/dev/null)
         if [ -n "$git_branch" ]; then
           git_info=" ($git_branch)"
+        fi
 
-          # Check if there are uncommitted changes
-          if ! ${pkgs.git}/bin/git -C "$cwd" --no-optional-locks diff --quiet 2>/dev/null || \
-             ! ${pkgs.git}/bin/git -C "$cwd" --no-optional-locks diff --cached --quiet 2>/dev/null; then
-            git_dirty=" ✗"
-          fi
+        # Check if there are uncommitted changes (staged, unstaged, or untracked)
+        # Runs outside git_branch conditional to work in detached HEAD state
+        if [ -n "$(${pkgs.git}/bin/git -C "$cwd" --no-optional-locks status --porcelain 2>/dev/null)" ]; then
+          git_dirty=" ✗"
         fi
       fi
 
