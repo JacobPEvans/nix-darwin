@@ -74,8 +74,10 @@
               users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
               # mac-app-util: Also needed for home.packages if any GUI apps there
+              # Agent OS: Proper home-manager module for spec-driven AI development
               sharedModules = [
                 mac-app-util.homeManagerModules.default
+                ./modules/home-manager/ai-cli/agent-os
               ];
             };
           }
