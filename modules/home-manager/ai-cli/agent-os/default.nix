@@ -96,6 +96,18 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # Enforce option dependencies
+    assertions = [
+      {
+        assertion = cfg.useClaudeCodeSubagents -> cfg.claudeCodeCommands;
+        message = "programs.agent-os.useClaudeCodeSubagents requires programs.agent-os.claudeCodeCommands to be enabled.";
+      }
+      {
+        assertion = cfg.standardsAsClaudeCodeSkills -> cfg.claudeCodeCommands;
+        message = "programs.agent-os.standardsAsClaudeCodeSkills requires programs.agent-os.claudeCodeCommands to be enabled.";
+      }
+    ];
+
     home.file = {
       # Nix-generated configuration
       "agent-os/config.yml".text = ''
