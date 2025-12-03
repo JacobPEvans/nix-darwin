@@ -16,6 +16,38 @@
         "type": "github"
       }
     },
+    "claude-code-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764717549,
+        "narHash": "sha256-bAI3OxygouIb6GZy0vhgkUh07tR0EVilkDjg2oFNWWM=",
+        "owner": "anthropics",
+        "repo": "claude-code",
+        "rev": "5e3e9408feea99c66bd2344f0e19b5f25d2a6b11",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-code",
+        "type": "github"
+      }
+    },
+    "claude-cookbooks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764719023,
+        "narHash": "sha256-P9vJtdJvri/Uc/k4SiPHqef9uQB2LaE8iLMl3uNCLUE=",
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "rev": "b4a8aae1f69cd534b71791612df6e02a333a3948",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -152,6 +184,8 @@
     },
     "root": {
       "inputs": {
+        "claude-code-plugins": "claude-code-plugins",
+        "claude-cookbooks": "claude-cookbooks",
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",

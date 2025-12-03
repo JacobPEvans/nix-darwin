@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -21,7 +21,10 @@ let
   awsFiles = import ./aws/config.nix { inherit config; };
 
   # AI CLI configuration imports (home.file entries)
-  claudeFiles = import ./ai-cli/claude.nix { inherit config pkgs; };
+  # Claude plugins require external repo inputs from flake.nix
+  claudeFiles = import ./ai-cli/claude.nix {
+    inherit config pkgs lib claude-code-plugins claude-cookbooks;
+  };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };
 in
