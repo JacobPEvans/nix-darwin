@@ -206,4 +206,12 @@ in
   # - gemini-permissions.nix
   # - copilot-permissions.nix
   home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles;
+
+  # ==========================================================================
+  # Agent OS
+  # ==========================================================================
+  # Spec-driven development system for AI coding agents
+  # Provides ~/agent-os/ with profiles, scripts, and config
+  # After rebuild, run ~/agent-os/scripts/project-install.sh in any project
+  programs.agent-os.enable = true;
 }

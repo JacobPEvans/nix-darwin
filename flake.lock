@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "agent-os": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1761688666,
+        "narHash": "sha256-027+m1nj78zC+6IIP8IdNtnx0ARBrZE9zs6crxfoh3o=",
+        "owner": "buildermethods",
+        "repo": "agent-os",
+        "rev": "a543311dc0430bc1dffd12feacf087c685670873",
+        "type": "github"
+      },
+      "original": {
+        "owner": "buildermethods",
+        "repo": "agent-os",
+        "type": "github"
+      }
+    },
     "cl-nix-lite": {
       "locked": {
         "lastModified": 1763190794,
@@ -184,6 +200,7 @@
     },
     "root": {
       "inputs": {
+        "agent-os": "agent-os",
         "claude-code-plugins": "claude-code-plugins",
         "claude-cookbooks": "claude-cookbooks",
         "darwin": "darwin",
