@@ -96,7 +96,7 @@ in
   };
 
   # Claude Code status line script
-  # Displays: current directory, git branch, model name, output style
+  # Displays: robbyrussell-style prompt with directory, git status, model, and output style
   ".claude/statusline-command.sh" = {
     text = ''
       #!/bin/bash
@@ -109,15 +109,23 @@ in
       model=$(echo "$input" | ${pkgs.jq}/bin/jq -r '.model.display_name')
       style=$(echo "$input" | ${pkgs.jq}/bin/jq -r '.output_style.name')
 
-      # Shorten home directory to ~
+      # Shorten home directory to ~ and get basename
       cwd_display=''${cwd/#$HOME/\~}
+      dir_name=$(basename "$cwd_display")
 
-      # Get git branch if in a git repo (skip optional locks for safety)
-      git_branch=""
+      # Get git branch and status if in a git repo (skip optional locks for safety)
+      git_info=""
+      git_dirty=""
       if ${pkgs.git}/bin/git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
         git_branch=$(${pkgs.git}/bin/git -C "$cwd" --no-optional-locks branch --show-current 2>/dev/null)
         if [ -n "$git_branch" ]; then
-          git_branch=" on $git_branch"
+          git_info=" ($git_branch)"
+
+          # Check if there are uncommitted changes
+          if ! ${pkgs.git}/bin/git -C "$cwd" --no-optional-locks diff --quiet 2>/dev/null || \
+             ! ${pkgs.git}/bin/git -C "$cwd" --no-optional-locks diff --cached --quiet 2>/dev/null; then
+            git_dirty=" ✗"
+          fi
         fi
       fi
 
@@ -127,8 +135,9 @@ in
         style_display=" [$style]"
       fi
 
-      # Output the status line
-      printf "%s%s | %s%s" "$cwd_display" "$git_branch" "$model" "$style_display"
+      # Output the status line in robbyrussell theme format
+      # Arrow symbol + directory + git info + dirty indicator | model + style
+      printf "➜  %s%s%s | %s%s" "$dir_name" "$git_info" "$git_dirty" "$model" "$style_display"
     '';
     executable = true;
   };
