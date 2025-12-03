@@ -8,30 +8,63 @@
 # 2. settings.local.json remains WRITABLE - for interactive "accept indefinitely"
 # 3. Claude merges both: local overrides base
 #
+# Permissions: Read from JSON in ai-assistant-instructions repo
+# - Centralized, portable permission definitions
+# - Single source of truth across projects
+#
 # Plugins: Configured via claude-plugins.nix
 # - Official Anthropic marketplace (claude-code repo)
 # - Commands/agents from claude-cookbooks repo
 #
-# Community Commands: Configured via claude-community-commands.nix
-# - Curated commands from the Claude Code community
-# - Prefixed to avoid conflicts (e.g., rok-*)
+# Commands: Symlinked from ai-assistant-instructions repo
+# - rok-* community commands (Shape Up workflow)
+# - Standard commands (commit, pull-request, etc.)
 
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ai-assistant-instructions, ... }:
 
 let
-  claudeAllow = import ../permissions/claude-permissions-allow.nix { inherit config; };
-  claudeAsk = import ../permissions/claude-permissions-ask.nix { };
-  claudeDeny = import ../permissions/claude-permissions-deny.nix { };
+  # Read permissions from JSON files in ai-assistant-instructions
+  # These are read at Nix evaluation time from the flake input
+  claudeAllowJson = builtins.fromJSON (
+    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json"
+  );
+  claudeAskJson = builtins.fromJSON (
+    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json"
+  );
+  claudeDenyJson = builtins.fromJSON (
+    builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json"
+  );
 
   # Import plugin configuration (official Anthropic repos)
   claudePlugins = import ./claude-plugins.nix {
     inherit config lib claude-code-plugins claude-cookbooks;
   };
 
-  # Import community commands (curated from the community)
-  communityCommands = import ./claude-community-commands.nix {
-    inherit config;
-  };
+  # Path to git repo for symlinks (live updates without rebuild)
+  aiInstructionsRepo = "${config.home.homeDirectory}/git/ai-assistant-instructions";
+
+  # Commands from ai-assistant-instructions to symlink globally
+  # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
+  aiInstructionsCommands = [
+    "commit"
+    "pull-request"
+    "review-pr-ci"
+    "rok-shape-issues"
+    "rok-resolve-issues"
+    "rok-review-pr"
+    "rok-respond-to-reviews"
+    "example-simple"
+    "example-advanced"
+  ];
+
+  # Create symlink entries for ai-instructions commands
+  mkAiInstructionsCommandSymlinks = builtins.listToAttrs (map (cmd: {
+    name = ".claude/commands/${cmd}.md";
+    value = {
+      source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.claude/commands/${cmd}.md";
+    };
+  }) aiInstructionsCommands);
+
 in
 {
   # Claude Code settings.json
@@ -47,12 +80,12 @@ in
     # See claude-plugins.nix for available plugins and descriptions
     enabledPlugins = claudePlugins.pluginConfig.enabledPlugins;
 
-    # Auto-approved commands (managed by Nix)
-    # See modules/home-manager/permissions/claude-permissions-*.nix
+    # Auto-approved commands (from ai-assistant-instructions JSON)
+    # Permissions are read from the flake input at build time
     permissions = {
-      allow = claudeAllow.allowList;
-      deny = claudeDeny.denyList;
-      ask = claudeAsk.askList;
+      allow = claudeAllowJson.permissions;
+      deny = claudeDenyJson.permissions;
+      ask = claudeAskJson.permissions;
 
       # Directory-level read access
       # Grants Claude access to files outside the current working directory
@@ -144,5 +177,5 @@ in
 }
 # Merge with commands and agents from claude-cookbooks
 // claudePlugins.files
-# Merge with community commands
-// communityCommands.files
+# Merge with ai-instructions command symlinks
+// mkAiInstructionsCommandSymlinks
