@@ -113,20 +113,19 @@ assert lib.all (x: x) (lib.attrValues validatedMarketplaces);
 
   # Home-manager file entries for commands and agents
   # These copy files from the claude-cookbooks repo to ~/.claude/
+  #
+  # Helper function to reduce duplication (refactored per review feedback)
+  # Creates file entries for a given type (command/agent) from a list of names
   files =
-    # Commands from claude-cookbooks
-    (builtins.listToAttrs (map (cmd: {
-      name = ".claude/commands/${cmd}.md";
-      value = {
-        source = "${claude-cookbooks}/.claude/commands/${cmd}.md";
-      };
-    }) cookbookCommands))
-    //
-    # Agents from claude-cookbooks
-    (builtins.listToAttrs (map (agent: {
-      name = ".claude/agents/${agent}.md";
-      value = {
-        source = "${claude-cookbooks}/.claude/agents/${agent}.md";
-      };
-    }) cookbookAgents));
+    let
+      mkCookbookFileEntries = type: names:
+        builtins.listToAttrs (map (name: {
+          name = ".claude/${type}s/${name}.md";
+          value = {
+            source = "${claude-cookbooks}/.claude/${type}s/${name}.md";
+          };
+        }) names);
+    in
+    mkCookbookFileEntries "command" cookbookCommands
+    // mkCookbookFileEntries "agent" cookbookAgents;
 }
