@@ -69,6 +69,30 @@ git commit -m "message"
 - Avoid `2>&1` or `> file` when the base command is in the allow list
 - Run the command without redirects; output is captured automatically
 
+### Known Permission Pattern Limitations
+The `#` character in flake paths breaks permission pattern matching.
+
+**Does NOT work** (prompts for permission):
+```bash
+nix build .#darwinConfigurations.default.system
+nix build nixpkgs#hello
+```
+
+**Alternatives that work**:
+```bash
+# Validate flake without building (no # needed)
+nix flake check /Users/jevans/.config/nix
+
+# Bare nix build (uses default)
+nix build
+
+# Other nix commands work fine
+nix --version
+nix search nixpkgs hello
+```
+
+**For testing Nix configuration changes**, use `nix flake check` instead of `nix build` with flake paths.
+
 ## Critical Requirements
 
 ### 1. Flakes-Only Configuration
@@ -321,7 +345,9 @@ exists for reference to maintain sync with Claude/Gemini structures.
 
 1. Make changes to nix files
 2. **Commit to git** (flakes requirement)
-3. Test build: `nix build ~/.config/nix#darwinConfigurations.default.system`
+3. Test build: `nix flake check /Users/jevans/.config/nix`
 4. Create PR and **wait for user approval**
-5. After merge, apply: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
+5. After merge, user applies: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 6. Update CHANGELOG.md for significant changes
+
+**Note**: Use `nix flake check` for testing (auto-approved). The `#` character in flake paths breaks permission matching, so `nix build .#...` will prompt for permission.

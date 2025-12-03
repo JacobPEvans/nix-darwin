@@ -7,19 +7,45 @@
 # 1. Nix manages settings.json (this file) - baseline approved commands
 # 2. settings.local.json remains WRITABLE - for interactive "accept indefinitely"
 # 3. Claude merges both: local overrides base
+#
+# Plugins: Configured via claude-plugins.nix
+# - Official Anthropic marketplace (claude-code repo)
+# - Commands/agents from claude-cookbooks repo
+#
+# Community Commands: Configured via claude-community-commands.nix
+# - Curated commands from the Claude Code community
+# - Prefixed to avoid conflicts (e.g., rok-*)
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ... }:
 
 let
   claudeAllow = import ../permissions/claude-permissions-allow.nix { inherit config; };
   claudeAsk = import ../permissions/claude-permissions-ask.nix { };
   claudeDeny = import ../permissions/claude-permissions-deny.nix { };
+
+  # Import plugin configuration (official Anthropic repos)
+  claudePlugins = import ./claude-plugins.nix {
+    inherit config lib claude-code-plugins claude-cookbooks;
+  };
+
+  # Import community commands (curated from the community)
+  communityCommands = import ./claude-community-commands.nix {
+    inherit config;
+  };
 in
 {
   # Claude Code settings.json
   ".claude/settings.json".text = builtins.toJSON {
     # Enable extended thinking mode
     alwaysThinkingEnabled = true;
+
+    # Plugin marketplace configuration
+    # Plugins are fetched on-demand from these marketplaces
+    extraKnownMarketplaces = claudePlugins.pluginConfig.marketplaces;
+
+    # Enabled plugins from marketplaces
+    # See claude-plugins.nix for available plugins and descriptions
+    enabledPlugins = claudePlugins.pluginConfig.enabledPlugins;
 
     # Auto-approved commands (managed by Nix)
     # See modules/home-manager/permissions/claude-permissions-*.nix
@@ -107,3 +133,7 @@ in
     executable = true;
   };
 }
+# Merge with commands and agents from claude-cookbooks
+// claudePlugins.files
+# Merge with community commands
+// communityCommands.files

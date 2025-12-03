@@ -25,12 +25,29 @@
       # See: https://github.com/hraban/mac-app-util/issues/39
       inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
     };
+
+    # Official Anthropic repositories for Claude Code plugins/commands
+    # These provide slash commands, agents, and skills for Claude Code
+    claude-code-plugins = {
+      url = "github:anthropics/claude-code";
+      flake = false;  # Not a flake, just fetch the repo
+    };
+
+    claude-cookbooks = {
+      url = "github:anthropics/claude-cookbooks";
+      flake = false;  # Not a flake, just fetch the repo
+    };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, ... }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
+
+      # Pass external sources to home-manager modules
+      extraSpecialArgs = {
+        inherit claude-code-plugins claude-cookbooks;
+      };
     in
     {
       darwinConfigurations.default = darwin.lib.darwinSystem {
@@ -45,6 +62,7 @@
           home-manager.darwinModules.home-manager
           {
             home-manager = hmDefaults // {
+              inherit extraSpecialArgs;
               users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
               # mac-app-util: Also needed for home.packages if any GUI apps there
