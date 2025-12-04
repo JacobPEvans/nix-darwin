@@ -12,41 +12,46 @@
 #
 # Usage:
 #   cd /path/to/your/claude-agent-project
-#   nix develop /path/to/nix/shells/claude-sdk-python
+#   nix develop ~/.config/nix/shells/claude-sdk-python
 #
 # Or with direnv (create .envrc):
-#   use flake /path/to/nix/shells/claude-sdk-python
+#   use flake ~/.config/nix/shells/claude-sdk-python
 
 { pkgs ? import <nixpkgs> {} }:
 
+let
+  # DRY: Define Python version once, use throughout
+  python = pkgs.python311;
+  pythonPackages = pkgs.python311Packages;
+in
 pkgs.mkShell {
   name = "claude-sdk-python";
 
-  buildInputs = with pkgs; [
+  buildInputs = [
     # Python runtime and package management
-    python311
-    python311Packages.pip
-    python311Packages.virtualenv
-    python311Packages.setuptools
+    python
+    pythonPackages.pip
+    pythonPackages.virtualenv
+    pythonPackages.setuptools
 
     # Anthropic SDK dependencies
-    python311Packages.anthropic  # Claude API SDK
-    python311Packages.httpx      # HTTP client
-    python311Packages.pydantic   # Data validation
+    pythonPackages.anthropic  # Claude API SDK
+    pythonPackages.httpx      # HTTP client
+    pythonPackages.pydantic   # Data validation
 
     # Development tools
-    python311Packages.pytest     # Testing framework
-    python311Packages.pytest-asyncio  # Async test support
-    python311Packages.black      # Code formatter
-    python311Packages.mypy       # Type checker
-    python311Packages.ruff       # Fast linter
+    pythonPackages.pytest     # Testing framework
+    pythonPackages.pytest-asyncio  # Async test support
+    pythonPackages.black      # Code formatter
+    pythonPackages.mypy       # Type checker
+    pythonPackages.ruff       # Fast linter
 
     # Useful utilities
-    python311Packages.ipython    # Interactive shell
-    python311Packages.rich       # Pretty printing
-    
+    pythonPackages.ipython    # Interactive shell
+    pythonPackages.rich       # Pretty printing
+
     # Version control
-    git
+    pkgs.git
   ];
 
   shellHook = ''
@@ -54,23 +59,22 @@ pkgs.mkShell {
     echo ""
     echo "Python version: $(python --version)"
     echo "Available tools:"
-    echo "  - anthropic: Claude API Python SDK"
+    echo "  - anthropic: Claude API Python SDK (pre-installed)"
     echo "  - pytest: Testing framework"
     echo "  - black: Code formatter"
     echo "  - mypy: Type checker"
     echo "  - ruff: Fast linter"
     echo ""
     echo "Quick start:"
-    echo "  1. Install the SDK: pip install anthropic"
-    echo "  2. Set API key: export ANTHROPIC_API_KEY=<your-key>"
-    echo "  3. Run examples from: https://github.com/anthropics/claude-agent-sdk-python"
+    echo "  1. Set API key: export ANTHROPIC_API_KEY=<your-key>"
+    echo "  2. Run examples from: https://github.com/anthropics/claude-agent-sdk-python"
     echo ""
     echo "Documentation:"
     echo "  - SDK: https://github.com/anthropics/claude-agent-sdk-python"
     echo "  - API Docs: https://docs.anthropic.com/"
     echo "  - Examples: https://github.com/anthropics/claude-agent-sdk-demos"
     echo ""
-    
+
     # Create local virtual environment if it doesn't exist
     if [ ! -d ".venv" ]; then
       echo "Creating Python virtual environment..."

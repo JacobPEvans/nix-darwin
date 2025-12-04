@@ -15,7 +15,7 @@ Development environment for building Claude agents with TypeScript/Node.js.
 
 ```bash
 cd /path/to/your/claude-agent-project
-nix develop /path/to/nix/shells/claude-sdk-typescript
+nix develop ~/.config/nix/shells/claude-sdk-typescript
 ```
 
 ### With direnv
@@ -23,7 +23,7 @@ nix develop /path/to/nix/shells/claude-sdk-typescript
 Create `.envrc` in your project:
 
 ```bash
-use flake /path/to/nix/shells/claude-sdk-typescript
+use flake ~/.config/nix/shells/claude-sdk-typescript
 ```
 
 Then run `direnv allow` to auto-load the environment.
@@ -32,7 +32,7 @@ Then run `direnv allow` to auto-load the environment.
 
 1. **Activate the shell**:
    ```bash
-   nix develop /path/to/nix/shells/claude-sdk-typescript
+   nix develop ~/.config/nix/shells/claude-sdk-typescript
    ```
 
 2. **Initialize your project**:

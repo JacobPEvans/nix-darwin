@@ -15,7 +15,7 @@ Development environment for building Claude agents with Python.
 
 ```bash
 cd /path/to/your/claude-agent-project
-nix develop /path/to/nix/shells/claude-sdk-python
+nix develop ~/.config/nix/shells/claude-sdk-python
 ```
 
 ### With direnv
@@ -23,7 +23,7 @@ nix develop /path/to/nix/shells/claude-sdk-python
 Create `.envrc` in your project:
 
 ```bash
-use flake /path/to/nix/shells/claude-sdk-python
+use flake ~/.config/nix/shells/claude-sdk-python
 ```
 
 Then run `direnv allow` to auto-load the environment.
@@ -32,7 +32,7 @@ Then run `direnv allow` to auto-load the environment.
 
 1. **Activate the shell**:
    ```bash
-   nix develop /path/to/nix/shells/claude-sdk-python
+   nix develop ~/.config/nix/shells/claude-sdk-python
    ```
 
 2. **Set your API key**:
@@ -77,8 +77,9 @@ The shell automatically creates a `.venv` directory. Activate it with:
 source .venv/bin/activate
 ```
 
-Then install additional dependencies:
+Core dependencies (`anthropic`, `pytest-asyncio`, etc.) are already included via Nix.
+Install additional project-specific packages as needed:
 
 ```bash
-pip install anthropic pytest-asyncio
+pip install <your-project-dependencies>
 ```

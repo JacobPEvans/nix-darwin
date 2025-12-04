@@ -1,90 +1,66 @@
-# GitHub Actions Workflow Templates
+# GitHub Actions Workflows
 
-Templates for integrating Claude Code into CI/CD pipelines.
+CI/CD workflows for this nix-darwin configuration repository.
 
-## Available Templates
+## Active Workflows
 
-### PR Review Workflow
+### Claude Code Review (`claude.yml`)
 
-**File**: `claude-review.yml.template`
+Automated PR review using [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action).
 
-Automated pull request review using Claude Code's multi-agent code review system.
-
-**Features**:
-- Comprehensive code analysis
-- Security vulnerability detection
-- Best practices validation
-- Automated comment posting
-
-**Setup**:
-1. Copy template to `.github/workflows/claude-review.yml`
-2. Add `ANTHROPIC_API_KEY` to repository secrets
-3. Customize triggers and thresholds as needed
-
-### Security Review Workflow
-
-**File**: `claude-security.yml.template`
-
-AI-powered security scanning for continuous security monitoring.
+**Triggers**: Pull requests (opened, synchronize)
 
 **Features**:
-- Vulnerability pattern detection
-- Security best practices validation
-- SARIF report generation
-- Scheduled daily scans
 
-**Setup**:
-1. Copy template to `.github/workflows/claude-security.yml`
-2. Add `ANTHROPIC_API_KEY` to repository secrets
-3. Enable security events permissions
-4. Customize scan schedule as needed
+- AI-powered code review using Claude
+- Runs the `/review-code` command
+- Posts review comments on PRs
 
-## Important Notes
+**Setup**: Add `ANTHROPIC_API_KEY` to repository secrets.
 
-⚠️ **These are reference templates**
+### Nix CI (`nix-ci.yml`)
 
-The workflows reference hypothetical GitHub Actions:
-- `anthropics/claude-code-action@v1`
-- `anthropics/claude-code-security-review@v1`
+Validates Nix flake configuration using Determinate Systems actions.
 
-Check the actual repositories for implementation details:
-- https://github.com/anthropics/claude-code-action
-- https://github.com/anthropics/claude-code-security-review
+**Triggers**: Push/PR on `*.nix` or `flake.lock` changes
 
-You may need to:
-- Install Claude Code CLI in a setup step
-- Run commands directly instead of using actions
-- Adapt the workflow structure based on actual implementation
+**Features**:
 
-## Customization
+- Installs Nix via [DeterminateSystems/nix-installer-action](https://github.com/DeterminateSystems/nix-installer-action)
+- Free caching via [DeterminateSystems/magic-nix-cache-action](https://github.com/DeterminateSystems/magic-nix-cache-action)
+- Checks flake.lock health via [DeterminateSystems/flake-checker-action](https://github.com/DeterminateSystems/flake-checker-action)
+- Runs `nix flake check` validation
 
-Both workflows can be customized:
+### Markdown Lint (`markdownlint.yml`)
 
-**Triggers**:
-```yaml
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM
-```
+Validates markdown file formatting.
 
-**Severity Thresholds**:
-```yaml
-with:
-  severity-threshold: medium  # low, medium, high, critical
-```
+**Triggers**: Push/PR on `*.md` or `.markdownlint.*` changes
 
-**Comment Formatting**:
-Modify the `github-script` steps to customize comment content.
+**Features**:
 
-## Documentation
+- Uses [DavidAnson/markdownlint-cli2-action](https://github.com/DavidAnson/markdownlint-cli2-action)
+- Enforces consistent markdown style
+- Configuration in `.markdownlint.json`
 
-For complete documentation on the Anthropic ecosystem integration, see:
-- [docs/ANTHROPIC-ECOSYSTEM.md](../docs/ANTHROPIC-ECOSYSTEM.md)
+## Configuration
 
-## Related Resources
+### Required Secrets
 
-- [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [SARIF Format](https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning)
+| Secret | Description | Required By |
+|--------|-------------|-------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `claude.yml` |
+
+### Permissions
+
+Workflows use minimal required permissions:
+
+- `contents: read` - Read repository code
+- `pull-requests: write` - Post review comments (Claude only)
+- `id-token: write` - Determinate Systems authentication
+
+## Related Documentation
+
+- [Claude Code Action](https://github.com/anthropics/claude-code-action)
+- [Determinate Systems Actions](https://github.com/DeterminateSystems)
+- [Nix Flakes](https://nixos.wiki/wiki/Flakes)

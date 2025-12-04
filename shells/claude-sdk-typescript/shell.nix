@@ -12,10 +12,10 @@
 #
 # Usage:
 #   cd /path/to/your/claude-agent-project
-#   nix develop /path/to/nix/shells/claude-sdk-typescript
+#   nix develop ~/.config/nix/shells/claude-sdk-typescript
 #
 # Or with direnv (create .envrc):
-#   use flake /path/to/nix/shells/claude-sdk-typescript
+#   use flake ~/.config/nix/shells/claude-sdk-typescript
 
 { pkgs ? import <nixpkgs> {} }:
 

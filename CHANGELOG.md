@@ -46,7 +46,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
   - Both templates based on official Anthropic actions (reference implementation)
 
 - **Documentation**:
-  - Created `docs/ANTHROPIC-ECOSYSTEM.md` - Comprehensive 350+ line reference
+  - Created `docs/ANTHROPIC-ECOSYSTEM.md` - Comprehensive 500+ line reference
     - Architecture overview, plugin management, commands/agents catalog
     - Skills and patterns documentation, SDK usage guides
     - GitHub Actions setup, troubleshooting, maintenance procedures
