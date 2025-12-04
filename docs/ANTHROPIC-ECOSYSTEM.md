@@ -12,6 +12,7 @@ Comprehensive reference for the integrated Anthropic Claude Code ecosystem in th
 - [Patterns](#patterns)
 - [SDK Development](#sdk-development)
 - [GitHub Actions](#github-actions)
+- [Agent OS Integration](#agent-os-integration)
 - [Resources](#resources)
 
 ---
@@ -440,168 +441,18 @@ Workflows can be customized for your needs:
 
 ## Agent OS Integration
 
-### What is Agent OS
+Agent OS is a spec-driven development system providing 7 commands, 8 agents, and 16+ skills for AI-assisted development.
 
-[Agent OS](https://buildermethods.com/agent-os) is a spec-driven development system for AI coding agents.
-It provides structured workflows, standards, and specialized agents for software development.
+**Full documentation**: [docs/AGENT-OS.md](AGENT-OS.md)
 
-**Integration Status**: Complete - All Agent OS components are available globally via `~/.claude/`.
-
-### Agent OS Configuration
-
-Agent OS is integrated as a flake input (`github:JacobPEvans/agent-os`) and configured via the `programs.agent-os` module in `modules/home-manager/ai-cli/agent-os/default.nix`.
-
-**Configuration**:
-
-```nix
-programs.agent-os = {
-  enable = true;                      # Enable Agent OS integration
-  claudeCodeCommands = true;          # Install slash commands
-  useClaudeCodeSubagents = true;      # Enable specialized agents
-  standardsAsClaudeCodeSkills = true; # Expose standards as skills (optional)
-  exposeWorkflows = true;             # Expose workflow templates (optional)
-};
-```
-
-### Agent OS Commands (7)
-
-Commands from Agent OS are installed to `~/.claude/commands/`:
-
-| Command | Description | Use Case |
-|---------|-------------|----------|
-| `plan-product` | Product planning workflow | Define features, user stories |
-| `shape-spec` | Specification shaping | Refine requirements, identify gaps |
-| `write-spec` | Write technical specification | Document architecture, APIs |
-| `create-tasks` | Break spec into tasks | Generate implementation tasks |
-| `implement-tasks` | Execute implementation | Code generation, testing |
-| `orchestrate-tasks` | Multi-task coordination | Parallel task execution |
-| `improve-skills` | Skill improvement loop | Enhance Agent OS skills |
-
-**Usage**:
+**Quick Start**:
 
 ```bash
-claude /plan-product      # Start product planning
+claude /plan-product      # Product planning
 claude /write-spec        # Write technical spec
 claude /create-tasks      # Generate task list
 claude /implement-tasks   # Execute implementation
 ```
-
-### Agent OS Agents (8)
-
-Specialized agents for autonomous task delegation, installed to `~/.claude/agents/`:
-
-| Agent | Role | Responsibility |
-|-------|------|----------------|
-| `product-planner` | Planning | Product strategy, feature definition |
-| `spec-initializer` | Specification | Initial spec setup |
-| `spec-shaper` | Specification | Refine and validate specs |
-| `spec-verifier` | Quality | Spec validation |
-| `spec-writer` | Documentation | Technical writing |
-| `tasks-list-creator` | Planning | Task breakdown |
-| `implementer` | Development | Code implementation |
-| `implementation-verifier` | Quality | Implementation validation |
-
-Agents are automatically available when `useClaudeCodeSubagents = true`.
-
-### Standards as Skills (Optional)
-
-When `standardsAsClaudeCodeSkills = true`, Agent OS coding standards are exposed as Claude Code skills in `~/.claude/skills/`:
-
-**Categories**:
-
-- **Backend Standards** - API design, database patterns, backend architecture
-- **Frontend Standards** - UI/UX patterns, component design, state management
-- **Global Standards** - Code style, naming conventions, documentation
-- **Testing Standards** - Test patterns, coverage requirements, test organization
-
-**File Naming**: Skills are prefixed with category: `backend-api-design.md`, `global-code-style.md`, etc.
-
-**Skill Template**: Available at `~/.claude/skills/TEMPLATE.md` for creating custom skills.
-
-**Usage**: Skills are automatically discovered by Claude Code and applied based on context. No explicit invocation needed.
-
-### Workflows (Optional)
-
-When `exposeWorkflows = true`, structured multi-step workflow templates are available at `~/agent-os/workflows/`:
-
-**Workflow Categories**:
-
-- `implementation/` - Task execution workflows
-- `planning/` - Product planning workflows
-- `specification/` - Spec creation workflows
-
-Workflows provide step-by-step guides for complex development processes.
-
-### Unified Directory Structure
-
-Agent OS coexists with ai-assistant-instructions and Anthropic ecosystem content in `~/.claude/`:
-
-```text
-~/.claude/
-├── commands/
-│   ├── plan-product.md           # Agent OS (7)
-│   ├── create-tasks.md
-│   ├── implement-tasks.md
-│   ├── ...
-│   ├── commit.md                 # ai-assistant-instructions (11)
-│   ├── review-code.md
-│   ├── ...
-│   └── review-pr.md              # Cookbook (6)
-│
-├── agents/
-│   ├── product-planner.md        # Agent OS (8)
-│   ├── implementer.md
-│   ├── ...
-│   └── code-reviewer.md          # Cookbook (1)
-│
-└── skills/                       # When standardsAsClaudeCodeSkills enabled
-    ├── backend-api-design.md     # Agent OS standards
-    ├── frontend-ui-patterns.md
-    ├── global-code-style.md
-    ├── testing-coverage.md
-    └── TEMPLATE.md               # Skill template
-```
-
-**Total Available**:
-
-- 24 commands (7 Agent OS + 11 ai-assistant-instructions + 6 Cookbook)
-- 9 agents (8 Agent OS + 1 Cookbook)
-- 10+ skills (when enabled)
-
-### Configuration Reference
-
-**Location**: `modules/home-manager/ai-cli/agent-os/default.nix`
-
-**Config File**: `~/agent-os/config.yml` (auto-generated by Nix)
-
-**Profile Reference**: `~/agent-os/profiles/default/` (full Agent OS profile for reference)
-
-### Agent OS Updates
-
-**Update Agent OS**:
-
-```bash
-nix flake lock --update-input agent-os
-darwin-rebuild switch --flake ~/.config/nix#default
-```
-
-**Verify Commands**:
-
-```bash
-ls -la ~/.claude/commands/ | grep -E "plan-product|create-tasks|implement-tasks"
-```
-
-**Verify Skills** (if enabled):
-
-```bash
-ls -la ~/.claude/skills/ | grep -E "backend-|frontend-|global-|testing-"
-```
-
-### References
-
-- [Agent OS Repository](https://github.com/JacobPEvans/agent-os)
-- [Agent OS Documentation](https://buildermethods.com/agent-os)
-- Module: `modules/home-manager/ai-cli/agent-os/default.nix`
 
 ---
 

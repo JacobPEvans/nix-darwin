@@ -150,6 +150,21 @@ nix search nixpkgs hello
 - Visibility > minimalism
 - Use `_latest` variants (e.g., `nodejs_latest`)
 
+### 5. File and Folder Organization
+
+- **Target 200 lines max per file** - Files exceeding this should be considered for refactoring
+- **Prefer logical separation** - Split by domain/responsibility, not arbitrary line counts
+- **Documentation files** - Extract large sections to their own files (e.g., `docs/AGENT-OS.md`)
+- **Nix modules** - Use subdirectories for related modules (e.g., `ai-cli/agent-os/`)
+- **When to split**:
+  - A section could stand alone as a reference document
+  - A module has multiple distinct responsibilities
+  - File requires excessive scrolling to navigate
+- **When NOT to split**:
+  - Code is highly cohesive and splitting would scatter related logic
+  - File is slightly over 200 lines but logically complete
+  - Splitting would create import/dependency complexity
+
 ## Task Management Workflow
 
 **STRICT PATTERN - Follow without exception:**
