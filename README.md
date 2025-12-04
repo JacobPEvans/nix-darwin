@@ -1,6 +1,7 @@
 # Nix Configuration
 
-> Because "it works on my machine" should mean it works on every machine. Deterministic builds, reproducible environments, and the smug satisfaction of knowing exactly what's installed.
+> Because "it works on my machine" should mean it works on *every* machine.
+> Deterministic builds, reproducible environments, and the smug satisfaction of knowing exactly what's installed.
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Markdown Lint](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml)
