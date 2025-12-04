@@ -22,6 +22,7 @@
 ## Scope of This Document
 
 This file contains **AI-specific instructions only** - rules and patterns that AI agents need beyond their base training. It should NOT contain:
+
 - General project documentation (belongs in README.md)
 - Directory structure or file listings (belongs in README.md)
 - Setup guides or troubleshooting (belongs in SETUP.md or TROUBLESHOOTING.md)
@@ -33,52 +34,63 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 ## Command Execution Preferences
 
 ### Avoid Command Chaining with &&
+
 - **NEVER chain commands with `&&`** - permission patterns don't match compound commands
 - Run each command separately in its own Bash tool call
 - This ensures each command matches its permission pattern correctly
 
 **Bad:**
+
 ```bash
 git add -A && git commit -m "message"
 ```
 
 **Good:** (two separate tool calls)
+
 ```bash
 git add -A
 ```
+
 ```bash
 git commit -m "message"
 ```
 
 ### Prefer Parallel Execution
+
 - When commands are **independent** (don't depend on each other's output), run them in parallel
 - Use multiple Bash tool calls in the same response message
 - This is faster and more efficient
 
 **Examples of parallel-safe commands:**
+
 - `git status` and `git log` (both read-only)
 - `nix search` and `brew search` (independent searches)
 - Multiple `grep` or `find` operations on different paths
 
 **Examples requiring sequential execution:**
+
 - `git add` then `git commit` (commit depends on staging)
 - `mkdir` then `touch file` inside it (file depends on directory)
 - `nix build` then `darwin-rebuild switch` (switch depends on build)
 
 ### Avoid Redirects in Permission-Sensitive Commands
+
 - Avoid `2>&1` or `> file` when the base command is in the allow list
 - Run the command without redirects; output is captured automatically
 
 ### Known Permission Pattern Limitations
+
 The `#` character in flake paths breaks permission pattern matching.
 
 **Does NOT work** (prompts for permission):
+
 ```bash
 nix build .#darwinConfigurations.default.system
 nix build nixpkgs#hello
 ```
 
 **Alternatives that work**:
+
 ```bash
 # Validate flake without building (no # needed)
 nix flake check /Users/jevans/.config/nix
@@ -96,36 +108,43 @@ nix search nixpkgs hello
 ## Critical Requirements
 
 ### 1. Flakes-Only Configuration
+
 - **NEVER use nix-channels or non-flake commands**
 - All changes must be committed to git before rebuild
 - Use: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 
 ### 2. Determinate Nix Compatibility
+
 - **NEVER enable nix-darwin's Nix management**
 - `nix.enable = false` must remain in `modules/darwin/common.nix`
 - Determinate Nix manages the daemon and nix itself
 
 ### 3. Nixpkgs First, Manual Homebrew Updates
+
 - **ALL packages from nixpkgs unless impossible**
 - Homebrew is fallback ONLY for packages not in nixpkgs or when the nixpkgs version is severely outdated.
 - Search first: `nix search nixpkgs <package>`
 - Document why homebrew was needed if used
 
 **Update Strategy:**
+
 - Nix packages update via `nix flake update` (manual, recommended weekly)
 - Homebrew `autoUpdate = false` - skip slow 45MB index download
 - Homebrew `upgrade = true` - upgrade packages based on cached index
 - To get latest Homebrew versions: `brew update` then `darwin-rebuild switch`
 
 **Why this setup?**
+
 - `darwin-rebuild switch` is fast (no 45MB download every time)
 - Packages still auto-upgrade when cached index has newer versions
 - Run `brew update` periodically to refresh the index
 
 **Current Homebrew Exceptions:**
+
 - None - all packages successfully managed via nixpkgs
 
 ### 4. Code Style for Learning
+
 - **Keep comments** - user is learning Nix
 - Show empty sections with examples (even if commented out)
 - Visibility > minimalism
@@ -142,24 +161,29 @@ nix search nixpkgs hello
 5. **Clean up regularly** - Reorganize PLANNING.md and clean CHANGELOG.md as needed
 
 **When completing a task:**
+
 1. Remove from PLANNING.md immediately
 2. Add to CHANGELOG.md under appropriate date
 3. Ensure no task exists in both files
 
 **File purposes:**
+
 - `PLANNING.md` = Future roadmap + current work in progress
 - `CHANGELOG.md` = Historical record of completed work
 
 ## Common Mistakes to Avoid
 
 ### Duplicate Packages (Homebrew + Nix)
+
 **Problem**: Adding package to nix but homebrew version still installed
 **Check**: `which <package>` should show `/run/current-system/sw/bin/<package>`
 **Fix**: `sudo -u <username> brew uninstall <package>`
 **Verify**: Backup important configs first (GPG keys, app settings)
 
 ### PATH Priority
+
 **Correct order**: Nix paths before homebrew
+
 1. `/Users/<username>/.nix-profile/bin`
 2. `/etc/profiles/per-user/<username>/bin`
 3. `/run/current-system/sw/bin` ← nix packages
@@ -169,6 +193,7 @@ nix search nixpkgs hello
 **If wrong**: Check `~/.zprofile` for manual homebrew PATH additions
 
 ### VS Code Deprecated API
+
 **Use**: `programs.vscode.profiles.default.userSettings`
 **NOT**: `programs.vscode.userSettings`
 
@@ -177,22 +202,26 @@ nix search nixpkgs hello
 **Layered Strategy**: Nix manages baseline, settings.local.json for ad-hoc approvals
 
 **Permission files** (`modules/home-manager/permissions/`):
+
 - `claude-permissions-allow.nix` - Auto-approved commands (280+ in 25 categories)
 - `claude-permissions-ask.nix` - Commands requiring user confirmation
 - `claude-permissions-deny.nix` - Permanently blocked (catastrophic operations)
 
 **User-managed** (`~/.claude/settings.local.json`):
+
 - NOT managed by Nix (intentionally writable)
 - Claude writes here on "accept indefinitely"
 - Machine-local only
 
 **Directory Access** (`additionalDirectories`):
+
 - Configured in `modules/home-manager/ai-cli/claude.nix`
 - Grants Claude read access to directories outside working directory
 - Prevents "allow reading from X/" prompts
 - Default: `~/`, `~/.claude/`, `~/.config/`
 
 **To add commands permanently**:
+
 1. Edit appropriate file in `modules/home-manager/permissions/`
 2. Add to appropriate category (allow, ask, or deny)
 3. Commit and rebuild
@@ -206,11 +235,13 @@ nix search nixpkgs hello
 **Configuration location**: `~/.gemini/settings.json`
 
 **Permission files** (`modules/home-manager/permissions/`):
+
 - `gemini-permissions-allow.nix` - coreTools (allowed commands)
 - `gemini-permissions-ask.nix` - Reference only (Gemini has no ask mode)
 - `gemini-permissions-deny.nix` - excludeTools (permanently blocked)
 
 **Permission model**:
+
 - **ReadFileTool, GlobTool, GrepTool**: Core read-only tools (always allowed)
 - **ShellTool(cmd)**: Shell commands with specific restrictions
   - Example: `ShellTool(git status)` allows only `git status`
@@ -218,15 +249,17 @@ nix search nixpkgs hello
 - **WebFetchTool**: Web fetching capabilities
 
 **To add commands permanently**:
+
 1. Edit appropriate file in `modules/home-manager/permissions/`
 2. Add to `coreTools` (allow) or `excludeTools` (deny)
 3. Use format: `ShellTool(command)` for shell commands
 4. Commit and rebuild
 
 **Security notes**:
+
 - Gemini CLI has no "ask" mode - commands are either allowed or blocked
 - The ask file exists for reference to maintain sync with Claude/Copilot
-- See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
+- See: <https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html>
 
 ## GitHub Copilot CLI Permission Management
 
@@ -235,11 +268,13 @@ nix search nixpkgs hello
 **Configuration location**: `~/.copilot/config.json`
 
 **Permission files** (`modules/home-manager/permissions/`):
+
 - `copilot-permissions-allow.nix` - trusted_folders (directory trust)
 - `copilot-permissions-ask.nix` - Reference only (Copilot uses CLI flags)
 - `copilot-permissions-deny.nix` - Recommended --deny-tool flags
 
 **Permission model**:
+
 - **Directory trust**: Copilot requires explicit directory approval (config.json)
 - **Tool permissions**: Controlled via CLI flags (NOT config file)
   - `--allow-tool 'shell'`: Allow all shell commands
@@ -248,6 +283,7 @@ nix search nixpkgs hello
   - Supports glob patterns: `--deny-tool 'shell(npm run test:*)'`
 
 **Runtime usage**:
+
 ```bash
 # Allow all tools except dangerous commands
 copilot --allow-all-tools --deny-tool 'shell(rm -rf)'
@@ -260,6 +296,7 @@ copilot --deny-tool 'My-MCP-Server(tool_name)'
 ```
 
 **To modify trusted directories**:
+
 1. Edit `modules/home-manager/permissions/copilot-permissions-allow.nix`
 2. Add/remove paths in `trustedDevelopmentDirs` or `trustedConfigDirs`
 3. Commit and rebuild
@@ -275,11 +312,13 @@ exists for reference to maintain sync with Claude/Gemini structures.
 **Configuration location**: Merged into VS Code `settings.json`
 
 **Nix-managed** (`modules/home-manager/vscode/copilot-settings.nix`):
+
 - Comprehensive GitHub Copilot settings for VS Code editor
 - Merged with other VS Code settings in common.nix
 - All settings fully declarative and version controlled
 
 **Key settings categories**:
+
 - **Authentication**: GitHub/GitHub Enterprise configuration
 - **Code completions**: Inline suggestions, Next Edit Suggestions (NES)
 - **Chat & agents**: AI chat, code discovery, custom instructions
@@ -287,17 +326,19 @@ exists for reference to maintain sync with Claude/Gemini structures.
 - **Experimental**: Preview features, model selection
 
 **To modify settings**:
+
 1. Edit `modules/home-manager/vscode/copilot-settings.nix`
 2. Update settings following VS Code's `github.copilot.*` namespace
 3. Commit and rebuild
 
 **Common customizations**:
+
 - Enable/disable per language: `"github.copilot.enable"`
 - Chat features: `"chat.*"` settings
 - Inline suggestions: `"editor.inlineSuggest.*"`
 - Enterprise auth: `"github.copilot.advanced.authProvider"`
 
-**Reference**: https://code.visualstudio.com/docs/copilot/reference/copilot-settings
+**Reference**: <https://code.visualstudio.com/docs/copilot/reference/copilot-settings>
 
 ## AI CLI Tools Comparison
 
@@ -312,6 +353,7 @@ exists for reference to maintain sync with Claude/Gemini structures.
 | **Security model** | Three-tier (allow/ask/deny) | Two-tier (allow/exclude) | Trust + runtime flags | Per-language enable |
 
 **Consistency philosophy**:
+
 - CLI tools (Claude, Gemini, Copilot) use same categorized command structure
 - Same principle of least privilege across all tools
 - Nix ensures reproducible, version-controlled configuration
@@ -322,6 +364,7 @@ exists for reference to maintain sync with Claude/Gemini structures.
 **CRITICAL: NEVER auto-merge PRs without explicit user approval.**
 
 ### Standard PR Process
+
 1. Create feature branch
 2. Make changes, commit
 3. Push branch and create PR
@@ -329,11 +372,13 @@ exists for reference to maintain sync with Claude/Gemini structures.
 5. Only merge when user explicitly requests it
 
 ### What "Explicit Request" Means
+
 - User says "merge it" or "go ahead and merge"
 - User clicks merge button themselves
 - User explicitly approves in PR comments
 
 ### What is NOT Approval
+
 - Silence or no response
 - User asking to create the PR
 - Completing the code changes
@@ -351,3 +396,43 @@ exists for reference to maintain sync with Claude/Gemini structures.
 6. Update CHANGELOG.md for significant changes
 
 **Note**: Use `nix flake check` for testing (auto-approved). The `#` character in flake paths breaks permission matching, so `nix build .#...` will prompt for permission.
+
+## Anthropic Ecosystem Integration
+
+**Comprehensive integration** of official Anthropic Claude Code repositories.
+
+**Documentation**: See [docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md) for complete reference.
+
+**Quick Overview**:
+
+- **12 official plugins** enabled (git, review, security, UI/UX, output styles, migration)
+- **2 plugin marketplaces** configured (claude-code + claude-plugins-official)
+- **6 cookbook commands** + **1 agent** installed from claude-cookbooks
+- **Skills system** integrated from anthropics/skills
+- **Pattern references** for agent workflows documented
+- **SDK dev shells** for Python and TypeScript development
+- **GitHub Actions** for CI/CD (Claude review, Nix CI, Markdown lint)
+
+**Configuration files**:
+
+- `modules/home-manager/ai-cli/claude-plugins.nix` - Plugin marketplace & enabled plugins
+- `modules/home-manager/ai-cli/claude-skills.nix` - Skills configuration
+- `modules/home-manager/ai-cli/claude-patterns.nix` - Cookbook pattern references
+- `shells/claude-sdk-python/` - Python SDK development shell
+- `shells/claude-sdk-typescript/` - TypeScript SDK development shell
+- `.github/workflows/claude.yml` - Claude Code review workflow
+- `.github/workflows/nix-ci.yml` - Nix flake validation workflow
+- `.github/workflows/markdownlint.yml` - Markdown linting workflow
+
+**Flake inputs**:
+
+- `claude-code-plugins` - Main CLI tool with plugins
+- `claude-cookbooks` - Patterns, agents, skills, examples
+- `claude-plugins-official` - Curated plugin directory
+- `anthropic-skills` - Public skills repository
+
+**To use**:
+
+- All slash commands auto-discovered: `/help` to list
+- SDK shells: `nix develop ~/.config/nix/shells/claude-sdk-python`
+- Update repos: `nix flake update` then rebuild

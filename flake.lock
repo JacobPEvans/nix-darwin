@@ -19,16 +19,32 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1764806207,
-        "narHash": "sha256-Zjjh3CNGOK6M6tJMdgR5Ax4//bNfW5xgLk1lKoyyvDE=",
+        "lastModified": 1764811612,
+        "narHash": "sha256-zJ3u9dGtWZCibG4aStRzl0XVGP1h5MppOcuVg99WNjA=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "25b16b47277e3592464dedc2ffff26ca3c7757bc",
+        "rev": "4ca503c020a5a655e72678f4300dd60b012cdf27",
         "type": "github"
       },
       "original": {
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
+        "type": "github"
+      }
+    },
+    "anthropic-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764612336,
+        "narHash": "sha256-lWbIF5j15rdKH7J3wvOX3RoilCowcu55DCsp4rQkx1o=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "ef740771ac901e03fbca3ce4e1c453a96010f30a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
         "type": "github"
       }
     },
@@ -77,6 +93,22 @@
       "original": {
         "owner": "anthropics",
         "repo": "claude-cookbooks",
+        "type": "github"
+      }
+    },
+    "claude-plugins-official": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764633782,
+        "narHash": "sha256-VdH4H0HSz5Eca2bUVX5c8fQ2KBMGqf/QDrhSF+3XRWE=",
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "rev": "22d3def39e4a6ad96d4fffff7fce5fb28c8d6215",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
         "type": "github"
       }
     },
@@ -218,8 +250,10 @@
       "inputs": {
         "agent-os": "agent-os",
         "ai-assistant-instructions": "ai-assistant-instructions",
+        "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",
         "claude-cookbooks": "claude-cookbooks",
+        "claude-plugins-official": "claude-plugins-official",
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",

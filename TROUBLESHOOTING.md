@@ -27,6 +27,7 @@ Understanding when `sudo` is needed prevents permission issues.
 | `mv/rm` in /etc | System config directory |
 
 **Correct usage**:
+
 ```bash
 sudo darwin-rebuild switch --flake ~/.config/nix#default
 ```
@@ -48,6 +49,7 @@ sudo darwin-rebuild switch --flake ~/.config/nix#default
 **Problem**: Files in `~/.config/nix` owned by root (usually from running editor as sudo).
 
 **Solution**:
+
 ```bash
 # Fix ownership of entire nix config directory
 sudo chown -R $(whoami):staff ~/.config/nix
@@ -59,6 +61,7 @@ ls -la ~/.config/nix
 ### AI CLI Tools and sudo
 
 **Claude Code, Gemini CLI, etc.**:
+
 - Should run as your user, NOT as sudo
 - Running as sudo causes:
   - GPG signing failures (root can't access user's keychain)
@@ -66,6 +69,7 @@ ls -la ~/.config/nix
   - Home directory set to /var/root
 
 **If you ran `sudo claude`**:
+
 ```bash
 # Fix any root-owned files it created
 sudo chown -R $(whoami):staff ~/.config/nix ~/.claude ~/.gitconfig
@@ -78,6 +82,7 @@ sudo chown -R $(whoami):staff ~/.config/nix ~/.claude ~/.gitconfig
 ### "command not found: nix"
 
 Source the Nix daemon script:
+
 ```bash
 source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 ```
@@ -85,6 +90,7 @@ source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 ### Git permission errors during build
 
 Fix ownership of .git directory:
+
 ```bash
 sudo chown -R $(whoami):staff ~/.config/nix/.git
 ```
@@ -92,6 +98,7 @@ sudo chown -R $(whoami):staff ~/.config/nix/.git
 ### Activation fails with "files in the way"
 
 Rename conflicting files with `.before-nix-darwin` suffix:
+
 ```bash
 sudo mv /etc/conflicting-file /etc/conflicting-file.before-nix-darwin
 ```
@@ -99,6 +106,7 @@ sudo mv /etc/conflicting-file /etc/conflicting-file.before-nix-darwin
 ### Home-manager activation fails
 
 Ensure backup extension is set in flake.nix:
+
 ```nix
 home-manager.backupFileExtension = "backup";
 ```
@@ -106,6 +114,7 @@ home-manager.backupFileExtension = "backup";
 ### "error: attribute 'package-name' missing"
 
 Package name differs in nixpkgs. Search for it:
+
 ```bash
 nix search nixpkgs <partial-name>
 ```
@@ -120,7 +129,8 @@ nix search nixpkgs <partial-name>
 
 ## Why Packages "Disappear"
 
-Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NOT tracked by nix-darwin. After system updates or profile switches, these packages may vanish because:
+Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NOT tracked by nix-darwin.
+After system updates or profile switches, these packages may vanish because:
 
 1. They weren't in the nix store
 2. PATH changes to prioritize nix-managed paths (`/run/current-system/sw/bin`)
@@ -139,23 +149,27 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 **Solution**:
 
 1. **Verify the duplicate**:
+
    ```bash
    which claude  # Shows /opt/homebrew/bin/claude (wrong)
    ls -la /run/current-system/sw/bin/claude  # Verify nix version exists
    ```
 
 2. **Check for homebrew installations**:
+
    ```bash
    brew list --formula  # List all formulas
    brew list --cask     # List all casks
    ```
 
 3. **Backup important configurations** (GPG keys, app settings):
+
    ```bash
    cp -R ~/.config/app ~/backup/app-$(date +%Y-%m-%d)/
    ```
 
 4. **Remove homebrew versions as user** (not root):
+
    ```bash
    # For command-line tools
    sudo -u <username> brew uninstall <package>
@@ -164,6 +178,7 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
    ```
 
 5. **Verify nix version is now found**:
+
    ```bash
    which <package>  # Should show /run/current-system/sw/bin/<package>
    ```
@@ -173,7 +188,8 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 **Problem**: `/opt/homebrew/bin` appears before `/run/current-system/sw/bin` in PATH.
 
 **Correct PATH Order**:
-```
+
+```text
 /Users/<username>/.nix-profile/bin
 /etc/profiles/per-user/<username>/bin
 /run/current-system/sw/bin          ← Nix packages here
@@ -182,6 +198,7 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 ```
 
 **Solution**:
+
 1. Check `~/.zprofile` for homebrew shellenv initialization
 2. Remove or comment out manual homebrew PATH additions
 3. Let nix-darwin manage PATH via `/etc/zshenv`
@@ -194,7 +211,8 @@ Packages installed outside of nix (manual `brew install`, `npm -g`, etc.) are NO
 ### mac-app-util Build Failure (gitlab.common-lisp.net)
 
 **Problem**: Build fails with errors like:
-```
+
+```text
 tar: This does not look like a tar archive
 do not know how to unpack source archive
 ```
@@ -202,6 +220,7 @@ do not know how to unpack source archive
 **Cause**: `gitlab.common-lisp.net` has deployed Anubis anti-bot protection, which blocks Nix's automated source fetches for the `iterate` Common Lisp library.
 
 **Solution**: The flake.nix already includes a workaround using a fork with GitHub mirrors:
+
 ```nix
 mac-app-util = {
   url = "github:hraban/mac-app-util";
@@ -218,6 +237,7 @@ mac-app-util = {
 **Cause**: macOS TCC (Transparency, Consent, Control) treats different Nix store paths as different applications. Every rebuild changes the path, revoking permissions.
 
 **Solution**: This configuration uses `mac-app-util` to create stable trampolines. If permissions still reset, verify mac-app-util is working:
+
 ```bash
 # Check that trampolines exist in /Applications
 ls -la /Applications/*.app
@@ -229,6 +249,7 @@ ls -la /Applications/*.app
 **Problem**: `gpg: WARNING: unsafe ownership on homedir '/Users/<username>/.gnupg'`
 
 **Solution**:
+
 ```bash
 # Fix ownership (replace <username> with your macOS username)
 sudo chown -R <username>:staff ~/.gnupg
@@ -248,6 +269,7 @@ gpg --list-keys
 **Problem**: Warning about `programs.vscode.userSettings` being renamed.
 
 **Solution**: Update `home/home.nix`:
+
 ```nix
 # OLD (deprecated):
 programs.vscode.userSettings = { ... };
@@ -267,17 +289,20 @@ programs.vscode.profiles.default.userSettings = { ... };
 **Solution**:
 
 1. **Check for backup files**:
+
    ```bash
    ls -la ~/.config/nix/home/
    # Look for home.nix~ or home.nix.backup
    ```
 
 2. **Restore from backup**:
+
    ```bash
    cp ~/.config/nix/home/home.nix~ ~/.config/nix/home/home.nix
    ```
 
 3. **Or restore from git**:
+
    ```bash
    cd ~/.config/nix
    git restore home/home.nix

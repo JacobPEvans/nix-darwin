@@ -20,7 +20,7 @@
 # - rok-* community commands (Shape Up workflow)
 # - Standard commands (commit, pull-request, etc.)
 
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ai-assistant-instructions, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
 
 let
   # User configuration (includes ai.instructionsRepo path)
@@ -54,7 +54,7 @@ let
 
   # Import plugin configuration (official Anthropic repos)
   claudePlugins = import ./claude-plugins.nix {
-    inherit config lib claude-code-plugins claude-cookbooks;
+    inherit config lib claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills;
   };
 
   # Path to git repo for symlinks (live updates without rebuild)

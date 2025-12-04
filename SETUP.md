@@ -16,9 +16,11 @@
 ---
 
 ## Overview
+
 Minimal nix-darwin configuration with home-manager for macOS system management.
 
 ## Setup Summary
+
 - **Date**: 2025-11-19
 - **Machine**: MacBook Pro M4 Max (128GB RAM)
 - **Nix Version**: 2.31.2 (Determinate Nix installer)
@@ -32,9 +34,11 @@ See [CLAUDE.md](CLAUDE.md) for complete directory structure with all files and d
 ## Issues Solved
 
 ### 1. Determinate Nix Compatibility
+
 **Problem**: nix-darwin's Nix management conflicts with Determinate Nix installer.
 
 **Solution**: Disabled nix-darwin's Nix management in `darwin/configuration.nix`:
+
 ```nix
 nix.enable = false;
 ```
@@ -42,9 +46,11 @@ nix.enable = false;
 **Why**: Determinate Nix manages its own daemon. Setting `nix.enable = false` allows nix-darwin to manage everything except Nix itself.
 
 ### 2. Documentation Build Warnings
+
 **Problem**: Warning about `builtins.toFile` referencing store paths without proper context.
 
 **Solution**: Disabled documentation building:
+
 ```nix
 documentation.enable = false;
 ```
@@ -52,9 +58,11 @@ documentation.enable = false;
 **Why**: The warning comes from upstream nix-darwin/home-manager documentation generation. Disabling documentation prevents the warning and speeds up builds.
 
 ### 3. Existing System Files Conflict
+
 **Problem**: `/etc/bashrc` already existed and blocked activation.
 
 **Solution**: Renamed existing file to `.before-nix-darwin` suffix:
+
 ```bash
 sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 ```
@@ -62,9 +70,11 @@ sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 **Why**: nix-darwin needs to manage system files. The backup allows reverting if needed.
 
 ### 4. Home Manager File Conflicts
+
 **Problem**: Existing `~/.zshrc` prevented home-manager from managing it.
 
 **Solution**: Added backup extension in `flake.nix`:
+
 ```nix
 home-manager.backupFileExtension = "backup";
 ```
@@ -72,6 +82,7 @@ home-manager.backupFileExtension = "backup";
 **Why**: Automatically backs up existing files before home-manager takes control (creates `.zshrc.backup`).
 
 ### 5. Nix Settings Warnings
+
 **Problem**: Warnings about unknown settings `eval-cores` and `lazy-trees`.
 
 **Solution**: None required - warnings are harmless.
@@ -81,17 +92,21 @@ home-manager.backupFileExtension = "backup";
 ## What Was Migrated
 
 ### From ~/.zshrc to home-manager
+
 All configuration moved to `home/home.nix`:
 
 **Aliases**:
+
 - `ll`, `llt`, `lls` - Enhanced ls with date formatting
 - `python`, `pip` - Python 3.12 shortcuts
 - `tgz` - Mac-friendly tar compression
 
 **Functions**:
+
 - `gitmd()` - Git merge and delete branch
 
 **Environment**:
+
 - Session logging to ~/logs/
 - .DS_Store cleanup
 - Tab width settings
@@ -99,6 +114,7 @@ All configuration moved to `home/home.nix`:
 ## Usage
 
 ### Rebuild System
+
 ```bash
 cd ~/.config/nix
 nix build .#darwinConfigurations.default.system
@@ -106,11 +122,13 @@ sudo ./result/sw/bin/darwin-rebuild switch --flake ~/.config/nix#default
 ```
 
 ### Or use darwin-rebuild directly (after first activation)
+
 ```bash
 sudo darwin-rebuild switch --flake ~/.config/nix#default
 ```
 
 ### Check Current Configuration
+
 ```bash
 darwin-rebuild --version
 home-manager --version

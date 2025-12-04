@@ -1,466 +1,109 @@
 # Changelog
 
-All notable changes to this nix-darwin configuration will be documented in this file.
-
+All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Calendar Versioning](https://calver.org/) using YYYY-MM-DD format.
+and this project adheres to [Calendar Versioning](https://calver.org/).
 
-## 2025-11-30
+## v0.8.0 - 2025-12-03
 
-### Added
-
-- **Universal Security & Cloud Tools** (`modules/common/packages.nix`):
-  - `bitwarden-cli` - CLI for Bitwarden password manager (`bw` command)
-  - `awscli2` - AWS CLI v2 for managing AWS services
-  - `aws-vault` - Secure AWS credential storage using OS keychain
-
-- **Bitwarden Desktop** (`modules/darwin/common.nix`):
-  - Added `bitwarden-desktop` to GUI applications
-  - Migrates from App Store version to nixpkgs-managed version
-  - NOTE: Remove existing App Store Bitwarden after rebuild
-
-- **Application Migration** (Phase 3):
-  - Added `obsidian` to darwin/common.nix (Knowledge base / note-taking)
-  - Added `zoom-us` to darwin/common.nix (Video conferencing)
-  - Added `mas` (Mac App Store CLI) with masApps pattern template
-  - NOTE: `ollama` CLI not added - nixpkgs build fails; using manual Ollama.app
-
-- **System-Level Packages Architecture** (`modules/common/packages.nix`):
-  - Created `modules/common/` directory for packages shared across ALL platforms
-  - These packages are system-level (not user-specific) on darwin
-  - On Linux (home-manager standalone), they go to user profile
-  - Packages: `pre-commit`, `shellcheck`, `shfmt`, `markdownlint-cli2`, `actionlint`, `nixfmt-classic`
-  - Updated `darwin/common.nix` to import common packages into `environment.systemPackages`
-  - Updated `linux/common.nix` to import common packages into `home.packages`
-
-- **Per-Project Development Shells**:
-  - Added `programs.direnv` with `nix-direnv` to home-manager/common.nix
-  - Created `shells/` directory with development environment templates:
-    - `python/` - Python with pip, venv
-    - `python-data/` - Data science: pandas, numpy, scipy, matplotlib, jupyter
-    - `js/` - Node.js with npm, yarn, pnpm, TypeScript
-    - `go/` - Go with gopls, delve debugger
-  - Added `shells/README.md` with usage instructions
-
-- **AI CLI Permission Consolidation**:
-  - Integrated safe commands from local settings files into nix-managed permissions
-  - Added to Claude and Gemini permissions:
-    - GitHub CLI: `gh pr checks`, `gh api graphql`, `gh run list/view`
-    - AWS DynamoDB: `list-tables`, `scan`, `describe-table`
-    - Terraform: `init`, `validate`, `fmt`, `plan`, `show`, `state`, `output`, `graph`
-    - Terragrunt: `init`, `validate`, `plan`, `show`, `state`, `output`, `hclfmt`
-    - File utilities: `ln`, `readlink`
-    - Process utilities: `sleep`, `true`, `false`
-    - WebFetch domains: anthropic.com, terraform.io, proxmox.com, ubuntu.com, etc.
-  - Updated Copilot trusted directories: added `~/git`, `~/.config`
-  - Added terraform/terragrunt destructive commands to deny lists
-
-- **SSH/Remote Login**: Enabled via `services.openssh.enable = true` in macbook-m4 host config
-  - Declaratively manages macOS Remote Login setting via launchd
-
-- **Comprehensive Dock Configuration** (`modules/darwin/dock.nix`):
-  - 30+ documented options with defaults and explanations
-  - Icon size: 64px (cleaned from 71), magnification: 80px
-  - Hot corners configured: Mission Control, Notification Center, App Windows, Quick Note
-  - Disabled recent apps, enabled minimize-to-application
-  - Fixed space ordering (mru-spaces = false)
-  - All gesture settings documented
-
-- **Power-User Finder Configuration** (`modules/darwin/finder.nix`):
-  - Show hidden files, all extensions, full POSIX path in title
-  - Folders sorted first, search defaults to current folder
-  - List view default, status bar and path bar visible
-  - Disabled .DS_Store on network/USB volumes
-  - Auto-remove trash items after 30 days
-  - CustomUserPreferences for additional settings
-
-- **Keyboard Configuration** (`modules/darwin/keyboard.nix`):
-  - Fast key repeat (KeyRepeat=5, InitialKeyRepeat=25)
-  - Full keyboard access (AppleKeyboardUIMode=3)
-  - Disabled press-and-hold for key repeat
-
-- **Trackpad Configuration** (`modules/darwin/trackpad.nix`):
-  - Tap-to-click enabled
-  - Two-finger right-click
-  - Natural scrolling, force click enabled
-
-- **System UI Configuration** (`modules/darwin/system-ui.nix`):
-  - Dark mode, auto-scrollbars
-  - Disabled auto-capitalization, smart quotes, spell correction
-  - Expanded save/print panels by default
-  - Menu bar clock with date and day of week
-  - Guest account disabled
-  - Screensaver password required immediately
-  - Screenshots: PNG, no shadow, default location
-  - Control center: battery %, Bluetooth, Sound, Display visible
-
-- **Security Policies** (`lib/security-policies.nix`):
-  - Policy document for git security requirements
-  - Documents what we want (signed commits/tags, fsck checks)
-  - Implemented via home-manager's native git options
-
-- **GPG Shell Integration**:
-  - Added `export GPG_TTY=$(tty)` to zsh initContent
-  - Required for pinentry to prompt for passphrase in terminal
-
-- **Hosts + Modules Architecture**: Major refactoring to support multi-host configurations
-  - Created `hosts/` directory with host-specific configurations:
-    - `macbook-m4/` - Active M4 Max MacBook Pro (nix-darwin + home-manager)
-    - `ubuntu-server/` - Template for Ubuntu server (home-manager standalone)
-    - `proxmox/` - Template for Proxmox server (home-manager standalone)
-    - `windows-workstation/` - Placeholder for future native Windows Nix support
-  - Created `modules/` directory with reusable modules:
-    - `darwin/common.nix` - macOS system packages, homebrew, settings
-    - `linux/common.nix` - Linux home-manager settings (XDG, packages)
-    - `home-manager/` - Cross-platform user configuration (shell, git, vscode, AI CLIs)
-  - Created `lib/` directory for shared configuration variables:
-    - `user-config.nix` - User info (name, email, GPG key, hostname)
-    - `server-config.nix` - Server hostnames and settings
-    - `home-manager-defaults.nix` - Shared home-manager settings (DRY)
-  - Each non-macOS host has its own `flake.nix` for standalone deployment
-
-- **Modern CLI Tools**: Added productivity tools for humans and AI assistants
-  - bat - Better cat with syntax highlighting
-  - delta - Better git diff viewer
-  - eza - Modern ls replacement with git integration
-  - fd - Faster, user-friendly find alternative
-  - fzf - Fuzzy finder for interactive selection
-  - htop - Interactive process viewer
-  - jq - JSON parsing
-  - ncdu - NCurses disk usage analyzer
-  - tldr - Simplified man pages
-  - tree - Directory visualization
-
-- **External Volume Management**:
-  - Ollama models symlink to `/Volumes/Ollama/models`
-  - `CONTAINER_DATA` environment variable for OrbStack (`/Volumes/ContainerData`)
-
-### Changed
-
-- **Module Architecture**:
-  - Created `modules/common/` for truly system-level packages across all platforms
-  - Darwin: packages go to `environment.systemPackages` (accessible by all users)
-  - Linux: packages go to `home.packages` (home-manager standalone limitation)
-
-- **Naming Consistency**:
-  - Renamed `windows-server` to `windows-workstation` throughout
-
-- **DRY Improvements**: Centralized all hardcoded values
-  - Username from `userConfig.user.name` everywhere
-  - Hostname from `userConfig.host.name`
-  - Home-manager settings from `lib/home-manager-defaults.nix`
-  - `nixpkgs.config.allowUnfree` moved to `modules/darwin/common.nix`
-
-- **Documentation**: Updated all docs to reflect new structure
-  - README.md - New directory structure, hosts table, package categories
-  - CLAUDE.md - Updated file paths for permissions and settings
-  - PLANNING.md - Simplified, removed completed phases
-
-## 2025-11-29
+First formal release. This version consolidates all development work into a stable, documented release.
 
 ### Added
 
-- **Phase 2: Application Migration**
-  - Added `ripgrep` (v15.1.0) to system packages - fast grep alternative
-  - Added `raycast` (v1.103.2) to system packages - productivity launcher (replaces native install)
-  - Configured Oh My Zsh via `programs.zsh.oh-my-zsh` with plugins: git, docker, macos, z, colored-man-pages
-  - Added zsh enhancements: autosuggestions, syntax highlighting, completion, 100k history
+- **Flakes-Only nix-darwin Configuration**: Complete declarative system management for M4 Max MacBook Pro
+  - Determinate Nix integration (daemon, updates, core config)
+  - nix-darwin for macOS packages and system settings
+  - home-manager for user environment (shell, git, dotfiles)
+  - mac-app-util for stable TCC permissions across rebuilds
 
-- **Nix-Managed Git Configuration**: Full git configuration via home-manager `programs.git`
-  - GPG signing enabled by default (`commit.gpgsign = true`, `tag.gpgSign = true`)
-  - Created `home/user-config.nix` for centralized user variables (name, email, GPG key ID)
-  - Created `home/git-aliases.nix` with 20 common git aliases (st, lo, lg, co, etc.)
-  - Created `home/shell-aliases.nix` with macOS-specific shell aliases
-  - Migrated to new `programs.git.settings` syntax (from deprecated `extraConfig`)
-  - Comprehensive git settings: histogram diff, rerere, fetch pruning, rebase on pull
+- **Multi-Host Architecture**: Extensible structure supporting multiple machines
+  - `hosts/macbook-m4/` - Active M4 Max MacBook Pro (nix-darwin + home-manager)
+  - `hosts/ubuntu-server/` - Template for Ubuntu server (home-manager standalone)
+  - `hosts/proxmox/` - Template for Proxmox server (home-manager standalone)
+  - `hosts/windows-workstation/` - Placeholder for future Windows Nix support
 
-- **Sudo Requirements Documentation**: Added TROUBLESHOOTING.md section documenting:
-  - Commands that REQUIRE sudo (darwin-rebuild switch)
-  - Commands that should NOT use sudo (nix build, git, brew)
-  - Instructions for fixing root-owned files
+- **Comprehensive Package Management**:
+  - Modern CLI tools: bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree
+  - Development: nodejs, gh, claude-code, gemini-cli
+  - GUI apps: VS Code, Obsidian, Raycast, Bitwarden, Zoom
+  - Cloud/security: awscli2, aws-vault, bitwarden-cli
+  - Linters: shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic
 
-- **VS Code Nix Migration**: Migrated VS Code from native macOS install to Nix-managed
-  - Added `vscode` to `darwin/configuration.nix` system packages
-  - Created `home/vscode-settings.nix` with migrated general settings (git, terminal, Python, extensions)
-  - VS Code now at `/Applications/Nix Apps/Visual Studio Code.app`
-  - Settings properly symlinked to Nix store via Home Manager
+- **macOS System Configuration**:
+  - Dock: 64px icons, hot corners, fixed space ordering, no recent apps
+  - Finder: Show hidden files, list view, full POSIX path, folders first
+  - Keyboard: Fast key repeat, full keyboard access
+  - Trackpad: Tap-to-click, two-finger right-click, natural scrolling
+  - System UI: Dark mode, expanded panels, battery %, control center items
 
-- **Claude Code Status Line**: Added custom status line configuration
-  - Created `statusline-command.sh` showing directory, git branch, model, and output style
-  - Configured in `home/home.nix` via `home.file` declarations
+- **AI CLI Permission Management**: Three-tier security model
+  - 280+ auto-approved commands across 25 categories
+  - 32 commands requiring user confirmation (potentially dangerous but legitimate)
+  - 40+ permanently blocked catastrophic operations
+  - Supports Claude Code, Gemini CLI, and GitHub Copilot
 
-- **Shell Aliases**: Added darwin-rebuild convenience alias
-  - `d-r` alias for `sudo darwin-rebuild switch --flake ~/.config/nix#default`
+- **Anthropic Claude Code Ecosystem**:
+  - 12 official plugins from 2 marketplaces (claude-code + claude-plugins-official)
+  - 6 cookbook commands + 1 agent from claude-cookbooks
+  - Skills framework from anthropics/skills
+  - Agent OS integration for spec-driven development
+  - SDK development shells (Python and TypeScript)
 
-### Changed
+- **Development Shells**: Project-specific environments via `nix develop`
+  - `python` - Python with pip, venv
+  - `python-data` - Data science: pandas, numpy, scipy, matplotlib, jupyter
+  - `js` - Node.js with npm, yarn, pnpm, TypeScript
+  - `go` - Go with gopls, delve debugger
+  - `terraform` - Terraform/OpenTofu
+  - `claude-sdk-python` - Anthropic SDK for Python
+  - `claude-sdk-typescript` - Anthropic SDK for TypeScript
 
-- **PR Review Fixes**:
-  - Renamed git alias `ll` to `lo` to avoid conflict with shell `ll` alias
-  - Updated `ss` alias from deprecated `stash save` to modern `stash push` (Git 2.16+)
-  - Removed redundant `home` attribute from `user-config.nix` (use `config.home.homeDirectory`)
+- **Shell Configuration**:
+  - Oh My Zsh with plugins: git, docker, macos, z, colored-man-pages
+  - Autosuggestions, syntax highlighting, 100k history
+  - Custom aliases and functions (gitmd, d-r, ll, etc.)
+  - GPG shell integration for commit signing
 
-- **Permission Accuracy Improvements**:
-  - Split `fileCommands` into `fileReadCommands` (read-only) + `fileCreationCommands` (mkdir, touch)
-  - Fixed comment claiming "read-only" while containing file creation commands
-  - Applied same fix to both `claude-permissions.nix` and `gemini-permissions.nix`
+- **Git Configuration**:
+  - GPG signing enabled by default
+  - 20+ common aliases (st, lo, lg, co, etc.)
+  - Security: fsck checks, fetch pruning, rebase on pull
+  - delta as diff viewer
 
-- **Gemini CLI sed/awk Permissions**:
-  - Moved `sed` and `awk` from excludeTools to coreTools (allow general text processing)
-  - Added `sed -i` and `sed --in-place` to excludeTools (block only destructive variants)
-  - Created new `textProcessingCommands` category in coreTools
+### Infrastructure
 
-- **VS Code Copilot Settings**: Updated model selection comment from "February 2025+" to "Introduced February 2025" for clarity
+- **GitHub Actions**:
+  - `claude.yml` - Automated PR review using Claude Code
+  - `nix-ci.yml` - Nix flake validation with Determinate Systems actions
+  - `markdownlint.yml` - Markdown linting
+
+- **Linting & Validation**:
+  - markdownlint-cli2 with project-specific configuration
+  - Pre-commit integration via direnv
+  - Automated flake checks
+
+- **External Integrations**:
+  - ai-assistant-instructions for centralized AI agent config
+  - agent-os for spec-driven development workflows
+  - mac-app-util workaround for gitlab.common-lisp.net Anubis protection
 
 ### Documentation
 
-- Reduced D-R-Y violations across documentation files
-- Updated file organization in CLAUDE.md to include `vscode-settings.nix`
-- Simplified README.md by referencing CLAUDE.md for detailed information
-- Removed duplicate directory structure and resource sections
+- **Core Documentation**:
+  - README.md - Project overview and quick start
+  - ARCHITECTURE.md - Detailed structure and module relationships
+  - RUNBOOK.md - Step-by-step operational procedures
+  - TROUBLESHOOTING.md - Common issues and solutions
+  - SETUP.md - Initial setup and configuration decisions
 
-## 2025-11-22
+- **AI & Integration Docs**:
+  - CLAUDE.md - AI agent instructions (scope, permissions, workflow)
+  - docs/ANTHROPIC-ECOSYSTEM.md - 500+ line Claude Code integration reference
 
-### Added
+- **Standard Open-Source Files**:
+  - CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md
+  - Apache 2.0 LICENSE
 
-- **Declarative Claude Code Permission Management**: Implemented layered configuration strategy for Claude Code auto-approved commands.
-  - Created `home/claude-permissions.nix` with 285 safe auto-approved commands in 24 categories
-  - Created `home/claude-permissions-ask.nix` with 32 potentially dangerous commands requiring user approval
-  - Nix manages baseline permissions in `~/.claude/settings.json` (version controlled, reproducible)
-  - `~/.claude/settings.local.json` remains writable for interactive approvals
-  - Three-tier permission strategy: allow (auto-approved), ask (user confirmation), deny (permanently blocked)
-  - 40 explicitly DENIED catastrophic operations
+---
 
-### Changed
-
-- **Security Hardening (after comprehensive PR #2 code review)**:
-  - **Allow list (285 commands)**: Only safe, read-only operations with minimal risk
-  - **Ask list (32 commands)**: Potentially dangerous but legitimate use cases requiring user approval
-    - System scripting: osascript (arbitrary AppleScript control)
-    - System info: system_profiler, defaults read (information disclosure)
-    - File operations: chmod, rm, rmdir, cp, mv, sed, awk (modification/deletion risks)
-    - Container operations: docker exec/run (arbitrary code execution in containers)
-    - Kubernetes: kubectl apply/create/delete/set/patch, helm install/upgrade/uninstall
-    - Cloud: aws s3 cp/sync/rm, aws ec2 run/terminate, aws lambda invoke, aws cloudformation delete
-    - Database: sqlite3, mongosh (arbitrary SQL execution)
-    - Package execution: npx (arbitrary package download/execution)
-  - **Deny list (40 commands)**: Absolutely catastrophic operations, permanently blocked
-    - File destruction: rm -rf / variants, system-level modifications
-    - Privilege escalation: sudo su/bash/bash -i
-    - Credential theft: sensitive file reads (.env, .ssh, .aws, .gnupg)
-    - HTTP write operations: curl POST/PUT/DELETE/PATCH (data exfiltration)
-    - Network listeners: nc/ncat/socat (reverse shells)
-
-- **Curl security hardening**: Restricted from generic `-s` flag to explicit GET patterns only
-  - Prevents ambiguous commands like `curl -s -X POST` bypassing deny rules
-  - Only allows: `curl -s -X GET`, `curl --silent --request GET`, etc.
-
-- **Remove dangerous but commonly used commands from auto-approve**:
-  - npx (can execute arbitrary npm packages)
-  - sed/awk without restrictions (in-place file editing with -i)
-  - cp/mv (file overwrite risks)
-  - chmod (permission modification risks)
-  - docker rm/rmi (removed, moved to ask - destructive)
-  - kubernetes apply/create (removed, moved to ask - cluster modification)
-  - aws s3 cp/sync (removed, moved to ask - data write/overwrite)
-  - aws lambda invoke (removed, moved to ask - execution of arbitrary functions)
-  - sqlite3/mongosh (removed, moved to ask - arbitrary SQL)
-
-- **Code cleanup**:
-  - Removed unused `readPermissions` variable (duplicate of coreReadTools)
-  - Consolidated rm -rf deny patterns (now covers -rf, -fr variants)
-  - Removed redundant patterns, added variants for privilege escalation
-
-### Fixed
-
-- Database command syntax issues (removed malformed sqlite3 patterns)
-- Duplicate `Bash(sudo rm:*)` - kept only in deny list (catastrophic)
-- Curl patterns too permissive (`curl -s:*` could be followed by -X POST)
-- Kubernetes and Helm operations that modify cluster state now require user approval
-- AWS operations that can incur costs now require user approval
-
-### Documentation
-
-- Updated PLANNING.md with "Recently Completed" section detailing security hardening
-- Added comprehensive comments to both permission files explaining risk levels
-- Documented principle of least privilege in baseline configuration
-- Clarified three-tier strategy with specific risk classifications
-- Added comments explaining why each dangerous command is in ask (not deny) list
-
-## 2025-11-21
-
-### Added
-
-- **Complete Package Management via Nix**: Successfully transitioned all package management to nix/nix-darwin with homebrew as fallback only.
-  - Added claude-code 2.0.44 from nixpkgs (system package)
-  - Added gemini-cli 0.15.3 from nixpkgs (system package)
-  - Added gnupg 2.4.8 from nixpkgs (system package)
-  - Added nodejs 24.11.1 (nodejs_latest) from nixpkgs (system package)
-  - Added VS Code 1.106.0 via home-manager declarative configuration
-- **AI Agent Instructions**: Enhanced CLAUDE.md with comprehensive guidance for handling duplicate packages and PATH prioritization issues.
-
-### Changed
-
-- **VS Code Configuration**: Updated from deprecated `programs.vscode.userSettings` to `programs.vscode.profiles.default.userSettings` in home.nix to resolve home-manager deprecation warning.
-- **Package Management Philosophy**: Enforced nixpkgs-first approach with comprehensive documentation of why packages "disappear" when installed outside nix.
-
-### Fixed
-
-- **Duplicate Package Management**: Resolved conflicts between homebrew and nix-managed packages by removing all homebrew duplicates:
-  - Uninstalled homebrew: gemini-cli, gnupg, node (and 18 dependency packages)
-  - Uninstalled homebrew cask: claude-code 2.0.49
-  - System now uses exclusively nix-managed versions
-- **PATH Priority Issues**: Fixed PATH prioritization where `/opt/homebrew/bin` took precedence over `/run/current-system/sw/bin`, causing old homebrew versions to be found before nix versions.
-- **GPG Directory Permissions**: Fixed ownership and permissions on `~/.gnupg` directory (700 for directories, 600 for files) to resolve "unsafe ownership" warnings.
-- **home.nix File Loss**: Recovered from accidental file truncation by restoring from backup file (home.nix~) created during darwin-rebuild.
-
-### Verified
-
-- All packages now resolve to nix store paths:
-  - claude: `/run/current-system/sw/bin/claude` (v2.0.44)
-  - gemini: `/run/current-system/sw/bin/gemini` (v0.15.3)
-  - gpg: `/run/current-system/sw/bin/gpg` (v2.4.8)
-  - node: `/run/current-system/sw/bin/node` (v24.11.1)
-  - code: `/etc/profiles/per-user/jevans/bin/code` (v1.106.0)
-- GPG keys preserved and functional after transition from homebrew to nix
-- VS Code launches successfully with declarative settings management
-
-### Documentation
-
-- Updated CLAUDE.md with package management best practices
-- Streamlined README.md to focus on quick reference (removed setup duplication)
-- Enhanced SETUP.md with comprehensive troubleshooting for duplicate packages and PATH issues
-- Updated PLANNING.md to reflect completed work and current system state
-
-## 2025-11-20
-
-### Added
-
-- **GitHub CLI (gh)**: Added gh package to system configuration for PR management and GitHub workflow automation following ai-assistant-instructions best practices.
-- **Project Documentation**: Created comprehensive README.md with quick start guide, architecture overview, and system management instructions.
-- **Change Tracking**: Established CHANGELOG.md following Keep a Changelog format with calendar versioning.
-- **Project Planning**: Created PLANNING.md with detailed roadmap, current status, and step-by-step action items.
-
-### Changed
-
-- **System Packages**: Expanded from minimal git/vim to include gh CLI for enhanced development workflow.
-
-## 2025-11-19
-
-### Added
-
-- **Initial Nix Darwin Setup**: Created minimal nix-darwin configuration for M4 Max MacBook Pro with flake-based architecture.
-- **Home Manager Integration**: Integrated home-manager for declarative user environment management.
-- **Zsh Configuration Migration**: Migrated complete ~/.zshrc configuration to home-manager declarative format including:
-  - Shell aliases (ll, llt, lls, tgz, python, pip)
-  - Custom functions (gitmd for branch merge and delete)
-  - Session logging to ~/logs/ with timestamp
-  - Automatic .DS_Store cleanup for ~/.config/, ~/git/, ~/obsidian/
-  - Tab width configuration (2 spaces)
-- **Comprehensive Documentation**: Created SETUP.md with detailed setup guide, issues solved, troubleshooting, and lessons learned.
-
-### Fixed
-
-- **Determinate Nix Compatibility**: Disabled nix-darwin's Nix management (`nix.enable = false`) to resolve conflict with Determinate Nix installer.
-- **Documentation Build Warnings**: Disabled documentation generation (`documentation.enable = false`) to suppress builtins.toFile warnings and speed up builds.
-- **Home Manager File Conflicts**: Added `backupFileExtension = "backup"` to automatically backup existing files (e.g., .zshrc.backup).
-- **System File Conflicts**: Manually renamed /etc/bashrc to /etc/bashrc.before-nix-darwin to allow nix-darwin activation.
-- **Deprecated API Usage**: Changed `programs.zsh.initExtra` to `programs.zsh.initContent` to resolve deprecation warning.
-- **Git Permission Issues**: Resolved git object ownership issues that prevented flake updates.
-
-### Changed
-
-- **Configuration Structure**: Moved old Linux-based configuration to backup/ directory (git-ignored).
-- **Branching Strategy**: Created feature/minimal-darwin-setup branch for initial development following conventional git workflow.
-
-## Configuration Decisions
-
-### Why These Choices Were Made
-
-1. **Determinate Nix Over Official Installer**:
-   - Better macOS integration with proper APFS volume management
-   - Optimized for Apple Silicon
-   - Enhanced security features
-   - Forward-compatible settings (eval-cores, lazy-trees)
-
-2. **Minimal Initial Setup**:
-   - Faster iteration and testing
-   - Easier to understand and debug
-   - Foundation for future expansion
-   - Clean slate approach rather than adapting Linux config
-
-3. **Documentation Disabled**:
-   - Warnings were from upstream nix-darwin/home-manager
-   - No functionality impact
-   - Significantly faster build times
-   - Can be re-enabled if needed
-
-4. **Single Default Profile**:
-   - Test and validate core functionality first
-   - Architecture supports multiple profiles (work, dev, ai-research, minimal)
-   - Profile switching planned for future enhancement
-
-5. **Flake-Based Configuration**:
-   - Reproducible builds with locked dependencies
-   - Better dependency management
-   - Industry best practice
-   - Required for modern Nix workflows
-
-## Known Limitations
-
-1. **Nix Settings Warnings**: Harmless warnings about `eval-cores` and `lazy-trees` from Determinate Nix forward-compatible settings. Current Nix version (2.31.2) ignores unknown settings gracefully.
-
-2. **Single Profile**: Only default profile implemented. Additional profiles (work, dev, ai-research, minimal) require manual creation.
-
-3. **Homebrew Coexistence**: Homebrew remains installed independently. Future work will integrate via nix-darwin's Homebrew module.
-
-4. **Minimal macOS Preferences**: No system preferences configured yet. Will expand in future iterations.
-
-## Migration Notes
-
-### What Changed for Users
-
-**Before**:
-- Traditional dotfiles (.zshrc in home directory)
-- Manual system configuration
-- Imperative package management
-
-**After**:
-- Declarative configuration via Nix
-- Version-controlled system state
-- Reproducible environment
-- Atomic updates with rollback capability
-
-**User Experience**:
-- Shell behaves identically (all aliases and functions preserved)
-- Original .zshrc backed up to .zshrc.backup
-- System updates via `darwin-rebuild switch`
-- New capabilities: profile switching, declarative packages
-
-## Rollback Procedure
-
-If issues occur, rollback is straightforward:
-
-```bash
-# 1. Restore original .zshrc
-mv ~/.zshrc.backup ~/.zshrc
-
-# 2. Restore system files
-sudo mv /etc/bashrc.before-nix-darwin /etc/bashrc
-
-# 3. Uninstall nix-darwin
-sudo /nix/store/*/darwin-uninstaller
-
-# 4. System returns to pre-nix-darwin state
-```
-
-## Dependencies
-
-**Runtime**:
-- Nix 2.31.2+ (Determinate Nix installer)
-- macOS on Apple Silicon (aarch64-darwin)
-- Git (for flake operations)
-
-**Build**:
-- nix-darwin 25.05 (fetched via flake)
-- home-manager 25.05 (fetched via flake)
-- nixpkgs unstable (fetched via flake)
+*This changelog consolidates all development work from initial creation through December 3, 2025.*

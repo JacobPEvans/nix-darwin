@@ -12,7 +12,7 @@
 # Schema validation: Assertions below ensure the settings.json structure
 # matches what Claude Code expects. Build fails if format is wrong.
 
-{ config, lib, claude-code-plugins, claude-cookbooks, ... }:
+{ config, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ... }:
 
 let
   # Validate marketplace entry has correct nested structure
@@ -28,7 +28,7 @@ let
       "Marketplace '${name}.source' must have a 'url' string";
     true;
 
-  # Official Anthropic plugin marketplace
+  # Official Anthropic plugin marketplaces
   # Plugins are fetched on-demand when enabled
   # Format: object with marketplace ID as key, containing nested source object
   marketplaces = {
@@ -36,6 +36,12 @@ let
       source = {
         source = "git";
         url = "https://github.com/anthropics/claude-code.git";
+      };
+    };
+    "anthropics/claude-plugins-official" = {
+      source = {
+        source = "git";
+        url = "https://github.com/anthropics/claude-plugins-official.git";
       };
     };
   };
@@ -78,10 +84,27 @@ let
 
     # SDK development (useful for Claude Agent SDK work)
     "agent-sdk-dev@anthropics/claude-code" = true;
+
+    # UI/UX design and guidance
+    "frontend-design@anthropics/claude-code" = true;
+
+    # Output styles for enhanced interaction
+    "explanatory-output-style@anthropics/claude-code" = true;
+    "learning-output-style@anthropics/claude-code" = true;
+
+    # Model migration tools
+    "claude-opus-4-5-migration@anthropics/claude-code" = true;
+
+    # Experimental: Autonomous iteration loops (commented out by default)
+    # "ralph-wiggum@anthropics/claude-code" = true;
   };
 
   # Commands from claude-cookbooks to install globally
   # These are copied directly to ~/.claude/commands/
+  #
+  # Note: The commit-commands plugin already provides /commit-push-pr
+  # Additional repo-level commands (dedupe, oncall-triage) may exist in
+  # anthropics/claude-code/.claude/commands/ but need verification.
   cookbookCommands = [
     "review-pr-ci"     # CI/CD PR review (auto-posts to GitHub)
     "review-pr"        # Interactive PR review

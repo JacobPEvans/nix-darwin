@@ -17,45 +17,45 @@ External documentation and resources for this nix configuration.
 
 | Resource | URL |
 |----------|-----|
-| Nix Manual | https://nix.dev/manual/nix/stable/ |
-| Nix Pills | https://nixos.org/guides/nix-pills/ |
-| Nix Flakes Wiki | https://nixos.wiki/wiki/Flakes |
-| Determinate Nix | https://determinate.systems/ |
+| Nix Manual | <https://nix.dev/manual/nix/stable/> |
+| Nix Pills | <https://nixos.org/guides/nix-pills/> |
+| Nix Flakes Wiki | <https://nixos.wiki/wiki/Flakes> |
+| Determinate Nix | <https://determinate.systems/> |
 
 ## nix-darwin
 
 | Resource | URL |
 |----------|-----|
-| GitHub | https://github.com/nix-darwin/nix-darwin |
-| Options Reference | https://nix-darwin.github.io/nix-darwin/manual/options.html |
+| GitHub | <https://github.com/nix-darwin/nix-darwin> |
+| Options Reference | <https://nix-darwin.github.io/nix-darwin/manual/options.html> |
 
 ### Source Files (for understanding implementations)
 
 | Module | URL |
 |--------|-----|
-| Dock | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/dock.nix |
-| Finder | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/finder.nix |
-| NSGlobalDomain | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/NSGlobalDomain.nix |
-| Trackpad | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/trackpad.nix |
-| Keyboard | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/keyboard.nix |
-| Screensaver | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/screensaver.nix |
-| menuExtraClock | https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/menuExtraClock.nix |
-| All Defaults | https://github.com/nix-darwin/nix-darwin/tree/master/modules/system/defaults |
+| Dock | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/dock.nix> |
+| Finder | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/finder.nix> |
+| NSGlobalDomain | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/NSGlobalDomain.nix> |
+| Trackpad | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/trackpad.nix> |
+| Keyboard | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/keyboard.nix> |
+| Screensaver | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/screensaver.nix> |
+| menuExtraClock | <https://raw.githubusercontent.com/nix-darwin/nix-darwin/master/modules/system/defaults/menuExtraClock.nix> |
+| All Defaults | <https://github.com/nix-darwin/nix-darwin/tree/master/modules/system/defaults> |
 
 ## home-manager
 
 | Resource | URL |
 |----------|-----|
-| GitHub | https://github.com/nix-community/home-manager |
-| Options Reference | https://nix-community.github.io/home-manager/options.xhtml |
+| GitHub | <https://github.com/nix-community/home-manager> |
+| Options Reference | <https://nix-community.github.io/home-manager/options.xhtml> |
 
 ## macOS Defaults
 
 | Resource | URL |
 |----------|-----|
-| macos-defaults.com | https://macos-defaults.com/ |
-| defaults-write.com | https://www.defaults-write.com/ |
-| mathiasbynens/dotfiles | https://github.com/mathiasbynens/dotfiles/blob/main/.macos |
+| macos-defaults.com | <https://macos-defaults.com/> |
+| defaults-write.com | <https://www.defaults-write.com/> |
+| mathiasbynens/dotfiles | <https://github.com/mathiasbynens/dotfiles/blob/main/.macos> |
 
 Common domains: `com.apple.dock`, `com.apple.finder`, `NSGlobalDomain`, `com.apple.AppleMultitouchTrackpad`
 
@@ -68,13 +68,13 @@ defaults find "keyword"               # Find setting by keyword
 
 | Tool | Documentation |
 |------|---------------|
-| Claude Code | https://github.com/anthropics/claude-code |
-| Gemini CLI | https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html |
-| GitHub Copilot | https://docs.github.com/en/copilot/github-copilot-in-the-cli |
+| Claude Code | <https://github.com/anthropics/claude-code> |
+| Gemini CLI | <https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html> |
+| GitHub Copilot | <https://docs.github.com/en/copilot/github-copilot-in-the-cli> |
 
 ## Package Search
 
 | Resource | URL |
 |----------|-----|
-| NixOS Packages | https://search.nixos.org/packages |
-| Homebrew | https://formulae.brew.sh/ |
+| NixOS Packages | <https://search.nixos.org/packages> |
+| Homebrew | <https://formulae.brew.sh/> |

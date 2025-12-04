@@ -37,11 +37,13 @@ sudo darwin-rebuild --list-generations
 ### Adding a Nix Package (Preferred)
 
 1. **Search nixpkgs first**:
+
    ```bash
    nix search nixpkgs <package>
    ```
 
 2. **Add to system packages** in `modules/darwin/common.nix`:
+
    ```nix
    environment.systemPackages = with pkgs; [
      existing-package
@@ -50,6 +52,7 @@ sudo darwin-rebuild --list-generations
    ```
 
 3. **Commit and rebuild**:
+
    ```bash
    cd ~/.config/nix
    git add .
@@ -60,11 +63,13 @@ sudo darwin-rebuild --list-generations
 ### Adding a Homebrew Package (Fallback Only)
 
 Only use Homebrew when:
+
 - Package doesn't exist in nixpkgs
 - Nixpkgs version is severely outdated
 - Package requires Homebrew-specific integration
 
 1. **Add to homebrew casks** in `modules/darwin/common.nix`:
+
    ```nix
    homebrew.casks = [
      "package-name"  # Why: not in nixpkgs
@@ -78,11 +83,13 @@ Only use Homebrew when:
 ### Adding a Mac App Store App
 
 1. **Find the app ID**:
+
    ```bash
    mas search "<app name>"
    ```
 
 2. **Add to mas apps** in `modules/darwin/common.nix`:
+
    ```nix
    homebrew.masApps = {
      "App Name" = 123456789;
@@ -185,6 +192,7 @@ sudo /nix/var/nix/profiles/system-1-link/activate
 ### Add an App to the Dock
 
 1. **Find the app path**:
+
    ```bash
    # System apps
    ls /System/Applications/
@@ -200,6 +208,7 @@ sudo /nix/var/nix/profiles/system-1-link/activate
    ```
 
 2. **Add to** `modules/darwin/dock/persistent-apps.nix`:
+
    ```nix
    persistent-apps = [
      # ... existing apps ...
@@ -223,6 +232,7 @@ persistent-others = [
 ### Dock Settings Reference
 
 All dock behavior settings are in `modules/darwin/dock/default.nix`:
+
 - Icon size, magnification
 - Autohide behavior
 - Hot corners
@@ -248,6 +258,7 @@ nix develop ~/.config/nix#terraform
 1. **Create shell directory**: `shells/<name>/`
 
 2. **Create flake.nix**:
+
    ```nix
    {
      description = "Shell description";
@@ -278,6 +289,7 @@ nix develop ~/.config/nix#terraform
 1. **Edit** `shells/<name>/flake.nix`
 
 2. **Test the shell**:
+
    ```bash
    nix develop ~/.config/nix#<name>
    ```
@@ -303,6 +315,7 @@ sudo darwin-rebuild switch --flake ~/.config/nix#macbook-m4
 1. **Create host directory**: `hosts/<hostname>/`
 
 2. **Create default.nix** (system config):
+
    ```nix
    { ... }:
    {
@@ -315,6 +328,7 @@ sudo darwin-rebuild switch --flake ~/.config/nix#macbook-m4
    ```
 
 3. **Create home.nix** (user config):
+
    ```nix
    { ... }:
    {
@@ -343,6 +357,7 @@ sudo darwin-rebuild switch --flake ~/.config/nix#macbook-m4
 1. **Edit** `modules/home-manager/permissions/claude-permissions-allow.nix`
 
 2. **Add command** to appropriate category:
+
    ```nix
    gitCommands = [
      "Bash(git status:*)"
@@ -355,6 +370,7 @@ sudo darwin-rebuild switch --flake ~/.config/nix#macbook-m4
 ### Quick Permission Approval
 
 For one-off approvals without editing Nix:
+
 - Click "Accept indefinitely" in Claude UI
 - Saves to `~/.claude/settings.local.json` (not Nix-managed)
 

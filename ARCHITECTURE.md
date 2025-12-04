@@ -12,7 +12,7 @@ Detailed structure of the nix-darwin configuration.
 
 ## Directory Structure
 
-```
+```text
 ~/.config/nix/
 ├── flake.nix                      # Main entry point
 ├── flake.lock                     # Locked dependency versions
@@ -98,7 +98,7 @@ Detailed structure of the nix-darwin configuration.
 
 ## Module Relationships
 
-```
+```text
 flake.nix
     │
     ├── darwinConfigurations.default

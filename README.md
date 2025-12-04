@@ -1,42 +1,16 @@
 # Nix Configuration
 
-Multi-host declarative system management using nix-darwin, home-manager, and flakes.
+> Because "it works on my machine" should mean it works on every machine. Deterministic builds, reproducible environments, and the smug satisfaction of knowing exactly what's installed.
 
-**This is a flakes-only configuration.** All nix commands use flakes. No channels.
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Markdown Lint](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml)
+[![Validate Flake](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml)
 
-## Table of Contents
+## What Is This?
 
-- [Hosts](#hosts)
-- [How It Works](#how-it-works)
-- [Quick Start](#quick-start)
-- [Directory Structure](#directory-structure)
-- [Current Packages](#current-packages)
-- [Documentation](#documentation)
+A flakes-only nix-darwin configuration for M4 Max MacBook Pro. Manages system packages, macOS settings, dotfiles, and AI CLI tools - all declaratively.
 
----
-
-## Hosts
-
-| Host | Platform | Status | Description |
-|------|----------|--------|-------------|
-| **macbook-m4** | aarch64-darwin | Active | M4 Max MacBook Pro (primary) |
-| **ubuntu-server** | x86_64-linux | Template | Ubuntu server (home-manager standalone) |
-| **proxmox** | x86_64-linux | Template | Proxmox server (home-manager standalone) |
-| **windows-workstation** | windows | Placeholder | Awaiting native Windows Nix support |
-
-## How It Works
-
-| Component | What It Does |
-|-----------|--------------|
-| **Determinate Nix** | Manages Nix itself - the daemon, updates, and core nix config |
-| **nix-darwin** | Manages macOS packages, system settings, and homebrew integration |
-| **home-manager** | Manages user config - shell, aliases, dotfiles |
-| **nixpkgs** | The package repository - ALL packages come from here |
-| **mac-app-util** | Creates stable app trampolines to preserve macOS TCC permissions |
-
-**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
-
-**Why mac-app-util?** Without it, macOS TCC permissions (camera, microphone, screen recording) are revoked after every rebuild because Nix store paths change. The trampolines keep the app path in `/Applications/` stable while the underlying Nix store target changes.
+Think of it as infrastructure-as-code, but for your laptop.
 
 ## Quick Start
 
@@ -46,66 +20,84 @@ sudo darwin-rebuild switch --flake ~/.config/nix#default
 
 # Search for a package
 nix search nixpkgs <name>
+
+# Rollback if something breaks
+sudo darwin-rebuild --rollback
 ```
 
 See [RUNBOOK.md](RUNBOOK.md) for detailed procedures.
 
 ## Directory Structure
 
-```
-~/.config/nix/
-├── flake.nix                      # Main entry point
-├── flake.lock                     # Locked dependency versions
-│
-├── hosts/                         # Host-specific configurations
-│   ├── macbook-m4/                # Active: M4 Max MacBook Pro
-│   ├── ubuntu-server/             # Template: Ubuntu server
-│   ├── proxmox/                   # Template: Proxmox server
-│   └── windows-workstation/       # Placeholder: awaiting Windows Nix
-│
-├── modules/                       # Reusable configuration modules
-│   ├── common/                    # Cross-platform packages
-│   ├── darwin/                    # macOS system settings
-│   │   └── dock/                  # Dock configuration
-│   ├── linux/                     # Linux settings
-│   └── home-manager/              # User environment (shell, git, vscode)
-│       ├── ai-cli/                # AI CLI tool configurations
-│       ├── permissions/           # AI CLI permission files
-│       └── zsh/                   # Shell aliases and functions
-│
-├── lib/                           # Shared configuration variables
-│
-└── shells/                        # Development environment templates
-    ├── python/                    # Basic Python
-    ├── python-data/               # Python with data science tools
-    ├── js/                        # Node.js
-    ├── go/                        # Go
-    └── terraform/                 # Terraform/OpenTofu
+```text
+.
+├── flake.nix                  # Main entry point
+├── hosts/                     # Host-specific configurations
+│   └── macbook-m4/            # Active M4 Max MacBook Pro
+├── modules/                   # Reusable configuration modules
+│   ├── common/                # Cross-platform packages
+│   ├── darwin/                # macOS system settings
+│   └── home-manager/          # User environment (shell, git, AI CLIs)
+├── shells/                    # Development environment templates
+└── lib/                       # Shared configuration variables
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full directory tree and module relationships.
+Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Current Packages
+## Key Components
 
-| Category | Packages |
+| Component | What It Does |
+|-----------|--------------|
+| **Determinate Nix** | Manages Nix itself - daemon, updates, core config |
+| **nix-darwin** | macOS packages, system settings, homebrew integration |
+| **home-manager** | User config - shell, aliases, dotfiles, AI CLIs |
+| **mac-app-util** | Stable app trampolines to preserve TCC permissions |
+
+**Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
+
+## What's Managed
+
+| Category | Examples |
 |----------|----------|
-| Core CLI | git, gnupg, vim |
-| Modern CLI | bat, delta, eza, fd, fzf, htop, jq, ncdu, ripgrep, tldr, tree |
-| Development | claude-code, gemini-cli, gh, mas, nodejs_latest |
-| GUI | bitwarden-desktop, obsidian, raycast, vscode, zoom-us |
-| Cloud (AWS) | awscli2, aws-vault |
-| Linters | shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic |
+| CLI Tools | bat, delta, eza, fd, fzf, ripgrep, jq, htop |
+| Development | nodejs, gh, claude-code, gemini-cli |
+| GUI Apps | VS Code, Obsidian, Raycast, Bitwarden |
+| macOS Settings | Dock, Finder, keyboard, trackpad, hot corners |
+| AI CLI Permissions | 280+ auto-approved commands with security tiers |
 
-**Homebrew casks**: None - all packages managed via nixpkgs
+## Dev Shells
+
+Project-specific environments without polluting global state:
+
+```bash
+nix develop ~/.config/nix#python      # Python + pip + venv
+nix develop ~/.config/nix#python-data # + pandas, numpy, jupyter
+nix develop ~/.config/nix#js          # Node.js + npm/yarn/pnpm
+nix develop ~/.config/nix#go          # Go + gopls + delve
+nix develop ~/.config/nix#terraform   # Terraform/OpenTofu
+```
+
+See [shells/README.md](shells/README.md) for all available shells.
 
 ## Documentation
 
 | File | Purpose |
 |------|---------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed structure and module relationships |
 | [RUNBOOK.md](RUNBOOK.md) | Step-by-step operational procedures |
-| [SETUP.md](SETUP.md) | Initial setup and configuration decisions |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed structure and module relationships |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
-| [REFERENCES.md](REFERENCES.md) | External documentation links |
-| [PLANNING.md](PLANNING.md) | Future roadmap |
-| [CHANGELOG.md](CHANGELOG.md) | Completed work history |
+| [CLAUDE.md](CLAUDE.md) | AI agent instructions |
+| [docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md) | Claude Code integration reference |
+
+## Contributing
+
+Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+The short version: open a PR, follow existing patterns, and I'll probably merge it.
+
+## License
+
+[Apache 2.0](LICENSE) - Use it, modify it, just keep the attribution.
+
+---
+
+*Built by a human, refined by AI, used by both.*
