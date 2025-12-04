@@ -41,20 +41,29 @@
     # Agent OS - spec-driven development system for AI coding agents
     # Provides standards, workflows, agents, and commands
     # https://buildermethods.com/agent-os
+    # Forked to user's GitHub to mitigate upstream disappearing
     agent-os = {
-      url = "github:buildermethods/agent-os";
+      url = "github:JacobPEvans/agent-os";
+      flake = false;  # Not a flake, just fetch the repo
+    };
+
+    # AI Assistant Instructions - source of truth for AI agent configuration
+    # Contains permissions, commands, and instruction files
+    # Consumed by claude.nix to generate settings.json
+    ai-assistant-instructions = {
+      url = "github:JacobPEvans/ai-assistant-instructions";
       flake = false;  # Not a flake, just fetch the repo
     };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, agent-os, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, agent-os, ai-assistant-instructions, ... }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
 
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
-        inherit claude-code-plugins claude-cookbooks agent-os;
+        inherit claude-code-plugins claude-cookbooks agent-os ai-assistant-instructions;
       };
     in
     {

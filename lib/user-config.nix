@@ -11,6 +11,12 @@
 let
   # Define username once, derive everything else from it
   username = "jevans";
+
+  # Home directory path (derived from username for macOS)
+  # macOS-specific - this configuration is Darwin-only
+  # Use this for paths in darwin modules where config.home.homeDirectory
+  # is not available
+  homeDir = "/Users/${username}";
 in
 {
   # ==========================================================================
@@ -20,10 +26,8 @@ in
     # System username (matches macOS account)
     name = username;
 
-    # Home directory path (derived from username for macOS)
-    # Use this for paths in darwin modules where config.home.homeDirectory
-    # is not available
-    homeDir = "/Users/${username}";
+    # Expose homeDir for modules that need it
+    inherit homeDir;
 
     # Full name for git commits and other identity purposes
     fullName = "JacobPEvans";
@@ -59,5 +63,19 @@ in
 
     # Default branch name for new repositories
     defaultBranch = "main";
+  };
+
+  # ==========================================================================
+  # AI Assistant Configuration
+  # ==========================================================================
+  # Paths to AI assistant configuration repositories
+  # NOTE: The ai-assistant-instructions repository must be cloned to the path below
+  # before running darwin-rebuild. If missing, symlinks will be broken.
+  # Clone with: git clone https://github.com/JacobPEvans/ai-assistant-instructions.git ~/git/ai-assistant-instructions
+  ai = {
+    # Path to ai-assistant-instructions repo (must be cloned here)
+    # Used by claude.nix and common.nix for symlinks
+    # Single source of truth - DRY principle
+    instructionsRepo = "${homeDir}/git/ai-assistant-instructions";
   };
 }

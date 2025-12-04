@@ -5,14 +5,30 @@
       "locked": {
         "lastModified": 1761688666,
         "narHash": "sha256-027+m1nj78zC+6IIP8IdNtnx0ARBrZE9zs6crxfoh3o=",
-        "owner": "buildermethods",
+        "owner": "JacobPEvans",
         "repo": "agent-os",
         "rev": "a543311dc0430bc1dffd12feacf087c685670873",
         "type": "github"
       },
       "original": {
-        "owner": "buildermethods",
+        "owner": "JacobPEvans",
         "repo": "agent-os",
+        "type": "github"
+      }
+    },
+    "ai-assistant-instructions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764806207,
+        "narHash": "sha256-Zjjh3CNGOK6M6tJMdgR5Ax4//bNfW5xgLk1lKoyyvDE=",
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "rev": "25b16b47277e3592464dedc2ffff26ca3c7757bc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
         "type": "github"
       }
     },
@@ -35,11 +51,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1764717549,
-        "narHash": "sha256-bAI3OxygouIb6GZy0vhgkUh07tR0EVilkDjg2oFNWWM=",
+        "lastModified": 1764792405,
+        "narHash": "sha256-TGMaZFbqBOzCWtkGyFzUGDHieI+Z7u+cswYFBzBSO6s=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "5e3e9408feea99c66bd2344f0e19b5f25d2a6b11",
+        "rev": "337cc419c3cfb9a9a5869f1b0bff135d3dd48598",
         "type": "github"
       },
       "original": {
@@ -128,11 +144,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764636297,
-        "narHash": "sha256-S41K55kw+hWgDfgKmZ9/fMZ3F0BQDMvqFfE120fMHeE=",
+        "lastModified": 1764788330,
+        "narHash": "sha256-hE/gXK+Z0j654T0tsW+KcndRqsgZXe8HyWchjBJgQpw=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "ff067cfc619fdf6f82d50344e7d19ff2323f0827",
+        "rev": "fca4cba863e76c26cfe48e5903c2ff4bac2b2d5d",
         "type": "github"
       },
       "original": {
@@ -184,11 +200,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1764642553,
-        "narHash": "sha256-mvbFFzVBhVK1FjyPHZGMAKpNiqkr7k++xIwy+p/NQvA=",
+        "lastModified": 1764733908,
+        "narHash": "sha256-QJiih52NU+nm7XQWCj+K8SwUdIEayDQ1FQgjkYISt4I=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f720de59066162ee879adcc8c79e15c51fe6bfb4",
+        "rev": "cadcc8de247676e4751c9d4a935acb2c0b059113",
         "type": "github"
       },
       "original": {
@@ -201,6 +217,7 @@
     "root": {
       "inputs": {
         "agent-os": "agent-os",
+        "ai-assistant-instructions": "ai-assistant-instructions",
         "claude-code-plugins": "claude-code-plugins",
         "claude-cookbooks": "claude-cookbooks",
         "darwin": "darwin",

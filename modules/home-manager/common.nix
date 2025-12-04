@@ -1,4 +1,4 @@
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ai-assistant-instructions, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -23,7 +23,26 @@ let
   # AI CLI configuration imports (home.file entries)
   # Claude plugins require external repo inputs from flake.nix
   claudeFiles = import ./ai-cli/claude.nix {
-    inherit config pkgs lib claude-code-plugins claude-cookbooks;
+    inherit config pkgs lib claude-code-plugins claude-cookbooks ai-assistant-instructions;
+  };
+
+  # Path to ai-assistant-instructions git repo for symlinks
+  # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
+  # Single source of truth in lib/user-config.nix (DRY - also used by claude.nix)
+  # See user-config.nix for clone instructions if the repo is missing
+  aiInstructionsRepo = userConfig.ai.instructionsRepo;
+
+  # Home directory symlinks to ai-assistant-instructions repo
+  # These provide global access to AI instruction files
+  # NOTE: .copilot and .gemini directories are NOT symlinked because
+  # Nix manages files inside them (config.json, settings.json)
+  aiInstructionsSymlinks = {
+    # Root instruction files accessible from home directory
+    "CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
+    "GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
+
+    # AI instruction directories (only those without Nix-managed files inside)
+    ".ai-instructions".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions";
   };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };
@@ -201,17 +220,15 @@ in
   # - gemini.nix: Gemini CLI settings
   # - copilot.nix: GitHub Copilot CLI config
   #
-  # Permission definitions are in separate files:
-  # - claude-permissions.nix, claude-permissions-ask.nix
-  # - gemini-permissions.nix
-  # - copilot-permissions.nix
-  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles;
+  # Permissions: Now read from JSON in ai-assistant-instructions repo
+  # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
+  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks;
 
   # ==========================================================================
   # Agent OS
   # ==========================================================================
   # Spec-driven development system for AI coding agents
-  # Provides ~/agent-os/ with profiles, scripts, and config
-  # After rebuild, run ~/agent-os/scripts/project-install.sh in any project
+  # Commands and agents installed globally to ~/.claude/ (no per-project setup)
+  # Config stored in ~/agent-os/config.yml
   programs.agent-os.enable = true;
 }

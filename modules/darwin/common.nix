@@ -11,6 +11,7 @@ in
     ./dock
     ./finder.nix
     ./keyboard.nix
+    ./security.nix
     ./trackpad.nix
     ./system-ui.nix
   ];
@@ -25,7 +26,7 @@ in
   # ==========================================================================
   users.users.${userConfig.user.name} = {
     name = userConfig.user.name;
-    home = "/Users/${userConfig.user.name}";
+    home = userConfig.user.homeDir;
   };
 
   # Required for nix-darwin with Determinate Nix

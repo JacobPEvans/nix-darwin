@@ -1,7 +1,13 @@
 # Agent OS Home-Manager Module
 #
-# A proper home-manager module for Agent OS integration.
-# Provides spec-driven development workflows for AI coding agents.
+# Global installation of Agent OS for spec-driven AI development.
+# Commands and agents are installed globally to ~/.claude/ and available
+# in ALL projects without per-project setup.
+#
+# Strategy: DRY - One installation, universal access
+# - Commands symlinked to ~/.claude/commands/
+# - Agents symlinked to ~/.claude/agents/
+# - Config stored in ~/agent-os/config.yml
 #
 # Usage:
 #   programs.agent-os = {
@@ -9,9 +15,6 @@
 #     claudeCodeCommands = true;
 #     useClaudeCodeSubagents = true;
 #   };
-#
-# After rebuild, run ~/agent-os/scripts/project-install.sh in any project
-# to compile Agent OS into .claude/commands/agent-os/ and related directories.
 #
 # Reference: https://buildermethods.com/agent-os
 
@@ -31,22 +34,46 @@ let
     };
   };
 
-  # Scripts to symlink from the upstream repo
-  scripts = [
-    "common-functions.sh"
-    "create-profile.sh"
-    "project-install.sh"
-    "project-update.sh"
+  # Agent OS commands to install globally
+  # These are the 7 core Agent OS slash commands
+  agentOsCommands = [
+    "create-tasks"
+    "implement-tasks"
+    "improve-skills"
+    "orchestrate-tasks"
+    "plan-product"
+    "shape-spec"
+    "write-spec"
   ];
 
-  # Generate file entries for each script
-  scriptFiles = builtins.listToAttrs (map (name: {
-    name = "agent-os/scripts/${name}";
-    value = {
-      source = "${agent-os}/scripts/${name}";
-      executable = true;
-    };
-  }) scripts);
+  # Agent OS agents to install globally
+  # These are the 8 specialized subagents for autonomous task delegation
+  agentOsAgents = [
+    "implementation-verifier"
+    "implementer"
+    "product-planner"
+    "spec-initializer"
+    "spec-shaper"
+    "spec-verifier"
+    "spec-writer"
+    "tasks-list-creator"
+  ];
+
+  # Generate command symlinks to ~/.claude/commands/
+  # Commands are in profiles/default/commands/{name}/{name}.md
+  # NOTE: This assumes the agent-os v1.x directory structure. If agent-os changes its structure,
+  # this symlink logic will need to be updated.
+  commandFiles = builtins.listToAttrs (map (name: {
+    name = ".claude/commands/${name}.md";
+    value.source = "${agent-os}/profiles/default/commands/${name}/${name}.md";
+  }) agentOsCommands);
+
+  # Generate agent symlinks to ~/.claude/agents/
+  # Agents are in profiles/default/agents/{name}.md
+  agentFiles = builtins.listToAttrs (map (name: {
+    name = ".claude/agents/${name}.md";
+    value.source = "${agent-os}/profiles/default/agents/${name}.md";
+  }) agentOsAgents);
 
 in {
   options.programs.agent-os = {
@@ -55,15 +82,16 @@ in {
     profile = lib.mkOption {
       type = lib.types.str;
       default = "default";
-      description = "Agent OS profile to use. Custom profiles can be created with create-profile.sh.";
+      description = "Agent OS profile to use. Custom profiles can be created manually.";
     };
 
     claudeCodeCommands = lib.mkOption {
       type = lib.types.bool;
       default = true;
       description = ''
-        Install Claude Code slash commands for Agent OS.
+        Install Claude Code slash commands for Agent OS globally.
         Provides /shape-spec, /write-spec, /create-tasks, /implement-tasks, etc.
+        Available in all projects without per-project setup.
       '';
     };
 
@@ -116,9 +144,15 @@ in {
         # To change settings, update programs.agent-os in your Nix configuration
       '' + configYaml;
 
-      # Upstream files
+      # Reference documentation
       "agent-os/CHANGELOG.md".source = "${agent-os}/CHANGELOG.md";
+
+      # Profile template for reference (users can customize)
       "agent-os/profiles/default".source = "${agent-os}/profiles/default";
-    } // scriptFiles;
+    }
+    # Global command symlinks (when claudeCodeCommands enabled)
+    // lib.optionalAttrs cfg.claudeCodeCommands commandFiles
+    # Global agent symlinks (when subagents enabled)
+    // lib.optionalAttrs cfg.useClaudeCodeSubagents agentFiles;
   };
 }
