@@ -7,6 +7,8 @@
 # Strategy: DRY - One installation, universal access
 # - Commands symlinked to ~/.claude/commands/
 # - Agents symlinked to ~/.claude/agents/
+# - Skills (from standards) symlinked to ~/.claude/skills/ (optional)
+# - Workflows exposed at ~/agent-os/workflows (optional)
 # - Config stored in ~/agent-os/config.yml
 #
 # Usage:
@@ -14,6 +16,8 @@
 #     enable = true;
 #     claudeCodeCommands = true;
 #     useClaudeCodeSubagents = true;
+#     standardsAsClaudeCodeSkills = true;  # Optional: expose standards as skills
+#     exposeWorkflows = true;              # Optional: expose workflow templates
 #   };
 #
 # Reference: https://buildermethods.com/agent-os
@@ -75,6 +79,46 @@ let
     value.source = "${agent-os}/profiles/default/agents/${name}.md";
   }) agentOsAgents);
 
+  # Generate skill symlinks from standards directories
+  # Standards are in profiles/default/standards/{category}/*.md
+  # Each file becomes: ~/.claude/skills/{category}-{filename}.md
+  # NOTE: This uses builtins.readDir which reads at evaluation time
+  # If agent-os changes its standards structure, this logic needs updating
+  standardsCategories = ["backend" "frontend" "global" "testing"];
+  
+  # Helper function to generate skill files for a single category
+  # Returns attrset of { ".claude/skills/{category}-{file}.md" = { source = ...; }; }
+  generateSkillsForCategory = category:
+    let
+      standardsPath = "${agent-os}/profiles/default/standards/${category}";
+      # Try to read directory, return empty set if it doesn't exist
+      filesInCategory = 
+        if builtins.pathExists standardsPath
+        then builtins.attrNames (builtins.readDir standardsPath)
+        else [];
+      # Filter to only .md files
+      mdFiles = builtins.filter (name: lib.hasSuffix ".md" name) filesInCategory;
+    in
+      builtins.listToAttrs (map (filename: {
+        name = ".claude/skills/${category}-${filename}";
+        value.source = "${standardsPath}/${filename}";
+      }) mdFiles);
+
+  # Combine all categories into a single attrset
+  skillFiles = builtins.foldl' (acc: cat: acc // (generateSkillsForCategory cat)) {} standardsCategories;
+
+  # Skill template symlink
+  skillTemplateFile = {
+    ".claude/skills/TEMPLATE.md".source = "${agent-os}/profiles/default/claude-code-skill-template.md";
+  };
+
+  # Workflow symlinks - expose workflows directory
+  # Workflows are in profiles/default/workflows/
+  # Symlink to ~/agent-os/workflows for easy reference
+  workflowFiles = {
+    "agent-os/workflows".source = "${agent-os}/profiles/default/workflows";
+  };
+
 in {
   options.programs.agent-os = {
     enable = lib.mkEnableOption "Agent OS integration for spec-driven AI development";
@@ -121,6 +165,15 @@ in {
         Use this for Cursor, Windsurf, Codex, Gemini, etc.
       '';
     };
+
+    exposeWorkflows = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Expose Agent OS workflows directory at ~/agent-os/workflows.
+        Provides structured multi-step processes for implementation, planning, and specification.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -153,6 +206,10 @@ in {
     # Global command symlinks (when claudeCodeCommands enabled)
     // lib.optionalAttrs cfg.claudeCodeCommands commandFiles
     # Global agent symlinks (when subagents enabled)
-    // lib.optionalAttrs cfg.useClaudeCodeSubagents agentFiles;
+    // lib.optionalAttrs cfg.useClaudeCodeSubagents agentFiles
+    # Standards as skills symlinks (when standardsAsClaudeCodeSkills enabled)
+    // lib.optionalAttrs cfg.standardsAsClaudeCodeSkills (skillFiles // skillTemplateFile)
+    # Workflows symlink (when exposeWorkflows enabled)
+    // lib.optionalAttrs cfg.exposeWorkflows workflowFiles;
   };
 }

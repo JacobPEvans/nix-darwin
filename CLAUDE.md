@@ -436,3 +436,63 @@ exists for reference to maintain sync with Claude/Gemini structures.
 - All slash commands auto-discovered: `/help` to list
 - SDK shells: `nix develop ~/.config/nix/shells/claude-sdk-python`
 - Update repos: `nix flake update` then rebuild
+
+## Agent OS Integration
+
+**Spec-driven development system** for AI coding agents.
+
+**Documentation**: See [docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md) for complete reference (includes Agent OS section).
+
+**Quick Overview**:
+
+- **7 Agent OS commands** (plan-product, write-spec, create-tasks, implement-tasks, etc.)
+- **8 specialized agents** (product-planner, spec-writer, implementer, etc.)
+- **Standards as skills** (optional) - backend, frontend, global, testing standards
+- **Workflows** (optional) - structured multi-step development processes
+- **Unified directory structure** - coexists with ai-assistant-instructions and Anthropic content
+
+**Configuration**:
+
+```nix
+programs.agent-os = {
+  enable = true;                      # Enable Agent OS
+  claudeCodeCommands = true;          # Install slash commands
+  useClaudeCodeSubagents = true;      # Enable specialized agents
+  standardsAsClaudeCodeSkills = true; # Expose standards as skills (optional)
+  exposeWorkflows = true;             # Expose workflow templates (optional)
+};
+```
+
+**Location**: `modules/home-manager/ai-cli/agent-os/default.nix`
+
+**Available Commands**:
+
+- `/plan-product` - Product planning workflow
+- `/shape-spec` - Specification shaping
+- `/write-spec` - Write technical specification
+- `/create-tasks` - Break spec into tasks
+- `/implement-tasks` - Execute implementation
+- `/orchestrate-tasks` - Multi-task coordination
+- `/improve-skills` - Skill improvement loop
+
+**Skills Directory** (when `standardsAsClaudeCodeSkills = true`):
+
+- `~/.claude/skills/backend-*.md` - Backend standards
+- `~/.claude/skills/frontend-*.md` - Frontend standards
+- `~/.claude/skills/global-*.md` - Global standards
+- `~/.claude/skills/testing-*.md` - Testing standards
+- `~/.claude/skills/TEMPLATE.md` - Skill template
+
+**Workflows Directory** (when `exposeWorkflows = true`):
+
+- `~/agent-os/workflows/implementation/` - Task execution workflows
+- `~/agent-os/workflows/planning/` - Product planning workflows
+- `~/agent-os/workflows/specification/` - Spec creation workflows
+
+**To use**:
+
+- Commands: `claude /plan-product`, `claude /create-tasks`
+- Skills: Automatically applied by Claude based on context
+- Update: `nix flake lock --update-input agent-os` then rebuild
+
+**Reference**: [Agent OS Repository](https://github.com/JacobPEvans/agent-os) | [Agent OS Docs](https://buildermethods.com/agent-os)
