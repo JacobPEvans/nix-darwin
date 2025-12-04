@@ -1,4 +1,4 @@
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, ai-assistant-instructions, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -23,7 +23,7 @@ let
   # AI CLI configuration imports (home.file entries)
   # Claude plugins require external repo inputs from flake.nix
   claudeFiles = import ./ai-cli/claude.nix {
-    inherit config pkgs lib claude-code-plugins claude-cookbooks ai-assistant-instructions;
+    inherit config pkgs lib claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills ai-assistant-instructions;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks
