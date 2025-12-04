@@ -40,10 +40,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/) using YYY
     - Modern async/await patterns for agents
   - Both shells include full documentation and quick start guides
 
-- **GitHub Actions Templates**:
-  - Created `.github/workflows/claude-review.yml.template` - Automated PR review
-  - Created `.github/workflows/claude-security.yml.template` - Security scanning
-  - Both templates based on official Anthropic actions (reference implementation)
+- **GitHub Actions**:
+  - Created `.github/workflows/claude.yml` - Automated PR review using Claude Code
+  - Created `.github/workflows/nix-ci.yml` - Nix flake validation with Determinate Systems actions
+  - Created `.github/workflows/markdownlint.yml` - Markdown linting
+  - Created `.markdownlint.json` - Markdownlint configuration
 
 - **Documentation**:
   - Created `docs/ANTHROPIC-ECOSYSTEM.md` - Comprehensive 500+ line reference

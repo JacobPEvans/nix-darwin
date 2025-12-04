@@ -7,7 +7,7 @@
 # Features:
 # - Node.js 20 LTS with npm, yarn, and pnpm
 # - TypeScript compiler and language server
-# - Development tools (vitest, prettier, eslint)
+# - Development tools (prettier, eslint)
 # - Pre-configured for agent development
 #
 # Usage:

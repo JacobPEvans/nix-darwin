@@ -22,7 +22,7 @@ This repository integrates the complete Anthropic Claude Code ecosystem, providi
 
 - **12 official plugins** from `anthropics/claude-code`
 - **2 plugin marketplaces** (claude-code + claude-plugins-official)
-- **7 cookbook commands** and **1 agent** from `anthropics/claude-cookbooks`
+- **6 cookbook commands** and **1 agent** from `anthropics/claude-cookbooks`
 - **Skills system** from `anthropics/skills`
 - **Pattern references** for agent workflows
 - **SDK development shells** for Python and TypeScript
@@ -178,7 +178,7 @@ darwin-rebuild switch --flake ~/.config/nix#default
 
 ## Commands & Agents
 
-### Cookbook Commands (7)
+### Cookbook Commands (6)
 
 From `anthropics/claude-cookbooks`, installed to `~/.claude/commands/`:
 
@@ -368,43 +368,49 @@ Then `direnv allow` to auto-load the environment.
 
 ## GitHub Actions
 
-### PR Review Workflow
+### Active Workflows
 
-Template: `.github/workflows/claude-review.yml.template`
+This repository uses three GitHub Actions workflows:
 
-**Features**:
-- Automated PR review using Claude Code
-- Multi-agent analysis with confidence scoring
-- Security vulnerability detection
-- Automated comment posting
+#### Claude Code Review (`claude.yml`)
 
-**Setup**:
-1. Copy template to `.github/workflows/claude-review.yml`
-2. Add `ANTHROPIC_API_KEY` to repository secrets
-3. Configure permissions (automatic)
+Automated PR review using [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action).
 
-**Note**: Template uses `anthropics/claude-code-action@v1` as reference. Check repository for actual implementation details.
-
-### Security Review Workflow
-
-Template: `.github/workflows/claude-security.yml.template`
+**Triggers**: Pull requests (opened, synchronize)
 
 **Features**:
-- AI-powered security scanning
-- Vulnerability pattern detection
-- SARIF report generation
-- Scheduled daily scans
+- AI-powered code review using Claude
+- Runs the `/review-code` command
+- Posts review comments on PRs
 
-**Setup**:
-1. Copy template to `.github/workflows/claude-security.yml`
-2. Add `ANTHROPIC_API_KEY` to repository secrets
-3. Enable security events permissions
+**Setup**: Add `CLAUDE_CODE_OAUTH_TOKEN` to repository secrets.
 
-**Note**: Template uses `anthropics/claude-code-security-review@v1` as reference. Check repository for actual implementation details.
+#### Nix CI (`nix-ci.yml`)
+
+Validates Nix flake configuration using Determinate Systems actions.
+
+**Triggers**: Push/PR on `*.nix` or `flake.lock` changes
+
+**Features**:
+- Installs Nix via [DeterminateSystems/nix-installer-action](https://github.com/DeterminateSystems/nix-installer-action)
+- Free caching via [DeterminateSystems/magic-nix-cache-action](https://github.com/DeterminateSystems/magic-nix-cache-action)
+- Checks flake.lock health via [DeterminateSystems/flake-checker-action](https://github.com/DeterminateSystems/flake-checker-action)
+- Runs `nix flake check` validation
+
+#### Markdown Lint (`markdownlint.yml`)
+
+Validates markdown file formatting.
+
+**Triggers**: Push/PR on `*.md` or `.markdownlint.*` changes
+
+**Features**:
+- Uses [DavidAnson/markdownlint-cli2-action](https://github.com/DavidAnson/markdownlint-cli2-action)
+- Enforces consistent markdown style
+- Configuration in `.markdownlint.json`
 
 ### Customization
 
-Both workflows can be customized for your needs:
+Workflows can be customized for your needs:
 - Adjust triggers (PR events, schedules)
 - Configure severity thresholds
 - Modify comment formatting

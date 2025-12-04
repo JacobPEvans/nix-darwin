@@ -85,5 +85,4 @@ pkgs.mkShell {
 
   # Environment variables
   ANTHROPIC_SDK_ENV = "development";
-  PYTHON_PATH = ".venv/bin/python";
 }

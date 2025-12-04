@@ -361,11 +361,11 @@ exists for reference to maintain sync with Claude/Gemini structures.
 **Quick Overview**:
 - **12 official plugins** enabled (git, review, security, UI/UX, output styles, migration)
 - **2 plugin marketplaces** configured (claude-code + claude-plugins-official)
-- **7 cookbook commands** + **1 agent** installed from claude-cookbooks
+- **6 cookbook commands** + **1 agent** installed from claude-cookbooks
 - **Skills system** integrated from anthropics/skills
 - **Pattern references** for agent workflows documented
 - **SDK dev shells** for Python and TypeScript development
-- **GitHub Actions templates** for CI/CD integration
+- **GitHub Actions** for CI/CD (Claude review, Nix CI, Markdown lint)
 
 **Configuration files**:
 - `modules/home-manager/ai-cli/claude-plugins.nix` - Plugin marketplace & enabled plugins
@@ -373,7 +373,9 @@ exists for reference to maintain sync with Claude/Gemini structures.
 - `modules/home-manager/ai-cli/claude-patterns.nix` - Cookbook pattern references
 - `shells/claude-sdk-python/` - Python SDK development shell
 - `shells/claude-sdk-typescript/` - TypeScript SDK development shell
-- `.github/workflows/*.yml.template` - GitHub Actions templates
+- `.github/workflows/claude.yml` - Claude Code review workflow
+- `.github/workflows/nix-ci.yml` - Nix flake validation workflow
+- `.github/workflows/markdownlint.yml` - Markdown linting workflow
 
 **Flake inputs**:
 - `claude-code-plugins` - Main CLI tool with plugins

@@ -18,6 +18,8 @@ cd /path/to/your/claude-agent-project
 nix develop ~/.config/nix/shells/claude-sdk-typescript
 ```
 
+**Note**: Replace `/path/to/your/claude-agent-project` with your actual project directory.
+
 ### With direnv
 
 Create `.envrc` in your project:
