@@ -213,14 +213,6 @@ in
   programs.home-manager.enable = true;
 
   # ==========================================================================
-  # Nix Package (required for Determinate Nix compatibility)
-  # ==========================================================================
-  # When nix-darwin has `nix.enable = false` (Determinate Nix manages the daemon),
-  # home-manager still needs to know which nix package to use for its operations.
-  # Without this, home-manager errors: "nix.package: accessed when nix.enable is off"
-  nix.package = pkgs.nix;
-
-  # ==========================================================================
   # AI CLI Configurations
   # ==========================================================================
   # Each AI CLI has its own file in ai-cli/ directory:
