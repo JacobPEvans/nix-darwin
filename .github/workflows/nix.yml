@@ -4,9 +4,10 @@
 # - lint: flake.lock health (no Nix needed)
 # - validate: flake structure check
 # - format: Nix code formatting
-# - build: Darwin build + symlink verification
+# - build: Darwin build + symlink verification (cached)
 #
-# Uses FlakeHub Cache for fast builds (requires OIDC auth).
+# Cache strategy: Write on main, read on PRs
+# Uses GitHub Actions cache for the Nix store.
 
 name: Nix
 
@@ -39,18 +40,12 @@ jobs:
   validate:
     name: Validate flake
     runs-on: macos-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Setup FlakeHub Cache
-        uses: DeterminateSystems/flakehub-cache-action@main
 
       - name: Check flake structure
         run: nix flake check --no-build
@@ -58,18 +53,12 @@ jobs:
   format:
     name: Check formatting
     runs-on: macos-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Setup FlakeHub Cache
-        uses: DeterminateSystems/flakehub-cache-action@main
 
       - name: Check Nix formatting
         run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
@@ -78,21 +67,29 @@ jobs:
   build:
     name: Build & Verify
     runs-on: macos-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Restore Nix cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/nix
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: nix-${{ runner.os }}-
+
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Setup FlakeHub Cache
-        uses: DeterminateSystems/flakehub-cache-action@main
 
       - name: Build home-manager configuration
         run: nix build .#darwinConfigurations.default.config.home-manager.users.jevans.home.activationPackage -o result-hm
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files
+
+      # Step 1: Always save to seed the cache (will change to main-only after testing)
+      - name: Save Nix cache
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/nix
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
