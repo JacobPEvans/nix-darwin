@@ -38,6 +38,8 @@ jobs:
 
       - name: Enable FlakeHub Cache
         uses: DeterminateSystems/flakehub-cache-action@v2
+        with:
+          use-gha-cache: disabled  # FlakeHub only - no GitHub Actions cache
 
       - name: Build home-manager configuration
         run: |

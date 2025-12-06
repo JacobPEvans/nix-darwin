@@ -39,6 +39,8 @@ jobs:
 
       - name: Enable FlakeHub Cache
         uses: DeterminateSystems/flakehub-cache-action@v2
+        with:
+          use-gha-cache: disabled  # FlakeHub only - no GitHub Actions cache
 
       - name: Check flake.lock health
         uses: DeterminateSystems/flake-checker-action@main
@@ -64,6 +66,8 @@ jobs:
 
       - name: Enable FlakeHub Cache
         uses: DeterminateSystems/flakehub-cache-action@v2
+        with:
+          use-gha-cache: disabled  # FlakeHub only - no GitHub Actions cache
 
       - name: Check Nix formatting
         run: |
