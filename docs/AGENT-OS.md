@@ -159,8 +159,9 @@ Agent OS coexists with ai-assistant-instructions and Anthropic ecosystem in `~/.
 
 ```bash
 nix flake lock --update-input agent-os
-darwin-rebuild switch --flake ~/.config/nix
 ```
+
+Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).
 
 **Verify Commands**:
 

@@ -86,7 +86,7 @@ git commit -m "message"
 - `nix-env` is the old imperative package manager - use declarative nixpkgs instead
 - All packages belong in `modules/darwin/packages.nix` or similar declarative config
 - All changes must be committed to git before rebuild
-- Use: `sudo darwin-rebuild switch --flake ~/.config/nix`
+- See [RUNBOOK.md](RUNBOOK.md#everyday-commands) for rebuild command
 
 ### 2. Determinate Nix Compatibility
 
@@ -380,9 +380,9 @@ exists for reference to maintain sync with Claude/Gemini structures.
 
 1. Make changes to nix files
 2. **Commit to git** (flakes requirement)
-3. Test build: `nix flake check /Users/jevans/.config/nix`
+3. Test build: `nix flake check`
 4. Create PR and **wait for user approval**
-5. After merge, apply changes: `sudo darwin-rebuild switch --flake ~/.config/nix`
+5. After merge, rebuild (see [RUNBOOK.md](RUNBOOK.md#everyday-commands))
 6. Update CHANGELOG.md for significant changes
 
 ## Anthropic Ecosystem Integration

@@ -179,11 +179,7 @@ enabledPlugins = {
 };
 ```
 
-Then rebuild:
-
-```bash
-darwin-rebuild switch --flake ~/.config/nix
-```
+Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).
 
 ---
 
@@ -497,10 +493,10 @@ claude /implement-tasks   # Execute implementation
 Update all Anthropic repositories:
 
 ```bash
-cd ~/.config/nix
 nix flake update
-darwin-rebuild switch --flake ~/.config/nix
 ```
+
+Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).
 
 Update specific repository:
 
@@ -560,7 +556,7 @@ To add new plugins, commands, or skills:
 1. **Plugins**: Add to `enabledPlugins` in `claude-plugins.nix`
 2. **Commands**: Add to `cookbookCommands` or create new command file
 3. **Skills**: Add to `selectedSkills` in `claude-skills.nix`
-4. **Rebuild**: `darwin-rebuild switch --flake ~/.config/nix`
+4. **Rebuild**: See [RUNBOOK.md](../RUNBOOK.md#everyday-commands)
 5. **Test**: Run `/help` in Claude Code to verify
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for full guidelines.

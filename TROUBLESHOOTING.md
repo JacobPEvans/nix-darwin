@@ -26,11 +26,7 @@ Understanding when `sudo` is needed prevents permission issues.
 | `chown` on system files | Changing ownership requires root |
 | `mv/rm` in /etc | System config directory |
 
-**Correct usage**:
-
-```bash
-sudo darwin-rebuild switch --flake ~/.config/nix
-```
+**Correct usage**: See [RUNBOOK.md](RUNBOOK.md#everyday-commands) for the rebuild command.
 
 ### Commands That Should NOT Use sudo
 
@@ -122,7 +118,7 @@ nix search nixpkgs <partial-name>
 ### Changes not applying
 
 1. Commit your changes to git (flakes require this)
-2. Run: `sudo darwin-rebuild switch --flake ~/.config/nix`
+2. Rebuild (see [RUNBOOK.md](RUNBOOK.md#everyday-commands))
 3. Open a new terminal
 
 ---
