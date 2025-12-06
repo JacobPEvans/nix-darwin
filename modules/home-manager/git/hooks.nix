@@ -8,7 +8,7 @@
 #   2. AI deny list - blocks --no-verify bypass attempts
 #   3. GitHub branch protection - server-side guarantee
 #
-# For existing repos, run: git config init.templateDir ~/.git-templates && pre-commit install
+# For existing repos, run: git init (re-initializes to copy template hooks)
 
 { config, pkgs, ... }:
 
