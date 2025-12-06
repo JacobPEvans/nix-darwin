@@ -1,9 +1,10 @@
-# Nix CI - All Nix validation in one macOS workflow
+# Nix CI - Parallel validation workflow
 #
-# Validates:
-# - Flake syntax and evaluation
-# - Nix formatting
-# - Darwin/home-manager symlinks
+# Jobs run in parallel where possible:
+# - lint: flake.lock health (no Nix needed)
+# - validate: flake structure check
+# - format: Nix code formatting
+# - build: Darwin build + symlink verification
 #
 # Uses determinate-nix-action for fast, reliable Nix installation.
 # Binary cache: cache.nixos.org (public, no auth required)
@@ -23,8 +24,20 @@ on:
       - 'modules/**'
 
 jobs:
+  lint:
+    name: Lint flake.lock
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check flake.lock health
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          nixpkgs-keys: nixpkgs
+
   validate:
-    name: Validate & Build
+    name: Validate flake
     runs-on: macos-latest
     steps:
       - name: Checkout repository
@@ -33,22 +46,35 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
 
-      - name: Check flake.lock health
-        uses: DeterminateSystems/flake-checker-action@main
-        with:
-          nixpkgs-keys: nixpkgs
-
-      - name: Validate flake
+      - name: Check flake structure
         run: nix flake check --no-build
 
+  format:
+    name: Check formatting
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
       - name: Check Nix formatting
-        run: |
-          nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
+        run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
         continue-on-error: true
 
+  build:
+    name: Build & Verify
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
       - name: Build home-manager configuration
-        run: |
-          nix build .#darwinConfigurations.default.config.home-manager.users.jevans.home.activationPackage -o result-hm
+        run: nix build .#darwinConfigurations.default.config.home-manager.users.jevans.home.activationPackage -o result-hm
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files
