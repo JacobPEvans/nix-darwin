@@ -2,15 +2,15 @@
 
 <!-- Provide a general summary of your changes in the Title above -->
 
-## Pull Request Type
+## Type
 
-<!-- What kind of change does this PR introduce? Please check one that applies to this PR. -->
+<!-- Delete all except one -->
 
-- [ ] Feature (new functionality or enhancements)
-- [ ] Bug fix (fixes an issue or incorrect configuration)
-- [ ] Documentation (updates to documentation or guides)
-- [ ] Maintenance (dependency updates, refactoring, or tooling changes)
-- [ ] Security (security improvements)
+- Feature
+- Bug fix
+- Documentation
+- Maintenance
+- Security
 
 ## Description
 
