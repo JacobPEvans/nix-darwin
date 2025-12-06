@@ -1,123 +1,39 @@
 # File Size Check - Enforce documentation organization guidelines
-#
-# Uses file size (bytes) as proxy for token count. Limits:
-# - 8KB (8192): Recommended maximum, consider refactoring
-# - 16KB (16384): Hard limit, should be split
-# - 32KB (32768): Extended limit for allowed large files
-# - No limit: Exempt files (reference data, etc.)
-#
-# Helps maintain manageable file sizes for AI context windows.
-# Documented in CLAUDE.md section 5.
-
+# Uses file size (bytes) as proxy for token count.
+# Limits: 8KB recommended, 16KB hard, 32KB extended, or exempt
 name: File Size Check
 
 on:
   pull_request:
-    paths:
-      - '**.md'
-      - '**.nix'
+    paths: ['**.md', '**.nix']
 
 env:
-  # Files with extended hard limit (32KB)
-  EXTENDED_LIMIT_FILES: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
-  # Files with no limit (reference data, auto-generated, etc.)
-  NO_LIMIT_FILES: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
+  EXTENDED: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
+  EXEMPT: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
 
 jobs:
   check:
     name: Check File Sizes
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Check file sizes
         run: |
-          # Size limits in bytes (powers of 2)
-          MAX_RECOMMENDED=8192    # 8KB
-          MAX_HARD=16384          # 16KB
-          MAX_EXTENDED=32768      # 32KB
-          WARNINGS=0
           ERRORS=0
+          for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
+            base=$(basename "$f" | sed 's/\.[^.]*$//')
+            size=$(wc -c < "$f" | tr -d ' ')
+            kb=$((size / 1024))
 
-          EXTENDED_FILES="${{ env.EXTENDED_LIMIT_FILES }}"
-          NO_LIMIT_FILES="${{ env.NO_LIMIT_FILES }}"
+            # Determine limit: exempt (skip) / extended (32KB) / standard (16KB)
+            if echo "${{ env.EXEMPT }}" | grep -qw "$base"; then continue; fi
+            if echo "${{ env.EXTENDED }}" | grep -qw "$base"; then limit=32768; else limit=16384; fi
 
-          # Helper to format bytes as human-readable
-          format_size() {
-            local bytes=$1
-            if [ "$bytes" -ge 1024 ]; then
-              echo "$((bytes / 1024))KB"
-            else
-              echo "${bytes}B"
+            if [ "$size" -gt "$limit" ]; then
+              echo "::error file=$f::$f is ${kb}KB (exceeds $((limit/1024))KB limit)"
+              ERRORS=$((ERRORS + 1))
+            elif [ "$size" -gt 8192 ]; then
+              echo "::warning file=$f::$f is ${kb}KB (exceeds 8KB recommended)"
             fi
-          }
-
-          # Check if file has no limit
-          has_no_limit() {
-            local filename="$1"
-            local base=$(basename "$filename" | sed 's/\.[^.]*$//')
-            for exempt in $NO_LIMIT_FILES; do
-              if [ "$base" = "$exempt" ]; then
-                return 0
-              fi
-            done
-            return 1
-          }
-
-          # Check if file has extended limit
-          has_extended_limit() {
-            local filename="$1"
-            local base=$(basename "$filename" | sed 's/\.[^.]*$//')
-            for ext_file in $EXTENDED_FILES; do
-              if [ "$base" = "$ext_file" ]; then
-                return 0
-              fi
-            done
-            return 1
-          }
-
-          echo "Checking file sizes (target: $(format_size $MAX_RECOMMENDED))..."
-          echo "Extended limit ($(format_size $MAX_EXTENDED)): $EXTENDED_FILES"
-          echo "No limit: $NO_LIMIT_FILES"
-          echo ""
-
-          check_files() {
-            local ext="$1"
-            echo "=== ${ext^^} Files ==="
-            for f in $(find . -name "*.$ext" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
-              size=$(wc -c < "$f" | tr -d ' ')
-
-              if has_no_limit "$f"; then
-                echo "  $f: $(format_size $size) (exempt)"
-                continue
-              fi
-
-              if has_extended_limit "$f"; then
-                hard_limit=$MAX_EXTENDED
-              else
-                hard_limit=$MAX_HARD
-              fi
-
-              if [ "$size" -gt "$hard_limit" ]; then
-                echo "::error file=$f::$f is $(format_size $size) (exceeds $(format_size $hard_limit) limit)"
-                ERRORS=$((ERRORS + 1))
-              elif [ "$size" -gt "$MAX_RECOMMENDED" ]; then
-                echo "::warning file=$f::$f is $(format_size $size) (exceeds $(format_size $MAX_RECOMMENDED) recommended)"
-                WARNINGS=$((WARNINGS + 1))
-              fi
-            done
-            echo ""
-          }
-
-          check_files "md"
-          check_files "nix"
-
-          echo "Summary: $ERRORS errors, $WARNINGS warnings"
-
-          if [ $ERRORS -gt 0 ]; then
-            echo "Files exceeding their size limit must be refactored"
-            exit 1
-          fi
-
-          echo "File size check passed"
+          done
+          [ $ERRORS -eq 0 ] || exit 1
