@@ -24,16 +24,13 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write  # Required for FlakeHub OIDC authentication
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Build home-manager configuration
         run: |

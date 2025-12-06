@@ -1,13 +1,11 @@
 # Nix CI - Validate flake configuration
 #
 # Uses Determinate Systems actions for fast, reliable Nix CI:
-# - nix-installer-action: Install Determinate Nix
-# - magic-nix-cache-action: Free 30-50% CI speedup via GitHub Actions cache
+# - determinate-nix-action: Unified Nix install + FlakeHub cache
 # - flake-checker-action: Validate flake.lock health (nixpkgs freshness)
 #
 # References:
-# - https://github.com/DeterminateSystems/nix-installer-action
-# - https://github.com/DeterminateSystems/magic-nix-cache-action
+# - https://github.com/DeterminateSystems/determinate-nix-action
 # - https://github.com/DeterminateSystems/flake-checker-action
 
 name: Nix CI
@@ -29,16 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write  # Required for FlakeHub OIDC authentication
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Check flake.lock health
         uses: DeterminateSystems/flake-checker-action@main
@@ -52,12 +47,15 @@ jobs:
   format:
     name: Check Formatting
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for FlakeHub OIDC authentication
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Check Nix formatting
         run: |
