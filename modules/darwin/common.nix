@@ -53,6 +53,7 @@ in
     fzf             # Fuzzy finder for interactive selection
     htop            # Interactive process viewer (better top)
     jq              # JSON parsing for config files and API responses
+    yq              # YAML parsing (like jq but for YAML/XML/TOML)
     ncdu            # NCurses disk usage analyzer
     ripgrep         # Fast grep alternative (rg)
     tldr            # Simplified, community-driven man pages

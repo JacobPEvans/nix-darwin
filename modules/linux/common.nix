@@ -41,6 +41,7 @@ in
     fzf
     htop
     jq
+    yq
     ncdu
     ripgrep
     tldr
