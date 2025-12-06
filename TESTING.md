@@ -50,14 +50,14 @@ git status
 
 All changes must be committed before rebuild (flakes requirement).
 
-### 4. Test Build (Dry Run)
+### 4. Validate Flake
 
 ```bash
 cd $NIX_CONFIG_DIR
 nix flake check
 ```
 
-Shows what would be built without actually building.
+Validates the flake structure and runs checks.
 
 ### 5. Full Rebuild
 
