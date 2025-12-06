@@ -1,4 +1,4 @@
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, claude-code-settings-schema, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -26,7 +26,7 @@ let
   # AI CLI configuration imports (home.file entries)
   # Claude plugins require external repo inputs from flake.nix
   claudeFiles = import ./ai-cli/claude.nix {
-    inherit config pkgs lib claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills ai-assistant-instructions;
+    inherit config pkgs lib claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills ai-assistant-instructions claude-code-settings-schema;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks
@@ -238,4 +238,25 @@ in
   # Commands and agents installed globally to ~/.claude/ (no per-project setup)
   # Config stored in ~/agent-os/config.yml
   programs.agent-os.enable = true;
+
+  # ==========================================================================
+  # Claude Code Settings Validation (post-rebuild)
+  # ==========================================================================
+  # Validates settings.json against JSON Schema after home files are written
+  # Uses check-jsonschema (Python CLI) from common/packages.nix
+  # Schema from: https://github.com/spences10/claude-code-settings-schema
+  home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SCHEMA="${config.home.homeDirectory}/.claude/claude-code-settings.schema.json"
+    SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
+
+    # Only validate if both files exist and check-jsonschema is available
+    if [ -f "$SCHEMA" ] && [ -f "$SETTINGS" ]; then
+      if command -v check-jsonschema > /dev/null 2>&1; then
+        $DRY_RUN_CMD check-jsonschema --schemafile "$SCHEMA" "$SETTINGS" || \
+          echo "Warning: Claude Code settings.json validation failed"
+      else
+        echo "Note: check-jsonschema not found, skipping Claude settings validation"
+      fi
+    fi
+  '';
 }

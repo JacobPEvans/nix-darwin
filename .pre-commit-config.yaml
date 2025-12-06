@@ -74,3 +74,27 @@ repos:
         language: system
         files: \.nix$
         pass_filenames: true
+
+  # Claude Code settings validation (uses check-jsonschema from nix)
+  # Schema from: https://github.com/spences10/claude-code-settings-schema
+  - repo: local
+    hooks:
+      - id: validate-claude-settings
+        name: Validate Claude Code settings
+        description: Validate Claude Code settings.json against JSON Schema
+        entry: bash -c '
+          SCHEMA="$HOME/.claude/claude-code-settings.schema.json"
+          if [ ! -f "$SCHEMA" ]; then
+            echo "Schema not found at $SCHEMA (run darwin-rebuild first)"
+            exit 0
+          fi
+          if command -v check-jsonschema &> /dev/null; then
+            check-jsonschema --schemafile "$SCHEMA" "$@"
+          else
+            echo "check-jsonschema not found (install via nix)"
+            exit 0
+          fi
+        '
+        language: system
+        files: '\.claude/settings.*\.json$'
+        types: [json]

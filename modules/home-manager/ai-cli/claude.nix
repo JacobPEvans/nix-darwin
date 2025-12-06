@@ -20,7 +20,7 @@
 # - rok-* community commands (Shape Up workflow)
 # - Standard commands (commit, pull-request, etc.)
 
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, claude-code-settings-schema, ... }:
 
 let
   # User configuration (includes ai.instructionsRepo path)
@@ -95,6 +95,10 @@ in
 {
   # Claude Code settings.json
   ".claude/settings.json".text = builtins.toJSON {
+    # JSON Schema reference for IDE IntelliSense and validation
+    # Schema from: https://github.com/spences10/claude-code-settings-schema
+    "$schema" = "./claude-code-settings.schema.json";
+
     # Enable extended thinking mode
     alwaysThinkingEnabled = true;
 
@@ -153,6 +157,12 @@ in
       };
     };
   };
+
+  # Claude Code settings schema for IDE IntelliSense and validation
+  # Community-built schema: https://github.com/spences10/claude-code-settings-schema
+  # Used by: $schema reference in settings.json, pre-commit hooks, CI validation
+  ".claude/claude-code-settings.schema.json".source =
+    "${claude-code-settings-schema}/claude-code-settings.schema.json";
 
   # Claude Code status line script
   # Displays: robbyrussell-style prompt with directory, git status, model, and output style

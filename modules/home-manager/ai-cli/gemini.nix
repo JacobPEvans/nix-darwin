@@ -20,13 +20,21 @@ let
 in
 {
   ".gemini/settings.json".text = builtins.toJSON {
-    # Allowed tools (safe, read-focused operations)
-    coreTools = geminiAllow.coreTools;
+    # JSON Schema reference for IDE IntelliSense and validation
+    # Official schema from google-gemini/gemini-cli repo
+    # NOTE: Gemini CLI has a bug where $schema triggers "not allowed" warning
+    # See: https://github.com/google-gemini/gemini-cli/issues/12695
+    "$schema" = "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
 
-    # Blocked tools (catastrophic operations)
-    excludeTools = geminiDeny.excludeTools;
-
-    # Additional Gemini CLI settings can be added here
+    # Tools configuration (must be nested under "tools" key)
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
+    tools = {
+      # Allowed tools (safe, read-focused operations)
+      # "allow always" selections are written here
+      core = geminiAllow.coreTools;
+
+      # Blocked tools (catastrophic operations)
+      exclude = geminiDeny.excludeTools;
+    };
   };
 }

@@ -69,16 +69,24 @@
       url = "github:JacobPEvans/ai-assistant-instructions";
       flake = false;  # Not a flake, just fetch the repo
     };
+
+    # Claude Code Settings Schema - JSON schema for validating settings.json
+    # Community-built schema for IDE autocomplete and validation
+    # https://github.com/spences10/claude-code-settings-schema
+    claude-code-settings-schema = {
+      url = "github:spences10/claude-code-settings-schema";
+      flake = false;  # Not a flake, just fetch the repo
+    };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, agent-os, ai-assistant-instructions, ... }:
+  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, agent-os, ai-assistant-instructions, claude-code-settings-schema, ... }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
 
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
-        inherit claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills agent-os ai-assistant-instructions;
+        inherit claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills agent-os ai-assistant-instructions claude-code-settings-schema;
       };
       # Define configuration once, assign to multiple names
       darwinConfig = darwin.lib.darwinSystem {

@@ -1,0 +1,49 @@
+# Validate Claude Code Settings
+#
+# Validates Claude Code settings files against JSON Schema to prevent
+# configuration errors that break permissions.
+#
+# Triggers: Changes to Claude config files or permission definitions
+# Schema: https://github.com/spences10/claude-code-settings-schema
+
+name: Validate Claude Settings
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.claude/**'
+      - 'modules/home-manager/ai-cli/**'
+  pull_request:
+    paths:
+      - '.claude/**'
+      - 'modules/home-manager/ai-cli/**'
+
+jobs:
+  validate:
+    name: Validate settings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Fetch schema
+        run: |
+          curl -sL https://raw.githubusercontent.com/spences10/claude-code-settings-schema/main/claude-code-settings.schema.json \
+            -o claude-code-settings.schema.json
+
+      - name: Validate settings files
+        run: |
+          nix-shell -p check-jsonschema --run '
+            echo "Validating Claude Code settings files..."
+            for f in .claude/settings*.json; do
+              if [ -f "$f" ]; then
+                echo "  Checking $f"
+                check-jsonschema --schemafile claude-code-settings.schema.json "$f"
+              fi
+            done
+            echo "All settings files are valid!"
+          '
