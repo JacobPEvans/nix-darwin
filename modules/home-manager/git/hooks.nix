@@ -21,10 +21,12 @@ let
     fi
 
     # Check for pre-commit framework
+    # NOTE: Warning only (not blocking) - pre-commit may not be installed in all environments
+    # Layer 2 (AI deny list) and Layer 3 (GitHub branch protection) provide enforcement
     if ! command -v pre-commit &> /dev/null; then
-      echo "Error: .pre-commit-config.yaml exists but pre-commit is not installed"
-      echo "Install with: nix-env -iA nixpkgs.pre-commit"
-      exit 1
+      echo "Warning: .pre-commit-config.yaml exists but pre-commit is not installed" >&2
+      echo "Add pre-commit to your Nix configuration and rebuild" >&2
+      exit 0
     fi
 
     # Run pre-commit hooks
@@ -39,23 +41,24 @@ let
     fi
 
     # Check for pre-commit framework
+    # NOTE: Warning only - don't block push, but inform user checks were skipped
     if ! command -v pre-commit &> /dev/null; then
-      exit 0  # Don't block push if pre-commit not available
+      echo "Warning: pre-commit not found, skipping pre-push checks." >&2
+      exit 0
     fi
 
     # Run all pre-commit hooks on all files
     exec pre-commit run --all-files --hook-stage push
   '';
 in
+# Return file definitions directly (merged into home.file in common.nix)
 {
-  home.file = {
-    ".git-templates/hooks/pre-commit" = {
-      source = preCommitHook;
-      executable = true;
-    };
-    ".git-templates/hooks/pre-push" = {
-      source = prePushHook;
-      executable = true;
-    };
+  ".git-templates/hooks/pre-commit" = {
+    source = preCommitHook;
+    executable = true;
+  };
+  ".git-templates/hooks/pre-push" = {
+    source = prePushHook;
+    executable = true;
   };
 }
