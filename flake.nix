@@ -80,9 +80,8 @@
       extraSpecialArgs = {
         inherit claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills agent-os ai-assistant-instructions;
       };
-    in
-    {
-      darwinConfigurations.default = darwin.lib.darwinSystem {
+      # Define configuration once, assign to multiple names
+      darwinConfig = darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
           ./hosts/macbook-m4/default.nix
@@ -106,6 +105,15 @@
             };
           }
         ];
+      };
+    in
+    {
+      # Both names point to same config:
+      # - "default" for explicit #default usage
+      # - hostname for auto-detection when # is omitted
+      darwinConfigurations = {
+        default = darwinConfig;
+        ${userConfig.host.name} = darwinConfig;
       };
     };
 }
