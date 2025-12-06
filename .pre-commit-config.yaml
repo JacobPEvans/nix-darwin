@@ -27,12 +27,13 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
 
-  # Markdown linting
+  # Markdown linting (ONLY .md files - never run on .nix!)
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.42.0
     hooks:
       - id: markdownlint-fix
         args: ['--config', '.markdownlint-cli2.jsonc']
+        files: \.md$
 
   # File length checker (local hook)
   - repo: local

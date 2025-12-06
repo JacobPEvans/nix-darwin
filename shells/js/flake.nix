@@ -29,8 +29,8 @@
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # Node.js 22
-            nodejs_22
+            # Node.js LTS (nixpkgs default)
+            nodejs
 
             # Package managers (npm included with nodejs)
             yarn
