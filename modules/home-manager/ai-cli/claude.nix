@@ -69,6 +69,7 @@ let
   aiInstructionsCommands = [
     "commit"
     "generate-code"
+    "git-refresh"
     "infrastructure-review"
     "pull-request"
     "pull-request-review-feedback"
