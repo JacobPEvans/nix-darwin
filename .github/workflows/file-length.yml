@@ -1,12 +1,13 @@
-# File Length Check - Enforce documentation organization guidelines
+# File Size Check - Enforce documentation organization guidelines
 #
-# Warns when files exceed recommended line limits:
-# - 200 lines: Recommended maximum, consider refactoring
-# - 300 lines: Hard warning, should definitely be split
-# - 500 lines: Extended limit for explicitly allowed files
+# Uses file size (bytes) as proxy for token count. Limits:
+# - 8KB (8192): Recommended maximum, consider refactoring
+# - 16KB (16384): Hard limit, should be split
+# - 32KB (32768): Extended limit for allowed large files
+# - No limit: Exempt files (reference data, etc.)
 #
-# Helps maintain the "target 200 lines max per file" guideline
-# documented in CLAUDE.md section 5.
+# Helps maintain manageable file sizes for AI context windows.
+# Documented in CLAUDE.md section 5.
 
 name: File Length Check
 
@@ -16,10 +17,11 @@ on:
       - '**.md'
       - '**.nix'
 
-# Files with extended hard limit (500 lines)
-# List file names without extension, space-separated
 env:
-  EXTENDED_LIMIT_FILES: "CLAUDE RUNBOOK TROUBLESHOOTING ANTHROPIC-ECOSYSTEM gemini-permissions-allow"
+  # Files with extended hard limit (32KB)
+  EXTENDED_LIMIT_FILES: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
+  # Files with no limit (reference data, auto-generated, etc.)
+  NO_LIMIT_FILES: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
 
 jobs:
   check:
@@ -29,21 +31,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check file lengths
+      - name: Check file sizes
         run: |
-          MAX_RECOMMENDED=200
-          MAX_HARD=300
-          MAX_EXTENDED=500
+          # Size limits in bytes (powers of 2)
+          MAX_RECOMMENDED=8192    # 8KB
+          MAX_HARD=16384          # 16KB
+          MAX_EXTENDED=32768      # 32KB
           WARNINGS=0
           ERRORS=0
 
-          # Convert extended limit files to array for lookup
           EXTENDED_FILES="${{ env.EXTENDED_LIMIT_FILES }}"
+          NO_LIMIT_FILES="${{ env.NO_LIMIT_FILES }}"
 
-          # Function to check if file has extended limit
+          # Helper to format bytes as human-readable
+          format_size() {
+            local bytes=$1
+            if [ "$bytes" -ge 1024 ]; then
+              echo "$((bytes / 1024))KB"
+            else
+              echo "${bytes}B"
+            fi
+          }
+
+          # Check if file has no limit
+          has_no_limit() {
+            local filename="$1"
+            local base=$(basename "$filename" | sed 's/\.[^.]*$//')
+            for exempt in $NO_LIMIT_FILES; do
+              if [ "$base" = "$exempt" ]; then
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          # Check if file has extended limit
           has_extended_limit() {
             local filename="$1"
-            # Extract base name without path and extension
             local base=$(basename "$filename" | sed 's/\.[^.]*$//')
             for ext_file in $EXTENDED_FILES; do
               if [ "$base" = "$ext_file" ]; then
@@ -53,53 +77,47 @@ jobs:
             return 1
           }
 
-          echo "Checking file lengths (target: $MAX_RECOMMENDED lines)..."
-          echo "Files with extended limit ($MAX_EXTENDED): $EXTENDED_FILES"
+          echo "Checking file sizes (target: $(format_size $MAX_RECOMMENDED))..."
+          echo "Extended limit ($(format_size $MAX_EXTENDED)): $EXTENDED_FILES"
+          echo "No limit: $NO_LIMIT_FILES"
           echo ""
 
-          # Check markdown files
-          echo "=== Markdown Files ==="
-          for f in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
-            lines=$(wc -l < "$f")
-            if has_extended_limit "$f"; then
-              hard_limit=$MAX_EXTENDED
-            else
-              hard_limit=$MAX_HARD
-            fi
-            if [ "$lines" -gt "$hard_limit" ]; then
-              echo "::error file=$f::$f has $lines lines (exceeds hard limit of $hard_limit)"
-              ERRORS=$((ERRORS + 1))
-            elif [ "$lines" -gt "$MAX_RECOMMENDED" ]; then
-              echo "::warning file=$f::$f has $lines lines (exceeds recommended $MAX_RECOMMENDED)"
-              WARNINGS=$((WARNINGS + 1))
-            fi
-          done
+          check_files() {
+            local ext="$1"
+            echo "=== ${ext^^} Files ==="
+            for f in $(find . -name "*.$ext" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
+              size=$(wc -c < "$f" | tr -d ' ')
 
-          echo ""
-          echo "=== Nix Files ==="
-          for f in $(find . -name "*.nix" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
-            lines=$(wc -l < "$f")
-            if has_extended_limit "$f"; then
-              hard_limit=$MAX_EXTENDED
-            else
-              hard_limit=$MAX_HARD
-            fi
-            if [ "$lines" -gt "$hard_limit" ]; then
-              echo "::error file=$f::$f has $lines lines (exceeds hard limit of $hard_limit)"
-              ERRORS=$((ERRORS + 1))
-            elif [ "$lines" -gt "$MAX_RECOMMENDED" ]; then
-              echo "::warning file=$f::$f has $lines lines (exceeds recommended $MAX_RECOMMENDED)"
-              WARNINGS=$((WARNINGS + 1))
-            fi
-          done
+              if has_no_limit "$f"; then
+                echo "  $f: $(format_size $size) (exempt)"
+                continue
+              fi
 
-          echo ""
+              if has_extended_limit "$f"; then
+                hard_limit=$MAX_EXTENDED
+              else
+                hard_limit=$MAX_HARD
+              fi
+
+              if [ "$size" -gt "$hard_limit" ]; then
+                echo "::error file=$f::$f is $(format_size $size) (exceeds $(format_size $hard_limit) limit)"
+                ERRORS=$((ERRORS + 1))
+              elif [ "$size" -gt "$MAX_RECOMMENDED" ]; then
+                echo "::warning file=$f::$f is $(format_size $size) (exceeds $(format_size $MAX_RECOMMENDED) recommended)"
+                WARNINGS=$((WARNINGS + 1))
+              fi
+            done
+            echo ""
+          }
+
+          check_files "md"
+          check_files "nix"
+
           echo "Summary: $ERRORS errors, $WARNINGS warnings"
 
-          # Only fail on hard errors, warnings are informational
           if [ $ERRORS -gt 0 ]; then
-            echo "Files exceeding their hard limit must be refactored"
+            echo "Files exceeding their size limit must be refactored"
             exit 1
           fi
 
-          echo "File length check passed"
+          echo "File size check passed"
