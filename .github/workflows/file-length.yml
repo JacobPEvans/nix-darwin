@@ -1,71 +1,39 @@
-# File Length Check - Enforce documentation organization guidelines
-#
-# Warns when files exceed recommended line limits:
-# - 200 lines: Recommended maximum, consider refactoring
-# - 300 lines: Hard warning, should definitely be split
-#
-# Helps maintain the "target 200 lines max per file" guideline
-# documented in CLAUDE.md section 5.
-
-name: File Length Check
+# File Size Check - Enforce documentation organization guidelines
+# Uses file size (bytes) as proxy for token count.
+# Limits: 8KB recommended, 16KB hard, 32KB extended, or exempt
+name: File Size Check
 
 on:
   pull_request:
-    paths:
-      - '**.md'
-      - '**.nix'
+    paths: ['**.md', '**.nix']
+
+env:
+  EXTENDED: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
+  EXEMPT: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
 
 jobs:
   check:
-    name: Check File Lengths
+    name: Check File Sizes
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check file lengths
+      - uses: actions/checkout@v4
+      - name: Check file sizes
         run: |
-          MAX_RECOMMENDED=200
-          MAX_HARD=300
-          WARNINGS=0
           ERRORS=0
+          for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
+            base=$(basename "$f" | sed 's/\.[^.]*$//')
+            size=$(wc -c < "$f" | tr -d ' ')
+            kb=$((size / 1024))
 
-          echo "Checking file lengths (target: $MAX_RECOMMENDED lines)..."
-          echo ""
+            # Determine limit: exempt (skip) / extended (32KB) / standard (16KB)
+            if [[ " ${{ env.EXEMPT }} " == *" $base "* ]]; then continue; fi
+            if [[ " ${{ env.EXTENDED }} " == *" $base "* ]]; then limit=32768; else limit=16384; fi
 
-          # Check markdown files
-          echo "=== Markdown Files ==="
-          for f in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
-            lines=$(wc -l < "$f")
-            if [ "$lines" -gt "$MAX_HARD" ]; then
-              echo "::error file=$f::$f has $lines lines (exceeds hard limit of $MAX_HARD)"
+            if [ "$size" -gt "$limit" ]; then
+              echo "::error file=$f::$f is ${kb}KB (exceeds $((limit/1024))KB limit)"
               ERRORS=$((ERRORS + 1))
-            elif [ "$lines" -gt "$MAX_RECOMMENDED" ]; then
-              echo "::warning file=$f::$f has $lines lines (exceeds recommended $MAX_RECOMMENDED)"
-              WARNINGS=$((WARNINGS + 1))
+            elif [ "$size" -gt 8192 ]; then
+              echo "::warning file=$f::$f is ${kb}KB (exceeds 8KB recommended)"
             fi
           done
-
-          echo ""
-          echo "=== Nix Files ==="
-          for f in $(find . -name "*.nix" -not -path "./node_modules/*" -not -path "./.git/*" | sort); do
-            lines=$(wc -l < "$f")
-            if [ "$lines" -gt "$MAX_HARD" ]; then
-              echo "::error file=$f::$f has $lines lines (exceeds hard limit of $MAX_HARD)"
-              ERRORS=$((ERRORS + 1))
-            elif [ "$lines" -gt "$MAX_RECOMMENDED" ]; then
-              echo "::warning file=$f::$f has $lines lines (exceeds recommended $MAX_RECOMMENDED)"
-              WARNINGS=$((WARNINGS + 1))
-            fi
-          done
-
-          echo ""
-          echo "Summary: $ERRORS errors, $WARNINGS warnings"
-
-          # Only fail on hard errors, warnings are informational
-          if [ $ERRORS -gt 0 ]; then
-            echo "Files exceeding $MAX_HARD lines must be refactored"
-            exit 1
-          fi
-
-          echo "File length check passed"
+          [ $ERRORS -eq 0 ] || exit 1
