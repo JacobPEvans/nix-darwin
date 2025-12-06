@@ -109,7 +109,9 @@ nix search nixpkgs hello
 
 ### 1. Flakes-Only Configuration
 
-- **NEVER use nix-channels or non-flake commands**
+- **NEVER use nix-channels, nix-env, or non-flake commands**
+- `nix-env` is the old imperative package manager - use declarative nixpkgs instead
+- All packages belong in `modules/darwin/packages.nix` or similar declarative config
 - All changes must be committed to git before rebuild
 - Use: `sudo darwin-rebuild switch --flake ~/.config/nix#default`
 

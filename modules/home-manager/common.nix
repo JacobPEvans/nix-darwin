@@ -7,6 +7,9 @@ let
   # Git aliases (cross-platform)
   gitAliases = import ./git/aliases.nix;
 
+  # Git hooks (auto-installed via templates)
+  gitHooks = import ./git/hooks.nix { inherit config pkgs; };
+
   # Shell aliases (macOS - see file for sudo requirements)
   shellAliases = import ./zsh/aliases.nix;
 
@@ -148,7 +151,11 @@ in
       };
 
       # Repository initialization
-      init.defaultBranch = userConfig.git.defaultBranch;
+      init = {
+        defaultBranch = userConfig.git.defaultBranch;
+        # Auto-install hooks on new clones (Layer 1 of pre-commit enforcement)
+        templateDir = "${config.home.homeDirectory}/.git-templates";
+      };
 
       # Pull behavior - rebase keeps history cleaner than merge commits
       pull.rebase = true;
@@ -222,7 +229,7 @@ in
   #
   # Permissions: Now read from JSON in ai-assistant-instructions repo
   # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
-  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks;
+  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
 
   # ==========================================================================
   # Agent OS
