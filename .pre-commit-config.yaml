@@ -85,13 +85,13 @@ repos:
         entry: bash -c '
           SCHEMA="$HOME/.claude/claude-code-settings.schema.json"
           if [ ! -f "$SCHEMA" ]; then
-            echo "Schema not found at $SCHEMA (run darwin-rebuild first)"
+            echo "Schema not found at $SCHEMA (run darwin-rebuild first)" >&2
             exit 0
           fi
           if command -v check-jsonschema &> /dev/null; then
             check-jsonschema --schemafile "$SCHEMA" "$@"
           else
-            echo "check-jsonschema not found (install via nix)"
+            echo "check-jsonschema not found (install via nix)" >&2
             exit 0
           fi
         '

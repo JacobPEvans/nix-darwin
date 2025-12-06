@@ -253,9 +253,9 @@ in
     if [ -f "$SCHEMA" ] && [ -f "$SETTINGS" ]; then
       if command -v check-jsonschema > /dev/null 2>&1; then
         $DRY_RUN_CMD check-jsonschema --schemafile "$SCHEMA" "$SETTINGS" || \
-          echo "Warning: Claude Code settings.json validation failed"
+          echo "Warning: Claude Code settings.json validation failed" >&2
       else
-        echo "Note: check-jsonschema not found, skipping Claude settings validation"
+        echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
       fi
     fi
   '';
