@@ -24,7 +24,7 @@ pkgs.mkShell {
 
   buildInputs = with pkgs; [
     # Node.js runtime and package managers
-    nodejs_20  # Node.js 20 LTS
+    nodejs  # Node.js LTS (nixpkgs default)
     nodePackages.npm
     nodePackages.yarn
     nodePackages.pnpm

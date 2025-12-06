@@ -148,7 +148,7 @@ nix search nixpkgs hello
 - **Keep comments** - user is learning Nix
 - Show empty sections with examples (even if commented out)
 - Visibility > minimalism
-- Use `_latest` variants (e.g., `nodejs_latest`)
+- Use default package names (e.g., `nodejs` not `nodejs_latest` or `nodejs_22`) - nixpkgs maintains defaults as stable/LTS
 
 ### 5. File and Folder Organization
 
