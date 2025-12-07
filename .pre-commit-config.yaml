@@ -96,5 +96,5 @@ repos:
           fi
         '
         language: system
-        files: '\.claude/settings.*\.json$'
+        files: '\.claude/settings(\.local)?\.json$'
         types: [json]

@@ -95,9 +95,8 @@ in
 {
   # Claude Code settings.json
   ".claude/settings.json".text = builtins.toJSON {
-    # NOTE: $schema removed - Claude Code doesn't recognize it and may break permissions
-    # Schema symlink still available at ~/.claude/claude-code-settings.schema.json
-    # for IDE IntelliSense (configure in editor, not in JSON)
+    # $schema property intentionally omitted to avoid potential parsing issues.
+    # Schema available at ~/.claude/claude-code-settings.schema.json for IDE IntelliSense.
 
     # Enable extended thinking mode
     alwaysThinkingEnabled = true;
