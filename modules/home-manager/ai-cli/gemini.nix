@@ -26,6 +26,15 @@ in
     # See: https://github.com/google-gemini/gemini-cli/issues/12695
     "$schema" = "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
 
+    # General settings
+    general = {
+      # Enable preview features (experimental models, features)
+      previewFeatures = true;
+
+      # Disable auto-update (managed via Nix)
+      disableAutoUpdate = true;
+    };
+
     # Tools configuration (must be nested under "tools" key)
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
     tools = {
@@ -35,6 +44,12 @@ in
 
       # Blocked tools (catastrophic operations)
       exclude = geminiDeny.excludeTools;
+
+      # Sandbox configuration (macOS Seatbelt)
+      # Uses permissive-open profile: restricts writes outside project directory
+      # CRITICAL: Gemini won't execute commands without sandbox enabled
+      # See: https://geminicli.com/docs/cli/sandbox/
+      sandbox = true;
     };
   };
 }
