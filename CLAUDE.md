@@ -235,7 +235,7 @@ git commit -m "message"
    - Rule: Bash commands must end with `:*` (e.g., `Bash(git status:*)`)
    - Rule: Only 0 or 1 wildcards per pattern, none in the middle
    - Valid: `Bash(git log:*)`, `Read(**)`
-   - Invalid: `Bash(git * status:*)`, `Bash(npm run:*:*)
+   - Invalid: `Bash(git * status:*)`, `Bash(npm run:*:*)`
 
 **Verification steps**:
 

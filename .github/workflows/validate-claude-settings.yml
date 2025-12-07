@@ -14,10 +14,12 @@ on:
     paths:
       - '.claude/**'
       - 'modules/home-manager/ai-cli/**'
+      - 'modules/home-manager/permissions/**'
   pull_request:
     paths:
       - '.claude/**'
       - 'modules/home-manager/ai-cli/**'
+      - 'modules/home-manager/permissions/**'
 
 jobs:
   validate:
