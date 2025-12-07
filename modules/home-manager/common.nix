@@ -244,7 +244,7 @@ in
   # ==========================================================================
   # Validates settings.json against JSON Schema after home files are written
   # Uses check-jsonschema (Python CLI) from common/packages.nix
-  # Schema from: https://github.com/spences10/claude-code-settings-schema
+  # Schema from: https://json.schemastore.org/claude-code-settings.json
   home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SCHEMA="${config.home.homeDirectory}/.claude/claude-code-settings.schema.json"
     SETTINGS="${config.home.homeDirectory}/.claude/settings.json"

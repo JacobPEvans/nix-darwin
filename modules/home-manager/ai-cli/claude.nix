@@ -20,7 +20,7 @@
 # - rok-* community commands (Shape Up workflow)
 # - Standard commands (commit, pull-request, etc.)
 
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, claude-code-settings-schema, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
 
 let
   # User configuration (includes ai.instructionsRepo path)
@@ -173,10 +173,12 @@ in
   ".claude/settings.json".source = claudeSettingsJson;
 
   # Claude Code settings schema for IDE IntelliSense and validation
-  # Community-built schema: https://github.com/spences10/claude-code-settings-schema
+  # Official schema from: https://json.schemastore.org/claude-code-settings.json
   # Used by: $schema reference in settings.json, pre-commit hooks, CI validation
-  ".claude/claude-code-settings.schema.json".source =
-    "${claude-code-settings-schema}/claude-code-settings.schema.json";
+  ".claude/claude-code-settings.schema.json".source = pkgs.fetchurl {
+    url = "https://json.schemastore.org/claude-code-settings.json";
+    hash = "sha256-3NvPMcsk5tz7kl1RPAZ7I8eYpKhgLgmLXlzOF/LHEUI=";
+  };
 
   # Claude Code status line script
   # Displays: robbyrussell-style prompt with directory, git status, model, and output style

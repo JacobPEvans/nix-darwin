@@ -4,7 +4,7 @@
 # configuration errors that break permissions.
 #
 # Triggers: Changes to Claude config files or permission definitions
-# Schema: https://github.com/spences10/claude-code-settings-schema
+# Schema: https://json.schemastore.org/claude-code-settings.json
 
 name: Validate Claude Settings
 
@@ -34,7 +34,7 @@ jobs:
 
       - name: Fetch schema
         run: |
-          curl -sL https://raw.githubusercontent.com/spences10/claude-code-settings-schema/main/claude-code-settings.schema.json \
+          curl -sL https://json.schemastore.org/claude-code-settings.json \
             -o claude-code-settings.schema.json
 
       - name: Extract settings via nix eval

@@ -80,22 +80,6 @@
         "type": "github"
       }
     },
-    "claude-code-settings-schema": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1765104720,
-        "narHash": "sha256-EiZy7Np146KTlWS5wRJJIupc+bW93KA+/46XuWbSsCU=",
-        "owner": "spences10",
-        "repo": "claude-code-settings-schema",
-        "rev": "67b5f15a046ac09c687bf1b437450f129a2b4759",
-        "type": "github"
-      },
-      "original": {
-        "owner": "spences10",
-        "repo": "claude-code-settings-schema",
-        "type": "github"
-      }
-    },
     "claude-cookbooks": {
       "flake": false,
       "locked": {
@@ -268,7 +252,6 @@
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",
-        "claude-code-settings-schema": "claude-code-settings-schema",
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
         "darwin": "darwin",

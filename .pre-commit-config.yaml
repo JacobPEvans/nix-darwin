@@ -76,7 +76,7 @@ repos:
         pass_filenames: true
 
   # Claude Code settings validation (uses check-jsonschema from nix)
-  # Schema from: https://github.com/spences10/claude-code-settings-schema
+  # Schema from: https://json.schemastore.org/claude-code-settings.json
   - repo: local
     hooks:
       - id: validate-claude-settings
