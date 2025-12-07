@@ -45,6 +45,8 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          flakehub: false
 
       - name: Check flake structure
         run: nix flake check --no-build
@@ -58,6 +60,8 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          flakehub: false
 
       - name: Check Nix formatting
         run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
@@ -75,13 +79,15 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          flakehub: false
 
       - name: Setup Magic Nix Cache
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build home-manager configuration
-        run: nix build .#darwinConfigurations.default.config.home-manager.users.jevans.home.activationPackage -o result-hm
+        run: nix build .#ci.hmActivationPackage -o result-hm
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files

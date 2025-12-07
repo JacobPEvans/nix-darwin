@@ -69,6 +69,7 @@
       url = "github:JacobPEvans/ai-assistant-instructions";
       flake = false;  # Not a flake, just fetch the repo
     };
+
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, mac-app-util, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, agent-os, ai-assistant-instructions, ... }:
@@ -114,6 +115,15 @@
       darwinConfigurations = {
         default = darwinConfig;
         ${userConfig.host.name} = darwinConfig;
+      };
+
+      # CI-friendly outputs for GitHub Actions validation
+      # Provides stable references like .#ci.claudeSettingsJson so workflows
+      # don't need hardcoded usernames - the username is resolved internally
+      ci = {
+        # Read the pretty-printed JSON from the derivation output
+        claudeSettingsJson = builtins.readFile darwinConfig.config.home-manager.users.${userConfig.user.name}.home.file.".claude/settings.json".source;
+        hmActivationPackage = darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
       };
     };
 }

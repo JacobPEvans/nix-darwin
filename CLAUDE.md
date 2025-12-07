@@ -218,6 +218,40 @@ git commit -m "message"
 
 **For quick approval**: Just click "accept indefinitely" in Claude UI
 
+### Debugging Permission Issues
+
+**Common causes of broken permissions**:
+
+1. **Project-level overrides**: `settings.local.json` in project `.claude/` directories
+   OVERRIDE (not merge with) global permissions
+   - Check: `ls ./.claude/settings.local.json`
+   - Fix: Delete or edit the file to remove `"allow": []` which clears all permissions
+
+2. **Stale settings**: Source permissions changed but `darwin-rebuild switch` not run
+   - Check: Compare `~/.claude/settings.json` permission count vs source JSON
+   - Fix: Run `darwin-rebuild switch` to regenerate
+
+3. **Invalid permission patterns**: Wildcards must follow strict format
+   - Rule: Bash commands must end with `:*` (e.g., `Bash(git status:*)`)
+   - Rule: Only 0 or 1 wildcards per pattern, none in the middle
+   - Valid: `Bash(git log:*)`, `Read(**)`
+   - Invalid: `Bash(git * status:*)`, `Bash(npm run:*:*)`
+
+**Verification steps**:
+
+```bash
+# Count permissions in source (should match after rebuild)
+jq '.permissions | length' ~/git/ai-assistant-instructions/.claude/permissions/allow.json
+
+# Count permissions in deployed settings
+jq '.permissions.allow | length' ~/.claude/settings.json
+
+# Check for project-level overrides in current directory
+cat ./.claude/settings.local.json 2>/dev/null | jq '.allow | length'
+```
+
+**Note**: After fixing permissions, restart Claude Code for changes to take effect.
+
 ## Gemini CLI Permission Management
 
 **Strategy**: Nix-managed configuration using coreTools and excludeTools
