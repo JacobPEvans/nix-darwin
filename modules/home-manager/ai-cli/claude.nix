@@ -95,8 +95,8 @@ let
   # This is the complete settings configuration that will be written to settings.json
   claudeSettings = {
     # JSON Schema for IDE IntelliSense and validation
-    # Uses official schema store URL per claude doctor requirements
-    "$schema" = "https://json.schemastore.org/claude-code-settings.json";
+    # URL centralized in lib/user-config.nix (single source of truth)
+    "$schema" = userConfig.ai.claudeSchemaUrl;
 
     # Enable extended thinking mode
     alwaysThinkingEnabled = true;
@@ -171,14 +171,6 @@ in
 {
   # Claude Code settings.json (pretty-printed for debugging)
   ".claude/settings.json".source = claudeSettingsJson;
-
-  # Claude Code settings schema for IDE IntelliSense and validation
-  # Official schema from: https://json.schemastore.org/claude-code-settings.json
-  # Used by: $schema reference in settings.json, pre-commit hooks, CI validation
-  ".claude/claude-code-settings.schema.json".source = pkgs.fetchurl {
-    url = "https://json.schemastore.org/claude-code-settings.json";
-    hash = "sha256-3NvPMcsk5tz7kl1RPAZ7I8eYpKhgLgmLXlzOF/LHEUI=";
-  };
 
   # Claude Code status line script
   # Displays: robbyrussell-style prompt with directory, git status, model, and output style

@@ -244,15 +244,13 @@ in
   # ==========================================================================
   # Validates settings.json against JSON Schema after home files are written
   # Uses check-jsonschema (Python CLI) from common/packages.nix
-  # Schema from: https://json.schemastore.org/claude-code-settings.json
+  # Schema URL from lib/user-config.nix (single source of truth)
   home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SCHEMA="${config.home.homeDirectory}/.claude/claude-code-settings.schema.json"
     SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
 
-    # Only validate if both files exist and check-jsonschema is available
-    if [ -f "$SCHEMA" ] && [ -f "$SETTINGS" ]; then
+    if [ -f "$SETTINGS" ]; then
       if command -v check-jsonschema > /dev/null 2>&1; then
-        $DRY_RUN_CMD check-jsonschema --schemafile "$SCHEMA" "$SETTINGS" || \
+        $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
           echo "Warning: Claude Code settings.json validation failed" >&2
       else
         echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
