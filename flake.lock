@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1765041000,
-        "narHash": "sha256-BpwN6zI6idjmGPjsWL8LL9zYELs4LAluzpNld8t1l+k=",
+        "lastModified": 1765140574,
+        "narHash": "sha256-DxTCwFa2h/VXSHkwm1W3lN8sZV5GCGQBOtcnmIlZzO0=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "82aad17685aa131f9acb3e7ffb9f786099bba379",
+        "rev": "06c583ff4668a1251201d2670fc5ac305b1b72f2",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1764987728,
-        "narHash": "sha256-I2wfHVpOqY8qFKDNG80Jc1z5/sQqG13TE9ytxWb44Bw=",
+        "lastModified": 1765104283,
+        "narHash": "sha256-Y/WY5hBglv3rlqjSgHmZ3zPugt/KaPArXL+bEJZqgMA=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "cbc55b7d5491987135f57c87f033178d057f10e0",
+        "rev": "de49a076792f56beefb78b18fa60015145532808",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "claude-code-settings-schema": {
       "flake": false,
       "locked": {
-        "lastModified": 1764538012,
-        "narHash": "sha256-JqlzTO/MCIcWtC+49WGZYs5b6Uj6JAECzDrzbphz7QA=",
+        "lastModified": 1765104720,
+        "narHash": "sha256-EiZy7Np146KTlWS5wRJJIupc+bW93KA+/46XuWbSsCU=",
         "owner": "spences10",
         "repo": "claude-code-settings-schema",
-        "rev": "293a78a24e9a2023e901d7dc115412bf7899226e",
+        "rev": "67b5f15a046ac09c687bf1b437450f129a2b4759",
         "type": "github"
       },
       "original": {
@@ -135,11 +135,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764161084,
-        "narHash": "sha256-HN84sByg9FhJnojkGGDSrcjcbeioFWoNXfuyYfJ1kBE=",
+        "lastModified": 1765065051,
+        "narHash": "sha256-b7W9WsvyMOkUScNxbzS45KEJp0iiqRPyJ1I3JBE+oEE=",
         "owner": "nix-darwin",
         "repo": "nix-darwin",
-        "rev": "e95de00a471d07435e0527ff4db092c84998698e",
+        "rev": "7e22bf538aa3e0937effcb1cee73d5f1bcc26f79",
         "type": "github"
       },
       "original": {

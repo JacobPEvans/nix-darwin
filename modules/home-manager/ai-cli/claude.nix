@@ -91,12 +91,12 @@ let
     };
   }) aiInstructionsCommands);
 
-in
-{
-  # Claude Code settings.json
-  ".claude/settings.json".text = builtins.toJSON {
-    # $schema property intentionally omitted to avoid potential parsing issues.
-    # Schema available at ~/.claude/claude-code-settings.schema.json for IDE IntelliSense.
+  # Claude Code settings object
+  # This is the complete settings configuration that will be written to settings.json
+  claudeSettings = {
+    # JSON Schema for IDE IntelliSense and validation
+    # Uses relative path since both files are in ~/.claude/
+    "$schema" = "./claude-code-settings.schema.json";
 
     # Enable extended thinking mode
     alwaysThinkingEnabled = true;
@@ -156,6 +156,21 @@ in
       };
     };
   };
+
+  # Generate pretty-printed JSON using a derivation with jq
+  # This improves readability for debugging permission issues
+  claudeSettingsJson = pkgs.runCommand "claude-settings.json" {
+    nativeBuildInputs = [ pkgs.jq ];
+    json = builtins.toJSON claudeSettings;
+    passAsFile = [ "json" ];
+  } ''
+    jq '.' "$jsonPath" > $out
+  '';
+
+in
+{
+  # Claude Code settings.json (pretty-printed for debugging)
+  ".claude/settings.json".source = claudeSettingsJson;
 
   # Claude Code settings schema for IDE IntelliSense and validation
   # Community-built schema: https://github.com/spences10/claude-code-settings-schema

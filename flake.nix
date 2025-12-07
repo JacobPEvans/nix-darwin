@@ -127,7 +127,8 @@
       # CI-friendly outputs that don't require knowing the username
       # Used by GitHub Actions for cross-platform validation
       ci = {
-        claudeSettingsJson = darwinConfig.config.home-manager.users.${userConfig.user.name}.home.file.".claude/settings.json".text;
+        # Read the pretty-printed JSON from the derivation output
+        claudeSettingsJson = builtins.readFile darwinConfig.config.home-manager.users.${userConfig.user.name}.home.file.".claude/settings.json".source;
         hmActivationPackage = darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
       };
     };
