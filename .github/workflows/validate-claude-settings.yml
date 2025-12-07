@@ -35,15 +35,17 @@ jobs:
           curl -sL https://raw.githubusercontent.com/spences10/claude-code-settings-schema/main/claude-code-settings.schema.json \
             -o claude-code-settings.schema.json
 
+      - name: Build and extract settings
+        run: |
+          # Build the home-manager configuration to generate settings.json
+          nix build .#darwinConfigurations.default.config.home-manager.users.jevans.home.activationPackage -o result-hm
+          # Extract settings.json for validation
+          cp result-hm/home-files/.claude/settings.json ./settings-generated.json
+
       - name: Validate settings files
         run: |
           nix-shell -p check-jsonschema --run '
-            echo "Validating Claude Code settings files..."
-            for f in .claude/settings*.json; do
-              if [ -f "$f" ]; then
-                echo "  Checking $f"
-                check-jsonschema --schemafile claude-code-settings.schema.json "$f"
-              fi
-            done
-            echo "All settings files are valid!"
+            echo "Validating Claude Code settings..."
+            check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
+            echo "Settings validation passed!"
           '

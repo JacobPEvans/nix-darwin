@@ -3,3 +3,4 @@ result
 **/.direnv
 backup/
 # Test GPG signing
+.claude/settings.local.json

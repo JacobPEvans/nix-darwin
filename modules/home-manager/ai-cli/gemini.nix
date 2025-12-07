@@ -35,6 +35,32 @@ in
       disableAutoUpdate = true;
     };
 
+    # Security settings
+    # See: https://geminicli.com/docs/cli/trusted-folders/
+    security = {
+      folderTrust = {
+        # Enable folder trust system
+        enabled = true;
+
+        # Trusted directories where Gemini can operate without confirmation
+        # SECURITY NOTE: Trusting a folder allows Gemini to read/write files
+        # and execute commands within that directory without prompts.
+        #
+        # Trusted:
+        # - ~/.config/nix: Nix configuration (this repo)
+        # - ~/git: All git repositories (development work)
+        #
+        # NOT trusted (intentionally):
+        # - ~/ (full home): Too broad, includes secrets (.ssh, .gnupg, etc.)
+        # - ~/.config: Contains sensitive app configs
+        # - /tmp: Potential for symlink attacks
+        trustedFolders = [
+          "${config.home.homeDirectory}/.config/nix"
+          "${config.home.homeDirectory}/git"
+        ];
+      };
+    };
+
     # Tools configuration (must be nested under "tools" key)
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
     tools = {
