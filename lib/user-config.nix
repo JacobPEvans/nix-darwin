@@ -77,5 +77,10 @@ in
     # Used by claude.nix and common.nix for symlinks
     # Single source of truth - DRY principle
     instructionsRepo = "${homeDir}/git/ai-assistant-instructions";
+
+    # Claude Code settings JSON Schema URL (official schema store)
+    # Used by: settings.json $schema, pre-commit hooks, CI validation, activation hooks
+    # Single source of truth - reference this everywhere
+    claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
   };
 }

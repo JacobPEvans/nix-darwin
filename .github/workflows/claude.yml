@@ -6,6 +6,7 @@ on:
 
 jobs:
   claude:
+    name: Claude Code Review
     runs-on: ubuntu-latest
     permissions:
       contents: read

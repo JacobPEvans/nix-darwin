@@ -77,6 +77,23 @@
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
 
+      # Pure settings generator for CI (no derivations, cross-platform)
+      # Reads permissions from flake inputs and generates settings attrset
+      ciClaudeSettings = import ./lib/claude-settings.nix {
+        homeDir = "/home/user";  # Placeholder - CI only validates schema structure
+        schemaUrl = userConfig.ai.claudeSchemaUrl;
+        permissions = {
+          allow = (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json")).permissions;
+          deny = (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json")).permissions;
+          ask = (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json")).permissions;
+        };
+        plugins = (import ./modules/home-manager/ai-cli/claude-plugins.nix {
+          inherit claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills;
+          lib = nixpkgs.lib;
+          config = {};  # Unused but required by signature
+        }).pluginConfig;
+      };
+
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
         inherit claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills agent-os ai-assistant-instructions;
@@ -118,11 +135,12 @@
       };
 
       # CI-friendly outputs for GitHub Actions validation
-      # Provides stable references like .#ci.claudeSettingsJson so workflows
-      # don't need hardcoded usernames - the username is resolved internally
+      # Pure Nix evaluation - no derivation building required, works cross-platform
       ci = {
-        # Read the pretty-printed JSON from the derivation output
-        claudeSettingsJson = builtins.readFile darwinConfig.config.home-manager.users.${userConfig.user.name}.home.file.".claude/settings.json".source;
+        # Settings JSON generated from lib/claude-settings.nix (pure function)
+        # Uses placeholder homeDir since CI only validates schema structure
+        claudeSettingsJson = builtins.toJSON ciClaudeSettings;
+        # Note: hmActivationPackage still requires Darwin (kept for macOS CI)
         hmActivationPackage = darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
       };
     };

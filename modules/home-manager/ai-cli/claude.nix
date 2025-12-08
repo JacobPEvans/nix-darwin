@@ -92,69 +92,16 @@ let
   }) aiInstructionsCommands);
 
   # Claude Code settings object
-  # This is the complete settings configuration that will be written to settings.json
-  claudeSettings = {
-    # JSON Schema for IDE IntelliSense and validation
-    # Uses official schema store URL per claude doctor requirements
-    "$schema" = "https://json.schemastore.org/claude-code-settings.json";
-
-    # Enable extended thinking mode
-    alwaysThinkingEnabled = true;
-
-    # Plugin marketplace configuration
-    # Plugins are fetched on-demand from these marketplaces
-    extraKnownMarketplaces = claudePlugins.pluginConfig.marketplaces;
-
-    # Enabled plugins from marketplaces
-    # See claude-plugins.nix for available plugins and descriptions
-    enabledPlugins = claudePlugins.pluginConfig.enabledPlugins;
-
-    # Auto-approved commands (from ai-assistant-instructions JSON)
-    # Permissions are read from the flake input at build time
+  # Generated from lib/claude-settings.nix (shared with CI for cross-platform validation)
+  claudeSettings = import ../../../lib/claude-settings.nix {
+    homeDir = config.home.homeDirectory;
+    schemaUrl = userConfig.ai.claudeSchemaUrl;
     permissions = {
       allow = claudeAllowJson.permissions;
       deny = claudeDenyJson.permissions;
       ask = claudeAskJson.permissions;
-
-      # Directory-level read access
-      # Grants Claude access to files outside the current working directory
-      # This prevents "allow reading from X/" prompts for common locations
-      additionalDirectories = [
-        "~/"              # Full home directory access
-        "~/.claude/"      # Claude configuration
-        "~/.config/"      # XDG config directory
-      ];
     };
-
-    # Status line configuration
-    statusLine = {
-      type = "command";
-      command = "${config.home.homeDirectory}/.claude/statusline-command.sh";
-    };
-
-    # MCP Servers
-    #
-    # Bitwarden MCP Server - provides Claude access to Bitwarden vault
-    #
-    # Security Model:
-    #   - Dedicated machine account (NOT personal vault access)
-    #   - Least privilege: only secrets the AI workflow requires
-    #   - Short-lived session tokens (BW_SESSION expires on lock/timeout)
-    #   - Credentials auto-rotated via Bitwarden Secrets Manager policies
-    #
-    # Setup:
-    #   1. Install: npm install -g @bitwarden/mcp-server
-    #   2. Unlock vault: bw unlock
-    #   3. Export session: export BW_SESSION="<session_key>"
-    #
-    # Binary installed to ~/.npm-packages/bin via npm global prefix
-    # (configured in modules/home-manager/npm/config.nix)
-    mcpServers = {
-      bitwarden = {
-        command = "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
-        args = [ ];
-      };
-    };
+    plugins = claudePlugins.pluginConfig;
   };
 
   # Generate pretty-printed JSON using a derivation with jq
@@ -171,14 +118,6 @@ in
 {
   # Claude Code settings.json (pretty-printed for debugging)
   ".claude/settings.json".source = claudeSettingsJson;
-
-  # Claude Code settings schema for IDE IntelliSense and validation
-  # Official schema from: https://json.schemastore.org/claude-code-settings.json
-  # Used by: $schema reference in settings.json, pre-commit hooks, CI validation
-  ".claude/claude-code-settings.schema.json".source = pkgs.fetchurl {
-    url = "https://json.schemastore.org/claude-code-settings.json";
-    hash = "sha256-3NvPMcsk5tz7kl1RPAZ7I8eYpKhgLgmLXlzOF/LHEUI=";
-  };
 
   # Claude Code status line script
   # Displays: robbyrussell-style prompt with directory, git status, model, and output style
