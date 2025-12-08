@@ -1,74 +1,112 @@
 # Nix CI - Parallel validation workflow
 #
 # Jobs run in parallel where possible:
+# - paths-filter: Determines if Nix files changed (runs on ALL PRs)
 # - lint: flake.lock health (no Nix needed)
 # - validate: flake structure check
 # - format: Nix code formatting
 # - build: Darwin build + symlink verification (cached)
 #
-# Cache: Magic Nix Cache saves on main push, PRs use upstream cache.nixos.org.
+# Pattern: Jobs always run (for required checks) but skip expensive steps
+# if no relevant files changed. Uses dorny/paths-filter for detection.
+#
+# Cache: Magic Nix Cache enabled for ALL runs:
+# - main: reads + writes to cache
+# - PRs: reads from cache (seeded by main)
 
 name: Nix
 
 on:
   push:
     branches: [main]
-    paths:
-      - '**.nix'
-      - 'flake.lock'
   pull_request:
-    paths:
-      - '**.nix'
-      - 'flake.lock'
-      - 'modules/**'
-      - 'scripts/**'
+  # No path filters - always run for required checks
 
 jobs:
+  paths-filter:
+    name: Check paths
+    runs-on: ubuntu-latest
+    outputs:
+      nix: ${{ steps.filter.outputs.nix }}
+      flake-lock: ${{ steps.filter.outputs.flake-lock }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            nix:
+              - '**.nix'
+              - 'modules/**'
+              - 'scripts/**'
+            flake-lock:
+              - 'flake.lock'
+
   lint:
     name: Lint flake.lock
+    needs: paths-filter
     runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Check flake.lock health
+        if: needs.paths-filter.outputs.flake-lock == 'true'
         uses: DeterminateSystems/flake-checker-action@main
         with:
           nixpkgs-keys: nixpkgs
 
+      - name: Skip (no flake.lock changes)
+        if: needs.paths-filter.outputs.flake-lock != 'true'
+        run: echo "Skipping - no flake.lock changes detected"
+
   validate:
     name: Validate flake
+    needs: paths-filter
     runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check flake structure
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
         run: nix flake check --no-build
+
+      - name: Skip (no Nix changes)
+        if: needs.paths-filter.outputs.nix != 'true' && needs.paths-filter.outputs.flake-lock != 'true'
+        run: echo "Skipping - no Nix file changes detected"
 
   format:
     name: Check formatting
+    needs: paths-filter
     runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
+        if: needs.paths-filter.outputs.nix == 'true'
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check Nix formatting
+        if: needs.paths-filter.outputs.nix == 'true'
         run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
         continue-on-error: true
 
+      - name: Skip (no Nix changes)
+        if: needs.paths-filter.outputs.nix != 'true'
+        run: echo "Skipping - no .nix file changes detected"
+
   build:
     name: Build & Verify
+    needs: paths-filter
     runs-on: macos-latest
     permissions:
       contents: read
@@ -78,16 +116,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Nix
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Setup Magic Nix Cache
-        if: github.ref == 'refs/heads/main'
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build home-manager configuration
-        run: nix build .#ci.hmActivationPackage -o result-hm
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
+        run: |
+          set -o pipefail
+
+          # Build and capture output for warning analysis
+          nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee /tmp/build-output.txt
+
+          # Fail on dangerous warnings (blocklist)
+          FAIL_PATTERNS=("unable to download" "HTTP error" "permission denied")
+          for pattern in "${FAIL_PATTERNS[@]}"; do
+            if grep -qi "$pattern" /tmp/build-output.txt; then
+              matched_line=$(grep -i "$pattern" /tmp/build-output.txt | head -1)
+              echo "::error::Build warning detected matching '$pattern': $matched_line"
+              exit 1
+            fi
+          done
 
       - name: Verify symlinks
+        if: needs.paths-filter.outputs.nix == 'true' || needs.paths-filter.outputs.flake-lock == 'true'
         run: ./scripts/verify-symlinks.sh result-hm/home-files
+
+      - name: Skip (no Nix changes)
+        if: needs.paths-filter.outputs.nix != 'true' && needs.paths-filter.outputs.flake-lock != 'true'
+        run: echo "Skipping - no Nix file changes detected"

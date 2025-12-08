@@ -1,26 +1,50 @@
 # File Size Check - Enforce documentation organization guidelines
 # Uses file size (bytes) as proxy for token count.
 # Limits: 8KB recommended, 16KB hard, 32KB extended, or exempt
+#
+# Pattern: Always runs (for required checks) but skips if no relevant files changed.
+
 name: File Size Check
 
 on:
   push:
     branches: [main]
-    paths: ['**.md', '**.nix']
   pull_request:
-    paths: ['**.md', '**.nix']
+  # No path filters - always run for required checks
 
 env:
   EXTENDED: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
   EXEMPT: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
 
 jobs:
+  paths-filter:
+    name: Check paths
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.filter.outputs.files }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            files:
+              - '**.md'
+              - '**.nix'
+
   check:
     name: Check File Sizes
+    needs: paths-filter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check file sizes
+        if: needs.paths-filter.outputs.files == 'true'
         run: |
           ERRORS=0
           for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
@@ -40,3 +64,7 @@ jobs:
             fi
           done
           [ $ERRORS -eq 0 ] || exit 1
+
+      - name: Skip (no relevant changes)
+        if: needs.paths-filter.outputs.files != 'true'
+        run: echo "Skipping - no .md or .nix file changes detected"

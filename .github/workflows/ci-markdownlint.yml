@@ -5,6 +5,8 @@
 # - Catches common issues (trailing whitespace, inconsistent lists)
 # - Auto-fixes when possible
 #
+# Pattern: Always runs (for required checks) but skips if no relevant files changed.
+#
 # Reference: https://github.com/DavidAnson/markdownlint-cli2-action
 
 name: Markdown Lint
@@ -12,19 +14,33 @@ name: Markdown Lint
 on:
   push:
     branches: [main]
-    paths:
-      - '**.md'
-      - '.markdownlint.json'
-      - '.markdownlint.yml'
   pull_request:
-    paths:
-      - '**.md'
-      - '.markdownlint.json'
-      - '.markdownlint.yml'
+  # No path filters - always run for required checks
 
 jobs:
+  paths-filter:
+    name: Check paths
+    runs-on: ubuntu-latest
+    outputs:
+      markdown: ${{ steps.filter.outputs.markdown }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            markdown:
+              - '**.md'
+              - '.markdownlint.json'
+              - '.markdownlint.yml'
+              - '.markdownlint-cli2.jsonc'
+
   lint:
     name: Lint Markdown
+    needs: paths-filter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,8 +49,13 @@ jobs:
           fetch-depth: 0
 
       - name: Run markdownlint
+        if: needs.paths-filter.outputs.markdown == 'true'
         uses: DavidAnson/markdownlint-cli2-action@v20
         with:
           globs: |
             **/*.md
             !**/node_modules/**
+
+      - name: Skip (no Markdown changes)
+        if: needs.paths-filter.outputs.markdown != 'true'
+        run: echo "Skipping - no Markdown file changes detected"

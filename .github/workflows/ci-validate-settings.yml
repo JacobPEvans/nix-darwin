@@ -3,7 +3,8 @@
 # Validates Claude Code settings files against JSON Schema to prevent
 # configuration errors that break permissions.
 #
-# Triggers: Changes to Claude config files or permission definitions
+# Pattern: Always runs (for required checks) but skips if no relevant files changed.
+#
 # Schema: https://json.schemastore.org/claude-code-settings.json
 
 name: Validate Claude Settings
@@ -11,44 +12,63 @@ name: Validate Claude Settings
 on:
   push:
     branches: [main]
-    paths:
-      - '.claude/**'
-      - 'modules/home-manager/ai-cli/**'
-      - 'modules/home-manager/permissions/**'
   pull_request:
-    paths:
-      - '.claude/**'
-      - 'modules/home-manager/ai-cli/**'
-      - 'modules/home-manager/permissions/**'
+  # No path filters - always run for required checks
 
 jobs:
+  paths-filter:
+    name: Check paths
+    runs-on: ubuntu-latest
+    outputs:
+      claude: ${{ steps.filter.outputs.claude }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            claude:
+              - '.claude/**'
+              - 'modules/home-manager/ai-cli/**'
+              - 'modules/home-manager/permissions/**'
+
   validate:
     name: Validate settings
+    needs: paths-filter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Nix
+        if: needs.paths-filter.outputs.claude == 'true'
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Fetch schema
+        if: needs.paths-filter.outputs.claude == 'true'
         run: |
           curl -sL https://json.schemastore.org/claude-code-settings.json \
             -o claude-code-settings.schema.json
 
       - name: Extract settings via nix eval
+        if: needs.paths-filter.outputs.claude == 'true'
         run: |
           # Use CI-friendly flake output to extract settings.json content
           # Avoids hardcoded usernames and cross-platform build issues
           nix eval --raw '.#ci.claudeSettingsJson' > settings-generated.json
 
       - name: Validate settings files
+        if: needs.paths-filter.outputs.claude == 'true'
         run: |
           nix-shell -p check-jsonschema --run '
             echo "Validating Claude Code settings..."
             check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
             echo "Settings validation passed!"
           '
+
+      - name: Skip (no Claude changes)
+        if: needs.paths-filter.outputs.claude != 'true'
+        run: echo "Skipping - no Claude settings file changes detected"
