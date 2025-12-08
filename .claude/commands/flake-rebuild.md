@@ -79,10 +79,10 @@ Push the branch:
 git push -u origin HEAD
 ```
 
-Create PR with the `dependencies` label (to skip Claude review) and enable auto-merge:
+Create PR with the `dependencies` label (to skip Claude review), or skip if PR already exists:
 
 ```bash
-gh pr create --fill --label dependencies
+gh pr view >/dev/null 2>&1 || gh pr create --fill --label dependencies
 ```
 
 Enable auto-merge (this will merge automatically when checks pass):
