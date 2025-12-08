@@ -15,9 +15,9 @@
 { config, ... }:
 
 let
-  copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config; };
-in
-{
+  copilotAllow =
+    import ../permissions/copilot-permissions-allow.nix { inherit config; };
+in {
   ".copilot/config.json".text = builtins.toJSON {
     # Trusted directories where Copilot can operate without confirmation
     trusted_folders = copilotAllow.trusted_folders;

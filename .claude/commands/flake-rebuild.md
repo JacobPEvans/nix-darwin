@@ -102,6 +102,7 @@ git checkout main
 ### 9. Report Summary
 
 Tell the user:
+
 1. What inputs were updated (from the nix flake update output)
 2. The PR URL
 3. That auto-merge is enabled and will merge when checks pass

@@ -30,52 +30,52 @@
 {
   description = "Terraform/Terragrunt development environment";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-  };
+  inputs = { nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable"; };
 
   outputs = { nixpkgs, ... }:
     let
-      systems = [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f {
-        pkgs = import nixpkgs {
-          inherit system;
-          # Terraform uses BSL license (unfree)
-          config.allowUnfree = true;
-        };
-      });
-    in
-    {
+      systems =
+        [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
+      forAllSystems = f:
+        nixpkgs.lib.genAttrs systems (system:
+          f {
+            pkgs = import nixpkgs {
+              inherit system;
+              # Terraform uses BSL license (unfree)
+              config.allowUnfree = true;
+            };
+          });
+    in {
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # === CORE IaC TOOLS ===
-            terraform              # HashiCorp Terraform
-            terragrunt             # Terraform wrapper (DRY configs)
-            opentofu               # Open source Terraform fork
+            terraform # HashiCorp Terraform
+            terragrunt # Terraform wrapper (DRY configs)
+            opentofu # Open source Terraform fork
 
             # === DOCUMENTATION ===
-            terraform-docs         # Auto-generate docs from modules
+            terraform-docs # Auto-generate docs from modules
 
             # === LINTING & FORMATTING ===
-            tflint                 # Terraform linter
+            tflint # Terraform linter
             # TFLint plugins (uncomment as needed for your providers):
             # tflint-plugins.tflint-ruleset-aws
             # tflint-plugins.tflint-ruleset-google
 
             # === SECURITY SCANNERS ===
-            checkov                # Security/compliance scanner (Bridgecrew)
-            terrascan              # Security scanner (Tenable)
-            tfsec                  # Security scanner (Aqua)
-            trivy                  # Comprehensive vulnerability scanner
+            checkov # Security/compliance scanner (Bridgecrew)
+            terrascan # Security scanner (Tenable)
+            tfsec # Security scanner (Aqua)
+            trivy # Comprehensive vulnerability scanner
 
             # === COST ESTIMATION ===
-            infracost              # Cloud cost estimates
+            infracost # Cloud cost estimates
 
             # === UTILITIES ===
             # NOTE: pre-commit and markdownlint-cli2 are in common system packages
-            jq                     # JSON processor
-            yq                     # YAML processor
+            jq # JSON processor
+            yq # YAML processor
           ];
 
           shellHook = ''

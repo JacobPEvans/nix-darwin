@@ -18,7 +18,8 @@ let
     # Basic workflow patterns
     # Source: patterns/agents/basic_workflows.ipynb
     prompt-chaining = {
-      description = "Sequential prompts where output of one becomes input to next";
+      description =
+        "Sequential prompts where output of one becomes input to next";
       notebook = "patterns/agents/basic_workflows.ipynb";
       useCase = "Multi-step analysis, document processing pipelines";
     };
@@ -38,7 +39,8 @@ let
     # Advanced orchestration patterns
     # Source: patterns/agents/orchestrator_workers.ipynb
     orchestrator-workers = {
-      description = "Coordinator agent manages multiple specialized worker agents";
+      description =
+        "Coordinator agent manages multiple specialized worker agents";
       notebook = "patterns/agents/orchestrator_workers.ipynb";
       useCase = "Complex workflows, task delegation, result aggregation";
     };
@@ -88,34 +90,33 @@ let
     };
   };
 
-in
-{
+in {
   # Expose pattern documentation for reference
   # This is metadata only - actual notebooks live in claude-cookbooks input
   patterns = {
     inherit agentPatterns skillsPatterns commandAgentPatterns;
-    
+
     # Helper to get full path to a pattern notebook
     getNotebookPath = pattern: "${claude-cookbooks}/${pattern}";
-    
+
     # Documentation string for easy reference
     documentation = ''
       Claude Cookbook Patterns Available:
-      
+
       Agent Patterns:
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pattern: 
-        "  - ${name}: ${pattern.description}"
-      ) agentPatterns)}
-      
+      ${lib.concatStringsSep "\n"
+      (lib.mapAttrsToList (name: pattern: "  - ${name}: ${pattern.description}")
+        agentPatterns)}
+
       Skills Patterns:
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pattern:
-        "  - ${name}: ${pattern.description}"
-      ) skillsPatterns)}
-      
+      ${lib.concatStringsSep "\n"
+      (lib.mapAttrsToList (name: pattern: "  - ${name}: ${pattern.description}")
+        skillsPatterns)}
+
       Command/Agent Patterns:
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pattern:
-        "  - ${name}: ${pattern.description}"
-      ) commandAgentPatterns)}
+      ${lib.concatStringsSep "\n"
+      (lib.mapAttrsToList (name: pattern: "  - ${name}: ${pattern.description}")
+        commandAgentPatterns)}
     '';
   };
 }

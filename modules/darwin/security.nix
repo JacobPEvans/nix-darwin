@@ -8,10 +8,8 @@
 
 { ... }:
 
-let
-  userConfig = import ../../lib/user-config.nix;
-in
-{
+let userConfig = import ../../lib/user-config.nix;
+in {
   # ==========================================================================
   # Passwordless sudo for darwin-rebuild
   # ==========================================================================

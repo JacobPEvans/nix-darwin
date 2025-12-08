@@ -8,10 +8,8 @@
 # This separation enables pure Nix evaluation for CI while keeping
 # pretty-printed JSON for local deployment.
 
-{ homeDir
-, schemaUrl
-, permissions  # { allow, deny, ask }
-, plugins      # { marketplaces, enabledPlugins }
+{ homeDir, schemaUrl, permissions # { allow, deny, ask }
+, plugins # { marketplaces, enabledPlugins }
 }:
 
 {
@@ -33,9 +31,9 @@
 
     # Directory-level read access
     additionalDirectories = [
-      "~/"              # Full home directory access
-      "~/.claude/"      # Claude configuration
-      "~/.config/"      # XDG config directory
+      "~/" # Full home directory access
+      "~/.claude/" # Claude configuration
+      "~/.config/" # XDG config directory
     ];
   };
 

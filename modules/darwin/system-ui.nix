@@ -8,9 +8,8 @@
 let
   # Available for customization (see screencapture.location example)
   userConfig = import ../../lib/user-config.nix;
-in
 
-{
+in {
   system.defaults.NSGlobalDomain = {
     # ==========================================================================
     # Appearance
@@ -89,7 +88,7 @@ in
 
   system.defaults.menuExtraClock = {
     # Show date in menu bar
-    ShowDate = 1;  # 0 = When space allows, 1 = Always, 2 = Never
+    ShowDate = 1; # 0 = When space allows, 1 = Always, 2 = Never
 
     # Show day of week
     ShowDayOfWeek = true;

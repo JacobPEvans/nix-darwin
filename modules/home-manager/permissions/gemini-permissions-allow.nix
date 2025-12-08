@@ -36,11 +36,7 @@ let
   username = config.home.username;
 
   # Core read-only tools (always safe)
-  coreReadTools = [
-    "ReadFileTool"
-    "GlobTool"
-    "GrepTool"
-  ];
+  coreReadTools = [ "ReadFileTool" "GlobTool" "GrepTool" ];
 
   # Git operations (version control)
   # Format: ShellTool(git subcommand)
@@ -169,15 +165,15 @@ let
   # Modern CLI tools (installed via nixpkgs)
   # These are enhanced alternatives to traditional Unix tools
   modernCliCommands = [
-    "ShellTool(bat)"       # Better cat with syntax highlighting
-    "ShellTool(delta)"     # Better git diff viewer
-    "ShellTool(eza)"       # Modern ls replacement
-    "ShellTool(fd)"        # Fast find alternative
-    "ShellTool(fzf)"       # Fuzzy finder
-    "ShellTool(htop)"      # Interactive process viewer
-    "ShellTool(ncdu)"      # NCurses disk usage
-    "ShellTool(tldr)"      # Simplified man pages
-    "ShellTool(rg)"        # ripgrep (fast grep)
+    "ShellTool(bat)" # Better cat with syntax highlighting
+    "ShellTool(delta)" # Better git diff viewer
+    "ShellTool(eza)" # Modern ls replacement
+    "ShellTool(fd)" # Fast find alternative
+    "ShellTool(fzf)" # Fuzzy finder
+    "ShellTool(htop)" # Interactive process viewer
+    "ShellTool(ncdu)" # NCurses disk usage
+    "ShellTool(tldr)" # Simplified man pages
+    "ShellTool(rg)" # ripgrep (fast grep)
   ];
 
   # Python ecosystem
@@ -397,10 +393,7 @@ let
   # Text processing tools
   # NOTE: General sed/awk allowed for read-only text processing
   # In-place editing (sed -i) blocked in excludeTools
-  textProcessingCommands = [
-    "ShellTool(sed)"
-    "ShellTool(awk)"
-  ];
+  textProcessingCommands = [ "ShellTool(sed)" "ShellTool(awk)" ];
 
   # Compression and archiving
   archiveCommands = [
@@ -475,35 +468,15 @@ let
   ];
 
   # Gemini-specific web tools
-  geminiWebTools = [
-    "WebFetchTool"
-  ];
+  geminiWebTools = [ "WebFetchTool" ];
 
-in
-{
+in {
   # Export coreTools list (allowed commands)
-  coreTools = coreReadTools
-    ++ gitCommands
-    ++ githubCommands
-    ++ nixCommands
-    ++ homebrewCommands
-    ++ modernCliCommands
-    ++ pythonCommands
-    ++ nodeCommands
-    ++ rustCommands
-    ++ dockerCommands
-    ++ kubernetesCommands
-    ++ awsCommands
-    ++ terraformCommands
-    ++ terragruntCommands
-    ++ databaseCommands
-    ++ fileReadCommands
-    ++ fileCreationCommands
-    ++ textProcessingCommands
-    ++ archiveCommands
-    ++ networkCommands
-    ++ systemCommands
-    ++ processCommands
-    ++ macosCommands
-    ++ geminiWebTools;
+  coreTools = coreReadTools ++ gitCommands ++ githubCommands ++ nixCommands
+    ++ homebrewCommands ++ modernCliCommands ++ pythonCommands ++ nodeCommands
+    ++ rustCommands ++ dockerCommands ++ kubernetesCommands ++ awsCommands
+    ++ terraformCommands ++ terragruntCommands ++ databaseCommands
+    ++ fileReadCommands ++ fileCreationCommands ++ textProcessingCommands
+    ++ archiveCommands ++ networkCommands ++ systemCommands ++ processCommands
+    ++ macosCommands ++ geminiWebTools;
 }

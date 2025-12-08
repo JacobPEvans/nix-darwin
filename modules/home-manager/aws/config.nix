@@ -51,8 +51,7 @@ let
   # Default values for all profiles (change here to update all)
   defaultRegion = "us-east-2";
   defaultOutput = "json";
-in
-{
+in {
   # ~/.aws/config - AWS CLI configuration
   ".aws/config".text = ''
     # Default profile - used when no --profile is specified

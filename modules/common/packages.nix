@@ -25,36 +25,36 @@ with pkgs; [
   # pre-commit hooks and should be available on any development machine.
 
   # Shell
-  shellcheck                      # Shell script static analysis (POSIX, bash)
-  shfmt                           # Shell script formatter
+  shellcheck # Shell script static analysis (POSIX, bash)
+  shfmt # Shell script formatter
 
   # Documentation
-  markdownlint-cli2               # Markdown linter (README, docs exist everywhere)
+  markdownlint-cli2 # Markdown linter (README, docs exist everywhere)
 
   # CI/CD
-  actionlint                      # GitHub Actions workflow linter
+  actionlint # GitHub Actions workflow linter
 
   # Nix
-  nixfmt-classic                  # Nix code formatter (this repo uses Nix)
+  nixfmt-classic # Nix code formatter (this repo uses Nix)
 
   # JSON
-  check-jsonschema                # JSON Schema validator CLI (for settings validation)
+  check-jsonschema # JSON Schema validator CLI (for settings validation)
 
   # ==========================================================================
   # Security & Credential Management
   # ==========================================================================
   # Password management and secure credential storage for all environments.
 
-  bitwarden-cli                   # CLI for Bitwarden password manager (bw command)
-  bws                             # Bitwarden Secrets Manager CLI (for machine secrets)
+  bitwarden-cli # CLI for Bitwarden password manager (bw command)
+  bws # Bitwarden Secrets Manager CLI (for machine secrets)
 
   # ==========================================================================
   # Cloud Infrastructure (AWS)
   # ==========================================================================
   # AWS tooling for infrastructure management and secure credential handling.
 
-  awscli2                         # AWS CLI v2 - unified tool to manage AWS services
-  aws-vault                       # Secure AWS credential storage (uses OS keychain)
+  awscli2 # AWS CLI v2 - unified tool to manage AWS services
+  aws-vault # Secure AWS credential storage (uses OS keychain)
 
   # ==========================================================================
   # Python Tools (python3Packages.*)
@@ -62,5 +62,5 @@ with pkgs; [
   # Python packages from nixpkgs. Use python3Packages (not python312Packages)
   # to avoid hardcoding versions - nixpkgs manages the default Python version.
 
-  python3Packages.grip            # Preview GitHub Markdown files locally
+  python3Packages.grip # Preview GitHub Markdown files locally
 ]

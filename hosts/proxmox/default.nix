@@ -5,10 +5,8 @@
 #
 # For user environment, see home.nix (managed by home-manager).
 
-let
-  serverConfig = import ../../lib/server-config.nix;
-in
-{ }
+let serverConfig = import ../../lib/server-config.nix;
+in { }
 
 # ==========================================================================
 # Host Information

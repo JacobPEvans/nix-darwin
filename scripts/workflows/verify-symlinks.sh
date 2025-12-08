@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Verify home-manager symlinks are valid
-# Usage: ./scripts/verify-symlinks.sh <path-to-home-files>
+# Usage: ./scripts/workflows/verify-symlinks.sh <path-to-home-files>
 
 set -euo pipefail
 

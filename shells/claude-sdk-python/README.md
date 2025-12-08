@@ -46,7 +46,7 @@ Then run `direnv allow` to auto-load the environment.
 
    ```python
    from anthropic import Anthropic
-   
+
    client = Anthropic()
    message = client.messages.create(
        model="claude-3-5-sonnet-20241022",

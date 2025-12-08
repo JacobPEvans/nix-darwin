@@ -8,9 +8,7 @@
 { ... }:
 
 {
-  imports = [
-    ./persistent-apps.nix
-  ];
+  imports = [ ./persistent-apps.nix ];
 
   system.defaults.dock = {
     # ==========================================================================

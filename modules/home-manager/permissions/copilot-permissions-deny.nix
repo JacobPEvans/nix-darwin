@@ -26,11 +26,8 @@
 
 let
   # === CATASTROPHIC FILE DESTRUCTION ===
-  catastrophicFileDestruction = [
-    "shell(rm -rf /)"
-    "shell(rm -rf /*)"
-    "shell(rm -rf ~)"
-  ];
+  catastrophicFileDestruction =
+    [ "shell(rm -rf /)" "shell(rm -rf /*)" "shell(rm -rf ~)" ];
 
   # === HTTP WRITE OPERATIONS (Data Exfiltration) ===
   httpWriteOperations = [
@@ -56,28 +53,16 @@ let
   ];
 
   # === PRIVILEGE ESCALATION ===
-  privilegeEscalation = [
-    "shell(sudo su)"
-    "shell(sudo -i)"
-    "shell(sudo bash)"
-    "shell(sudo -s)"
-  ];
+  privilegeEscalation =
+    [ "shell(sudo su)" "shell(sudo -i)" "shell(sudo bash)" "shell(sudo -s)" ];
 
   # === REVERSE SHELLS / NETWORK LISTENERS ===
-  reverseShells = [
-    "shell(nc -l)"
-    "shell(ncat -l)"
-    "shell(socat)"
-  ];
+  reverseShells = [ "shell(nc -l)" "shell(ncat -l)" "shell(socat)" ];
 
-in
-{
+in {
   # Export recommended deny tools (for use with --deny-tool flags)
-  recommendedDenyTools = catastrophicFileDestruction
-    ++ httpWriteOperations
-    ++ systemDestruction
-    ++ privilegeEscalation
-    ++ reverseShells;
+  recommendedDenyTools = catastrophicFileDestruction ++ httpWriteOperations
+    ++ systemDestruction ++ privilegeEscalation ++ reverseShells;
 
   # === USAGE EXAMPLE ===
   # Build a deny-tool command string:

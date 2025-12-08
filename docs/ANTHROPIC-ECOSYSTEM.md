@@ -52,18 +52,18 @@ inputs = {
     url = "github:anthropics/claude-code";
     flake = false;
   };
-  
+
   claude-cookbooks = {
     url = "github:anthropics/claude-cookbooks";
     flake = false;
   };
-  
+
   # Plugin marketplace
   claude-plugins-official = {
     url = "github:anthropics/claude-plugins-official";
     flake = false;
   };
-  
+
   # Skills system
   anthropic-skills = {
     url = "github:anthropics/skills";

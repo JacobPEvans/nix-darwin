@@ -15,10 +15,8 @@
 
 { config, ... }:
 
-let
-  homeDir = config.home.homeDirectory;
-in
-{
+let homeDir = config.home.homeDirectory;
+in {
   # === GIT INTEGRATION ===
 
   "git.enableSmartCommit" = true;
@@ -31,11 +29,7 @@ in
   "git.replaceTagsWhenPull" = true;
 
   # Protected branches - prevent accidental commits
-  "git.branchProtection" = [
-    "develop"
-    "main"
-    "master"
-  ];
+  "git.branchProtection" = [ "develop" "main" "master" ];
 
   # Branch naming convention validation
   "git.branchValidationRegex" = "(bugfix|chore|feature|hotfix|release)/";
@@ -83,9 +77,7 @@ in
   "continue.enableTabAutocomplete" = false;
 
   # Code Spell Checker
-  "cSpell.userWords" = [
-    "sourcetype"
-  ];
+  "cSpell.userWords" = [ "sourcetype" ];
 
   # Rainbow CSV
   "rainbow_csv.highlight_rows" = true;

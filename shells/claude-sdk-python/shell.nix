@@ -17,14 +17,13 @@
 # Or with direnv (create .envrc):
 #   use flake ~/.config/nix/shells/claude-sdk-python
 
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 
 let
   # DRY: Define Python version once, use throughout
   python = pkgs.python311;
   pythonPackages = pkgs.python311Packages;
-in
-pkgs.mkShell {
+in pkgs.mkShell {
   name = "claude-sdk-python";
 
   buildInputs = [
@@ -35,20 +34,20 @@ pkgs.mkShell {
     pythonPackages.setuptools
 
     # Anthropic SDK dependencies
-    pythonPackages.anthropic  # Claude API SDK
-    pythonPackages.httpx      # HTTP client
-    pythonPackages.pydantic   # Data validation
+    pythonPackages.anthropic # Claude API SDK
+    pythonPackages.httpx # HTTP client
+    pythonPackages.pydantic # Data validation
 
     # Development tools
-    pythonPackages.pytest     # Testing framework
-    pythonPackages.pytest-asyncio  # Async test support
-    pythonPackages.black      # Code formatter
-    pythonPackages.mypy       # Type checker
-    pythonPackages.ruff       # Fast linter
+    pythonPackages.pytest # Testing framework
+    pythonPackages.pytest-asyncio # Async test support
+    pythonPackages.black # Code formatter
+    pythonPackages.mypy # Type checker
+    pythonPackages.ruff # Fast linter
 
     # Useful utilities
-    pythonPackages.ipython    # Interactive shell
-    pythonPackages.rich       # Pretty printing
+    pythonPackages.ipython # Interactive shell
+    pythonPackages.rich # Pretty printing
 
     # Version control
     pkgs.git

@@ -21,7 +21,7 @@
   # Enable Copilot for specific languages
   # Set to object with language IDs as keys, boolean as values
   "github.copilot.enable" = {
-    "*" = true;           # Enable for all languages by default
+    "*" = true; # Enable for all languages by default
     "plaintext" = true;
     "markdown" = true;
     "yaml" = true;

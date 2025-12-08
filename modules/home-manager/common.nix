@@ -1,4 +1,5 @@
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+{ config, pkgs, lib, claude-code-plugins, claude-cookbooks
+, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -26,7 +27,8 @@ let
   # AI CLI configuration imports (home.file entries)
   # Claude plugins require external repo inputs from flake.nix
   claudeFiles = import ./ai-cli/claude.nix {
-    inherit config pkgs lib claude-code-plugins claude-cookbooks claude-plugins-official anthropic-skills ai-assistant-instructions;
+    inherit config pkgs lib claude-code-plugins claude-cookbooks
+      claude-plugins-official anthropic-skills ai-assistant-instructions;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks
@@ -41,16 +43,18 @@ let
   # Nix manages files inside them (config.json, settings.json)
   aiInstructionsSymlinks = {
     # Root instruction files accessible from home directory
-    "CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
-    "GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
+    "CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
+    "GEMINI.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
 
     # AI instruction directories (only those without Nix-managed files inside)
-    ".ai-instructions".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions";
+    ".ai-instructions".source = config.lib.file.mkOutOfStoreSymlink
+      "${aiInstructionsRepo}/.ai-instructions";
   };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };
-in
-{
+in {
   home.stateVersion = "24.05";
 
   # ==========================================================================
@@ -75,28 +79,28 @@ in
     shellAliases = shellAliases;
 
     # Shell enhancements
-    autosuggestion.enable = true;     # Fish-like autosuggestions
+    autosuggestion.enable = true; # Fish-like autosuggestions
     syntaxHighlighting.enable = true; # Syntax highlighting for commands
-    enableCompletion = true;          # Tab completion
+    enableCompletion = true; # Tab completion
     history = {
-      size = 100000;                  # Large history for better recall
+      size = 100000; # Large history for better recall
       save = 100000;
-      ignoreDups = true;              # Don't save duplicate commands
-      ignoreAllDups = true;           # Remove older duplicates
-      ignoreSpace = true;             # Don't save commands starting with space
+      ignoreDups = true; # Don't save duplicate commands
+      ignoreAllDups = true; # Remove older duplicates
+      ignoreSpace = true; # Don't save commands starting with space
     };
 
     # Oh My Zsh - framework for managing zsh configuration
     # Provides themes, plugins, and helper functions
     oh-my-zsh = {
       enable = true;
-      theme = "robbyrussell";  # Default theme, clean and informative
+      theme = "robbyrussell"; # Default theme, clean and informative
       plugins = [
-        "git"           # Git aliases and functions (ga, gc, gp, etc.)
-        "docker"        # Docker command completion
-        "macos"         # macOS utilities (ofd, cdf, etc.)
-        "z"             # Jump to frequently used directories
-        "colored-man-pages"  # Colorize man pages for readability
+        "git" # Git aliases and functions (ga, gc, gp, etc.)
+        "docker" # Docker command completion
+        "macos" # macOS utilities (ofd, cdf, etc.)
+        "z" # Jump to frequently used directories
+        "colored-man-pages" # Colorize man pages for readability
       ];
     };
 
@@ -132,7 +136,7 @@ in
     # NOTE: Key ID is a public identifier, not the private key (safe to commit)
     signing = {
       key = userConfig.gpg.signingKey;
-      signByDefault = true;  # Enforced by security policy
+      signByDefault = true; # Enforced by security policy
     };
 
     # All git settings (new unified syntax)
@@ -146,9 +150,11 @@ in
       # Core settings
       core = {
         editor = userConfig.git.editor;
-        autocrlf = "input";           # LF on commit, unchanged on checkout (Unix-style)
-        whitespace = "trailing-space,space-before-tab";  # Highlight whitespace issues
-        hooksPath = "${config.home.homeDirectory}/.git-templates/hooks";  # Global hooks for ALL repos
+        autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
+        whitespace =
+          "trailing-space,space-before-tab"; # Highlight whitespace issues
+        hooksPath =
+          "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
       };
 
       # Repository initialization
@@ -163,40 +169,41 @@ in
 
       # Push behavior
       push = {
-        autoSetupRemote = true;       # Auto-track remote branches
-        default = "current";          # Push current branch to same-named remote
+        autoSetupRemote = true; # Auto-track remote branches
+        default = "current"; # Push current branch to same-named remote
       };
 
       # Fetch behavior
       fetch = {
-        prune = true;                 # Auto-remove deleted remote branches
-        pruneTags = true;             # Auto-remove deleted remote tags
+        prune = true; # Auto-remove deleted remote branches
+        pruneTags = true; # Auto-remove deleted remote tags
       };
 
       # Merge & diff improvements
       merge = {
-        conflictstyle = "diff3";      # Show original in conflicts (easier resolution)
-        ff = "only";                  # Only fast-forward merges (use rebase for others)
+        conflictstyle =
+          "diff3"; # Show original in conflicts (easier resolution)
+        ff = "only"; # Only fast-forward merges (use rebase for others)
       };
       diff = {
-        algorithm = "histogram";      # Better diff algorithm than default
-        colorMoved = "default";       # Highlight moved lines in different color
-        mnemonicPrefix = true;        # Use i/w/c/o instead of a/b in diffs
+        algorithm = "histogram"; # Better diff algorithm than default
+        colorMoved = "default"; # Highlight moved lines in different color
+        mnemonicPrefix = true; # Use i/w/c/o instead of a/b in diffs
       };
 
       # Rerere - remember merge conflict resolutions
       rerere = {
-        enabled = true;               # Remember how you resolved conflicts
-        autoupdate = true;            # Auto-stage rerere resolutions
+        enabled = true; # Remember how you resolved conflicts
+        autoupdate = true; # Auto-stage rerere resolutions
       };
 
       # Sign all tags (security policy)
       tag.gpgSign = true;
 
       # Helpful features
-      help.autocorrect = 10;          # Auto-correct typos after 1 second
-      status.showStash = true;        # Show stash count in git status
-      log.date = "iso";               # Use ISO date format in logs
+      help.autocorrect = 10; # Auto-correct typos after 1 second
+      status.showStash = true; # Show stash count in git status
+      log.date = "iso"; # Use ISO date format in logs
       branch.sort = "-committerdate"; # Sort branches by recent commits
 
       # Git aliases - see git-aliases.nix for full list
@@ -212,7 +219,7 @@ in
   # See shells/ directory for example flake.nix files
   programs.direnv = {
     enable = true;
-    nix-direnv.enable = true;  # Faster, cached nix-shell/flake loading
+    nix-direnv.enable = true; # Faster, cached nix-shell/flake loading
   };
 
   # ==========================================================================
@@ -230,7 +237,8 @@ in
   #
   # Permissions: Now read from JSON in ai-assistant-instructions repo
   # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
-  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
+  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles
+    // aiInstructionsSymlinks // gitHooks;
 
   # ==========================================================================
   # Agent OS
@@ -246,16 +254,17 @@ in
   # Validates settings.json against JSON Schema after home files are written
   # Uses check-jsonschema (Python CLI) from common/packages.nix
   # Schema URL from lib/user-config.nix (single source of truth)
-  home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
+  home.activation.validateClaudeSettings =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
 
-    if [ -f "$SETTINGS" ]; then
-      if command -v check-jsonschema > /dev/null 2>&1; then
-        $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
-          echo "Warning: Claude Code settings.json validation failed" >&2
-      else
-        echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
+      if [ -f "$SETTINGS" ]; then
+        if command -v check-jsonschema > /dev/null 2>&1; then
+          $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
+            echo "Warning: Claude Code settings.json validation failed" >&2
+        else
+          echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
+        fi
       fi
-    fi
-  '';
+    '';
 }

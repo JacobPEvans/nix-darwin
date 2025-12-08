@@ -42,23 +42,18 @@ let
   ];
 
   # Trusted configuration directories
-  trustedConfigDirs = [
-    "${homeDir}/.config/nix"
-    "${homeDir}/.dotfiles"
-    "${homeDir}/.config"
-  ];
+  trustedConfigDirs =
+    [ "${homeDir}/.config/nix" "${homeDir}/.dotfiles" "${homeDir}/.config" ];
 
   # Generic home directory access
   # Allows Copilot to operate anywhere under home directory
   # Note: Explicit subdirectories are kept for documentation and future
   # flexibility if home-wide access is ever removed
-  trustedHomeDir = [
-    homeDir
-  ];
+  trustedHomeDir = [ homeDir ];
 
-in
-{
+in {
   # Export trusted_folders list for config.json
   # Includes home dir plus explicit subdirectories for documentation
-  trusted_folders = trustedHomeDir ++ trustedDevelopmentDirs ++ trustedConfigDirs;
+  trusted_folders = trustedHomeDir ++ trustedDevelopmentDirs
+    ++ trustedConfigDirs;
 }

@@ -11,8 +11,7 @@
 let
   # Universal packages (pre-commit, linters) shared across all systems
   commonPackages = import ../common/packages.nix { inherit pkgs; };
-in
-{
+in {
   # ==========================================================================
   # Linux-Specific Home-Manager Settings
   # ==========================================================================

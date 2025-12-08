@@ -17,8 +17,7 @@ let
   # Use this for paths in darwin modules where config.home.homeDirectory
   # is not available
   homeDir = "/Users/${username}";
-in
-{
+in {
   # ==========================================================================
   # User Identity
   # ==========================================================================

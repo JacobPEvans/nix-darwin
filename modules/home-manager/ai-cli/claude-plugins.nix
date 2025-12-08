@@ -12,7 +12,8 @@
 # Schema validation: Assertions below ensure the settings.json structure
 # matches what Claude Code expects. Build fails if format is wrong.
 
-{ config, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official, anthropic-skills, ... }:
+{ config, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official
+, anthropic-skills, ... }:
 
 let
   # Validate marketplace entry has correct nested structure
@@ -22,9 +23,11 @@ let
       "Marketplace '${name}' must be an attrset, got ${builtins.typeOf value}";
     assert lib.assertMsg (value ? source && builtins.isAttrs value.source)
       "Marketplace '${name}' must have a 'source' attrset";
-    assert lib.assertMsg (value.source ? source && builtins.isString value.source.source)
+    assert lib.assertMsg
+      (value.source ? source && builtins.isString value.source.source)
       "Marketplace '${name}.source' must have a 'source' string (git, github, npm, etc)";
-    assert lib.assertMsg (value.source ? url && builtins.isString value.source.url)
+    assert lib.assertMsg
+      (value.source ? url && builtins.isString value.source.url)
       "Marketplace '${name}.source' must have a 'url' string";
     true;
 
@@ -106,49 +109,41 @@ let
   # Additional repo-level commands (dedupe, oncall-triage) may exist in
   # anthropics/claude-code/.claude/commands/ but need verification.
   cookbookCommands = [
-    "review-pr-ci"     # CI/CD PR review (auto-posts to GitHub)
-    "review-pr"        # Interactive PR review
-    "review-issue"     # GitHub issue review
-    "notebook-review"  # Jupyter notebook review
-    "model-check"      # Model validation
-    "link-review"      # Link verification
+    "review-pr-ci" # CI/CD PR review (auto-posts to GitHub)
+    "review-pr" # Interactive PR review
+    "review-issue" # GitHub issue review
+    "notebook-review" # Jupyter notebook review
+    "model-check" # Model validation
+    "link-review" # Link verification
   ];
 
   # Agents from claude-cookbooks to install globally
   # These are copied to ~/.claude/agents/
   cookbookAgents = [
-    "code-reviewer"    # Senior code review agent
+    "code-reviewer" # Senior code review agent
   ];
 
   # Validate all marketplaces at evaluation time
   # If any marketplace has wrong structure, build fails with clear error
   validatedMarketplaces = lib.mapAttrs validateMarketplace marketplaces;
 
-in
-# Force evaluation of validations
-assert lib.all (x: x) (lib.attrValues validatedMarketplaces);
-{
+  # Force evaluation of validations
+in assert lib.all (x: x) (lib.attrValues validatedMarketplaces); {
   # Plugin marketplace and enabled plugins configuration
   # Merged into settings.json by claude.nix
-  pluginConfig = {
-    inherit marketplaces enabledPlugins;
-  };
+  pluginConfig = { inherit marketplaces enabledPlugins; };
 
   # Home-manager file entries for commands and agents
   # These copy files from the claude-cookbooks repo to ~/.claude/
   #
   # Helper function to reduce duplication (refactored per review feedback)
   # Creates file entries for a given type (command/agent) from a list of names
-  files =
-    let
-      mkCookbookFileEntries = type: names:
-        builtins.listToAttrs (map (name: {
-          name = ".claude/${type}s/${name}.md";
-          value = {
-            source = "${claude-cookbooks}/.claude/${type}s/${name}.md";
-          };
-        }) names);
-    in
-    mkCookbookFileEntries "command" cookbookCommands
-    // mkCookbookFileEntries "agent" cookbookAgents;
+  files = let
+    mkCookbookFileEntries = type: names:
+      builtins.listToAttrs (map (name: {
+        name = ".claude/${type}s/${name}.md";
+        value = { source = "${claude-cookbooks}/.claude/${type}s/${name}.md"; };
+      }) names);
+  in mkCookbookFileEntries "command" cookbookCommands
+  // mkCookbookFileEntries "agent" cookbookAgents;
 }

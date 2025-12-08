@@ -14,8 +14,7 @@
 let
   userConfig = import ../../../lib/user-config.nix;
   homeDir = userConfig.user.homeDir;
-in
-{
+in {
   system.defaults.dock = {
     # ========================================================================
     # Left side of Dock (before separator) - Main apps
@@ -54,7 +53,7 @@ in
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
     persistent-others = [
-      "${homeDir}/Applications/Mind Tickle.app"  # Sales enablement platform
+      "${homeDir}/Applications/Mind Tickle.app" # Sales enablement platform
       "/System/Applications/TextEdit.app"
       "/System/Applications/iPhone Mirroring.app"
       "/System/Applications/System Settings.app"

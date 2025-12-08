@@ -15,16 +15,17 @@
 { config, ... }:
 
 let
-  geminiAllow = import ../permissions/gemini-permissions-allow.nix { inherit config; };
+  geminiAllow =
+    import ../permissions/gemini-permissions-allow.nix { inherit config; };
   geminiDeny = import ../permissions/gemini-permissions-deny.nix { };
-in
-{
+in {
   ".gemini/settings.json".text = builtins.toJSON {
     # JSON Schema reference for IDE IntelliSense and validation
     # Official schema from google-gemini/gemini-cli repo
     # NOTE: Gemini CLI has a bug where $schema triggers "not allowed" warning
     # See: https://github.com/google-gemini/gemini-cli/issues/12695
-    "$schema" = "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
+    "$schema" =
+      "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
 
     # General settings
     general = {

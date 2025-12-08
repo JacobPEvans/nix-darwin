@@ -25,7 +25,8 @@
   home.file = {
     # Ollama models on dedicated external volume
     # CRITICAL: 692GB+ of models - NEVER delete /Volumes/Ollama
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/Volumes/Ollama/models";
+    ".ollama/models".source =
+      config.lib.file.mkOutOfStoreSymlink "/Volumes/Ollama/models";
   };
 
   # Environment variables for external data locations

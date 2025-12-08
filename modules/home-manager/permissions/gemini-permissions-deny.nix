@@ -69,18 +69,11 @@ let
   ];
 
   # === REVERSE SHELLS / NETWORK LISTENERS ===
-  reverseShells = [
-    "ShellTool(nc -l)"
-    "ShellTool(ncat -l)"
-    "ShellTool(socat)"
-  ];
+  reverseShells =
+    [ "ShellTool(nc -l)" "ShellTool(ncat -l)" "ShellTool(socat)" ];
 
-in
-{
+in {
   # Export excludeTools (permanently blocked commands)
-  excludeTools = catastrophicFileDestruction
-    ++ httpWriteOperations
-    ++ systemDestruction
-    ++ privilegeEscalation
-    ++ reverseShells;
+  excludeTools = catastrophicFileDestruction ++ httpWriteOperations
+    ++ systemDestruction ++ privilegeEscalation ++ reverseShells;
 }

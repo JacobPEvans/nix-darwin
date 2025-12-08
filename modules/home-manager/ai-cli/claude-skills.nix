@@ -30,10 +30,10 @@ let
   selectedSkills = [
     # Document generation skills
     # "document-generator"
-    
+
     # Analysis skills
     # "code-analyzer"
-    
+
     # Automation skills
     # "workflow-automator"
   ];
@@ -43,20 +43,17 @@ let
   mkSkillFileEntries = skills:
     builtins.listToAttrs (map (skill: {
       name = ".claude/skills/${skill}.md";
-      value = {
-        source = "${anthropic-skills}/skills/${skill}.md";
-      };
+      value = { source = "${anthropic-skills}/skills/${skill}.md"; };
     }) skills);
 
-in
-{
+in {
   # Home-manager file entries for skills
   # These copy skill files from the anthropics/skills repo to ~/.claude/skills/
   #
   # Note: Currently no skills are enabled by default.
   # Uncomment skills in selectedSkills list above to enable them.
   files = mkSkillFileEntries selectedSkills;
-  
+
   # Expose the skills configuration for potential use by other modules
   skillsConfig = {
     inherit selectedSkills;

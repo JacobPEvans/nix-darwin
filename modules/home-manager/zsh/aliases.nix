@@ -20,15 +20,15 @@
   # -G: colorized output (macOS BSD ls)
   # -D: date format (macOS BSD ls)
   ll = "ls -ahlFG -D '%Y-%m-%d %H:%M:%S'";
-  llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'";  # sorted by time
-  lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'";  # show size
+  llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'"; # sorted by time
+  lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'"; # show size
 
   # ===========================================================================
   # Docker (no sudo needed - user in docker group)
   # ===========================================================================
-  dps = "docker ps -a";         # List all containers
+  dps = "docker ps -a"; # List all containers
   dcu = "docker compose up -d"; # Start compose stack detached
-  dcd = "docker compose down";  # Stop compose stack
+  dcd = "docker compose down"; # Stop compose stack
 
   # ===========================================================================
   # Nix / Darwin
@@ -64,9 +64,9 @@
   #   av terraform -- terraform plan # Run terraform with specific profile
   #   avl                            # List all profiles in vault
   #   avd aws sts get-caller-identity # Quick check with default profile
-  av = "aws-vault exec";              # Execute command with profile credentials
-  avl = "aws-vault list";             # List profiles stored in vault
-  avd = "aws-vault exec default --";  # Execute with default profile
-  ava = "aws-vault add";              # Add new profile credentials to vault
-  avr = "aws-vault remove";           # Remove profile from vault
+  av = "aws-vault exec"; # Execute command with profile credentials
+  avl = "aws-vault list"; # List profiles stored in vault
+  avd = "aws-vault exec default --"; # Execute with default profile
+  ava = "aws-vault add"; # Add new profile credentials to vault
+  avr = "aws-vault remove"; # Remove profile from vault
 }

@@ -21,22 +21,4 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check file sizes
-        run: |
-          ERRORS=0
-          for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
-            base=$(basename "$f" | sed 's/\.[^.]*$//')
-            size=$(wc -c < "$f" | tr -d ' ')
-            kb=$((size / 1024))
-
-            # Determine limit: exempt (skip) / extended (32KB) / standard (16KB)
-            if [[ " ${{ env.EXEMPT }} " == *" $base "* ]]; then continue; fi
-            if [[ " ${{ env.EXTENDED }} " == *" $base "* ]]; then limit=32768; else limit=16384; fi
-
-            if [ "$size" -gt "$limit" ]; then
-              echo "::error file=$f::$f is ${kb}KB (exceeds $((limit/1024))KB limit)"
-              ERRORS=$((ERRORS + 1))
-            elif [ "$size" -gt 8192 ]; then
-              echo "::warning file=$f::$f is ${kb}KB (exceeds 8KB recommended)"
-            fi
-          done
-          [ $ERRORS -eq 0 ] || exit 1
+        run: ./scripts/workflows/check-file-sizes.sh "${{ env.EXTENDED }}" "${{ env.EXEMPT }}"
