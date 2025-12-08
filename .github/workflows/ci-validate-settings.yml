@@ -31,8 +31,6 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Fetch schema
         run: |
