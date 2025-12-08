@@ -6,7 +6,9 @@
 # - format: Nix code formatting
 # - build: Darwin build + symlink verification (cached)
 #
-# Cache: Magic Nix Cache saves on main push, PRs use upstream cache.nixos.org.
+# Cache: Magic Nix Cache enabled for build job:
+# - main: reads + writes to cache
+# - PRs: reads from cache (seeded by main)
 
 name: Nix
 
@@ -29,7 +31,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check flake.lock health
         uses: DeterminateSystems/flake-checker-action@main
@@ -41,12 +43,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check flake structure
         run: nix flake check --no-build
@@ -56,12 +56,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check Nix formatting
         run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
@@ -75,19 +73,44 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Setup Magic Nix Cache
-        if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build home-manager configuration
-        run: nix build .#ci.hmActivationPackage -o result-hm
+        run: |
+          set -o pipefail
+          BUILD_OUTPUT=$(mktemp)
+          trap 'rm -f "$BUILD_OUTPUT"' EXIT
+
+          # Build and capture output for warning analysis
+          nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee "$BUILD_OUTPUT"
+          build_exit_code=${PIPESTATUS[0]}
+          if [ "$build_exit_code" -ne 0 ]; then
+            echo "::error::nix build failed with exit code $build_exit_code"
+            exit $build_exit_code
+          fi
+
+          # Fail on dangerous patterns (blocklist)
+          # Anchored to common error/warning prefixes to reduce false positives
+          FAIL_PATTERNS=(
+            "error:.*unable to download"
+            "error:.*HTTP error"
+            "error:.*permission denied"
+            "warning:.*unable to download"
+            "warning:.*HTTP error"
+          )
+          for pattern in "${FAIL_PATTERNS[@]}"; do
+            if grep -qiE "$pattern" "$BUILD_OUTPUT"; then
+              matched_line=$(grep -iE "$pattern" "$BUILD_OUTPUT" | head -1)
+              echo "::error::Build issue detected matching '$pattern': $matched_line"
+              exit 1
+            fi
+          done
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files

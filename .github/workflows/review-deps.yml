@@ -21,14 +21,12 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Full history for diff analysis
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Generate flake.lock diff
         id: diff
