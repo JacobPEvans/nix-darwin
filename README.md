@@ -3,9 +3,9 @@
 > Because "it works on my machine" should mean it works on *every* machine.
 > Deterministic builds, reproducible environments, and the smug satisfaction of knowing exactly what's installed.
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Markdown Lint](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml)
-[![Validate Flake](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml)
+[![License][license-img]][license-link]
+
+[![Nix CI][nix-ci-img]][nix-ci-link] [![Markdown Lint][md-lint-img]][md-lint-link] [![File Size][file-size-img]][file-size-link]
 
 ## What Is This?
 
@@ -102,3 +102,13 @@ The short version: open a PR, follow existing patterns, and I'll probably merge 
 ---
 
 *Built by a human, refined by AI, used by both.*
+
+<!-- Badge references -->
+[license-img]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
+[license-link]: LICENSE
+[nix-ci-img]: https://github.com/JacobPEvans/nix/actions/workflows/nix.yml/badge.svg
+[nix-ci-link]: https://github.com/JacobPEvans/nix/actions/workflows/nix.yml
+[md-lint-img]: https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg
+[md-lint-link]: https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml
+[file-size-img]: https://github.com/JacobPEvans/nix/actions/workflows/file-length.yml/badge.svg
+[file-size-link]: https://github.com/JacobPEvans/nix/actions/workflows/file-length.yml
