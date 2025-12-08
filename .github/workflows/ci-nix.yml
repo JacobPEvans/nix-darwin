@@ -85,9 +85,15 @@ jobs:
         run: |
           set -o pipefail
           BUILD_OUTPUT=$(mktemp)
+          trap 'rm -f "$BUILD_OUTPUT"' EXIT
 
           # Build and capture output for warning analysis
           nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee "$BUILD_OUTPUT"
+          build_exit_code=${PIPESTATUS[0]}
+          if [ "$build_exit_code" -ne 0 ]; then
+            echo "::error::nix build failed with exit code $build_exit_code"
+            exit $build_exit_code
+          fi
 
           # Fail on dangerous patterns (blocklist)
           # Anchored to common error/warning prefixes to reduce false positives
@@ -102,11 +108,9 @@ jobs:
             if grep -qiE "$pattern" "$BUILD_OUTPUT"; then
               matched_line=$(grep -iE "$pattern" "$BUILD_OUTPUT" | head -1)
               echo "::error::Build issue detected matching '$pattern': $matched_line"
-              rm -f "$BUILD_OUTPUT"
               exit 1
             fi
           done
-          rm -f "$BUILD_OUTPUT"
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files
