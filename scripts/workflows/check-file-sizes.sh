@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Check file sizes against tier limits (bytes as token proxy)
-# Usage: ./scripts/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]
+# Usage: ./scripts/workflows/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]
 #
 # Limits: 8KB recommended, 16KB hard, 32KB extended
 #
