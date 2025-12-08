@@ -148,6 +148,7 @@ in
         editor = userConfig.git.editor;
         autocrlf = "input";           # LF on commit, unchanged on checkout (Unix-style)
         whitespace = "trailing-space,space-before-tab";  # Highlight whitespace issues
+        hooksPath = "${config.home.homeDirectory}/.git-templates/hooks";  # Global hooks for ALL repos
       };
 
       # Repository initialization

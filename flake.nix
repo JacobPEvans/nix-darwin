@@ -1,4 +1,5 @@
 {
+  # Nix-darwin flake configuration
   description = "nix-darwin configuration for M4 Max MacBook Pro";
 
   inputs = {

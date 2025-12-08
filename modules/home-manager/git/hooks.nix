@@ -1,14 +1,12 @@
-# Git Hooks (Auto-installed via templates)
+# Git Hooks (Global via core.hooksPath)
 #
-# These hooks are installed automatically on new git clones via init.templateDir.
+# These hooks apply to ALL git repos via core.hooksPath (set in common.nix).
 # They delegate to pre-commit framework if .pre-commit-config.yaml exists.
 #
 # Layer 1 of 3-layer defense:
-#   1. Auto-install hooks (this) - fast local feedback
+#   1. Global hooks (this) - fast local feedback on ALL repos
 #   2. AI deny list - blocks --no-verify bypass attempts
 #   3. GitHub branch protection - server-side guarantee
-#
-# For existing repos, run: git init (re-initializes to copy template hooks)
 
 { config, pkgs, ... }:
 
@@ -50,9 +48,8 @@ let
     # Run all pre-commit hooks on all files
     exec pre-commit run --all-files --hook-stage push
   '';
-in
-# Return file definitions directly (merged into home.file in common.nix)
-{
+  # Return file definitions directly (merged into home.file in common.nix)
+in {
   ".git-templates/hooks/pre-commit" = {
     source = preCommitHook;
     executable = true;

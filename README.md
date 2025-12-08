@@ -11,7 +11,7 @@
 
 A flakes-only nix-darwin configuration for M4 Max MacBook Pro. Manages system packages, macOS settings, dotfiles, and AI CLI tools - all declaratively.
 
-Think of it as infrastructure-as-code, but for your laptop.
+Think of it as infrastructure-as-code, but for your laptop. Fully automated with Dependabot and AI-reviewed updates.
 
 ## Quick Start
 

@@ -1,21 +1,12 @@
 # Pre-commit hooks for nix-darwin configuration
 #
-# Install: pre-commit install
+# Hooks run automatically via core.hooksPath (set in common.nix)
 # Run manually: pre-commit run --all-files
-#
-# Hooks:
-# - markdownlint: Consistent markdown formatting
-# - file-length: Warn on files exceeding 200 lines
-# - nixfmt: Nix code formatting (optional, may need adjustment)
-# - trailing-whitespace: Remove trailing whitespace
-# - end-of-file-fixer: Ensure files end with newline
-# - check-yaml: Validate YAML syntax
-# - check-json: Validate JSON syntax
 
 repos:
   # Standard pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
@@ -23,65 +14,26 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=500']
+        args: ["--maxkb=500"]
       - id: check-merge-conflict
       - id: detect-private-key
 
-  # Markdown linting (ONLY .md files - never run on .nix!)
+  # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.42.0
+    rev: v0.43.0
     hooks:
       - id: markdownlint-fix
-        args: ['--config', '.markdownlint-cli2.jsonc']
+        args: ["--config", ".markdownlint-cli2.jsonc"]
         files: \.md$
 
-  # File length checker (local hook)
-  - repo: local
-    hooks:
-      - id: file-length-check
-        name: Check file length
-        description: Warn when files exceed 200 lines
-        entry: bash -c '
-          MAX=200
-          EXIT=0
-          for file in "$@"; do
-            if [ -f "$file" ]; then
-              lines=$(wc -l < "$file")
-              if [ "$lines" -gt "$MAX" ]; then
-                echo "WARNING: $file has $lines lines (target: $MAX)"
-              fi
-            fi
-          done
-          exit $EXIT
-        '
-        language: system
-        types_or: [markdown, file]
-        files: \.(md|nix)$
+  # NOTE: nixfmt hook removed - it doesn't support aligned comments
+  # Nix files are manually formatted to preserve comment alignment
 
-  # Nix formatting (uses nixfmt from nix-shell)
-  - repo: local
-    hooks:
-      - id: nixfmt
-        name: Format Nix files
-        description: Format Nix files with nixfmt
-        entry: bash -c '
-          if command -v nix-shell &> /dev/null; then
-            nix-shell -p nixfmt-classic --run "nixfmt $*"
-          else
-            echo "Skipping nixfmt (nix not available)"
-          fi
-        '
-        language: system
-        files: \.nix$
-        pass_filenames: true
-
-  # Claude Code settings validation (uses check-jsonschema from nix)
-  # Schema URL: keep in sync with userConfig.ai.claudeSchemaUrl in lib/user-config.nix
+  # Claude Code settings validation - check-jsonschema installed via nix
   - repo: local
     hooks:
       - id: validate-claude-settings
-        name: Validate Claude Code settings
-        description: Validate Claude Code settings.json against JSON Schema
+        name: Validate Claude settings
         entry: check-jsonschema --schemafile https://json.schemastore.org/claude-code-settings.json
         language: system
         files: '\.claude/settings(\.local)?\.json$'

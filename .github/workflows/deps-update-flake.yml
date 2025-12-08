@@ -1,0 +1,43 @@
+# Automated flake.lock updates
+# Runs Mon/Thu at 6 AM UTC to keep nix inputs current
+# Creates PRs with 'dependencies' label for AI review workflow
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Monday 6 AM UTC
+    - cron: "0 6 * * 4" # Thursday 6 AM UTC
+  workflow_dispatch: {} # Manual trigger
+
+jobs:
+  update:
+    name: Update flake inputs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          flakehub: false
+
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@v24
+        with:
+          pr-title: "chore(deps): update flake.lock"
+          pr-labels: dependencies
+          commit-msg: "chore(deps): update flake.lock"
+          pr-body: |
+            Automated flake.lock update.
+
+            ## Updated inputs
+            This PR updates the following flake inputs to their latest versions.
+
+            ## Review process
+            - CI validates the flake structure and builds
+            - AI review workflow analyzes changes for risk
+            - Low-risk updates may auto-merge; others require human review
