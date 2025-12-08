@@ -19,7 +19,7 @@ jobs:
     name: Check File Sizes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Check file sizes
         run: |
           ERRORS=0
