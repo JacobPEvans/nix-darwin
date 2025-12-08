@@ -8,65 +8,103 @@ allowed-tools: Read, Bash(nix flake:*), Bash(git:*), Bash(gh:*), Bash(darwin-reb
 
 Update all flake inputs and rebuild nix-darwin.
 
-**IMPORTANT**: This command has special auto-merge permission. Unlike normal PRs, this command may merge automatically if all conditions are met.
+**IMPORTANT**: This command uses GitHub auto-merge. The PR will automatically merge when all required status checks pass.
+
+## Critical Rules
+
+1. **NEVER commit to main** - Always create or switch to a feature branch FIRST
+2. **NEVER manually merge** - Use `gh pr merge --auto` to enable auto-merge
 
 ## Steps
 
-### 1. Update Flake Inputs
+### 1. Pre-flight Checks
 
-Run this exact command:
+Ensure you're on main and it's clean:
+
+```bash
+git checkout main
+git pull
+git status
+```
+
+If there are uncommitted changes, **STOP** and report to the user.
+
+### 2. Switch to Feature Branch
+
+Check if the branch already exists. If it does, switch to it. If not, create it.
+
+Branch name format: `chore/flake-update-YYYY-MM-DD` (replace with today's date)
+
+```bash
+git checkout chore/flake-update-YYYY-MM-DD 2>/dev/null || git checkout -b chore/flake-update-YYYY-MM-DD
+```
+
+### 3. Update Flake Inputs
+
 ```bash
 nix flake update
 ```
 
-**On failure**: Stop and report the error to the user.
+**On failure**: Switch back to main and report the error.
 
-### 2. Check for Changes
+### 4. Check for Changes
 
-Run `git status` to check if flake.lock changed.
-
-- If flake.lock is **unchanged**: Report "All flake inputs already up to date" and **STOP**.
-- If flake.lock **changed**: Continue to step 3.
-
-### 3. Create Feature Branch
-
-Run these commands (replace YYYY-MM-DD with today's date):
 ```bash
-git checkout -b chore/flake-update-YYYY-MM-DD
+git status
 ```
 
-### 4. Commit the Update
+- If flake.lock is **unchanged**: Switch back to main, report "All flake inputs already up to date" and **STOP**.
+- If flake.lock **changed**: Continue to step 5.
 
-Run:
+### 5. Commit the Update
+
 ```bash
 git add flake.lock
 git commit -m "chore(deps): update flake.lock"
 ```
 
-### 5. Rebuild nix-darwin
+### 6. Rebuild nix-darwin
 
-Run this exact command:
 ```bash
 sudo darwin-rebuild switch --flake .
 ```
 
-**On failure**: Stop and report the error to the user.
+**On failure**: Report the error but continue to create the PR (the CI will also catch issues).
 
-### 6. Push and Create PR
+### 7. Push and Create PR with Auto-Merge
 
-Run:
+Push the branch:
+
 ```bash
 git push -u origin HEAD
-gh pr create --fill
 ```
 
-### 7. Wait for Checks and Auto-Merge
+Create PR with the `dependencies` label (to skip Claude review) and enable auto-merge:
 
-Run `gh pr checks --watch`. Then:
+```bash
+gh pr create --fill --label dependencies
+```
 
-- If **all checks pass**: Run `gh pr merge --squash --delete-branch` and `git checkout main && git pull`
-- If **checks fail**: Report status and do NOT merge.
+Enable auto-merge (this will merge automatically when checks pass):
 
-### 8. Report Summary
+```bash
+gh pr merge --auto --squash --delete-branch
+```
 
-Tell the user what inputs were updated (from the nix flake update output).
+### 8. Return to Main
+
+Switch back to main while waiting for auto-merge:
+
+```bash
+git checkout main
+```
+
+### 9. Report Summary
+
+Tell the user:
+1. What inputs were updated (from the nix flake update output)
+2. The PR URL
+3. That auto-merge is enabled and will merge when checks pass
+4. They can run `git pull` after the PR merges to sync locally
+
+**DO NOT wait for checks** - auto-merge handles this automatically.
