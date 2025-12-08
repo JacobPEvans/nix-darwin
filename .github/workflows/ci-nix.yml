@@ -83,6 +83,8 @@ jobs:
 
       - name: Build home-manager configuration
         run: |
+          set -o pipefail
+
           # Build and capture output for warning analysis
           nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee /tmp/build-output.txt
 
@@ -90,7 +92,8 @@ jobs:
           FAIL_PATTERNS=("unable to download" "HTTP error" "permission denied")
           for pattern in "${FAIL_PATTERNS[@]}"; do
             if grep -qi "$pattern" /tmp/build-output.txt; then
-              echo "::error::Build warning detected: $pattern"
+              matched_line=$(grep -i "$pattern" /tmp/build-output.txt | head -1)
+              echo "::error::Build warning detected matching '$pattern': $matched_line"
               exit 1
             fi
           done
