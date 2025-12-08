@@ -84,19 +84,29 @@ jobs:
       - name: Build home-manager configuration
         run: |
           set -o pipefail
+          BUILD_OUTPUT=$(mktemp)
 
           # Build and capture output for warning analysis
-          nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee /tmp/build-output.txt
+          nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee "$BUILD_OUTPUT"
 
-          # Fail on dangerous warnings (blocklist)
-          FAIL_PATTERNS=("unable to download" "HTTP error" "permission denied")
+          # Fail on dangerous patterns (blocklist)
+          # Anchored to common error/warning prefixes to reduce false positives
+          FAIL_PATTERNS=(
+            "error:.*unable to download"
+            "error:.*HTTP error"
+            "error:.*permission denied"
+            "warning:.*unable to download"
+            "warning:.*HTTP error"
+          )
           for pattern in "${FAIL_PATTERNS[@]}"; do
-            if grep -qi "$pattern" /tmp/build-output.txt; then
-              matched_line=$(grep -i "$pattern" /tmp/build-output.txt | head -1)
-              echo "::error::Build warning detected matching '$pattern': $matched_line"
+            if grep -qiE "$pattern" "$BUILD_OUTPUT"; then
+              matched_line=$(grep -iE "$pattern" "$BUILD_OUTPUT" | head -1)
+              echo "::error::Build issue detected matching '$pattern': $matched_line"
+              rm -f "$BUILD_OUTPUT"
               exit 1
             fi
           done
+          rm -f "$BUILD_OUTPUT"
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files
