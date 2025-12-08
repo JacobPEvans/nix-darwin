@@ -1,0 +1,113 @@
+# AI-powered review of flake.lock updates
+# Analyzes dependency changes and conditionally enables auto-merge for low-risk updates
+name: Review Flake Update
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "flake.lock"
+
+jobs:
+  review:
+    name: AI Dependency Review
+    # Only run on dependency PRs (e.g., from update-flake-lock workflow or dependabot)
+    if: contains(github.event.pull_request.labels.*.name, 'dependencies')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for diff analysis
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v17
+
+      - name: Generate flake.lock diff summary
+        id: diff-summary
+        run: |
+          # Get the diff between base and head
+          git diff origin/${{ github.base_ref }}...HEAD -- flake.lock > /tmp/flake-diff.txt
+
+          # Count changed lines
+          LINES_CHANGED=$(wc -l < /tmp/flake-diff.txt)
+          echo "lines_changed=$LINES_CHANGED" >> $GITHUB_OUTPUT
+
+          # Try to extract input names that changed (grep for "locked" changes)
+          CHANGED_INPUTS=$(grep -E '"[^"]+":' /tmp/flake-diff.txt | grep -oE '"[^"]+"' | sort -u | tr -d '"' | head -20 | tr '\n' ', ' || echo "unknown")
+          echo "changed_inputs=$CHANGED_INPUTS" >> $GITHUB_OUTPUT
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --max-turns 5
+
+          prompt: |
+            You are reviewing a flake.lock update PR for a nix-darwin configuration.
+
+            ## Your Task
+            1. Read the flake.lock diff to identify what changed
+            2. For each changed input, assess the risk level
+            3. Provide a clear recommendation
+
+            ## Risk Levels
+            - **LOW**: Routine updates - nixpkgs bumps, patch updates, documentation repos, non-code flake inputs
+            - **MEDIUM**: Minor version changes, new features added, repos with breaking change potential
+            - **HIGH**: Major version changes, security-related updates, changes to core infrastructure (darwin, home-manager)
+
+            ## Important Context
+            - This is a personal nix-darwin config, not production infrastructure
+            - The CI already validates the flake builds successfully
+            - Fast-moving inputs like nixpkgs and claude-code-plugins update frequently
+
+            ## Your Response Format
+            Structure your review as:
+
+            ### Changed Inputs
+            List each changed input with old rev (first 7 chars) → new rev (first 7 chars)
+
+            ### Risk Assessment
+            For each input, state the risk level and brief reason
+
+            ### Recommendation
+            State ONE of these exactly at the end of your review:
+
+            If ALL changes are LOW risk:
+            `DECISION: AUTO-MERGE`
+
+            If ANY change is MEDIUM or HIGH risk:
+            `DECISION: HOLD - [brief reason]`
+
+      - name: Check review decision
+        id: check-decision
+        run: |
+          # Read Claude's execution output
+          if [ -f "${{ steps.claude-review.outputs.execution_file }}" ]; then
+            # Check if the review contains AUTO-MERGE decision
+            if grep -q "DECISION: AUTO-MERGE" "${{ steps.claude-review.outputs.execution_file }}"; then
+              echo "decision=auto-merge" >> $GITHUB_OUTPUT
+              echo "Claude recommended auto-merge"
+            else
+              echo "decision=hold" >> $GITHUB_OUTPUT
+              echo "Claude recommended holding for human review"
+            fi
+          else
+            echo "decision=hold" >> $GITHUB_OUTPUT
+            echo "Could not read Claude's response, defaulting to hold"
+          fi
+
+      - name: Enable auto-merge if approved
+        if: steps.check-decision.outputs.decision == 'auto-merge'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Enabling auto-merge for PR #${{ github.event.pull_request.number }}"
+          gh pr merge --auto --squash --delete-branch "${{ github.event.pull_request.number }}"
