@@ -62,7 +62,7 @@ gh pr create --fill
 
 ### 7. Wait for Checks and Auto-Merge
 
-Run `gh pr checks` repeatedly until checks complete. Then:
+Run `gh pr checks --watch`. Then:
 
 - If **all checks pass**: Run `gh pr merge --squash --delete-branch` and `git checkout main && git pull`
 - If **checks fail**: Report status and do NOT merge.
