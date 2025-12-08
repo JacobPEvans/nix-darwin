@@ -1,8 +1,8 @@
 # Nix CI - Validation and build workflow
 #
 # Jobs:
-# - validate: Sequential lint/format/check (single Nix install)
-# - build: Darwin build with caching
+# - build: Darwin build with formatting, caching, and symlink verification
+# - validate: Flake lint and structure check (runs on ubuntu)
 
 name: Nix CI
 
