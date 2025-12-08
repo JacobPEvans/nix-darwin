@@ -9,7 +9,7 @@
 # - gemini-permissions-deny.nix (this file) - Permanently blocked commands (excludeTools)
 #
 # NOTE: These permission lists are kept in sync across Claude, Gemini, and Copilot.
-# Automated updates managed by Dependabot and AI-reviewed workflows.
+# These files are manually maintained - changes require darwin-rebuild to take effect.
 # Currently each AI has separate files. Future improvement: DRY refactor to share
 # common command lists across all AI tools.
 #
