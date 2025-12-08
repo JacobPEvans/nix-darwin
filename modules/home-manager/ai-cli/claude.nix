@@ -12,6 +12,8 @@
 # - Centralized, portable permission definitions
 # - Single source of truth across projects
 #
+# Validation: CI validates generated settings via validate-claude-settings.yml
+#
 # Plugins: Configured via claude-plugins.nix
 # - Official Anthropic marketplace (claude-code repo)
 # - Commands/agents from claude-cookbooks repo

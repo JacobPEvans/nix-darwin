@@ -4,8 +4,8 @@
 > Deterministic builds, reproducible environments, and the smug satisfaction of knowing exactly what's installed.
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Markdown Lint](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml)
-[![Validate Flake](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/nix-ci.yml)
+
+[![Nix CI](https://github.com/JacobPEvans/nix/actions/workflows/nix.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/nix.yml) [![Markdown Lint](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/markdownlint.yml) [![File Size](https://github.com/JacobPEvans/nix/actions/workflows/file-length.yml/badge.svg)](https://github.com/JacobPEvans/nix/actions/workflows/file-length.yml)
 
 ## What Is This?
 
