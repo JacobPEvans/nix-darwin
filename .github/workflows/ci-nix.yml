@@ -6,7 +6,7 @@
 # - format: Nix code formatting
 # - build: Darwin build + symlink verification (cached)
 #
-# Cache: Magic Nix Cache enabled for ALL runs:
+# Cache: Magic Nix Cache enabled for build job:
 # - main: reads + writes to cache
 # - PRs: reads from cache (seeded by main)
 
