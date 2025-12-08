@@ -14,6 +14,7 @@ updates:
       - "dependencies"
     commit-message:
       prefix: "ci(deps)"
+      include: "scope"
     # Group minor/patch updates to reduce PR noise
     groups:
       actions:
