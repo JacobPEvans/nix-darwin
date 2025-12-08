@@ -6,7 +6,9 @@
 # - format: Nix code formatting
 # - build: Darwin build + symlink verification (cached)
 #
-# Cache: Magic Nix Cache saves on main push, PRs use upstream cache.nixos.org.
+# Cache: Magic Nix Cache enabled for ALL runs:
+# - main: reads + writes to cache
+# - PRs: reads from cache (seeded by main)
 
 name: Nix
 
@@ -45,8 +47,6 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check flake structure
         run: nix flake check --no-build
@@ -60,8 +60,6 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Check Nix formatting
         run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
@@ -79,15 +77,23 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-        with:
-          flakehub: false
 
       - name: Setup Magic Nix Cache
-        if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build home-manager configuration
-        run: nix build .#ci.hmActivationPackage -o result-hm
+        run: |
+          # Build and capture output for warning analysis
+          nix build .#ci.hmActivationPackage -o result-hm 2>&1 | tee /tmp/build-output.txt
+
+          # Fail on dangerous warnings (blocklist)
+          FAIL_PATTERNS=("unable to download" "HTTP error" "permission denied")
+          for pattern in "${FAIL_PATTERNS[@]}"; do
+            if grep -qi "$pattern" /tmp/build-output.txt; then
+              echo "::error::Build warning detected: $pattern"
+              exit 1
+            fi
+          done
 
       - name: Verify symlinks
         run: ./scripts/verify-symlinks.sh result-hm/home-files
