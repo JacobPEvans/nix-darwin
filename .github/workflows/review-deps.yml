@@ -31,9 +31,14 @@ jobs:
           flakehub: false
 
       - name: Generate flake.lock diff
+        id: diff
         run: |
           # Get the diff between base and head using PR base sha for reliability
-          git diff ${{ github.event.pull_request.base.sha }}...HEAD -- flake.lock > /tmp/flake-diff.txt
+          DIFF=$(git diff ${{ github.event.pull_request.base.sha }}...HEAD -- flake.lock)
+          # Save diff to output (escape for multiline)
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run Claude Code Review
         id: claude-review
@@ -46,8 +51,13 @@ jobs:
           prompt: |
             You are reviewing a flake.lock update PR for a nix-darwin configuration.
 
+            ## Diff Content
+            ```diff
+            ${{ steps.diff.outputs.content }}
+            ```
+
             ## Your Task
-            1. Read the flake.lock diff to identify what changed
+            1. Analyze the diff above to identify what changed
             2. For each changed input, assess the risk level
             3. Provide a clear recommendation
 
@@ -88,13 +98,16 @@ jobs:
             if grep -q "DECISION: AUTO-MERGE" "${{ steps.claude-review.outputs.execution_file }}"; then
               echo "decision=auto-merge" >> $GITHUB_OUTPUT
               echo "Claude recommended auto-merge"
-            else
+            elif grep -q "DECISION: HOLD" "${{ steps.claude-review.outputs.execution_file }}"; then
               echo "decision=hold" >> $GITHUB_OUTPUT
               echo "Claude recommended holding for human review"
+            else
+              echo "decision=hold" >> $GITHUB_OUTPUT
+              echo "::warning::Could not parse decision from Claude response, defaulting to hold"
             fi
           else
             echo "decision=hold" >> $GITHUB_OUTPUT
-            echo "Could not read Claude's response, defaulting to hold"
+            echo "::warning::Execution file not found, defaulting to hold"
           fi
 
       - name: Enable auto-merge if approved
