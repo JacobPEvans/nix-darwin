@@ -10,8 +10,8 @@ let
   userConfig = import ../../../lib/user-config.nix;
   aiInstructionsRepo = userConfig.ai.instructionsRepo;
 
-  # Statusline configuration - split into modular files
-  statuslineConfigToml = import ./claude/statusline { inherit pkgs lib; };
+  # Statusline configuration - flat TOML file (required format for statusline tool)
+  statuslineConfigToml = ./claude/statusline/config.toml;
 
   # Read permissions from ai-assistant-instructions
   # Helper to reduce repetition (DRY)
