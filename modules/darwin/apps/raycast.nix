@@ -96,11 +96,11 @@ in {
         cloudSync_ensurePresetSyncRecords = 1;
 
         # Skip Pro plan walkthrough on fresh install
-        # Default: 1 (shown)
+        # Value: 1 = already shown (skip), 0 = show walkthrough
         raycastAccountService_proPlanWalkthroughShownOnCurrentDevice = 1;
 
         # Skip cloud sync walkthrough on fresh install
-        # Default: 1 (shown)
+        # Value: 1 = already shown (skip), 0 = show walkthrough
         raycastAccountService_cloudSyncWalkthroughShown = 1;
       };
     };
