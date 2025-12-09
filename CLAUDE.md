@@ -5,6 +5,7 @@
 ## Table of Contents
 
 - [Scope of This Document](#scope-of-this-document)
+- [Enforced Git Development Workflow](#enforced-git-development-workflow)
 - [Command Execution Preferences](#command-execution-preferences)
 - [Critical Requirements](#critical-requirements)
 - [Task Management Workflow](#task-management-workflow)
@@ -16,6 +17,14 @@
 - [AI CLI Tools Comparison](#ai-cli-tools-comparison)
 - [Pull Request Workflow](#pull-request-workflow)
 - [Workflow](#workflow)
+- [Anthropic Ecosystem Integration](#anthropic-ecosystem-integration)
+- [Agent OS Integration](#agent-os-integration)
+- [Permission Reference](#permission-reference-load-last-for-context-freshness)
+
+**Navigation Note**: Use this TOC to jump to specific sections. Referenced docs
+([TESTING.md](TESTING.md), [RUNBOOK.md](RUNBOOK.md),
+[docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md)) each have their own TOC.
+You do not need to read entire files - navigate via TOC links to relevant sections.
 
 ---
 
@@ -30,6 +39,62 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Future plans (belongs in PLANNING.md)
 
 **Rule**: If information is useful for humans reading project docs, it belongs in README.md or other project files, not here.
+
+## Enforced Git Development Workflow
+
+**MANDATORY for all changes.** Follow without exception.
+
+### Before Making Changes
+
+1. Check current branch - determine if change relates to current worktree+branch
+2. If on `main`: create new feature branch before modifying any files
+3. If on unrelated branch: switch to main, pull latest, create new dedicated branch
+4. Never make changes directly on `main`
+
+### After Completing Changes
+
+**Complete ALL local work before pushing.** Each push triggers CI workflows.
+
+1. Stage intended changes explicitly (avoid `git add -A` to prevent staging unintended files)
+2. Commit with descriptive message (pre-commit hooks run automatically on commit)
+3. If pre-commit hooks fail, fix issues and re-commit - **NEVER disable or bypass hooks**
+4. Test the build: `sudo darwin-rebuild switch --flake .` (see [TESTING.md](TESTING.md#basic-local-change-testing))
+5. If rebuild fails, fix issues and amend the commit, then re-test
+6. Repeat steps 1-5 for any additional changes (e.g., addressing review feedback)
+7. **Only after ALL commits are complete**: Push to remote (single push)
+
+### Pull Request Requirement
+
+- Always create a PR after pushing if one doesn't exist for current branch
+- Do not ask user to run tests - run them yourself using pre-approved commands
+- Complete the full cycle: branch → change → test → commit(s) → push → PR
+- **Minimize pushes**: Batch all related commits locally, then push once
+
+### Background Monitoring (On Every PR Create and Push)
+
+After creating a PR or pushing to a branch with an open PR:
+
+**Pre-spawn check:** If context remaining is less than 50% (less than half until auto-compact),
+run `/compact` on the main conversation before spawning subagents.
+
+**Spawn TWO subagents:**
+
+1. **CI Check Monitor Subagent** - Watch GitHub Action checks (`gh pr checks` or `gh run watch`).
+   When checks fail, analyze the failure and attempt to fix the root cause.
+   After fixing, commit and push to trigger new CI run.
+   Repeat until checks pass or issue requires user input.
+
+2. **PR Review Monitor Subagent** - Watch for completed PR reviews (`gh pr view` or `gh api`).
+   Compare each reviewer's latest `commit_id` with PR head SHA - mismatch means review pending.
+   Use: `gh api repos/OWNER/REPO/pulls/NUM/reviews` to get reviews with commit_id.
+   Wait until all reviewers have reviewed the current head commit before finishing.
+   When a reviewer completes their review (comments, changes requested, or approved),
+   automatically invoke `/rok-respond-to-reviews` to address feedback.
+   Continue monitoring until PR is merged or closed.
+
+### Procedure Violations
+
+If user indicates workflow was not followed, immediately reread this file into context.
 
 ## Command Execution Preferences
 
@@ -518,3 +583,37 @@ programs.agent-os = {
 - Update: `nix flake lock --update-input agent-os` then rebuild
 
 **Reference**: [Agent OS Repository](https://github.com/JacobPEvans/agent-os) | [Agent OS Docs](https://buildermethods.com/agent-os)
+
+## Permission Reference (Load Last for Context Freshness)
+
+Review these permission files to understand what commands are pre-approved:
+
+**User-level** (`~/.claude/settings.json`):
+
+- Generated from `.claude/permissions/allow.json` in the `ai-assistant-instructions` repository
+- Contains 280+ pre-approved commands across 25 categories
+- Includes: git operations, nix commands, darwin-rebuild, testing tools
+
+**Project-level** (`.claude/settings.local.json`):
+
+- Project-specific overrides (if present)
+- Can extend or restrict user-level permissions
+
+**Key pre-approved operations for development workflow:**
+
+- All git commands (status, add, commit, push, branch, checkout, etc.)
+- `nix flake check`, `nix flake update`, `nix build`, `nix develop`
+- `sudo darwin-rebuild switch --flake .`
+- `pre-commit run --all-files`
+- `markdownlint-cli2`
+- `gh pr create`, `gh pr list`, `gh pr view`
+
+**Denied operations** (see `.claude/permissions/deny.json`):
+
+- Destructive system commands
+- Force push to protected branches
+- Disabling security features
+
+When uncertain about Claude permissions, check `.claude/permissions/{allow,ask,deny}.json`
+in the `ai-assistant-instructions` repository. Gemini and Copilot permissions are in
+`modules/home-manager/permissions/`.

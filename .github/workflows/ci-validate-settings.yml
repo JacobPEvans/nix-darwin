@@ -21,6 +21,11 @@ on:
       - 'modules/home-manager/ai-cli/**'
       - 'modules/home-manager/permissions/**'
 
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: Validate settings
@@ -41,7 +46,7 @@ jobs:
         run: |
           # Use CI-friendly flake output to extract settings.json content
           # Avoids hardcoded usernames and cross-platform build issues
-          nix eval --raw '.#ci.claudeSettingsJson' > settings-generated.json
+          nix eval --raw '.#lib.ci.claudeSettingsJson' > settings-generated.json
 
       - name: Validate settings files
         run: |

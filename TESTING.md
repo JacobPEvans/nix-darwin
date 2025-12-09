@@ -2,12 +2,37 @@
 
 Step-by-step procedures to verify this nix-darwin configuration is functioning correctly.
 
+> **Warning**: ALL warnings and errors from `nix flake check` and `darwin-rebuild`
+> MUST be resolved before proceeding. Do NOT continue past any command that produces
+> warnings or errors. This applies to every test in this document.
+
+---
+
 ## Table of Contents
 
+- [Basic Local Change Testing](#basic-local-change-testing)
 - [Variables](#variables)
 - [Full Testing Procedure](#full-testing-procedure)
 - [Quick Smoke Test](#quick-smoke-test)
 - [Troubleshooting](#troubleshooting)
+
+---
+
+## Basic Local Change Testing
+
+**Core test command for any nix configuration change.**
+
+```bash
+sudo darwin-rebuild switch --flake .
+```
+
+**Prerequisites:**
+
+- All changes must be committed first (Nix flakes requirement)
+- Pre-commit hooks run automatically on `git commit`
+
+**Note:** For the complete git workflow (staging, committing, pushing), see
+[CLAUDE.md](CLAUDE.md#after-completing-changes) which is the single source of truth.
 
 ---
 
@@ -30,7 +55,7 @@ FLAKE_TARGET=default
 nix flake check $NIX_CONFIG_DIR
 ```
 
-Validates the flake.nix structure without building.
+Validates the flake.nix structure without building. **Stop and fix any warnings or errors.**
 
 ### 2. Validate Markdown Linting
 
@@ -57,7 +82,7 @@ cd $NIX_CONFIG_DIR
 nix flake check
 ```
 
-Validates the flake structure and runs checks.
+Validates the flake structure and runs checks. **Stop and fix any warnings or errors.**
 
 ### 5. Full Rebuild
 
@@ -65,7 +90,7 @@ Validates the flake structure and runs checks.
 sudo darwin-rebuild switch --flake $NIX_CONFIG_DIR
 ```
 
-Applies the configuration to the system.
+Applies the configuration to the system. **Stop and fix any warnings or errors.**
 
 ### 6. Verify Nix PATH Priority
 
@@ -117,7 +142,7 @@ sudo darwin-rebuild switch --flake $NIX_CONFIG_DIR
 
 ## Quick Smoke Test
 
-Minimum validation for quick checks:
+Minimum validation for quick checks. **Any warnings or errors = stop and fix.**
 
 ```bash
 NIX_CONFIG_DIR=~/.config/nix

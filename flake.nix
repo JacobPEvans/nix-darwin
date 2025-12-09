@@ -157,13 +157,16 @@
 
       # CI-friendly outputs for GitHub Actions validation
       # Pure Nix evaluation - no derivation building required, works cross-platform
-      ci = {
-        # Settings JSON generated from lib/claude-settings.nix (pure function)
-        # Uses placeholder homeDir since CI only validates schema structure
-        claudeSettingsJson = builtins.toJSON ciClaudeSettings;
-        # Note: hmActivationPackage still requires Darwin (kept for macOS CI)
-        hmActivationPackage =
-          darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
+      # Using 'lib' (standard flake output) to avoid 'unknown flake output' warning
+      lib = {
+        ci = {
+          # Settings JSON generated from lib/claude-settings.nix (pure function)
+          # Uses placeholder homeDir since CI only validates schema structure
+          claudeSettingsJson = builtins.toJSON ciClaudeSettings;
+          # Note: hmActivationPackage still requires Darwin (kept for macOS CI)
+          hmActivationPackage =
+            darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
+        };
       };
     };
 }
