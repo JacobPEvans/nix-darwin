@@ -18,10 +18,10 @@ if [ "$build_exit_code" -ne 0 ]; then
   exit $build_exit_code
 fi
 
-# Fail on actual errors (warnings like builtins.toFile are informational)
-if grep -qE "^error:" "$BUILD_OUTPUT"; then
-  matched_line=$(grep -E "^error:" "$BUILD_OUTPUT" | head -1)
-  echo "::error::Build error detected: $matched_line"
+# Fail on errors or warnings (treat warnings as errors for strict CI)
+if grep -qE "^(error|warning):" "$BUILD_OUTPUT"; then
+  matched_line=$(grep -E "^(error|warning):" "$BUILD_OUTPUT" | head -1)
+  echo "::error::Build issue detected: $matched_line"
   exit 1
 fi
 
