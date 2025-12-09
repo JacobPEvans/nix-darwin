@@ -9,7 +9,7 @@
   # Generate the full known_marketplaces.json structure
   mkKnownMarketplaces = { marketplaces, homeDir ? "/home/user", allowRuntimeInstall ? true }:
     lib.mapAttrs (name: m: {
-      source = { inherit (m.source) type url; };
+      source = { source = m.source.type; url = m.source.url; };
       installLocation =
         if m.flakeInput or null != null
         then toString m.flakeInput
@@ -18,7 +18,7 @@
     }) marketplaces
     // lib.optionalAttrs allowRuntimeInstall {
       "local/experimental" = {
-        source = { type = "directory"; url = "~/.claude/plugins/local"; };
+        source = { source = "directory"; url = "~/.claude/plugins/local"; };
         installLocation = "${homeDir}/.claude/plugins/marketplaces/local";
         lastUpdated = "2025-12-08T00:00:00.000Z";
         managedBy = "runtime";
