@@ -6,18 +6,6 @@
 { lib ? import <nixpkgs/lib> }:
 
 {
-  # Generate a marketplace registry entry
-  mkMarketplaceEntry = { name, source, installLocation ? null, homeDir ? "/home/user" }: {
-    source = {
-      inherit (source) type url;
-    };
-    installLocation =
-      if installLocation != null
-      then installLocation
-      else "${homeDir}/.claude/plugins/marketplaces/${lib.replaceStrings ["/"] ["-"] name}";
-    lastUpdated = "@ACTIVATION_TIME@";
-  };
-
   # Generate the full known_marketplaces.json structure
   mkKnownMarketplaces = { marketplaces, homeDir ? "/home/user", allowRuntimeInstall ? true }:
     lib.mapAttrs (name: m: {

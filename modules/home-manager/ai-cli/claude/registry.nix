@@ -2,38 +2,25 @@
 #
 # Generates known_marketplaces.json and installed_plugins.json.
 # Supports hybrid mode: Nix-managed + runtime plugins coexist.
+# Uses pure functions from lib/claude-registry.nix for DRY.
 { config, lib, ... }:
 
 let
   cfg = config.programs.claude;
 
-  # Generate registry entry for a marketplace
-  mkMarketplaceEntry = name: marketplace: {
-    source = {
-      inherit (marketplace.source) type url;
-    };
-    # For Nix-managed: point to store path; for runtime: use standard location
-    installLocation =
-      if marketplace.flakeInput != null
-      then toString marketplace.flakeInput
-      else "${config.home.homeDirectory}/.claude/plugins/marketplaces/${lib.replaceStrings ["/"] ["-"] name}";
-    lastUpdated = "@ACTIVATION_TIME@";
+  # Import pure registry functions from lib
+  claudeRegistryLib = import ../../../../lib/claude-registry.nix { inherit lib; };
+
+  # Build the full registry using lib function
+  knownMarketplaces = claudeRegistryLib.mkKnownMarketplaces {
+    marketplaces = cfg.plugins.marketplaces;
+    homeDir = config.home.homeDirectory;
+    allowRuntimeInstall = cfg.plugins.allowRuntimeInstall;
   };
 
-  # Build the full registry
-  knownMarketplaces = lib.mapAttrs mkMarketplaceEntry cfg.plugins.marketplaces
-    // lib.optionalAttrs cfg.plugins.allowRuntimeInstall {
-      "local/experimental" = {
-        source = { type = "local"; url = "~/.claude/plugins/local"; };
-        installLocation = "${config.home.homeDirectory}/.claude/plugins/marketplaces/local";
-        managedBy = "runtime";
-      };
-    };
-
-  # Installed plugins registry (schema version tracking)
-  installedPlugins = {
-    version = cfg.features.pluginSchemaVersion;
-    plugins = { };  # Claude Code populates this at runtime
+  # Installed plugins registry using lib function
+  installedPlugins = claudeRegistryLib.mkInstalledPlugins {
+    schemaVersion = cfg.features.pluginSchemaVersion;
   };
 
 in {

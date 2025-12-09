@@ -10,12 +10,15 @@ let
   aiInstructionsRepo = userConfig.ai.instructionsRepo;
 
   # Read permissions from ai-assistant-instructions
-  claudeAllowJson = builtins.fromJSON
-    (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json");
-  claudeAskJson = builtins.fromJSON
-    (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json");
-  claudeDenyJson = builtins.fromJSON
-    (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json");
+  # Helper to reduce repetition (DRY)
+  readPermissionsJson = path: builtins.fromJSON (builtins.readFile path);
+
+  claudeAllowJson = readPermissionsJson
+    "${ai-assistant-instructions}/.claude/permissions/allow.json";
+  claudeAskJson = readPermissionsJson
+    "${ai-assistant-instructions}/.claude/permissions/ask.json";
+  claudeDenyJson = readPermissionsJson
+    "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
   # Commands from ai-assistant-instructions repo (live updates)
   liveRepoCommands = [
