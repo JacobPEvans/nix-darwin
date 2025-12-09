@@ -53,18 +53,22 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### After Completing Changes
 
+**Complete ALL local work before pushing.** Each push triggers CI workflows.
+
 1. Stage intended changes explicitly (avoid `git add -A` to prevent staging unintended files)
 2. Commit with descriptive message (pre-commit hooks run automatically on commit)
 3. If pre-commit hooks fail, fix issues and re-commit - **NEVER disable or bypass hooks**
 4. Test the build: `sudo darwin-rebuild switch --flake .` (see [TESTING.md](TESTING.md#basic-local-change-testing))
 5. If rebuild fails, fix issues and amend the commit, then re-test
-6. Push to remote
+6. Repeat steps 1-5 for any additional changes (e.g., addressing review feedback)
+7. **Only after ALL commits are complete**: Push to remote (single push)
 
 ### Pull Request Requirement
 
-- Always create a PR after testing if one doesn't exist for current branch
+- Always create a PR after pushing if one doesn't exist for current branch
 - Do not ask user to run tests - run them yourself using pre-approved commands
-- Complete the full cycle: branch → change → test → commit → push → PR
+- Complete the full cycle: branch → change → test → commit(s) → push → PR
+- **Minimize pushes**: Batch all related commits locally, then push once
 
 ### Background Monitoring (On Every PR Create and Push)
 
