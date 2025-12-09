@@ -3,7 +3,7 @@
 # Centralized configuration for the programs.claude module.
 # Imported by common.nix to keep it clean and high-level.
 { config, pkgs, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official
-, anthropic-skills, ai-assistant-instructions, ... }:
+, anthropic-skills, ai-assistant-instructions, claude-code-statusline, ... }:
 
 let
   userConfig = import ../../../lib/user-config.nix;
@@ -143,8 +143,12 @@ in {
 
   statusLine = {
     enable = true;
-    # Script reads JSON from stdin and outputs status line
-    # Uses jq and git which must be in PATH (installed system-wide)
-    script = builtins.readFile (./. + "/statusline.sh");
+    enhanced = {
+      enable = true;
+      # Pulls from flake input - auto-updated via Dependabot
+      source = claude-code-statusline;
+      # Uses default examples/Config.toml from source
+      # Override with: configFile = /path/to/custom/Config.toml;
+    };
   };
 }

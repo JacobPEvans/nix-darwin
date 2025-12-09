@@ -25,6 +25,7 @@ in {
     ./plugins.nix
     ./components.nix
     ./settings.nix
+    ./statusline.nix
     ./mcp.nix
   ];
 

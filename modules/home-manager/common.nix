@@ -1,5 +1,6 @@
 { config, pkgs, lib, claude-code-plugins, claude-cookbooks
-, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+, claude-plugins-official, anthropic-skills, ai-assistant-instructions
+, claude-code-statusline, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -27,7 +28,8 @@ let
   # Claude Code configuration (extracted to separate file for clarity)
   claudeConfig = import ./ai-cli/claude-config.nix {
     inherit config pkgs lib claude-code-plugins claude-cookbooks
-      claude-plugins-official anthropic-skills ai-assistant-instructions;
+      claude-plugins-official anthropic-skills ai-assistant-instructions
+      claude-code-statusline;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks

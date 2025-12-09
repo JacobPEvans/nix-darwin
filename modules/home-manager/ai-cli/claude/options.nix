@@ -113,8 +113,16 @@ in {
       script = mkOption { type = types.nullOr types.lines; default = null; };
       enhanced = {
         enable = mkOption { type = types.bool; default = false; };
-        package = mkOption { type = types.nullOr types.package; default = null; };
-        configFile = mkOption { type = types.nullOr types.path; default = null; };
+        source = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = "Flake input path to claude-code-statusline repo";
+        };
+        configFile = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = "Path to Config.toml (defaults to examples/Config.toml from source)";
+        };
       };
     };
 

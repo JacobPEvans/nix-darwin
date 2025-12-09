@@ -37,9 +37,24 @@ let
 
     # Status line (if enabled)
   } // lib.optionalAttrs cfg.statusLine.enable {
-    statusLine = if cfg.statusLine.enhanced.enable then {
+    statusLine = if cfg.statusLine.enhanced.enable && cfg.statusLine.enhanced.source != null then {
       type = "command";
-      command = "${cfg.statusLine.enhanced.package}/bin/claude-code-statusline";
+      # Reference statusline binary (built in statusline.nix, deduped by Nix)
+      command = let
+        statuslinePkg = pkgs.stdenvNoCC.mkDerivation {
+          pname = "claude-code-statusline";
+          version = "2.1.0";
+          src = cfg.statusLine.enhanced.source;
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+          installPhase = ''
+            mkdir -p $out/share/claude-code-statusline $out/bin
+            cp -r . $out/share/claude-code-statusline/
+            makeWrapper $out/share/claude-code-statusline/statusline.sh $out/bin/claude-code-statusline \
+              --prefix PATH : ${lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.git pkgs.coreutils ]}
+            chmod +x $out/bin/claude-code-statusline
+          '';
+        };
+      in "${statuslinePkg}/bin/claude-code-statusline";
     } else if cfg.statusLine.script != null then {
       type = "command";
       command = "${homeDir}/.claude/statusline-command.sh";

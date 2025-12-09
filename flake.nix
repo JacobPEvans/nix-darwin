@@ -71,11 +71,20 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
+    # Claude Code Statusline - modular multi-line terminal statusline
+    # Provides git status, MCP monitoring, cost tracking, themes
+    # https://github.com/rz1989s/claude-code-statusline
+    claude-code-statusline = {
+      url = "github:rz1989s/claude-code-statusline";
+      flake = false; # Not a flake, just fetch the repo
+    };
+
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, mac-app-util
     , claude-code-plugins, claude-cookbooks, claude-plugins-official
-    , anthropic-skills, agent-os, ai-assistant-instructions, ... }:
+    , anthropic-skills, agent-os, ai-assistant-instructions
+    , claude-code-statusline, ... }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
@@ -105,7 +114,8 @@
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
         inherit claude-code-plugins claude-cookbooks claude-plugins-official
-          anthropic-skills agent-os ai-assistant-instructions;
+          anthropic-skills agent-os ai-assistant-instructions
+          claude-code-statusline;
       };
       # Define configuration once, assign to multiple names
       darwinConfig = darwin.lib.darwinSystem {
