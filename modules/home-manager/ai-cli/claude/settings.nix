@@ -23,7 +23,7 @@ let
 
     # Plugin configuration
     extraKnownMarketplaces = lib.mapAttrs (_: m: {
-      source = { inherit (m.source) type url; };
+      source = { source = m.source.type; url = m.source.url; };
     }) cfg.plugins.marketplaces;
 
     enabledPlugins = cfg.plugins.enabled;
