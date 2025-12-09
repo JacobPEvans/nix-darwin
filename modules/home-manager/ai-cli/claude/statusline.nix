@@ -2,6 +2,7 @@
 #
 # Builds and configures claude-code-statusline from flake input.
 # Creates wrapper package and manages Config.toml symlink.
+# Uses bun for ccusage cost tracking integration.
 { config, lib, pkgs, ... }:
 
 let
@@ -25,9 +26,10 @@ let
       # Copy all source files (statusline.sh, lib/, examples/)
       cp -r . $out/share/claude-code-statusline/
 
-      # Create wrapper - only add bash/jq/git, rely on system for stat/coreutils
+      # Create wrapper - add bash/jq/git/bun (for ccusage via bunx)
+      # The statusline script uses 'bunx ccusage' for cost tracking
       makeWrapper $out/share/claude-code-statusline/statusline.sh $out/bin/claude-code-statusline \
-        --prefix PATH : ${lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.git ]} \
+        --prefix PATH : ${lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.git pkgs.bun ]} \
         --set STATUSLINE_HOME $out/share/claude-code-statusline
 
       chmod +x $out/bin/claude-code-statusline
