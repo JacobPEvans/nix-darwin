@@ -65,6 +65,22 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Do not ask user to run tests - run them yourself using pre-approved commands
 - Complete the full cycle: branch → change → test → commit → push → PR
 
+### Background Monitoring (On Every PR Create and Push)
+
+After creating a PR or pushing to a branch with an open PR, spawn TWO background tasks:
+
+1. **CI Check Monitor** - Watch GitHub Action checks (`gh pr checks` or `gh run watch`).
+   When checks fail, analyze the failure and attempt to fix the root cause.
+   After fixing, commit and push to trigger new CI run.
+   Repeat until checks pass or issue requires user input.
+
+2. **PR Review Monitor** - Watch for completed PR reviews (`gh pr view` or `gh api`).
+   When a reviewer completes their review (comments, changes requested, or approved),
+   automatically invoke `/rok-respond-to-reviews` to address feedback.
+   Continue monitoring until PR is merged or closed.
+
+Both tasks run concurrently in background while you continue other work.
+
 ### Procedure Violations
 
 If user indicates workflow was not followed, immediately reread this file into context.
