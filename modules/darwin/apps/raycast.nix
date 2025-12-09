@@ -11,6 +11,10 @@
 # encrypted SQLite databases and should be managed via Raycast's
 # export/import feature.
 #
+# Cloud Sync: Requires manual authentication via Raycast UI.
+# After fresh install: Raycast > Settings > Account > Sign In
+# Once authenticated, the sync settings below will take effect.
+#
 # To see all available keys: defaults read com.raycast.macos
 # Reference: https://raycast.com
 
@@ -80,6 +84,24 @@ in {
         # Show overlay after screenshot
         # Default: false
         mainWindowCaptureOpenQuickAccessOverlay = false;
+
+        # ========================================================================
+        # Cloud Sync (Raycast Pro)
+        # ========================================================================
+        # Note: Sync requires manual authentication first.
+        # These settings ensure sync auto-activates once logged in.
+
+        # Enable cloud sync for presets (extensions, snippets, quicklinks)
+        # Default: 1 (enabled)
+        cloudSync_ensurePresetSyncRecords = 1;
+
+        # Skip Pro plan walkthrough on fresh install
+        # Default: 1 (shown)
+        raycastAccountService_proPlanWalkthroughShownOnCurrentDevice = 1;
+
+        # Skip cloud sync walkthrough on fresh install
+        # Default: 1 (shown)
+        raycastAccountService_cloudSyncWalkthroughShown = 1;
       };
     };
   };

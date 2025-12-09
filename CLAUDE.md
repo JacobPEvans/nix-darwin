@@ -17,7 +17,14 @@
 - [AI CLI Tools Comparison](#ai-cli-tools-comparison)
 - [Pull Request Workflow](#pull-request-workflow)
 - [Workflow](#workflow)
+- [Anthropic Ecosystem Integration](#anthropic-ecosystem-integration)
+- [Agent OS Integration](#agent-os-integration)
 - [Permission Reference](#permission-reference-load-last-for-context-freshness)
+
+**Navigation Note**: Use this TOC to jump to specific sections. Referenced docs
+([TESTING.md](TESTING.md), [RUNBOOK.md](RUNBOOK.md),
+[docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md)) each have their own TOC.
+You do not need to read entire files - navigate via TOC links to relevant sections.
 
 ---
 
