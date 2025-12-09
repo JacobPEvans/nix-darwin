@@ -74,7 +74,7 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 After creating a PR or pushing to a branch with an open PR:
 
-**Pre-spawn check:** If context remaining is <50% (less than half until auto-compact),
+**Pre-spawn check:** If context remaining is less than 50% (less than half until auto-compact),
 run `/compact` on the main conversation before spawning subagents.
 
 **Spawn TWO subagents:**
