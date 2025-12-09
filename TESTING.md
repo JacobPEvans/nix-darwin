@@ -4,10 +4,30 @@ Step-by-step procedures to verify this nix-darwin configuration is functioning c
 
 ## Table of Contents
 
+- [Basic Local Change Testing](#basic-local-change-testing)
 - [Variables](#variables)
 - [Full Testing Procedure](#full-testing-procedure)
 - [Quick Smoke Test](#quick-smoke-test)
 - [Troubleshooting](#troubleshooting)
+
+---
+
+## Basic Local Change Testing
+
+**Universal workflow for any nix configuration change.** AI agents MUST run this after every change.
+
+1. Navigate to git root
+2. Stage changes
+3. Run pre-commit hooks (validates formatting, linting, flake)
+4. Commit changes
+5. Run darwin-rebuild switch (use `sudo darwin-rebuild switch --flake .`)
+6. Push to trigger CI
+
+**Critical rules:**
+
+- NEVER skip or disable pre-commit hooks - fix the root cause instead
+- All changes must be committed before darwin-rebuild (flakes requirement)
+- If rebuild fails, fix and repeat from step 2
 
 ---
 

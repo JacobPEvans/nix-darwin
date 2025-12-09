@@ -5,6 +5,7 @@
 ## Table of Contents
 
 - [Scope of This Document](#scope-of-this-document)
+- [Enforced Git Development Workflow](#enforced-git-development-workflow)
 - [Command Execution Preferences](#command-execution-preferences)
 - [Critical Requirements](#critical-requirements)
 - [Task Management Workflow](#task-management-workflow)
@@ -16,6 +17,7 @@
 - [AI CLI Tools Comparison](#ai-cli-tools-comparison)
 - [Pull Request Workflow](#pull-request-workflow)
 - [Workflow](#workflow)
+- [Permission Reference](#permission-reference-load-last-for-context-freshness)
 
 ---
 
@@ -30,6 +32,35 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Future plans (belongs in PLANNING.md)
 
 **Rule**: If information is useful for humans reading project docs, it belongs in README.md or other project files, not here.
+
+## Enforced Git Development Workflow
+
+**MANDATORY for all changes.** Follow without exception.
+
+### Before Making Changes
+
+1. Check current branch - determine if change relates to current worktree+branch
+2. If on `main`: create new feature branch before modifying any files
+3. If on unrelated branch: switch to main, pull latest, create new dedicated branch
+4. Never make changes directly on `main`
+
+### After Completing Changes
+
+1. Stage all changes
+2. Run full test cycle per [TESTING.md](TESTING.md#basic-local-change-testing)
+3. **NEVER disable or bypass git pre-commit hooks** - always fix the root cause
+4. Commit with descriptive message
+5. Push to remote
+
+### Pull Request Requirement
+
+- Always create a PR after testing if one doesn't exist for current branch
+- Do not ask user to run tests - run them yourself using pre-approved commands
+- Complete the full cycle: branch → change → test → commit → push → PR
+
+### Procedure Violations
+
+If user indicates workflow was not followed, immediately reread this file into context.
 
 ## Command Execution Preferences
 
@@ -518,3 +549,35 @@ programs.agent-os = {
 - Update: `nix flake lock --update-input agent-os` then rebuild
 
 **Reference**: [Agent OS Repository](https://github.com/JacobPEvans/agent-os) | [Agent OS Docs](https://buildermethods.com/agent-os)
+
+## Permission Reference (Load Last for Context Freshness)
+
+Review these permission files to understand what commands are pre-approved:
+
+**User-level** (`~/.claude/settings.json`):
+
+- Generated from `modules/home-manager/permissions/claude-permissions-allow.nix`
+- Contains 280+ pre-approved commands across 25 categories
+- Includes: git operations, nix commands, darwin-rebuild, testing tools
+
+**Project-level** (`.claude/settings.local.json`):
+
+- Project-specific overrides (if present)
+- Can extend or restrict user-level permissions
+
+**Key pre-approved operations for development workflow:**
+
+- All git commands (status, add, commit, push, branch, checkout, etc.)
+- `nix flake check`, `nix flake update`, `nix build`, `nix develop`
+- `sudo darwin-rebuild switch --flake .`
+- `pre-commit run --all-files`
+- `markdownlint-cli2`
+- `gh pr create`, `gh pr list`, `gh pr view`
+
+**Denied operations** (see `claude-permissions-deny.nix`):
+
+- Destructive system commands
+- Force push to protected branches
+- Disabling security features
+
+When uncertain about permissions, check the source files in `modules/home-manager/permissions/`.
