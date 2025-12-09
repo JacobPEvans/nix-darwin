@@ -154,7 +154,7 @@ in {
       enable = true;
       # Pulls from flake input - auto-updated via Dependabot
       source = claude-code-statusline;
-      # Custom config from modular Nix files - see claude/statusline/
+      # Custom config - see claude/statusline/config.toml
       configFile = statuslineConfigToml;
     };
   };

@@ -5,14 +5,12 @@
 # - Reduced to 4 lines (removed Islamic prayer times)
 # - Enabled: git_extended, system_info plugins
 # - Enabled: profiles with work hours auto-switching
-# - Enabled: theme inheritance and performance mode
+# - Enabled: performance mode
 
 # === THEME ===
 theme.name = "catppuccin"
-theme.inheritance.enabled = true
-theme.inheritance.base_theme = ""
-theme.inheritance.override_colors = []
-theme.inheritance.merge_strategy = "override"
+# Theme inheritance disabled - using catppuccin directly
+theme.inheritance.enabled = false
 
 # === FEATURES ===
 features.show_commits = true
@@ -39,7 +37,6 @@ emojis.live_block = "🔥"
 timeouts.mcp = "10s"
 timeouts.version = "10s"
 timeouts.ccusage = "10s"
-timeouts.prayer = "10s"
 
 # === DISPLAY (4 lines) ===
 display.lines = 4
@@ -169,8 +166,6 @@ cache.durations.git_branches = 30
 cache.durations.git_status = 10
 cache.durations.git_current_branch = 10
 cache.durations.mcp_server_list = 120
-cache.durations.prayer_data = 3600
-cache.durations.hijri_date = 3600
 cache.durations.location_data = 604800
 cache.durations.directory_info = 5
 cache.durations.file_operations = 2
@@ -193,8 +188,6 @@ cache.isolation.mcp = "repository"
 cache.isolation.git = "repository"
 cache.isolation.cost = "shared"
 cache.isolation.session = "repository"
-cache.isolation.prayer = "shared"
-cache.isolation.hijri = "shared"
 
 cache.legacy.version_duration = 3600
 cache.legacy.version_file = "/tmp/.claude_version_cache"
