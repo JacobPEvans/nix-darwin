@@ -10,7 +10,7 @@ BUILD_OUTPUT=$(mktemp)
 trap 'rm -f "$BUILD_OUTPUT"' EXIT
 
 # Build and capture output
-nix build .#ci.hmActivationPackage -o "$OUTPUT_LINK" 2>&1 | tee "$BUILD_OUTPUT"
+nix build .#lib.ci.hmActivationPackage -o "$OUTPUT_LINK" 2>&1 | tee "$BUILD_OUTPUT"
 build_exit_code=${PIPESTATUS[0]}
 
 if [ "$build_exit_code" -ne 0 ]; then
