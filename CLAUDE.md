@@ -53,11 +53,12 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### After Completing Changes
 
-1. Stage all changes
-2. Run full test cycle per [TESTING.md](TESTING.md#basic-local-change-testing)
-3. **NEVER disable or bypass git pre-commit hooks** - always fix the root cause
-4. Commit with descriptive message
-5. Push to remote
+1. Stage intended changes explicitly (avoid `git add -A` to prevent staging unintended files)
+2. Commit with descriptive message (pre-commit hooks run automatically on commit)
+3. If pre-commit hooks fail, fix issues and re-commit - **NEVER disable or bypass hooks**
+4. Test the build: `sudo darwin-rebuild switch --flake .` (see [TESTING.md](TESTING.md#basic-local-change-testing))
+5. If rebuild fails, fix issues and amend the commit, then re-test
+6. Push to remote
 
 ### Pull Request Requirement
 
@@ -67,19 +68,19 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### Background Monitoring (On Every PR Create and Push)
 
-After creating a PR or pushing to a branch with an open PR, spawn TWO background tasks:
+After creating a PR or pushing to a branch with an open PR, spawn TWO subagents:
 
-1. **CI Check Monitor** - Watch GitHub Action checks (`gh pr checks` or `gh run watch`).
+1. **CI Check Monitor Subagent** - Watch GitHub Action checks (`gh pr checks` or `gh run watch`).
    When checks fail, analyze the failure and attempt to fix the root cause.
    After fixing, commit and push to trigger new CI run.
    Repeat until checks pass or issue requires user input.
 
-2. **PR Review Monitor** - Watch for completed PR reviews (`gh pr view` or `gh api`).
+2. **PR Review Monitor Subagent** - Watch for completed PR reviews (`gh pr view` or `gh api`).
    When a reviewer completes their review (comments, changes requested, or approved),
    automatically invoke `/rok-respond-to-reviews` to address feedback.
    Continue monitoring until PR is merged or closed.
 
-Both tasks run concurrently in background while you continue other work.
+Both subagents run concurrently in background while you continue other work.
 
 ### Procedure Violations
 
@@ -579,7 +580,7 @@ Review these permission files to understand what commands are pre-approved:
 
 **User-level** (`~/.claude/settings.json`):
 
-- Generated from `modules/home-manager/permissions/claude-permissions-allow.nix`
+- Generated from `.claude/permissions/allow.json` in the `ai-assistant-instructions` repository
 - Contains 280+ pre-approved commands across 25 categories
 - Includes: git operations, nix commands, darwin-rebuild, testing tools
 
@@ -597,10 +598,12 @@ Review these permission files to understand what commands are pre-approved:
 - `markdownlint-cli2`
 - `gh pr create`, `gh pr list`, `gh pr view`
 
-**Denied operations** (see `claude-permissions-deny.nix`):
+**Denied operations** (see `.claude/permissions/deny.json`):
 
 - Destructive system commands
 - Force push to protected branches
 - Disabling security features
 
-When uncertain about permissions, check the source files in `modules/home-manager/permissions/`.
+When uncertain about Claude permissions, check `.claude/permissions/{allow,ask,deny}.json`
+in the `ai-assistant-instructions` repository. Gemini and Copilot permissions are in
+`modules/home-manager/permissions/`.
