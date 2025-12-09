@@ -80,6 +80,22 @@
         "type": "github"
       }
     },
+    "claude-code-statusline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763178960,
+        "narHash": "sha256-0FE0cqfoBxRucywQ+wUSJrlpEF9U5ARh1NhLuHfjVVw=",
+        "owner": "rz1989s",
+        "repo": "claude-code-statusline",
+        "rev": "c16d3a95b5db776d41b879b287e31d2e15919f87",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rz1989s",
+        "repo": "claude-code-statusline",
+        "type": "github"
+      }
+    },
     "claude-cookbooks": {
       "flake": false,
       "locked": {
@@ -252,6 +268,7 @@
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",
+        "claude-code-statusline": "claude-code-statusline",
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
         "darwin": "darwin",

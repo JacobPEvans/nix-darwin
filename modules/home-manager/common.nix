@@ -1,5 +1,6 @@
 { config, pkgs, lib, claude-code-plugins, claude-cookbooks
-, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+, claude-plugins-official, anthropic-skills, ai-assistant-instructions
+, claude-code-statusline, ... }:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -24,11 +25,11 @@ let
   # AWS CLI configuration (home.file entries)
   awsFiles = import ./aws/config.nix { inherit config; };
 
-  # AI CLI configuration imports (home.file entries)
-  # Claude plugins require external repo inputs from flake.nix
-  claudeFiles = import ./ai-cli/claude.nix {
+  # Claude Code configuration (extracted to separate file for clarity)
+  claudeConfig = import ./ai-cli/claude-config.nix {
     inherit config pkgs lib claude-code-plugins claude-cookbooks
-      claude-plugins-official anthropic-skills ai-assistant-instructions;
+      claude-plugins-official anthropic-skills ai-assistant-instructions
+      claude-code-statusline;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks
@@ -237,8 +238,17 @@ in {
   #
   # Permissions: Now read from JSON in ai-assistant-instructions repo
   # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
-  home.file = npmFiles // awsFiles // claudeFiles // geminiFiles // copilotFiles
+  # NOTE: claudeFiles removed - now handled by programs.claude module
+  home.file = npmFiles // awsFiles // geminiFiles // copilotFiles
     // aiInstructionsSymlinks // gitHooks;
+
+  # ==========================================================================
+  # Claude Code (Unified Module)
+  # ==========================================================================
+  # Declarative configuration for Claude Code ecosystem
+  # Manages: plugins, commands, agents, skills, hooks, MCP servers
+  # Configuration extracted to ai-cli/claude-config.nix for clarity
+  programs.claude = claudeConfig;
 
   # ==========================================================================
   # Agent OS

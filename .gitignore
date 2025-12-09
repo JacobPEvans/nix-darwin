@@ -4,3 +4,5 @@ result
 backup/
 # Test GPG signing
 .claude/settings.local.json
+# Generated scripts (built from flake inputs)
+statusline.sh
