@@ -68,7 +68,12 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 ### Background Monitoring (On Every PR Create and Push)
 
-After creating a PR or pushing to a branch with an open PR, spawn TWO subagents:
+After creating a PR or pushing to a branch with an open PR:
+
+**Pre-spawn check:** If context remaining is <50% (less than half until auto-compact),
+run `/compact` on the main conversation before spawning subagents.
+
+**Spawn TWO subagents:**
 
 1. **CI Check Monitor Subagent** - Watch GitHub Action checks (`gh pr checks` or `gh run watch`).
    When checks fail, analyze the failure and attempt to fix the root cause.
@@ -79,8 +84,6 @@ After creating a PR or pushing to a branch with an open PR, spawn TWO subagents:
    When a reviewer completes their review (comments, changes requested, or approved),
    automatically invoke `/rok-respond-to-reviews` to address feedback.
    Continue monitoring until PR is merged or closed.
-
-Both subagents run concurrently in background while you continue other work.
 
 ### Procedure Violations
 
