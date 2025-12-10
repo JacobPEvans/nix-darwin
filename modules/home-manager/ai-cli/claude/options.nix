@@ -214,7 +214,13 @@ in {
           type = types.nullOr types.path;
           default = null;
           description =
-            "Path to Config.toml (defaults to examples/Config.toml from source)";
+            "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
+        };
+        mobileConfigFile = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description =
+            "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
         };
         # Internal: package built by statusline.nix, used by settings.nix
         package = mkOption {

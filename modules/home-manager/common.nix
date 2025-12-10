@@ -117,6 +117,10 @@ in {
       export PATH="$HOME/.npm-packages/bin:$PATH"
       export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
 
+      # Claude statusline SSH detection (must run before Claude starts)
+      # Switches between full and mobile configs based on session type
+      source ${./zsh/claude-statusline-switch.zsh}
+
       source ${./zsh/git-functions.zsh}
       source ${./zsh/docker-functions.zsh}
       source ${./zsh/macos-setup.zsh}

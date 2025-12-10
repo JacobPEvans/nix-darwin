@@ -10,8 +10,10 @@ let
   userConfig = import ../../../lib/user-config.nix;
   aiInstructionsRepo = userConfig.ai.instructionsRepo;
 
-  # Statusline configuration - flat TOML file (required format for statusline tool)
-  statuslineConfigToml = ./claude/statusline/config.toml;
+  # Statusline configuration - flat TOML files (required format for statusline tool)
+  # Full config for local terminal, mobile config for SSH sessions
+  statuslineConfigFull = ./claude/statusline/config.toml;
+  statuslineConfigMobile = ./claude/statusline/config-mobile.toml;
 
   # Read permissions from ai-assistant-instructions
   # Helper to reduce repetition (DRY)
@@ -154,8 +156,10 @@ in {
       enable = true;
       # Pulls from flake input - auto-updated via Dependabot
       source = claude-code-statusline;
-      # Custom config - see claude/statusline/config.toml
-      configFile = statuslineConfigToml;
+      # Full config for local terminal
+      configFile = statuslineConfigFull;
+      # Mobile config for SSH sessions (single-line, minimal)
+      mobileConfigFile = statuslineConfigMobile;
     };
   };
 }
