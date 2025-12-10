@@ -44,6 +44,23 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 
 **MANDATORY for all changes.** Follow without exception.
 
+### SSH Agent Pre-Flight Check (Required for Remote Git Operations)
+
+Before any `git push`, `git pull`, `git fetch`, or `git clone` over SSH:
+
+1. Check if SSH agent is running and has keys: `ssh-add -l`
+2. If error or "no identities", start the agent:
+
+   ```bash
+   eval "$(ssh-agent -s)"
+   ssh-add
+   ```
+
+3. Only proceed with Git operations after confirming agent is ready
+
+**Why**: SSH sessions (remote access) often do not inherit the SSH agent from local login.
+Without this check, authenticated Git operations will fail with authentication errors or prompt for passwords.
+
 ### Before Making Changes
 
 1. Check current branch - determine if change relates to current worktree+branch
