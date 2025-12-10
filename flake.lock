@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1765248060,
-        "narHash": "sha256-OQR+EoxW/PUpTN58GavBC7aehTcC+YsqVM7RHa8kIv0=",
+        "lastModified": 1765265788,
+        "narHash": "sha256-RkNgXENAt8q/bNVGSsGTiR0i+X+xCaayJlX0qIrx+n4=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "4f755296eb8e2ab70dc8c74e8f47ce924b4c988c",
+        "rev": "1ac7e23a55f1aceeef118b915817ac5c444df8c9",
         "type": "github"
       },
       "original": {
@@ -248,11 +248,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1764947035,
-        "narHash": "sha256-EYHSjVM4Ox4lvCXUMiKKs2vETUSL5mx+J2FfutM7T9w=",
+        "lastModified": 1765270179,
+        "narHash": "sha256-g2a4MhRKu4ymR4xwo+I+auTknXt/+j37Lnf0Mvfl1rE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "a672be65651c80d3f592a89b3945466584a22069",
+        "rev": "677fbe97984e7af3175b6c121f3c39ee5c8d62c9",
         "type": "github"
       },
       "original": {
