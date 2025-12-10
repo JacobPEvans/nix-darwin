@@ -1,0 +1,219 @@
+# Claude Code Statusline - Mobile/SSH Configuration
+# Minimal single-line display for Termius and mobile terminals
+#
+# Shows: directory | RESET time_left
+
+# === THEME ===
+theme.name = "classic"
+theme.inheritance.enabled = false
+
+# === FEATURES ===
+# Minimal features for mobile
+features.show_commits = false
+features.show_version = false
+features.show_submodules = false
+features.show_mcp_status = false
+features.show_cost_tracking = false
+features.show_reset_info = true
+features.show_session_info = false
+features.show_prayer_times = false
+features.show_hijri_date = false
+
+# === EMOJIS ===
+# Disable emojis for mobile compatibility
+emojis.opus = ""
+emojis.haiku = ""
+emojis.sonnet = ""
+emojis.default_model = ""
+emojis.clean_status = ""
+emojis.dirty_status = ""
+emojis.clock = ""
+emojis.live_block = ""
+
+# === TIMEOUTS ===
+timeouts.mcp = "5s"
+timeouts.version = "5s"
+timeouts.ccusage = "5s"
+
+# === DISPLAY (1 line only) ===
+display.lines = 1
+display.time_format = "%H:%M"
+display.date_format = "%Y-%m-%d"
+display.date_format_compact = "%m%d"
+
+# Line 1: Directory + Reset Timer only
+display.line1.components = ["repo_info", "reset_timer"]
+display.line1.separator = " | "
+display.line1.show_when_empty = true
+
+# All other lines disabled
+display.line2.components = []
+display.line2.separator = ""
+display.line2.show_when_empty = false
+display.line3.components = []
+display.line3.separator = ""
+display.line3.show_when_empty = false
+display.line4.components = []
+display.line4.separator = ""
+display.line4.show_when_empty = false
+display.line5.components = []
+display.line5.separator = ""
+display.line5.show_when_empty = false
+display.line6.components = []
+display.line6.separator = ""
+display.line6.show_when_empty = false
+display.line7.components = []
+display.line7.separator = ""
+display.line7.show_when_empty = false
+display.line8.components = []
+display.line8.separator = ""
+display.line8.show_when_empty = false
+display.line9.components = []
+display.line9.separator = ""
+display.line9.show_when_empty = false
+
+# === LABELS ===
+labels.commits = ""
+labels.repo = ""
+labels.monthly = ""
+labels.weekly = ""
+labels.daily = ""
+labels.mcp = ""
+labels.version_prefix = ""
+labels.submodule = ""
+labels.session_prefix = ""
+labels.live = ""
+labels.reset = "RESET"
+
+# === PLUGINS ===
+plugins.enabled = false
+plugins.auto_discovery = false
+plugins.plugin_dirs = []
+plugins.timeout_per_plugin = "5s"
+
+plugins.git_extended.enabled = false
+plugins.system_info.enabled = false
+plugins.weather.enabled = false
+
+# === PROFILES ===
+profiles.enabled = false
+
+# === CONDITIONAL ===
+conditional.enabled = false
+
+# === CACHE ===
+cache.base_directory = "auto"
+cache.enable_universal_caching = true
+cache.enable_statistics = false
+cache.enable_corruption_detection = true
+cache.cleanup_stale_files = true
+cache.migrate_legacy_cache = false
+
+cache.durations.command_exists = "session"
+cache.durations.system_info = 86400
+cache.durations.claude_version = 21600
+cache.durations.git_config = 3600
+cache.durations.git_submodules = 300
+cache.durations.git_branches = 30
+cache.durations.git_status = 10
+cache.durations.git_current_branch = 10
+cache.durations.mcp_server_list = 120
+cache.durations.location_data = 604800
+cache.durations.directory_info = 5
+cache.durations.file_operations = 2
+
+cache.performance.max_lock_retries = 5
+cache.performance.lock_retry_delay_ms = "50-200"
+cache.performance.atomic_write_timeout = 5
+cache.performance.cache_cleanup_interval = 600
+cache.performance.max_cache_age_hours = 168
+
+cache.security.directory_permissions = "700"
+cache.security.file_permissions = "600"
+cache.security.enable_checksums = false
+cache.security.validate_on_read = false
+cache.security.secure_temp_files = true
+cache.security.instance_isolation = true
+
+cache.isolation.mode = "repository"
+cache.isolation.mcp = "repository"
+cache.isolation.git = "repository"
+cache.isolation.cost = "shared"
+cache.isolation.session = "repository"
+
+cache.legacy.version_duration = 3600
+cache.legacy.version_file = "/tmp/.claude_version_cache"
+
+# === MESSAGES ===
+messages.no_ccusage = ""
+messages.ccusage_install = ""
+messages.no_active_block = ""
+messages.mcp_unknown = ""
+messages.mcp_none = ""
+messages.unknown_version = ""
+messages.no_submodules = ""
+
+# === ADVANCED ===
+advanced.warn_missing_deps = false
+advanced.debug_mode = false
+advanced.performance_mode = true
+advanced.strict_validation = false
+
+# === COMPATIBILITY ===
+compatibility.auto_detect_bash = true
+compatibility.enable_compatibility_mode = true
+compatibility.compatibility_warnings = false
+compatibility.bash_path = ""
+
+# === PLATFORM ===
+platform.prefer_gtimeout = true
+platform.use_gdate = false
+platform.color_support_level = "basic"
+
+# === PATHS ===
+paths.temp_dir = "/tmp"
+paths.config_dir = "~/.config/claude-code-statusline"
+paths.cache_dir = "~/.cache/claude-code-statusline"
+paths.log_file = "~/.cache/claude-code-statusline/statusline.log"
+
+# === PERFORMANCE ===
+performance.parallel_data_collection = false
+performance.max_concurrent_operations = 1
+performance.git_operation_timeout = "5s"
+performance.network_operation_timeout = "5s"
+performance.enable_smart_caching = true
+performance.cache_compression = false
+
+# === DEBUG ===
+debug.log_level = "error"
+debug.log_config_loading = false
+debug.log_theme_application = false
+debug.log_validation_details = false
+debug.benchmark_performance = false
+debug.export_debug_info = false
+
+# === COLORS (basic only for mobile) ===
+colors.basic.red = "\033[31m"
+colors.basic.blue = "\033[34m"
+colors.basic.green = "\033[32m"
+colors.basic.yellow = "\033[33m"
+colors.basic.magenta = "\033[35m"
+colors.basic.cyan = "\033[36m"
+colors.basic.white = "\033[37m"
+
+colors.extended.orange = "\033[33m"
+colors.extended.light_orange = "\033[33m"
+colors.extended.light_gray = "\033[37m"
+colors.extended.bright_green = "\033[32m"
+colors.extended.purple = "\033[35m"
+colors.extended.teal = "\033[36m"
+colors.extended.gold = "\033[33m"
+colors.extended.pink_bright = "\033[35m"
+colors.extended.indigo = "\033[34m"
+colors.extended.violet = "\033[35m"
+colors.extended.light_blue = "\033[34m"
+
+colors.formatting.dim = "\033[2m"
+colors.formatting.italic = "\033[3m"
+colors.formatting.strikethrough = "\033[9m"
+colors.formatting.reset = "\033[0m"
