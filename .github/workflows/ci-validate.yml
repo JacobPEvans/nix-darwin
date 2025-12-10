@@ -1,0 +1,35 @@
+# Nix Validate - Flake validation workflow
+#
+# Flake lint and structure check
+# Runs on all PRs to satisfy branch protection
+
+name: Nix Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Lint flake.lock
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          nixpkgs-keys: nixpkgs
+
+      - name: Check flake
+        run: nix flake check --no-build
