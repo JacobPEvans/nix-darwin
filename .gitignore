@@ -6,3 +6,6 @@ backup/
 .claude/settings.local.json
 # Generated scripts (built from flake inputs)
 statusline.sh
+
+# Git worktrees (local working copies)
+worktrees/
