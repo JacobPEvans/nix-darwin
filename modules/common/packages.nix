@@ -57,6 +57,13 @@ with pkgs; [
   aws-vault # Secure AWS credential storage (uses OS keychain)
 
   # ==========================================================================
+  # HTTP & API Tools
+  # ==========================================================================
+  # Tools for testing and working with HTTP APIs and web services.
+
+  rapidapi # Full-featured HTTP client for testing and describing APIs
+
+  # ==========================================================================
   # Python Tools (python3Packages.*)
   # ==========================================================================
   # Python packages from nixpkgs. Use python3Packages (not python312Packages)
