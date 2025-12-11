@@ -41,35 +41,35 @@ equivalents while preserving unique custom functionality.
 
 ### 2.1 Analyze commit-commands Plugin
 
-- [ ] **2.1.1** Read current custom `commit.md` command content from ai-assistant-instructions repository
-- [ ] **2.1.2** Test official `/commit` command from `commit-commands` plugin on a test change
-- [ ] **2.1.3** Document feature comparison: custom commit vs official /commit
-- [ ] **2.1.4** Verify official `/commit` produces compliant commit messages
-- [ ] **2.1.5** Confirm `/commit-push-pr` workflow functions correctly (bonus feature)
-- [ ] **2.1.6** Decision: Approve removal of custom `commit` command if feature parity confirmed
+- [x] **2.1.1** Read current custom `commit.md` command content from ai-assistant-instructions repository
+- [x] **2.1.2** Test official `/commit` command from `commit-commands` plugin on a test change
+- [x] **2.1.3** Document feature comparison: custom commit vs official /commit
+- [x] **2.1.4** Verify official `/commit` produces compliant commit messages
+- [x] **2.1.5** Confirm `/commit-push-pr` workflow functions correctly (bonus feature)
+- [x] **2.1.6** Decision: Approve removal of custom `commit` command if feature parity confirmed
 
 ### 2.2 Analyze code-review Plugin
 
-- [ ] **2.2.1** Read current `review-pr-ci` cookbook command content
-- [ ] **2.2.2** Test official `/code-review` plugin on an existing PR
-- [ ] **2.2.3** Document feature comparison: `review-pr-ci` vs `/code-review`
-- [ ] **2.2.4** Verify CI integration capabilities of official plugin
-- [ ] **2.2.5** Decision: Approve removal of `review-pr-ci` if feature parity confirmed
+- [x] **2.2.1** Read current `review-pr-ci` cookbook command content
+- [x] **2.2.2** Test official `/code-review` plugin on an existing PR
+- [x] **2.2.3** Document feature comparison: `review-pr-ci` vs `/code-review`
+- [x] **2.2.4** Verify CI integration capabilities of official plugin
+- [x] **2.2.5** Decision: Approve removal of `review-pr-ci` if feature parity confirmed
 
 ### 2.3 Analyze review-pr Cookbook Command (Open Question)
 
-- [ ] **2.3.1** Read `review-pr` cookbook command content
-- [ ] **2.3.2** Compare `review-pr` (interactive) vs `/code-review` plugin functionality
-- [ ] **2.3.3** Identify any unique features in `review-pr` not in `/code-review`
-- [ ] **2.3.4** Decision: Keep or remove `review-pr` based on analysis
-- [ ] **2.3.5** Document decision rationale in spec or migration notes
+- [x] **2.3.1** Read `review-pr` cookbook command content
+- [x] **2.3.2** Compare `review-pr` (interactive) vs `/code-review` plugin functionality
+- [x] **2.3.3** Identify any unique features in `review-pr` not in `/code-review`
+- [x] **2.3.4** Decision: Keep or remove `review-pr` based on analysis
+- [x] **2.3.5** Document decision rationale in spec or migration notes
 
 ### 2.4 Verify Retained Commands
 
-- [ ] **2.4.1** List all custom commands that will be retained (11 commands)
-- [ ] **2.4.2** Verify no naming conflicts between retained custom commands and official plugins
-- [ ] **2.4.3** Confirm all 5 retained cookbook commands have no official equivalent
-- [ ] **2.4.4** Verify all 7 Agent OS commands remain unchanged
+- [x] **2.4.1** List all custom commands that will be retained (11 commands)
+- [x] **2.4.2** Verify no naming conflicts between retained custom commands and official plugins
+- [x] **2.4.3** Confirm all 5 retained cookbook commands have no official equivalent
+- [x] **2.4.4** Verify all 7 Agent OS commands remain unchanged
 
 ---
 
