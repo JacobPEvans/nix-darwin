@@ -188,7 +188,7 @@ From `modules/home-manager/ai-cli/agent-os/default.nix`:
 | Command | Reason to Remove |
 |---------|------------------|
 | `review-pr-ci` | Replaced by `code-review` plugin |
-| `review-pr` | Potentially redundant with `code-review` plugin (needs verification) |
+| `review-pr` | Replaced by `code-review` plugin |
 
 ### Potential Command Renaming
 
@@ -549,7 +549,6 @@ Before starting migration:
 
 ### Cookbook Commands (retained)
 
-- `/review-pr` (pending verification)
 - `/review-issue`
 - `/notebook-review`
 - `/model-check`

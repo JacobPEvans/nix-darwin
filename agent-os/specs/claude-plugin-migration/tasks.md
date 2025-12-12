@@ -96,11 +96,11 @@ equivalents while preserving unique custom functionality.
 
 - [x] **3.2.1** Read current `cookbookCommands` list in claude-plugins.nix
 - [x] **3.2.2** Remove `"review-pr-ci"` from `cookbookCommands` list
-- [x] **3.2.3** KEEP `"review-pr"` (Phase 2 decision: provides unique interactive value)
+- [x] **3.2.3** REMOVE `"review-pr"` (user decision: use /code-review plugin instead)
 - [x] **3.2.4** Add comment documenting migration:
   `# Removed: "review-pr-ci" - replaced by code-review plugin (/code-review)`
 - [x] **3.2.5** Verify retained cookbook commands are present
-  (5 commands: review-pr, review-issue, notebook-review, model-check, link-review)
+  (4 commands: review-issue, notebook-review, model-check, link-review)
 - [x] **3.2.6** Verify all 12 official plugins remain in `enabledPlugins` list
 - [x] **3.2.7** Save changes to `claude-plugins.nix`
 
@@ -148,7 +148,7 @@ equivalents while preserving unique custom functionality.
 - [ ] **4.4.2** Verify `/notebook-review` command is available
 - [ ] **4.4.3** Verify `/model-check` command is available
 - [ ] **4.4.4** Verify `/link-review` command is available
-- [ ] **4.4.5** Verify `/review-pr` is present or absent based on Phase 2 decision
+- [ ] **4.4.5** Verify `/review-pr` is REMOVED (user decision: use /code-review instead)
 
 ### 4.5 Regression Testing
 
