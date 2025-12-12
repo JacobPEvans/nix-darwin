@@ -13,6 +13,7 @@ Comprehensive reference for the integrated Anthropic Claude Code ecosystem in th
 - [SDK Development](#sdk-development)
 - [GitHub Actions](#github-actions)
 - [Agent OS Integration](#agent-os-integration)
+- [Migration Notes](#migration-notes)
 - [Resources](#resources)
 
 ---
@@ -23,7 +24,7 @@ This repository integrates the complete Anthropic Claude Code ecosystem, providi
 
 - **12 official plugins** from `anthropics/claude-code`
 - **2 plugin marketplaces** (claude-code + claude-plugins-official)
-- **6 cookbook commands** and **1 agent** from `anthropics/claude-cookbooks`
+- **4 cookbook commands** and **1 agent** from `anthropics/claude-cookbooks`
 - **Skills system** from `anthropics/skills`
 - **Pattern references** for agent workflows
 - **SDK development shells** for Python and TypeScript
@@ -33,9 +34,9 @@ This repository integrates the complete Anthropic Claude Code ecosystem, providi
 
 | Tier | Priority | Repositories | Status |
 |------|----------|--------------|--------|
-| **Tier 1: Core** | High | claude-code, claude-cookbooks, claude-plugins-official, skills | ✅ Integrated |
-| **Tier 2: SDK** | Medium | claude-agent-sdk-python, claude-agent-sdk-typescript | ✅ Dev Shells |
-| **Tier 3: Learning** | Low | claude-quickstarts, courses | 📝 Referenced |
+| **Tier 1: Core** | High | claude-code, claude-cookbooks, claude-plugins-official, skills | Integrated |
+| **Tier 2: SDK** | Medium | claude-agent-sdk-python, claude-agent-sdk-typescript | Dev Shells |
+| **Tier 3: Learning** | Low | claude-quickstarts, courses | Referenced |
 
 ---
 
@@ -87,13 +88,13 @@ modules/home-manager/ai-cli/
 
 ```text
 flake.nix (inputs)
-    ↓
+    |
 extraSpecialArgs (pass to home-manager)
-    ↓
+    |
 claude.nix (import child modules)
-    ↓
+    |
 claude-plugins.nix (configure plugins & marketplaces)
-    ↓
+    |
 settings.json (merged configuration)
 ```
 
@@ -185,14 +186,12 @@ Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).
 
 ## Commands & Agents
 
-### Cookbook Commands (6)
+### Cookbook Commands (4)
 
 From `anthropics/claude-cookbooks`, installed to `~/.claude/commands/`:
 
 | Command | Description |
 |---------|-------------|
-| `review-pr-ci` | CI/CD PR review (auto-posts to GitHub) |
-| `review-pr` | Interactive PR review |
 | `review-issue` | GitHub issue review |
 | `notebook-review` | Jupyter notebook review |
 | `model-check` | Model validation |
@@ -222,7 +221,6 @@ From community contributors, installed to `~/.claude/commands/`:
 All commands are available as slash commands in Claude Code:
 
 ```bash
-claude /review-pr          # Review a pull request
 claude /review-issue       # Review an issue
 claude /rok-shape-issues   # Shape issues (community)
 ```
@@ -268,7 +266,7 @@ From `anthropics/claude-cookbooks`, documented in `claude-patterns.nix`:
 
 | Pattern | Description | Use Case |
 |---------|-------------|----------|
-| **Prompt Chaining** | Sequential prompts where output → input | Multi-step analysis, document pipelines |
+| **Prompt Chaining** | Sequential prompts where output -> input | Multi-step analysis, document pipelines |
 | **Parallelization** | Execute multiple tasks concurrently | Batch processing, concurrent API calls |
 | **Routing** | Direct requests to specialized agents | Task classification, tool selection |
 
@@ -449,6 +447,46 @@ claude /write-spec        # Write technical spec
 claude /create-tasks      # Generate task list
 claude /implement-tasks   # Execute implementation
 ```
+
+---
+
+## Migration Notes
+
+This section documents commands that have been migrated from custom implementations to official Anthropic plugins.
+
+### Migrated Commands
+
+| Previous Command | Replacement | Notes |
+|------------------|-------------|-------|
+| `commit` (custom) | `/commit` from `commit-commands` plugin | Official plugin provides identical git commit functionality |
+| `review-pr-ci` (cookbook) | `/code-review` from `code-review` plugin | Official plugin has CI integration and multi-agent review |
+| `review-pr` (cookbook) | `/code-review` from `code-review` plugin | Official plugin provides comprehensive PR review |
+
+### Using the New Commands
+
+**For git commits:**
+
+```bash
+# Previously: /commit
+# Now use:
+claude /commit              # Create a commit
+claude /commit-push-pr      # Commit, push, and create PR (bonus feature)
+```
+
+**For PR reviews:**
+
+```bash
+# Previously: /review-pr-ci or /review-pr
+# Now use:
+claude /code-review         # Multi-agent PR review with confidence scoring
+```
+
+### Why Migrate?
+
+1. **Reduced maintenance** - Official plugins are maintained by Anthropic
+2. **Feature parity** - Official plugins provide equivalent or better functionality
+3. **Consistent updates** - Plugins update automatically via marketplace
+4. **Community alignment** - Using standard commands improves collaboration
 
 ---
 
