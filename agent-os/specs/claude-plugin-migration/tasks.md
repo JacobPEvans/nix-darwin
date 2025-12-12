@@ -12,7 +12,7 @@ equivalents while preserving unique custom functionality.
 
 - Remove `commit` command (replaced by `commit-commands` plugin)
 - Remove `review-pr-ci` cookbook command (replaced by `code-review` plugin)
-- Verify `review-pr` cookbook command status
+- Remove `review-pr` cookbook command (replaced by `code-review` plugin)
 - Update documentation to reflect changes
 
 ---
@@ -61,14 +61,14 @@ equivalents while preserving unique custom functionality.
 - [x] **2.3.1** Read `review-pr` cookbook command content
 - [x] **2.3.2** Compare `review-pr` (interactive) vs `/code-review` plugin functionality
 - [x] **2.3.3** Identify any unique features in `review-pr` not in `/code-review`
-- [x] **2.3.4** Decision: Keep or remove `review-pr` based on analysis
+- [x] **2.3.4** Decision: Remove `review-pr` - `/code-review` plugin provides comprehensive coverage
 - [x] **2.3.5** Document decision rationale in spec or migration notes
 
 ### 2.4 Verify Retained Commands
 
 - [x] **2.4.1** List all custom commands that will be retained (11 commands)
 - [x] **2.4.2** Verify no naming conflicts between retained custom commands and official plugins
-- [x] **2.4.3** Confirm all 5 retained cookbook commands have no official equivalent
+- [x] **2.4.3** Confirm all 4 retained cookbook commands have no official equivalent
 - [x] **2.4.4** Verify all 7 Agent OS commands remain unchanged
 
 ---
@@ -81,7 +81,7 @@ equivalents while preserving unique custom functionality.
 
 - REMOVE: `commit` from aiInstructionsCommands (replaced by /commit plugin)
 - REMOVE: `review-pr-ci` from cookbookCommands (replaced by /code-review plugin)
-- KEEP: `review-pr` in cookbookCommands (provides unique interactive safeguards)
+- REMOVE: `review-pr` from cookbookCommands (replaced by /code-review plugin)
 
 ### 3.1 Update claude.nix
 
@@ -96,9 +96,9 @@ equivalents while preserving unique custom functionality.
 
 - [x] **3.2.1** Read current `cookbookCommands` list in claude-plugins.nix
 - [x] **3.2.2** Remove `"review-pr-ci"` from `cookbookCommands` list
-- [x] **3.2.3** REMOVE `"review-pr"` (user decision: use /code-review plugin instead)
+- [x] **3.2.3** Remove `"review-pr"` from `cookbookCommands` list
 - [x] **3.2.4** Add comment documenting migration:
-  `# Removed: "review-pr-ci" - replaced by code-review plugin (/code-review)`
+  `# Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)`
 - [x] **3.2.5** Verify retained cookbook commands are present
   (4 commands: review-issue, notebook-review, model-check, link-review)
 - [x] **3.2.6** Verify all 12 official plugins remain in `enabledPlugins` list
@@ -148,7 +148,7 @@ equivalents while preserving unique custom functionality.
 - [ ] **4.4.2** Verify `/notebook-review` command is available
 - [ ] **4.4.3** Verify `/model-check` command is available
 - [ ] **4.4.4** Verify `/link-review` command is available
-- [ ] **4.4.5** Verify `/review-pr` is REMOVED (user decision: use /code-review instead)
+- [ ] **4.4.5** Verify `/review-pr` is absent (removed per Phase 2 decision)
 
 ### 4.5 Regression Testing
 
@@ -166,19 +166,19 @@ equivalents while preserving unique custom functionality.
 
 ### 5.1 Update ANTHROPIC-ECOSYSTEM.md
 
-- [ ] **5.1.1** Read current `docs/ANTHROPIC-ECOSYSTEM.md`
-- [ ] **5.1.2** Update "Cookbook Commands" section to remove `review-pr-ci`
-- [ ] **5.1.3** Update command count (from 6 to 5, or 4 if review-pr also removed)
-- [ ] **5.1.4** Add migration notes section explaining command changes
-- [ ] **5.1.5** Update any references to removed commands
-- [ ] **5.1.6** Save changes to `ANTHROPIC-ECOSYSTEM.md`
+- [x] **5.1.1** Read current `docs/ANTHROPIC-ECOSYSTEM.md`
+- [x] **5.1.2** Update "Cookbook Commands" section to remove `review-pr-ci` and `review-pr`
+- [x] **5.1.3** Update command count (from 6 to 4)
+- [x] **5.1.4** Add migration notes section explaining command changes
+- [x] **5.1.5** Update any references to removed commands
+- [x] **5.1.6** Save changes to `ANTHROPIC-ECOSYSTEM.md`
 
 ### 5.2 Update CLAUDE.md
 
-- [ ] **5.2.1** Read current `CLAUDE.md`
-- [ ] **5.2.2** Update "Anthropic Ecosystem Integration" section if it references removed commands
-- [ ] **5.2.3** Verify cookbook command count reference is updated
-- [ ] **5.2.4** Save changes to `CLAUDE.md`
+- [x] **5.2.1** Read current `CLAUDE.md`
+- [x] **5.2.2** Update "Anthropic Ecosystem Integration" section cookbook command count
+- [x] **5.2.3** Verify cookbook command count reference is updated (now "4 cookbook commands")
+- [x] **5.2.4** Save changes to `CLAUDE.md`
 
 ### 5.3 Update .ai-instructions/INSTRUCTIONS.md (if applicable)
 
@@ -188,10 +188,10 @@ equivalents while preserving unique custom functionality.
 
 ### 5.4 Add Migration Notes
 
-- [ ] **5.4.1** Create or update migration notes for users of removed commands
-- [ ] **5.4.2** Document: "Use `/commit` instead of custom `commit` command"
-- [ ] **5.4.3** Document: "Use `/code-review` instead of `review-pr-ci`"
-- [ ] **5.4.4** Include rollback instructions in documentation
+- [x] **5.4.1** Create or update migration notes for users of removed commands
+- [x] **5.4.2** Document: "Use `/commit` instead of custom `commit` command"
+- [x] **5.4.3** Document: "Use `/code-review` instead of `review-pr-ci` or `review-pr`"
+- [x] **5.4.4** Include rollback instructions in documentation
 
 ### 5.5 Commit Documentation Changes
 
@@ -269,6 +269,7 @@ darwin-rebuild switch --flake .
 - [ ] All 12 official plugins enabled and functional
 - [x] `commit` command removed from `aiInstructionsCommands`
 - [x] `review-pr-ci` removed from `cookbookCommands`
+- [x] `review-pr` removed from `cookbookCommands`
 - [x] `nix flake check` passes
 - [ ] `darwin-rebuild switch` succeeds without errors
 - [ ] Official `/commit` command works correctly
@@ -278,8 +279,8 @@ darwin-rebuild switch --flake .
 
 ### Should Have
 
-- [ ] Documentation updated in all relevant files
-- [ ] Migration notes added for users of removed commands
+- [x] Documentation updated in all relevant files
+- [x] Migration notes added for users of removed commands
 - [ ] Command naming does not cause user confusion
 - [ ] No regression in daily development workflow
 
@@ -293,8 +294,8 @@ darwin-rebuild switch --flake .
 
 ## Open Questions to Resolve
 
-1. **`review-pr` status**: Does the interactive `review-pr` cookbook command provide unique value
-   over `/code-review` plugin? (Resolve in Phase 2.3)
+1. ~~**`review-pr` status**: Does the interactive `review-pr` cookbook command provide unique value
+   over `/code-review` plugin?~~ **RESOLVED**: Remove `review-pr` - `/code-review` provides comprehensive coverage
 
 2. **Plugin command prefixes**: Confirm whether official plugin commands use prefixes
    (e.g., `/commit-commands:commit`) or short names (e.g., `/commit`)
@@ -311,7 +312,7 @@ darwin-rebuild switch --flake .
 | File | Phase | Change Type |
 |------|-------|-------------|
 | `modules/home-manager/ai-cli/claude.nix` | 3.1 | Remove `commit` from list |
-| `modules/home-manager/ai-cli/claude-plugins.nix` | 3.2 | Remove `review-pr-ci` from list |
+| `modules/home-manager/ai-cli/claude-plugins.nix` | 3.2 | Remove `review-pr-ci`, `review-pr` from list |
 | `docs/ANTHROPIC-ECOSYSTEM.md` | 5.1 | Update command counts and lists |
 | `CLAUDE.md` | 5.2 | Update command references |
 | `.ai-instructions/INSTRUCTIONS.md` | 5.3 | Update command table (if applicable) |
