@@ -25,7 +25,7 @@
 
     # Magnified icon size (16-128 pixels)
     # Default: 128
-    largesize = 80;
+    largesize = 128;
 
     # Dock position on screen: "bottom", "left", or "right"
     # Default: "bottom"
