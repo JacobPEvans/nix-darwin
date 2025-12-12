@@ -20,7 +20,10 @@
 #
 # Commands: Symlinked from ai-assistant-instructions repo
 # - rok-* community commands (Shape Up workflow)
-# - Standard commands (commit, pull-request, etc.)
+# - Standard commands (pull-request, git-refresh, etc.)
+#
+# Migration Notes:
+# - Removed: "commit" - replaced by commit-commands plugin (/commit)
 
 { config, pkgs, lib, claude-code-plugins, claude-cookbooks
 , claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
@@ -73,8 +76,9 @@ let
   #
   # These commands live in .ai-instructions/commands/ and are symlinked
   # directly to ~/.claude/commands/ for global availability.
+  #
+  # Note: "commit" removed - use /commit from commit-commands plugin instead
   aiInstructionsCommands = [
-    "commit"
     "generate-code"
     "git-refresh"
     "infrastructure-review"

@@ -27,8 +27,8 @@ let
     "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
   # Commands from ai-assistant-instructions repo (live updates)
+  # Note: "commit" removed - use /commit from commit-commands plugin instead
   liveRepoCommands = [
-    "commit"
     "generate-code"
     "git-refresh"
     "infrastructure-review"
@@ -43,14 +43,9 @@ let
   ];
 
   # Commands from claude-cookbooks (immutable from flake)
-  cookbookCommands = [
-    "review-pr-ci"
-    "review-pr"
-    "review-issue"
-    "notebook-review"
-    "model-check"
-    "link-review"
-  ];
+  # Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)
+  cookbookCommands =
+    [ "review-issue" "notebook-review" "model-check" "link-review" ];
 
   # Agents from claude-cookbooks
   cookbookAgents = [ "code-reviewer" ];

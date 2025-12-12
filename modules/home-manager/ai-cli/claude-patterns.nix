@@ -72,10 +72,12 @@ let
 
   # Commands and agents patterns
   # Location: .claude/ in the claude-cookbooks repository
+  # Note: review-pr and review-pr-ci are now handled by code-review plugin
   commandAgentPatterns = {
     review-workflows = {
       description = "PR and issue review workflows with confidence scoring";
-      commands = [ "review-pr" "review-pr-ci" "review-issue" ];
+      # review-pr and review-pr-ci replaced by code-review plugin (/code-review)
+      commands = [ "review-issue" ];
       agents = [ "code-reviewer" ];
     };
 

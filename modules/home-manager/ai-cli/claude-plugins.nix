@@ -11,6 +11,9 @@
 #
 # Schema validation: Assertions below ensure the settings.json structure
 # matches what Claude Code expects. Build fails if format is wrong.
+#
+# Migration Notes:
+# - Removed: "review-pr-ci" - replaced by code-review plugin (/code-review)
 
 { config, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official
 , anthropic-skills, ... }:
@@ -108,9 +111,11 @@ let
   # Note: The commit-commands plugin already provides /commit-push-pr
   # Additional repo-level commands (dedupe, oncall-triage) may exist in
   # anthropics/claude-code/.claude/commands/ but need verification.
+  #
+  # Migration Notes:
+  # - Removed: "review-pr-ci" - replaced by code-review plugin (/code-review)
+  # - Removed: "review-pr" - replaced by code-review plugin (/code-review)
   cookbookCommands = [
-    "review-pr-ci" # CI/CD PR review (auto-posts to GitHub)
-    "review-pr" # Interactive PR review
     "review-issue" # GitHub issue review
     "notebook-review" # Jupyter notebook review
     "model-check" # Model validation

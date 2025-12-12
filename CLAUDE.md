@@ -84,7 +84,7 @@ Without this check, authenticated Git operations will fail with authentication e
 
 - Always create a PR after pushing if one doesn't exist for current branch
 - Do not ask user to run tests - run them yourself using pre-approved commands
-- Complete the full cycle: branch → change → test → commit(s) → push → PR
+- Complete the full cycle: branch -> change -> test -> commit(s) -> push -> PR
 - **Minimize pushes**: Batch all related commits locally, then push once
 
 ### Background Monitoring (On Every PR Create and Push)
@@ -258,9 +258,9 @@ git commit -m "message"
 
 1. `/Users/<username>/.nix-profile/bin`
 2. `/etc/profiles/per-user/<username>/bin`
-3. `/run/current-system/sw/bin` ← nix packages
+3. `/run/current-system/sw/bin` <- nix packages
 4. `/nix/var/nix/profiles/default/bin`
-5. `/opt/homebrew/bin` ← fallback only
+5. `/opt/homebrew/bin` <- fallback only
 
 **If wrong**: Check `~/.zprofile` for manual homebrew PATH additions
 
@@ -511,7 +511,7 @@ exists for reference to maintain sync with Claude/Gemini structures.
 
 - **12 official plugins** enabled (git, review, security, UI/UX, output styles, migration)
 - **2 plugin marketplaces** configured (claude-code + claude-plugins-official)
-- **6 cookbook commands** + **1 agent** installed from claude-cookbooks
+- **4 cookbook commands** + **1 agent** installed from claude-cookbooks
 - **Skills system** integrated from anthropics/skills
 - **Pattern references** for agent workflows documented
 - **SDK dev shells** for Python and TypeScript development
