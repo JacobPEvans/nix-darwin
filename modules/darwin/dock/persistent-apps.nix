@@ -20,20 +20,24 @@ in {
     # Left side of Dock (before separator) - Main apps
     # ========================================================================
     persistent-apps = [
-      # Communication
+      # Time & Tasks
+      "/System/Applications/Clock.app"
+      "/System/Applications/Reminders.app"
       "/System/Applications/Calendar.app"
+      "/Applications/Toggl Track.app"
+
+      # Communication
+      "/System/Applications/Messages.app"
       "/Applications/Slack.app"
       "/Applications/Nix Apps/zoom.us.app"
-      "/System/Applications/Messages.app"
+      "/Applications/Webex.app"
 
-      # Productivity
-      "/System/Applications/Reminders.app"
-      "/Applications/Toggl Track.app"
-      "/System/Applications/Clock.app"
+      # Knowledge & Notes
       "/Applications/Nix Apps/Obsidian.app"
-      "/Applications/Granola.app"
+      # Note: Additional note-taking apps may be installed locally
 
       # Development & Tools
+      "/Applications/Nix Apps/RapidAPI.app"
       "/Applications/Nix Apps/Visual Studio Code.app"
       "/System/Applications/Utilities/Terminal.app"
       "/Applications/Nix Apps/Bitwarden.app"
@@ -42,7 +46,6 @@ in {
       # Browsers
       "/Applications/Safari.app"
       "/Applications/Brave Browser.app"
-      "/Applications/Google Chrome.app"
 
       # AI Tools
       "${homeDir}/Applications/Gemini.app"
@@ -52,11 +55,9 @@ in {
     # ========================================================================
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
-    persistent-others = [
-      "${homeDir}/Applications/Mind Tickle.app" # Sales enablement platform
-      "/System/Applications/TextEdit.app"
-      "/System/Applications/iPhone Mirroring.app"
-      "/System/Applications/System Settings.app"
-    ];
+    # Explicitly empty - prefer show-recents for temporary apps rather than
+    # persisting folders/apps not managed by Nix. Add apps to persistent-apps
+    # above when they should be permanent.
+    persistent-others = [ ];
   };
 }

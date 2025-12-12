@@ -29,7 +29,7 @@
 
     # Dock position on screen: "bottom", "left", or "right"
     # Default: "bottom"
-    orientation = "bottom";
+    orientation = "left";
 
     # ==========================================================================
     # Dock Behavior
@@ -59,7 +59,10 @@
 
     # Show recent applications section in Dock
     # Default: true
-    show-recents = false;
+    # Enabled: allows temporary/non-Nix-managed apps to appear on the right
+    # side of the dock without polluting the persistent-apps list. Recent
+    # apps rotate automatically, keeping the dock clean.
+    show-recents = true;
 
     # Minimize windows into their application icon
     # Default: false
