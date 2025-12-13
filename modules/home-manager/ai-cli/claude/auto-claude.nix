@@ -64,7 +64,11 @@ in {
     };
   };
 
-  config = lib.mkIf (cfg.enable && cfg.autoClaude.enable) {
+  config = lib.mkIf (cfg.enable && cfg.autoClaude.enable) (let
+    # Extract enabled repositories once (DRY)
+    enabledRepos =
+      lib.filterAttrs (_: r: r.enabled) cfg.autoClaude.repositories;
+  in {
     # Warn if apiKeyHelper is not enabled (required for headless auth)
     warnings = lib.optional (!cfg.apiKeyHelper.enable) ''
       programs.claude.autoClaude is enabled but programs.claude.apiKeyHelper is not.
@@ -77,7 +81,7 @@ in {
       lib.nameValuePair ".claude/scripts/auto-claude-${name}.sh" {
         source = mkAutoClaudeScript name repoCfg;
         executable = true;
-      }) (lib.filterAttrs (_: r: r.enabled) cfg.autoClaude.repositories);
+      }) enabledRepos;
 
     # Create launchd agents for each repository (Darwin only)
     launchd.agents = lib.mapAttrs' (name: repoCfg:
@@ -97,6 +101,6 @@ in {
               "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           };
         };
-      }) (lib.filterAttrs (_: r: r.enabled) cfg.autoClaude.repositories);
-  };
+      }) enabledRepos;
+  });
 }

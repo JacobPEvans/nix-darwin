@@ -21,7 +21,7 @@ LOG_DIR="@logDir@"
 
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
-  echo "Error: Directory $TARGET_DIR does not exist."
+  echo "Error: Directory $TARGET_DIR does not exist." >&2
   exit 1
 fi
 
@@ -140,8 +140,8 @@ EXIT_CODE=${pipestatus[1]}
 # --- POST-RUN PROCESSING ---
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
-# Extract final summary from log if present
-FINAL_SUMMARY=$(grep -o '{[^}]*"outcome"[^}]*}' "$LOG_FILE" 2>/dev/null | tail -1)
+# Extract final summary from log if present (use jq for robust JSON parsing)
+FINAL_SUMMARY=$(jq -c 'select(.outcome)' "$LOG_FILE" 2>/dev/null | tail -1)
 
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
