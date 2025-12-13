@@ -107,13 +107,13 @@ in {
       ai-assistant-instructions = {
         path = "${config.home.homeDirectory}/git/ai-assistant-instructions";
         schedule.hour = 4;
-        maxBudget = 2.00;
+        maxBudget = 25.00;
       };
       # nix config: runs daily at 1pm (13:00)
       nix = {
         path = "${config.home.homeDirectory}/.config/nix";
         schedule.hour = 13;
-        maxBudget = 2.00;
+        maxBudget = 25.00;
       };
     };
   };
