@@ -66,6 +66,7 @@ in
       # Development tools
       # ========================================================================
       claude-code # Anthropic's agentic coding CLI
+      claude-monitor # Real-time Claude Code usage monitor
       gemini-cli # Google's Gemini CLI
       gh # GitHub CLI
       mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
