@@ -286,18 +286,11 @@ in
   # Claude Code Settings Validation (post-rebuild)
   # ==========================================================================
   # Validates settings.json against JSON Schema after home files are written
-  # Uses check-jsonschema (Python CLI) from common/packages.nix
-  # Schema URL from lib/user-config.nix (single source of truth)
-  home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
-
-    if [ -f "$SETTINGS" ]; then
-      if command -v check-jsonschema > /dev/null 2>&1; then
-        $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
-          echo "Warning: Claude Code settings.json validation failed" >&2
-      else
-        echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
-      fi
-    fi
-  '';
+  # Script extracted to scripts/validate-claude-settings.sh for maintainability
+  home.activation.validateClaudeSettings =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
+        "${config.home.homeDirectory}/.claude/settings.json" \
+        "${userConfig.ai.claudeSchemaUrl}"
+    '';
 }
