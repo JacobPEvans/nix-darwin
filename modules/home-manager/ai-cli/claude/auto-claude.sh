@@ -6,18 +6,20 @@
 # Runs Claude autonomously via launchd to perform maintenance tasks on git repos.
 # Designed for full autonomy with safety constraints and structured logging.
 #
-# Configuration (injected via Nix substituteAll):
-# - @targetDir@   : Directory to run maintenance in
-# - @maxBudget@   : Maximum cost per run in USD
-# - @logDir@      : Directory for log files
+# Usage: auto-claude.sh <target_dir> <max_budget_usd> [log_dir]
 # =============================================================================
 
 set -euo pipefail
 
-# --- CONFIGURATION (from Nix) ---
-TARGET_DIR="@targetDir@"
-MAX_BUDGET_USD="@maxBudget@"
-LOG_DIR="@logDir@"
+# --- ARGUMENT PARSING ---
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <target_dir> <max_budget_usd> [log_dir]" >&2
+  exit 1
+fi
+
+TARGET_DIR="$1"
+MAX_BUDGET_USD="$2"
+LOG_DIR="${3:-$HOME/.claude/logs}"
 
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then

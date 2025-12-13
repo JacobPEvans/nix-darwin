@@ -7,14 +7,8 @@
 let
   cfg = config.programs.claude;
   homeDir = config.home.homeDirectory;
-
-  # Build a script for each repository
-  mkAutoClaudeScript = name: repoCfg:
-    pkgs.replaceVars ./auto-claude.sh {
-      targetDir = repoCfg.path;
-      maxBudget = toString repoCfg.maxBudget;
-      logDir = "${homeDir}/.claude/logs";
-    };
+  logDir = "${homeDir}/.claude/logs";
+  scriptPath = "${homeDir}/.claude/scripts/auto-claude.sh";
 
   # Convert hour to launchd calendar interval
   mkCalendarInterval = hour: {
@@ -76,25 +70,25 @@ in {
       Enable it with: programs.claude.apiKeyHelper.enable = true;
     '';
 
-    # Deploy scripts for each repository
-    home.file = lib.mapAttrs' (name: repoCfg:
-      lib.nameValuePair ".claude/scripts/auto-claude-${name}.sh" {
-        source = mkAutoClaudeScript name repoCfg;
-        executable = true;
-      }) enabledRepos;
+    # Deploy single parameterized script
+    home.file.".claude/scripts/auto-claude.sh" = {
+      source = ./auto-claude.sh;
+      executable = true;
+    };
 
     # Create launchd agents for each repository (Darwin only)
+    # Each agent calls the single script with repository-specific arguments
     launchd.agents = lib.mapAttrs' (name: repoCfg:
       lib.nameValuePair "com.claude.auto-claude-${name}" {
         enable = repoCfg.enabled;
         config = {
           Label = "com.claude.auto-claude-${name}";
           ProgramArguments =
-            [ "${homeDir}/.claude/scripts/auto-claude-${name}.sh" ];
+            [ scriptPath repoCfg.path (toString repoCfg.maxBudget) logDir ];
           StartCalendarInterval =
             [ (mkCalendarInterval repoCfg.schedule.hour) ];
-          StandardOutPath = "${homeDir}/.claude/logs/launchd-${name}.log";
-          StandardErrorPath = "${homeDir}/.claude/logs/launchd-${name}.err";
+          StandardOutPath = "${logDir}/launchd-${name}.log";
+          StandardErrorPath = "${logDir}/launchd-${name}.err";
           EnvironmentVariables = {
             HOME = homeDir;
             PATH =
