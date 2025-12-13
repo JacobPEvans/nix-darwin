@@ -49,7 +49,7 @@ in {
 
           maxBudget = lib.mkOption {
             type = lib.types.float;
-            default = 2.00;
+            default = 2.0;
             description = "Maximum cost per run in USD";
           };
 
@@ -81,7 +81,8 @@ in {
           Label = "com.claude.auto-claude-${name}";
           ProgramArguments =
             [ "${homeDir}/.claude/scripts/auto-claude-${name}.sh" ];
-          StartCalendarInterval = [ (mkCalendarInterval repoCfg.schedule.hour) ];
+          StartCalendarInterval =
+            [ (mkCalendarInterval repoCfg.schedule.hour) ];
           StandardOutPath = "${homeDir}/.claude/logs/launchd-${name}.log";
           StandardErrorPath = "${homeDir}/.claude/logs/launchd-${name}.err";
           EnvironmentVariables = {
@@ -91,7 +92,8 @@ in {
           };
           # Don't run if missed (e.g., laptop was asleep)
           # Set to true if you want catch-up runs
-          StartCalendarInterval = [ (mkCalendarInterval repoCfg.schedule.hour) ];
+          StartCalendarInterval =
+            [ (mkCalendarInterval repoCfg.schedule.hour) ];
         };
       }) (lib.filterAttrs (_: r: r.enabled) cfg.autoClaude.repositories);
   };

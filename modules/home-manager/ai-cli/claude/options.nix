@@ -162,7 +162,8 @@ in {
 
     # API Key Helper (for headless authentication)
     apiKeyHelper = {
-      enable = mkEnableOption "API key helper for headless Claude authentication";
+      enable =
+        mkEnableOption "API key helper for headless Claude authentication";
 
       scriptPath = mkOption {
         type = types.str;

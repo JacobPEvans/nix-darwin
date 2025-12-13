@@ -41,24 +41,23 @@ let
 
     # API Key Helper (for headless authentication)
   } // lib.optionalAttrs cfg.apiKeyHelper.enable {
-    env = {
-      apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
-    };
+    env = { apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}"; };
   }
 
   # Status line (if enabled)
-  // lib.optionalAttrs cfg.statusLine.enable {
-    statusLine = if cfg.statusLine.enhanced.enable
-    && cfg.statusLine.enhanced.package != null then {
-      type = "command";
-      # Reference package built by statusline.nix (single source of truth)
-      command = "${cfg.statusLine.enhanced.package}/bin/claude-code-statusline";
-    } else if cfg.statusLine.script != null then {
-      type = "command";
-      command = "${homeDir}/.claude/statusline-command.sh";
-    } else
-      { };
-  };
+    // lib.optionalAttrs cfg.statusLine.enable {
+      statusLine = if cfg.statusLine.enhanced.enable
+      && cfg.statusLine.enhanced.package != null then {
+        type = "command";
+        # Reference package built by statusline.nix (single source of truth)
+        command =
+          "${cfg.statusLine.enhanced.package}/bin/claude-code-statusline";
+      } else if cfg.statusLine.script != null then {
+        type = "command";
+        command = "${homeDir}/.claude/statusline-command.sh";
+      } else
+        { };
+    };
 
   # Pretty-print JSON
   settingsJson = pkgs.runCommand "claude-settings.json" {
