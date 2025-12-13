@@ -51,7 +51,9 @@ jobs:
         run: nix develop --command statix check .
 
       - name: Check for unused Nix code (deadnix)
-        run: nix develop --command deadnix --fail .
+        # -L: ignore lambda pattern names (common in modules: config, lib, pkgs)
+        # --fail: exit with error if unused bindings found
+        run: nix develop --command deadnix -L --fail .
 
       - name: Check flake health
         uses: DeterminateSystems/flake-checker-action@main
