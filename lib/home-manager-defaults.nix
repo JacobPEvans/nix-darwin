@@ -15,6 +15,8 @@
   # Install user packages to /etc/profiles instead of ~/.nix-profile
   useUserPackages = true;
 
-  # Backup extension for existing files that would be overwritten
-  backupFileExtension = "backup";
+  # No backups needed - everything is git/Nix version controlled
+  # Remove conflicting files instead of creating .backup files that accumulate
+  # This prevents "would be clobbered" errors on repeated rebuilds
+  backupFileExtension = null;
 }

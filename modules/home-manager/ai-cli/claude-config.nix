@@ -2,9 +2,18 @@
 #
 # Centralized configuration for the programs.claude module.
 # Imported by common.nix to keep it clean and high-level.
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks
-, claude-plugins-official, anthropic-skills, ai-assistant-instructions
-, claude-code-statusline, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  claude-code-plugins,
+  claude-cookbooks,
+  claude-plugins-official,
+  anthropic-skills,
+  ai-assistant-instructions,
+  claude-code-statusline,
+  ...
+}:
 
 let
   userConfig = import ../../../lib/user-config.nix;
@@ -19,12 +28,9 @@ let
   # Helper to reduce repetition (DRY)
   readPermissionsJson = path: builtins.fromJSON (builtins.readFile path);
 
-  claudeAllowJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/allow.json";
-  claudeAskJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/ask.json";
-  claudeDenyJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/deny.json";
+  claudeAllowJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/allow.json";
+  claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
+  claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
   # Commands from ai-assistant-instructions repo (live updates)
   # Note: "commit" removed - use /commit from commit-commands plugin instead
@@ -44,8 +50,12 @@ let
 
   # Commands from claude-cookbooks (immutable from flake)
   # Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)
-  cookbookCommands =
-    [ "review-issue" "notebook-review" "model-check" "link-review" ];
+  cookbookCommands = [
+    "review-issue"
+    "notebook-review"
+    "model-check"
+    "link-review"
+  ];
 
   # Agents from claude-cookbooks
   cookbookAgents = [ "code-reviewer" ];
@@ -87,7 +97,8 @@ let
     # "ralph-wiggum@anthropics/claude-code" = true;  # Autonomous iteration loops
   };
 
-in {
+in
+{
   enable = true;
 
   # API Key Helper for headless authentication (cron jobs, CI/CD)
@@ -193,13 +204,16 @@ in {
     };
 
     # Additional directories accessible to Claude Code without prompts
-    additionalDirectories = [ "~/" "~/.claude/" "~/.config/" ];
+    additionalDirectories = [
+      "~/"
+      "~/.claude/"
+      "~/.config/"
+    ];
   };
 
   mcpServers = {
     bitwarden = {
-      command =
-        "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
+      command = "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
       args = [ ];
     };
   };

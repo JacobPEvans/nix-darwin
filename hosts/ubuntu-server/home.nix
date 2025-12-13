@@ -3,12 +3,18 @@
 # User environment managed by home-manager standalone.
 # System packages are managed by apt (see default.nix for notes).
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   userConfig = import ../../lib/user-config.nix;
   serverConfig = import ../../lib/server-config.nix;
-in {
+in
+{
   # ==========================================================================
   # Module Imports
   # ==========================================================================
@@ -35,8 +41,7 @@ in {
   programs.vscode.enable = lib.mkForce false;
 
   # Ubuntu-specific packages (beyond common)
-  home.packages = with pkgs;
-    [
-      # Add Ubuntu-specific tools here if needed
-    ];
+  home.packages = with pkgs; [
+    # Add Ubuntu-specific tools here if needed
+  ];
 }

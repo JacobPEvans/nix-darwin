@@ -10,7 +10,8 @@
 let
   # User-specific configuration (hostname, identity, etc.)
   userConfig = import ../../lib/user-config.nix;
-in {
+in
+{
   imports = [
     # Darwin system modules
     ../../modules/darwin/common.nix
@@ -32,6 +33,21 @@ in {
   # Enables macOS Remote Login via launchd (System Settings > General > Sharing)
   # Allows SSH access to this development machine
   services.openssh.enable = true;
+
+  # ==========================================================================
+  # OrbStack Configuration
+  # ==========================================================================
+  # Container runtime with dedicated APFS volume for data storage
+  # Data symlink configured in home.nix using mkOutOfStoreSymlink
+
+  programs.orbstack = {
+    enable = true;
+    dataVolume = {
+      enable = true;
+      name = "ContainerData";
+      apfsContainer = "disk3"; # Find with: diskutil apfs list
+    };
+  };
 
   # Machine-specific packages (if any beyond common)
   # environment.systemPackages = with pkgs; [ ];

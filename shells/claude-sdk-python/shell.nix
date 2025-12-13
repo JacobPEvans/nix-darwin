@@ -17,13 +17,16 @@
 # Or with direnv (create .envrc):
 #   use flake ~/.config/nix/shells/claude-sdk-python
 
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 
 let
   # DRY: Define Python version once, use throughout
   python = pkgs.python311;
   pythonPackages = pkgs.python311Packages;
-in pkgs.mkShell {
+in
+pkgs.mkShell {
   name = "claude-sdk-python";
 
   buildInputs = [

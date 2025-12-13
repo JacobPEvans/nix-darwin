@@ -16,18 +16,18 @@
 
 { config, ... }:
 
-let homeDir = config.home.homeDirectory;
-in {
+let
+  homeDir = config.home.homeDirectory;
+in
+{
   # === UPDATE MANAGEMENT ===
   # Disable all auto-update functionality (Nix manages VS Code updates via nixpkgs)
   # This prevents the "An update is ready to install" popup and helper tool prompts
   #
   # NOTE: update.mode and extensions.autoCheckUpdates are set by home-manager module
   # options (enableUpdateCheck/enableExtensionUpdateCheck) in common.nix
-  "update.showReleaseNotes" =
-    false; # Don't show release notes after Nix updates
-  "extensions.autoUpdate" =
-    false; # Don't auto-update extensions (not covered by HM)
+  "update.showReleaseNotes" = false; # Don't show release notes after Nix updates
+  "extensions.autoUpdate" = false; # Don't auto-update extensions (not covered by HM)
 
   # === GIT INTEGRATION ===
 
@@ -41,7 +41,11 @@ in {
   "git.replaceTagsWhenPull" = true;
 
   # Protected branches - prevent accidental commits
-  "git.branchProtection" = [ "develop" "main" "master" ];
+  "git.branchProtection" = [
+    "develop"
+    "main"
+    "master"
+  ];
 
   # Branch naming convention validation
   "git.branchValidationRegex" = "(bugfix|chore|feature|hotfix|release)/";

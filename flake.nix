@@ -81,10 +81,21 @@
 
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, mac-app-util
-    , claude-code-plugins, claude-cookbooks, claude-plugins-official
-    , anthropic-skills, agent-os, ai-assistant-instructions
-    , claude-code-statusline, ... }:
+  outputs =
+    {
+      nixpkgs,
+      darwin,
+      home-manager,
+      mac-app-util,
+      claude-code-plugins,
+      claude-cookbooks,
+      claude-plugins-official,
+      anthropic-skills,
+      agent-os,
+      ai-assistant-instructions,
+      claude-code-statusline,
+      ...
+    }:
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
@@ -92,30 +103,44 @@
       # Pure settings generator for CI (no derivations, cross-platform)
       # Reads permissions from flake inputs and generates settings attrset
       ciClaudeSettings = import ./lib/claude-settings.nix {
-        homeDir =
-          "/home/user"; # Placeholder - CI only validates schema structure
+        homeDir = "/home/user"; # Placeholder - CI only validates schema structure
         schemaUrl = userConfig.ai.claudeSchemaUrl;
         permissions = {
-          allow = (builtins.fromJSON (builtins.readFile
-            "${ai-assistant-instructions}/.claude/permissions/allow.json")).permissions;
-          deny = (builtins.fromJSON (builtins.readFile
-            "${ai-assistant-instructions}/.claude/permissions/deny.json")).permissions;
-          ask = (builtins.fromJSON (builtins.readFile
-            "${ai-assistant-instructions}/.claude/permissions/ask.json")).permissions;
+          allow =
+            (builtins.fromJSON (
+              builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json"
+            )).permissions;
+          deny =
+            (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json"))
+            .permissions;
+          ask =
+            (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json"))
+            .permissions;
         };
-        plugins = (import ./modules/home-manager/ai-cli/claude-plugins.nix {
-          inherit claude-code-plugins claude-cookbooks claude-plugins-official
-            anthropic-skills;
-          lib = nixpkgs.lib;
-          config = { }; # Unused but required by signature
-        }).pluginConfig;
+        plugins =
+          (import ./modules/home-manager/ai-cli/claude-plugins.nix {
+            inherit
+              claude-code-plugins
+              claude-cookbooks
+              claude-plugins-official
+              anthropic-skills
+              ;
+            lib = nixpkgs.lib;
+            config = { }; # Unused but required by signature
+          }).pluginConfig;
       };
 
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
-        inherit claude-code-plugins claude-cookbooks claude-plugins-official
-          anthropic-skills agent-os ai-assistant-instructions
-          claude-code-statusline;
+        inherit
+          claude-code-plugins
+          claude-cookbooks
+          claude-plugins-official
+          anthropic-skills
+          agent-os
+          ai-assistant-instructions
+          claude-code-statusline
+          ;
       };
       # Define configuration once, assign to multiple names
       darwinConfig = darwin.lib.darwinSystem {
@@ -131,8 +156,7 @@
           {
             home-manager = hmDefaults // {
               inherit extraSpecialArgs;
-              users.${userConfig.user.name} =
-                import ./hosts/macbook-m4/home.nix;
+              users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
               # mac-app-util: Also needed for home.packages if any GUI apps there
               # Agent OS: Proper home-manager module for spec-driven AI development
@@ -146,7 +170,8 @@
           }
         ];
       };
-    in {
+    in
+    {
       # Both names point to same config:
       # - "default" for explicit #default usage
       # - hostname for auto-detection when # is omitted
@@ -167,6 +192,20 @@
           hmActivationPackage =
             darwinConfig.config.home-manager.users.${userConfig.user.name}.home.activationPackage;
         };
+      };
+
+      # Formatter for `nix fmt` command (2025 best practice)
+      # nixfmt-tree = treefmt pre-configured with nixfmt
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
+
+      # Development shell for CI and local nix tooling
+      devShells.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.mkShell {
+        packages = with nixpkgs.legacyPackages.aarch64-darwin; [
+          nixfmt-rfc-style
+          statix
+          deadnix
+          treefmt
+        ];
       };
     };
 }

@@ -22,7 +22,12 @@
 #
 # Reference: https://buildermethods.com/agent-os
 
-{ config, lib, agent-os, ... }:
+{
+  config,
+  lib,
+  agent-os,
+  ...
+}:
 
 let
   cfg = config.programs.agent-os;
@@ -53,7 +58,10 @@ let
   ];
 
   # Commands without subdirectory structure (file is directly in command folder):
-  commandsWithoutSubdirs = [ "improve-skills" "orchestrate-tasks" ];
+  commandsWithoutSubdirs = [
+    "improve-skills"
+    "orchestrate-tasks"
+  ];
 
   # Agent OS agents to install globally
   # These are the 8 specialized subagents for autonomous task delegation
@@ -70,33 +78,37 @@ let
 
   # Determine which subdir to use based on useClaudeCodeSubagents setting
   # multi-agent mode uses specialized subagents, single-agent mode is self-contained
-  commandSubdir =
-    if cfg.useClaudeCodeSubagents then "multi-agent" else "single-agent";
+  commandSubdir = if cfg.useClaudeCodeSubagents then "multi-agent" else "single-agent";
 
   # Generate command symlinks for commands WITH subdirectory structure
   # Path: profiles/default/commands/{name}/{subdir}/{name}.md
-  commandFilesWithSubdirs = builtins.listToAttrs (map (name: {
-    name = ".claude/commands/${name}.md";
-    value.source =
-      "${agent-os}/profiles/default/commands/${name}/${commandSubdir}/${name}.md";
-  }) commandsWithSubdirs);
+  commandFilesWithSubdirs = builtins.listToAttrs (
+    map (name: {
+      name = ".claude/commands/${name}.md";
+      value.source = "${agent-os}/profiles/default/commands/${name}/${commandSubdir}/${name}.md";
+    }) commandsWithSubdirs
+  );
 
   # Generate command symlinks for commands WITHOUT subdirectory structure
   # Path: profiles/default/commands/{name}/{name}.md
-  commandFilesWithoutSubdirs = builtins.listToAttrs (map (name: {
-    name = ".claude/commands/${name}.md";
-    value.source = "${agent-os}/profiles/default/commands/${name}/${name}.md";
-  }) commandsWithoutSubdirs);
+  commandFilesWithoutSubdirs = builtins.listToAttrs (
+    map (name: {
+      name = ".claude/commands/${name}.md";
+      value.source = "${agent-os}/profiles/default/commands/${name}/${name}.md";
+    }) commandsWithoutSubdirs
+  );
 
   # Combined command files
   commandFiles = commandFilesWithSubdirs // commandFilesWithoutSubdirs;
 
   # Generate agent symlinks to ~/.claude/agents/
   # Agents are in profiles/default/agents/{name}.md
-  agentFiles = builtins.listToAttrs (map (name: {
-    name = ".claude/agents/${name}.md";
-    value.source = "${agent-os}/profiles/default/agents/${name}.md";
-  }) agentOsAgents);
+  agentFiles = builtins.listToAttrs (
+    map (name: {
+      name = ".claude/agents/${name}.md";
+      value.source = "${agent-os}/profiles/default/agents/${name}.md";
+    }) agentOsAgents
+  );
 
   # Generate skill symlinks from standards directories
   # Standards are in profiles/default/standards/{category}/*.md
@@ -107,36 +119,41 @@ let
   # - If agent-os structure changes, rebuild required to pick up changes
   # - Missing directories gracefully return empty sets (no build failure)
   # - This is intentional: ensures skills match the agent-os version in flake.lock
-  standardsCategories = [ "backend" "frontend" "global" "testing" ];
+  standardsCategories = [
+    "backend"
+    "frontend"
+    "global"
+    "testing"
+  ];
 
   # Helper function to generate skill files for a single category
   # Returns attrset of { ".claude/skills/{category}-{file}.md" = { source = ...; }; }
-  generateSkillsForCategory = category:
+  generateSkillsForCategory =
+    category:
     let
       standardsPath = "${agent-os}/profiles/default/standards/${category}";
       # Graceful fallback: if directory doesn't exist, return empty attrset
       # This handles cases where agent-os repo structure changes or categories are removed
-      dirContents = if builtins.pathExists standardsPath then
-        builtins.readDir standardsPath
-      else
-        { };
+      dirContents = if builtins.pathExists standardsPath then builtins.readDir standardsPath else { };
       filesInCategory = builtins.attrNames dirContents;
       # Filter to only .md files
-      mdFiles =
-        builtins.filter (name: lib.hasSuffix ".md" name) filesInCategory;
-    in builtins.listToAttrs (map (filename: {
-      name = ".claude/skills/${category}-${filename}";
-      value.source = "${standardsPath}/${filename}";
-    }) mdFiles);
+      mdFiles = builtins.filter (name: lib.hasSuffix ".md" name) filesInCategory;
+    in
+    builtins.listToAttrs (
+      map (filename: {
+        name = ".claude/skills/${category}-${filename}";
+        value.source = "${standardsPath}/${filename}";
+      }) mdFiles
+    );
 
   # Combine all categories into a single attrset
-  skillFiles = builtins.foldl' (acc: attrs: acc // attrs) { }
-    (map generateSkillsForCategory standardsCategories);
+  skillFiles = builtins.foldl' (acc: attrs: acc // attrs) { } (
+    map generateSkillsForCategory standardsCategories
+  );
 
   # Skill template symlink
   skillTemplateFile = {
-    ".claude/skills/TEMPLATE.md".source =
-      "${agent-os}/profiles/default/claude-code-skill-template.md";
+    ".claude/skills/TEMPLATE.md".source = "${agent-os}/profiles/default/claude-code-skill-template.md";
   };
 
   # Workflow symlinks - expose workflows directory
@@ -146,16 +163,15 @@ let
     "agent-os/workflows".source = "${agent-os}/profiles/default/workflows";
   };
 
-in {
+in
+{
   options.programs.agent-os = {
-    enable =
-      lib.mkEnableOption "Agent OS integration for spec-driven AI development";
+    enable = lib.mkEnableOption "Agent OS integration for spec-driven AI development";
 
     profile = lib.mkOption {
       type = lib.types.str;
       default = "default";
-      description =
-        "Agent OS profile to use. Custom profiles can be created manually.";
+      description = "Agent OS profile to use. Custom profiles can be created manually.";
     };
 
     claudeCodeCommands = lib.mkOption {
@@ -210,11 +226,12 @@ in {
 
   config = lib.mkIf cfg.enable {
     # Enforce option dependencies
-    assertions = [{
-      assertion = cfg.standardsAsClaudeCodeSkills -> cfg.claudeCodeCommands;
-      message =
-        "programs.agent-os.standardsAsClaudeCodeSkills requires programs.agent-os.claudeCodeCommands to be enabled.";
-    }];
+    assertions = [
+      {
+        assertion = cfg.standardsAsClaudeCodeSkills -> cfg.claudeCodeCommands;
+        message = "programs.agent-os.standardsAsClaudeCodeSkills requires programs.agent-os.claudeCodeCommands to be enabled.";
+      }
+    ];
 
     home.file = {
       # Nix-generated configuration
@@ -222,7 +239,8 @@ in {
         # Agent OS Configuration
         # Generated by Nix - do not edit manually
         # To change settings, update programs.agent-os in your Nix configuration
-      '' + configYaml;
+      ''
+      + configYaml;
 
       # Reference documentation
       "agent-os/CHANGELOG.md".source = "${agent-os}/CHANGELOG.md";
@@ -231,13 +249,12 @@ in {
       "agent-os/profiles/default".source = "${agent-os}/profiles/default";
     }
     # Global command symlinks (when claudeCodeCommands enabled)
-      // lib.optionalAttrs cfg.claudeCodeCommands commandFiles
-      # Global agent symlinks (when subagents enabled)
-      // lib.optionalAttrs cfg.useClaudeCodeSubagents agentFiles
-      # Standards as skills symlinks (when standardsAsClaudeCodeSkills enabled)
-      // lib.optionalAttrs cfg.standardsAsClaudeCodeSkills
-      (skillFiles // skillTemplateFile)
-      # Workflows symlink (when exposeWorkflows enabled)
-      // lib.optionalAttrs cfg.exposeWorkflows workflowFiles;
+    // lib.optionalAttrs cfg.claudeCodeCommands commandFiles
+    # Global agent symlinks (when subagents enabled)
+    // lib.optionalAttrs cfg.useClaudeCodeSubagents agentFiles
+    # Standards as skills symlinks (when standardsAsClaudeCodeSkills enabled)
+    // lib.optionalAttrs cfg.standardsAsClaudeCodeSkills (skillFiles // skillTemplateFile)
+    # Workflows symlink (when exposeWorkflows enabled)
+    // lib.optionalAttrs cfg.exposeWorkflows workflowFiles;
   };
 }

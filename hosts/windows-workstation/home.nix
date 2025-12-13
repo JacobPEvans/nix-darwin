@@ -8,7 +8,12 @@
 # - Cross-platform settings (shell, git, etc.)
 # - Windows-specific home-manager settings
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ==========================================================================

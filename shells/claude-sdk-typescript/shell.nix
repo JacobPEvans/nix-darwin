@@ -17,7 +17,9 @@
 # Or with direnv (create .envrc):
 #   use flake ~/.config/nix/shells/claude-sdk-typescript
 
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 
 pkgs.mkShell {
   name = "claude-sdk-typescript";

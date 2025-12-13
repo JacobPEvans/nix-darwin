@@ -10,7 +10,8 @@
 let
   # Available for customization (see NewWindowTargetPath example below)
   userConfig = import ../../lib/user-config.nix;
-in {
+in
+{
   system.defaults.finder = {
     # ==========================================================================
     # File Visibility
@@ -159,6 +160,8 @@ in {
     };
 
     # Disable personalized ads (privacy)
-    "com.apple.AdLib" = { allowApplePersonalizedAdvertising = false; };
+    "com.apple.AdLib" = {
+      allowApplePersonalizedAdvertising = false;
+    };
   };
 }

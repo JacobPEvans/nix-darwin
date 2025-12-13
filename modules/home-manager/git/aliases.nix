@@ -6,8 +6,7 @@
 {
   # Status & info
   st = "status -sb"; # Short status with branch info
-  lo =
-    "log --oneline -20"; # Quick log view (renamed from ll to avoid shell alias conflict)
+  lo = "log --oneline -20"; # Quick log view (renamed from ll to avoid shell alias conflict)
   lg = "log --graph --oneline --decorate --all"; # Visual branch graph
   last = "log -1 HEAD --stat"; # Show last commit with stats
 
@@ -41,6 +40,5 @@
   sl = "stash list";
 
   # Cleanup
-  cleanup =
-    "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d";
+  cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d";
 }

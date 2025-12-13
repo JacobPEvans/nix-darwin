@@ -45,7 +45,19 @@ jobs:
           use-gha-cache: true
 
       - name: Check Nix formatting
-        run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
+        # treefmt uses --ci flag (not --check) for CI mode
+        run: nix fmt -- --ci .
+
+      - name: Lint Nix files (statix)
+        run: nix develop --command statix check .
+
+      - name: Check for unused Nix code (deadnix)
+        # -L: ignore lambda pattern names (common in modules: config, lib, pkgs)
+        # --fail: exit with error if unused bindings found
+        run: nix develop --command deadnix -L --fail .
+
+      - name: Check flake health
+        uses: DeterminateSystems/flake-checker-action@main
 
       - name: Build Home Manager
         run: ./scripts/workflows/build-hm.sh result-hm

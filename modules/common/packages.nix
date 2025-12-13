@@ -11,7 +11,8 @@
 
 { pkgs }:
 
-with pkgs; [
+with pkgs;
+[
   # ==========================================================================
   # Git & Pre-commit Hooks
   # ==========================================================================
@@ -34,8 +35,12 @@ with pkgs; [
   # CI/CD
   actionlint # GitHub Actions workflow linter
 
-  # Nix
-  nixfmt-classic # Nix code formatter (this repo uses Nix)
+  # Nix (2025 official tooling)
+  nixfmt-rfc-style # Official Nix formatter (RFC 166, v1.1.0+)
+  statix # Nix linter - catches anti-patterns
+  deadnix # Find unused code in .nix files
+  treefmt # Multi-language formatter runner
+  nix-tree # Browse Nix store dependencies interactively
 
   # JSON
   check-jsonschema # JSON Schema validator CLI (for settings validation)

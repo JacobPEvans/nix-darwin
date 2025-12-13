@@ -13,7 +13,12 @@
 # - analysis: Data and code analysis capabilities
 # - automation: Workflow automation skills
 
-{ config, lib, anthropic-skills, ... }:
+{
+  config,
+  lib,
+  anthropic-skills,
+  ...
+}:
 
 let
   # Skills to install from the anthropics/skills repository
@@ -40,13 +45,19 @@ let
 
   # Helper function to create file entries for skills
   # Creates ~/.claude/skills/<skill-name>.md entries
-  mkSkillFileEntries = skills:
-    builtins.listToAttrs (map (skill: {
-      name = ".claude/skills/${skill}.md";
-      value = { source = "${anthropic-skills}/skills/${skill}.md"; };
-    }) skills);
+  mkSkillFileEntries =
+    skills:
+    builtins.listToAttrs (
+      map (skill: {
+        name = ".claude/skills/${skill}.md";
+        value = {
+          source = "${anthropic-skills}/skills/${skill}.md";
+        };
+      }) skills
+    );
 
-in {
+in
+{
   # Home-manager file entries for skills
   # These copy skill files from the anthropics/skills repo to ~/.claude/skills/
   #

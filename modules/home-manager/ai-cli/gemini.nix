@@ -15,10 +15,10 @@
 { config, ... }:
 
 let
-  geminiAllow =
-    import ../permissions/gemini-permissions-allow.nix { inherit config; };
+  geminiAllow = import ../permissions/gemini-permissions-allow.nix { inherit config; };
   geminiDeny = import ../permissions/gemini-permissions-deny.nix { };
-in {
+in
+{
   ".gemini/settings.json".text = builtins.toJSON {
     # JSON Schema reference for IDE IntelliSense and validation
     # Official schema from google-gemini/gemini-cli repo

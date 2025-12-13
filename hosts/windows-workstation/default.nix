@@ -8,7 +8,12 @@
 # - Windows-specific settings
 # - Integration with Windows features
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ==========================================================================

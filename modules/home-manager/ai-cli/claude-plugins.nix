@@ -15,23 +15,32 @@
 # Migration Notes:
 # - Removed: "review-pr-ci" - replaced by code-review plugin (/code-review)
 
-{ config, lib, claude-code-plugins, claude-cookbooks, claude-plugins-official
-, anthropic-skills, ... }:
+{
+  config,
+  lib,
+  claude-code-plugins,
+  claude-cookbooks,
+  claude-plugins-official,
+  anthropic-skills,
+  ...
+}:
 
 let
   # Validate marketplace entry has correct nested structure
   # Claude Code schema: { "id": { source: { source: "git", url: "..." } } }
-  validateMarketplace = name: value:
+  validateMarketplace =
+    name: value:
     assert lib.assertMsg (builtins.isAttrs value)
       "Marketplace '${name}' must be an attrset, got ${builtins.typeOf value}";
-    assert lib.assertMsg (value ? source && builtins.isAttrs value.source)
-      "Marketplace '${name}' must have a 'source' attrset";
-    assert lib.assertMsg
-      (value.source ? source && builtins.isString value.source.source)
-      "Marketplace '${name}.source' must have a 'source' string (git, github, npm, etc)";
-    assert lib.assertMsg
-      (value.source ? url && builtins.isString value.source.url)
-      "Marketplace '${name}.source' must have a 'url' string";
+    assert lib.assertMsg (
+      value ? source && builtins.isAttrs value.source
+    ) "Marketplace '${name}' must have a 'source' attrset";
+    assert lib.assertMsg (
+      value.source ? source && builtins.isString value.source.source
+    ) "Marketplace '${name}.source' must have a 'source' string (git, github, npm, etc)";
+    assert lib.assertMsg (
+      value.source ? url && builtins.isString value.source.url
+    ) "Marketplace '${name}.source' must have a 'url' string";
     true;
 
   # Official Anthropic plugin marketplaces
@@ -133,7 +142,9 @@ let
   validatedMarketplaces = lib.mapAttrs validateMarketplace marketplaces;
 
   # Force evaluation of validations
-in assert lib.all (x: x) (lib.attrValues validatedMarketplaces); {
+in
+assert lib.all (x: x) (lib.attrValues validatedMarketplaces);
+{
   # Plugin marketplace and enabled plugins configuration
   # Merged into settings.json by claude.nix
   pluginConfig = { inherit marketplaces enabledPlugins; };
@@ -143,12 +154,18 @@ in assert lib.all (x: x) (lib.attrValues validatedMarketplaces); {
   #
   # Helper function to reduce duplication (refactored per review feedback)
   # Creates file entries for a given type (command/agent) from a list of names
-  files = let
-    mkCookbookFileEntries = type: names:
-      builtins.listToAttrs (map (name: {
-        name = ".claude/${type}s/${name}.md";
-        value = { source = "${claude-cookbooks}/.claude/${type}s/${name}.md"; };
-      }) names);
-  in mkCookbookFileEntries "command" cookbookCommands
-  // mkCookbookFileEntries "agent" cookbookAgents;
+  files =
+    let
+      mkCookbookFileEntries =
+        type: names:
+        builtins.listToAttrs (
+          map (name: {
+            name = ".claude/${type}s/${name}.md";
+            value = {
+              source = "${claude-cookbooks}/.claude/${type}s/${name}.md";
+            };
+          }) names
+        );
+    in
+    mkCookbookFileEntries "command" cookbookCommands // mkCookbookFileEntries "agent" cookbookAgents;
 }

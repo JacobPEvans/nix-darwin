@@ -9,7 +9,8 @@ let
   # Available for customization (see screencapture.location example)
   userConfig = import ../../lib/user-config.nix;
 
-in {
+in
+{
   system.defaults.NSGlobalDomain = {
     # ==========================================================================
     # Appearance

@@ -15,7 +15,13 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }:
     # ==========================================================================
     # PLACEHOLDER: This flake is non-functional until native Windows Nix support
     # is available from Determinate Systems.

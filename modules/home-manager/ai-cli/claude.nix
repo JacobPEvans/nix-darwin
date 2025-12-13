@@ -25,8 +25,17 @@
 # Migration Notes:
 # - Removed: "commit" - replaced by commit-commands plugin (/commit)
 
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks
-, claude-plugins-official, anthropic-skills, ai-assistant-instructions, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  claude-code-plugins,
+  claude-cookbooks,
+  claude-plugins-official,
+  anthropic-skills,
+  ai-assistant-instructions,
+  ...
+}:
 
 let
   # User configuration (includes ai.instructionsRepo path)
@@ -46,25 +55,30 @@ let
   #
   # If the file is missing, malformed, or lacks the "permissions" key,
   # Nix evaluation will fail with a descriptive error.
-  readPermissionsJson = path:
-    let json = builtins.fromJSON (builtins.readFile path);
-    in if builtins.isAttrs json && json ? permissions then
+  readPermissionsJson =
+    path:
+    let
+      json = builtins.fromJSON (builtins.readFile path);
+    in
+    if builtins.isAttrs json && json ? permissions then
       json
     else
-      builtins.throw
-      "Invalid permissions JSON at ${path}: must contain a 'permissions' key";
+      builtins.throw "Invalid permissions JSON at ${path}: must contain a 'permissions' key";
 
-  claudeAllowJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/allow.json";
-  claudeAskJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/ask.json";
-  claudeDenyJson = readPermissionsJson
-    "${ai-assistant-instructions}/.claude/permissions/deny.json";
+  claudeAllowJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/allow.json";
+  claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
+  claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
   # Import plugin configuration (official Anthropic repos)
   claudePlugins = import ./claude-plugins.nix {
-    inherit config lib claude-code-plugins claude-cookbooks
-      claude-plugins-official anthropic-skills;
+    inherit
+      config
+      lib
+      claude-code-plugins
+      claude-cookbooks
+      claude-plugins-official
+      anthropic-skills
+      ;
   };
 
   # Path to git repo for symlinks (live updates without rebuild)
@@ -95,13 +109,14 @@ let
   # Create symlink entries for ai-instructions commands
   # Points directly to .ai-instructions/commands/ source files (not the .claude/commands/ symlinks)
   # This avoids a chain of symlinks and is more resilient
-  mkAiInstructionsCommandSymlinks = builtins.listToAttrs (map (cmd: {
-    name = ".claude/commands/${cmd}.md";
-    value = {
-      source = config.lib.file.mkOutOfStoreSymlink
-        "${aiInstructionsRepo}/.ai-instructions/commands/${cmd}.md";
-    };
-  }) aiInstructionsCommands);
+  mkAiInstructionsCommandSymlinks = builtins.listToAttrs (
+    map (cmd: {
+      name = ".claude/commands/${cmd}.md";
+      value = {
+        source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions/commands/${cmd}.md";
+      };
+    }) aiInstructionsCommands
+  );
 
   # Claude Code settings object
   # Generated from lib/claude-settings.nix (shared with CI for cross-platform validation)
@@ -118,15 +133,19 @@ let
 
   # Generate pretty-printed JSON using a derivation with jq
   # This improves readability for debugging permission issues
-  claudeSettingsJson = pkgs.runCommand "claude-settings.json" {
-    nativeBuildInputs = [ pkgs.jq ];
-    json = builtins.toJSON claudeSettings;
-    passAsFile = [ "json" ];
-  } ''
-    jq '.' "$jsonPath" > $out
-  '';
+  claudeSettingsJson =
+    pkgs.runCommand "claude-settings.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        json = builtins.toJSON claudeSettings;
+        passAsFile = [ "json" ];
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
 
-in {
+in
+{
   # Claude Code settings.json (pretty-printed for debugging)
   ".claude/settings.json".source = claudeSettingsJson;
 

@@ -8,8 +8,11 @@
 # This separation enables pure Nix evaluation for CI while keeping
 # pretty-printed JSON for local deployment.
 
-{ homeDir, schemaUrl, permissions # { allow, deny, ask }
-, plugins # { marketplaces, enabledPlugins }
+{
+  homeDir,
+  schemaUrl,
+  permissions, # { allow, deny, ask }
+  plugins, # { marketplaces, enabledPlugins }
 }:
 
 {

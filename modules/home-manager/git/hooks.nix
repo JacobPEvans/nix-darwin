@@ -49,7 +49,8 @@ let
     exec pre-commit run --all-files --hook-stage push
   '';
   # Return file definitions directly (merged into home.file in common.nix)
-in {
+in
+{
   ".git-templates/hooks/pre-commit" = {
     source = preCommitHook;
     executable = true;

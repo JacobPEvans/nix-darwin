@@ -7,8 +7,10 @@
 # - Server-specific configuration files
 { config, lib, ... }:
 
-let cfg = config.programs.claude;
-in {
+let
+  cfg = config.programs.claude;
+in
+{
   # MCP servers are currently handled entirely in settings.nix
   # This module exists for future MCP-specific extensions
   config = lib.mkIf cfg.enable {

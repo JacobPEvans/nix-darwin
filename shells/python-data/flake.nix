@@ -15,22 +15,30 @@
 {
   description = "Python data science environment";
 
-  inputs = { nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable"; };
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  };
 
-  outputs = { nixpkgs, ... }:
+  outputs =
+    { nixpkgs, ... }:
     let
-      systems =
-        [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = f:
-        nixpkgs.lib.genAttrs systems
-        (system: f { pkgs = import nixpkgs { inherit system; }; });
-    in {
-      devShells = forAllSystems ({ pkgs }: {
-        default = pkgs.mkShell {
-          buildInputs = with pkgs;
-            [
-              (python312.withPackages (ps:
-                with ps; [
+      systems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems =
+        f: nixpkgs.lib.genAttrs systems (system: f { pkgs = import nixpkgs { inherit system; }; });
+    in
+    {
+      devShells = forAllSystems (
+        { pkgs }:
+        {
+          default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              (python312.withPackages (
+                ps: with ps; [
                   # Core data science
                   pandas
                   numpy
@@ -54,18 +62,20 @@
                   # scikit-learn
                   # tensorflow
                   # torch
-                ]))
+                ]
+              ))
             ];
 
-          shellHook = ''
-            echo "Python Data Science environment ready"
-            echo "  - pandas, numpy, scipy"
-            echo "  - matplotlib, seaborn, plotly"
-            echo "  - jupyter lab"
-            echo ""
-            echo "Start Jupyter: jupyter lab"
-          '';
-        };
-      });
+            shellHook = ''
+              echo "Python Data Science environment ready"
+              echo "  - pandas, numpy, scipy"
+              echo "  - matplotlib, seaborn, plotly"
+              echo "  - jupyter lab"
+              echo ""
+              echo "Start Jupyter: jupyter lab"
+            '';
+          };
+        }
+      );
     };
 }

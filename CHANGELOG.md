@@ -27,7 +27,7 @@ First formal release. This version consolidates all development work into a stab
   - Development: nodejs, gh, claude-code, gemini-cli
   - GUI apps: VS Code, Obsidian, Raycast, Bitwarden, Zoom
   - Cloud/security: awscli2, aws-vault, bitwarden-cli
-  - Linters: shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt-classic
+  - Linters: shellcheck, shfmt, markdownlint-cli2, actionlint, nixfmt
 
 - **macOS System Configuration**:
   - Dock: 64px icons, hot corners, fixed space ordering, no recent apps

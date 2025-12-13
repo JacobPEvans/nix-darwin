@@ -30,74 +30,88 @@
 {
   description = "Terraform/Terragrunt development environment";
 
-  inputs = { nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable"; };
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  };
 
-  outputs = { nixpkgs, ... }:
+  outputs =
+    { nixpkgs, ... }:
     let
-      systems =
-        [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = f:
-        nixpkgs.lib.genAttrs systems (system:
+      systems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems =
+        f:
+        nixpkgs.lib.genAttrs systems (
+          system:
           f {
             pkgs = import nixpkgs {
               inherit system;
               # Terraform uses BSL license (unfree)
               config.allowUnfree = true;
             };
-          });
-    in {
-      devShells = forAllSystems ({ pkgs }: {
-        default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            # === CORE IaC TOOLS ===
-            terraform # HashiCorp Terraform
-            terragrunt # Terraform wrapper (DRY configs)
-            opentofu # Open source Terraform fork
+          }
+        );
+    in
+    {
+      devShells = forAllSystems (
+        { pkgs }:
+        {
+          default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              # === CORE IaC TOOLS ===
+              terraform # HashiCorp Terraform
+              terragrunt # Terraform wrapper (DRY configs)
+              opentofu # Open source Terraform fork
 
-            # === DOCUMENTATION ===
-            terraform-docs # Auto-generate docs from modules
+              # === DOCUMENTATION ===
+              terraform-docs # Auto-generate docs from modules
 
-            # === LINTING & FORMATTING ===
-            tflint # Terraform linter
-            # TFLint plugins (uncomment as needed for your providers):
-            # tflint-plugins.tflint-ruleset-aws
-            # tflint-plugins.tflint-ruleset-google
+              # === LINTING & FORMATTING ===
+              tflint # Terraform linter
+              # TFLint plugins (uncomment as needed for your providers):
+              # tflint-plugins.tflint-ruleset-aws
+              # tflint-plugins.tflint-ruleset-google
 
-            # === SECURITY SCANNERS ===
-            checkov # Security/compliance scanner (Bridgecrew)
-            terrascan # Security scanner (Tenable)
-            tfsec # Security scanner (Aqua)
-            trivy # Comprehensive vulnerability scanner
+              # === SECURITY SCANNERS ===
+              checkov # Security/compliance scanner (Bridgecrew)
+              terrascan # Security scanner (Tenable)
+              tfsec # Security scanner (Aqua)
+              trivy # Comprehensive vulnerability scanner
 
-            # === COST ESTIMATION ===
-            infracost # Cloud cost estimates
+              # === COST ESTIMATION ===
+              infracost # Cloud cost estimates
 
-            # === UTILITIES ===
-            # NOTE: pre-commit and markdownlint-cli2 are in common system packages
-            jq # JSON processor
-            yq # YAML processor
-          ];
+              # === UTILITIES ===
+              # NOTE: pre-commit and markdownlint-cli2 are in common system packages
+              jq # JSON processor
+              yq # YAML processor
+            ];
 
-          shellHook = ''
-            echo "Terraform/Terragrunt development environment ready"
-            echo ""
-            echo "Core tools:"
-            echo "  - terraform $(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1)"
-            echo "  - terragrunt $(terragrunt --version 2>/dev/null | head -1)"
-            echo "  - opentofu $(tofu version 2>/dev/null | head -1)"
-            echo ""
-            echo "Validation & Docs:"
-            echo "  - terraform-docs, tflint"
-            echo ""
-            echo "Security scanners:"
-            echo "  - checkov, terrascan, tfsec, trivy"
-            echo ""
-            echo "Cost estimation:"
-            echo "  - infracost"
-            echo ""
-            echo "Tip: Run 'pre-commit install' to enable git hooks"
-          '';
-        };
-      });
+            shellHook = ''
+              echo "Terraform/Terragrunt development environment ready"
+              echo ""
+              echo "Core tools:"
+              echo "  - terraform $(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1)"
+              echo "  - terragrunt $(terragrunt --version 2>/dev/null | head -1)"
+              echo "  - opentofu $(tofu version 2>/dev/null | head -1)"
+              echo ""
+              echo "Validation & Docs:"
+              echo "  - terraform-docs, tflint"
+              echo ""
+              echo "Security scanners:"
+              echo "  - checkov, terrascan, tfsec, trivy"
+              echo ""
+              echo "Cost estimation:"
+              echo "  - infracost"
+              echo ""
+              echo "Tip: Run 'pre-commit install' to enable git hooks"
+            '';
+          };
+        }
+      );
     };
 }

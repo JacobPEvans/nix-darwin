@@ -36,7 +36,11 @@ let
   username = config.home.username;
 
   # Core read-only tools (always safe)
-  coreReadTools = [ "ReadFileTool" "GlobTool" "GrepTool" ];
+  coreReadTools = [
+    "ReadFileTool"
+    "GlobTool"
+    "GrepTool"
+  ];
 
   # Git operations (version control)
   # Format: ShellTool(git subcommand)
@@ -393,7 +397,10 @@ let
   # Text processing tools
   # NOTE: General sed/awk allowed for read-only text processing
   # In-place editing (sed -i) blocked in excludeTools
-  textProcessingCommands = [ "ShellTool(sed)" "ShellTool(awk)" ];
+  textProcessingCommands = [
+    "ShellTool(sed)"
+    "ShellTool(awk)"
+  ];
 
   # Compression and archiving
   archiveCommands = [
@@ -470,13 +477,32 @@ let
   # Gemini-specific web tools
   geminiWebTools = [ "WebFetchTool" ];
 
-in {
+in
+{
   # Export coreTools list (allowed commands)
-  coreTools = coreReadTools ++ gitCommands ++ githubCommands ++ nixCommands
-    ++ homebrewCommands ++ modernCliCommands ++ pythonCommands ++ nodeCommands
-    ++ rustCommands ++ dockerCommands ++ kubernetesCommands ++ awsCommands
-    ++ terraformCommands ++ terragruntCommands ++ databaseCommands
-    ++ fileReadCommands ++ fileCreationCommands ++ textProcessingCommands
-    ++ archiveCommands ++ networkCommands ++ systemCommands ++ processCommands
-    ++ macosCommands ++ geminiWebTools;
+  coreTools =
+    coreReadTools
+    ++ gitCommands
+    ++ githubCommands
+    ++ nixCommands
+    ++ homebrewCommands
+    ++ modernCliCommands
+    ++ pythonCommands
+    ++ nodeCommands
+    ++ rustCommands
+    ++ dockerCommands
+    ++ kubernetesCommands
+    ++ awsCommands
+    ++ terraformCommands
+    ++ terragruntCommands
+    ++ databaseCommands
+    ++ fileReadCommands
+    ++ fileCreationCommands
+    ++ textProcessingCommands
+    ++ archiveCommands
+    ++ networkCommands
+    ++ systemCommands
+    ++ processCommands
+    ++ macosCommands
+    ++ geminiWebTools;
 }

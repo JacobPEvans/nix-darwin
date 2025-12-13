@@ -1,6 +1,15 @@
-{ config, pkgs, lib, claude-code-plugins, claude-cookbooks
-, claude-plugins-official, anthropic-skills, ai-assistant-instructions
-, claude-code-statusline, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  claude-code-plugins,
+  claude-cookbooks,
+  claude-plugins-official,
+  anthropic-skills,
+  ai-assistant-instructions,
+  claude-code-statusline,
+  ...
+}:
 
 let
   # User-specific configuration (identity, GPG keys, preferences)
@@ -27,9 +36,17 @@ let
 
   # Claude Code configuration (extracted to separate file for clarity)
   claudeConfig = import ./ai-cli/claude-config.nix {
-    inherit config pkgs lib claude-code-plugins claude-cookbooks
-      claude-plugins-official anthropic-skills ai-assistant-instructions
-      claude-code-statusline;
+    inherit
+      config
+      pkgs
+      lib
+      claude-code-plugins
+      claude-cookbooks
+      claude-plugins-official
+      anthropic-skills
+      ai-assistant-instructions
+      claude-code-statusline
+      ;
   };
 
   # Path to ai-assistant-instructions git repo for symlinks
@@ -44,18 +61,17 @@ let
   # Nix manages files inside them (config.json, settings.json)
   aiInstructionsSymlinks = {
     # Root instruction files accessible from home directory
-    "CLAUDE.md".source =
-      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
-    "GEMINI.md".source =
-      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
+    "CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
+    "GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
 
     # AI instruction directories (only those without Nix-managed files inside)
-    ".ai-instructions".source = config.lib.file.mkOutOfStoreSymlink
-      "${aiInstructionsRepo}/.ai-instructions";
+    ".ai-instructions".source =
+      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions";
   };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };
-in {
+in
+{
   home.stateVersion = "24.05";
 
   # ==========================================================================
@@ -68,11 +84,12 @@ in {
     profiles.default = {
       # Disable VS Code's built-in update mechanism (Nix manages updates)
       enableUpdateCheck = false; # Sets update.mode = "none"
-      enableExtensionUpdateCheck =
-        false; # Sets extensions.autoCheckUpdates = false
+      enableExtensionUpdateCheck = false; # Sets extensions.autoCheckUpdates = false
       userSettings = {
         "editor.formatOnSave" = true;
-      } // vscodeGeneralSettings // vscodeGithubCopilotSettings;
+      }
+      // vscodeGeneralSettings
+      // vscodeGithubCopilotSettings;
     };
   };
 
@@ -162,10 +179,8 @@ in {
       core = {
         editor = userConfig.git.editor;
         autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
-        whitespace =
-          "trailing-space,space-before-tab"; # Highlight whitespace issues
-        hooksPath =
-          "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
+        whitespace = "trailing-space,space-before-tab"; # Highlight whitespace issues
+        hooksPath = "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
       };
 
       # Repository initialization
@@ -192,8 +207,7 @@ in {
 
       # Merge & diff improvements
       merge = {
-        conflictstyle =
-          "diff3"; # Show original in conflicts (easier resolution)
+        conflictstyle = "diff3"; # Show original in conflicts (easier resolution)
         ff = "only"; # Only fast-forward merges (use rebase for others)
       };
       diff = {
@@ -249,8 +263,8 @@ in {
   # Permissions: Now read from JSON in ai-assistant-instructions repo
   # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
   # NOTE: claudeFiles removed - now handled by programs.claude module
-  home.file = npmFiles // awsFiles // geminiFiles // copilotFiles
-    // aiInstructionsSymlinks // gitHooks;
+  home.file =
+    npmFiles // awsFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
 
   # ==========================================================================
   # Claude Code (Unified Module)
@@ -274,17 +288,16 @@ in {
   # Validates settings.json against JSON Schema after home files are written
   # Uses check-jsonschema (Python CLI) from common/packages.nix
   # Schema URL from lib/user-config.nix (single source of truth)
-  home.activation.validateClaudeSettings =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
+  home.activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SETTINGS="${config.home.homeDirectory}/.claude/settings.json"
 
-      if [ -f "$SETTINGS" ]; then
-        if command -v check-jsonschema > /dev/null 2>&1; then
-          $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
-            echo "Warning: Claude Code settings.json validation failed" >&2
-        else
-          echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
-        fi
+    if [ -f "$SETTINGS" ]; then
+      if command -v check-jsonschema > /dev/null 2>&1; then
+        $DRY_RUN_CMD check-jsonschema --schemafile "${userConfig.ai.claudeSchemaUrl}" "$SETTINGS" || \
+          echo "Warning: Claude Code settings.json validation failed" >&2
+      else
+        echo "Note: check-jsonschema not found, skipping Claude settings validation" >&2
       fi
-    '';
+    fi
+  '';
 }

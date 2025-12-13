@@ -14,7 +14,8 @@
 let
   userConfig = import ../../../lib/user-config.nix;
   homeDir = userConfig.user.homeDir;
-in {
+in
+{
   system.defaults.dock = {
     # ========================================================================
     # Left side of Dock (before separator) - Main apps

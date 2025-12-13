@@ -4,14 +4,20 @@
 # Creates wrapper package and manages config files.
 # Supports SSH detection for mobile-friendly single-line display.
 # Uses bun for ccusage cost tracking integration.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.claude;
 
   # Build claude-code-statusline package from source
   # Only evaluated when enhanced statusline is enabled
-  mkStatuslinePackage = source:
+  mkStatuslinePackage =
+    source:
     pkgs.stdenvNoCC.mkDerivation {
       pname = "claude-code-statusline";
       version = "2.1.0";
@@ -19,7 +25,11 @@ let
 
       nativeBuildInputs = [ pkgs.makeWrapper ];
       # Note: NOT including coreutils - script expects macOS stat, not GNU stat
-      buildInputs = [ pkgs.bash pkgs.jq pkgs.git ];
+      buildInputs = [
+        pkgs.bash
+        pkgs.jq
+        pkgs.git
+      ];
 
       installPhase = ''
         runHook preInstall
@@ -32,7 +42,12 @@ let
         # The statusline script uses 'bunx ccusage' for cost tracking
         makeWrapper $out/share/claude-code-statusline/statusline.sh $out/bin/claude-code-statusline \
           --prefix PATH : ${
-            lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.git pkgs.bun ]
+            lib.makeBinPath [
+              pkgs.bash
+              pkgs.jq
+              pkgs.git
+              pkgs.bun
+            ]
           } \
           --set STATUSLINE_HOME $out/share/claude-code-statusline
 
@@ -49,19 +64,22 @@ let
       };
     };
 
-in {
-  config = lib.mkIf
-    (cfg.enable && cfg.statusLine.enable && cfg.statusLine.enhanced.enable) (let
+in
+{
+  config = lib.mkIf (cfg.enable && cfg.statusLine.enable && cfg.statusLine.enhanced.enable) (
+    let
       statuslinePackage = mkStatuslinePackage cfg.statusLine.enhanced.source;
 
       # Config files - full (local) and mobile (SSH)
-      configFull = if cfg.statusLine.enhanced.configFile != null then
-        cfg.statusLine.enhanced.configFile
-      else
-        "${cfg.statusLine.enhanced.source}/examples/Config.toml";
+      configFull =
+        if cfg.statusLine.enhanced.configFile != null then
+          cfg.statusLine.enhanced.configFile
+        else
+          "${cfg.statusLine.enhanced.source}/examples/Config.toml";
 
       configMobile = cfg.statusLine.enhanced.mobileConfigFile;
-    in {
+    in
+    {
       # Export the package for settings.nix to reference
       programs.claude.statusLine.enhanced.package = statuslinePackage;
 
@@ -72,9 +90,11 @@ in {
       home.file = {
         # Full config (always deployed)
         ".claude/statusline/config-full.toml".source = configFull;
-      } // lib.optionalAttrs (configMobile != null) {
+      }
+      // lib.optionalAttrs (configMobile != null) {
         # Mobile config (only if specified)
         ".claude/statusline/config-mobile.toml".source = configMobile;
       };
-    });
+    }
+  );
 }

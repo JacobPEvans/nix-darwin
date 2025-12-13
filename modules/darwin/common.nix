@@ -5,7 +5,8 @@ let
 
   # Universal packages (pre-commit, linters) shared across all systems
   commonPackages = import ../common/packages.nix { inherit pkgs; };
-in {
+in
+{
   imports = [
     ./apps
     ./dock
@@ -34,51 +35,58 @@ in {
 
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
-  environment.systemPackages = commonPackages ++ (with pkgs; [
-    # ========================================================================
-    # Core CLI tools
-    # ========================================================================
-    git
-    gnupg
-    vim
+  environment.systemPackages =
+    commonPackages
+    ++ (with pkgs; [
+      # ========================================================================
+      # Core CLI tools
+      # ========================================================================
+      git
+      gnupg
+      vim
 
-    # ========================================================================
-    # Modern CLI tools (popular alternatives, also useful for AI CLI agents)
-    # These enhance productivity for both humans and AI assistants
-    # ========================================================================
-    bat # Better cat with syntax highlighting
-    delta # Better git diff viewer with syntax highlighting
-    eza # Modern ls replacement with git integration
-    fd # Faster, user-friendly find alternative
-    fzf # Fuzzy finder for interactive selection
-    htop # Interactive process viewer (better top)
-    jq # JSON parsing for config files and API responses
-    yq # YAML parsing (like jq but for YAML/XML/TOML)
-    ncdu # NCurses disk usage analyzer
-    ripgrep # Fast grep alternative (rg)
-    tldr # Simplified, community-driven man pages
-    tree # Directory tree visualization
+      # ========================================================================
+      # Modern CLI tools (popular alternatives, also useful for AI CLI agents)
+      # These enhance productivity for both humans and AI assistants
+      # ========================================================================
+      bat # Better cat with syntax highlighting
+      delta # Better git diff viewer with syntax highlighting
+      eza # Modern ls replacement with git integration
+      fd # Faster, user-friendly find alternative
+      fzf # Fuzzy finder for interactive selection
+      htop # Interactive process viewer (better top)
+      jq # JSON parsing for config files and API responses
+      yq # YAML parsing (like jq but for YAML/XML/TOML)
+      ncdu # NCurses disk usage analyzer
+      ripgrep # Fast grep alternative (rg)
+      tldr # Simplified, community-driven man pages
+      tree # Directory tree visualization
 
-    # ========================================================================
-    # Development tools
-    # ========================================================================
-    claude-code # Anthropic's agentic coding CLI
-    gemini-cli # Google's Gemini CLI
-    gh # GitHub CLI
-    mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
-    nodejs # Node.js LTS (nixpkgs default tracks current LTS)
-    # NOTE: ollama not included - nixpkgs build fails; using manual Ollama.app install
-    # See hosts/macbook-m4/home.nix for models symlink to /Volumes/Ollama
+      # ========================================================================
+      # Development tools
+      # ========================================================================
+      claude-code # Anthropic's agentic coding CLI
+      gemini-cli # Google's Gemini CLI
+      gh # GitHub CLI
+      mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
+      nodejs # Node.js LTS (nixpkgs default tracks current LTS)
+      # NOTE: ollama not included - nixpkgs build fails; using manual Ollama.app install
+      # See hosts/macbook-m4/home.nix for models symlink to /Volumes/Ollama
 
-    # ========================================================================
-    # GUI applications
-    # ========================================================================
-    bitwarden-desktop # Password manager desktop app
-    obsidian # Knowledge base / note-taking (Markdown)
-    raycast # Productivity launcher (replaces Spotlight)
-    vscode # Visual Studio Code editor
-    zoom-us # Video conferencing
-  ]);
+      # ========================================================================
+      # GUI applications
+      # ========================================================================
+      bitwarden-desktop # Password manager desktop app
+      obsidian # Knowledge base / note-taking (Markdown)
+      # OrbStack: Docker & Linux VM manager (lightweight alternative to Docker Desktop)
+      # Provides: docker, docker-compose, docker-buildx, kubectl, orb, orbctl
+      # CLIs installed to /usr/local/bin via OrbStack's helper tool
+      # Docker socket: /var/run/docker.sock (managed by programs.orbstack module)
+      orbstack
+      raycast # Productivity launcher (replaces Spotlight)
+      vscode # Visual Studio Code editor
+      zoom-us # Video conferencing
+    ]);
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
   # Prefer nixpkgs for everything - only use homebrew when absolutely necessary

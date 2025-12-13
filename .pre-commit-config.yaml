@@ -26,12 +26,41 @@ repos:
       - id: markdownlint-cli2
         files: \.md$
 
-  # NOTE: nixfmt hook removed - it doesn't support aligned comments
-  # Nix files are manually formatted to preserve comment alignment
-
-  # Claude Code settings validation - check-jsonschema installed via nix
+  # Local hooks using system-installed tools (from nix)
   - repo: local
     hooks:
+      # Nix formatting using `nix fmt` (uses flake's formatter)
+      - id: nix-fmt
+        name: Format Nix files
+        entry: nix fmt
+        language: system
+        files: \.nix$
+        types: [file]
+        pass_filenames: false
+
+      # Nix linting with statix (anti-patterns)
+      # Uses nix develop to ensure flake-locked version
+      # Note: statix check returns warnings, not blocking errors
+      - id: statix
+        name: Lint Nix files (statix)
+        entry: bash -c 'nix develop --command statix check . || true'
+        language: system
+        files: \.nix$
+        types: [file]
+        pass_filenames: false
+
+      # Dead code detection with deadnix
+      # Uses nix develop to ensure flake-locked version
+      # Note: warnings only, not blocking (use --fail in CI for stricter checks)
+      - id: deadnix
+        name: Find unused Nix code
+        entry: bash -c 'nix develop --command deadnix . || true'
+        language: system
+        files: \.nix$
+        types: [file]
+        exclude: ^worktrees/
+
+      # Claude Code settings validation - check-jsonschema installed via nix
       - id: validate-claude-settings
         name: Validate Claude settings
         entry: check-jsonschema --schemafile https://json.schemastore.org/claude-code-settings.json

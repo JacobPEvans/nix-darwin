@@ -14,7 +14,11 @@ let
         type = types.submodule {
           options = {
             type = mkOption {
-              type = types.enum [ "git" "github" "local" ];
+              type = types.enum [
+                "git"
+                "github"
+                "local"
+              ];
               default = "git";
             };
             url = mkOption { type = types.str; };
@@ -56,7 +60,8 @@ let
 
   hookType = types.nullOr (types.either types.path types.lines);
 
-in {
+in
+{
   options.programs.claude = {
     enable = mkEnableOption "Claude Code configuration";
 
@@ -162,14 +167,12 @@ in {
 
     # API Key Helper (for headless authentication)
     apiKeyHelper = {
-      enable =
-        mkEnableOption "API key helper for headless Claude authentication";
+      enable = mkEnableOption "API key helper for headless Claude authentication";
 
       scriptPath = mkOption {
         type = types.str;
         default = ".local/bin/claude-api-key-helper";
-        description =
-          "Path (relative to home) where the API key helper script is installed";
+        description = "Path (relative to home) where the API key helper script is installed";
       };
 
       keychainService = mkOption {
@@ -282,14 +285,12 @@ in {
         configFile = mkOption {
           type = types.nullOr types.path;
           default = null;
-          description =
-            "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
+          description = "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
         };
         mobileConfigFile = mkOption {
           type = types.nullOr types.path;
           default = null;
-          description =
-            "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
+          description = "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
         };
         # Internal: package built by statusline.nix, used by settings.nix
         package = mkOption {
