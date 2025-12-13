@@ -44,9 +44,10 @@ let
     env = {
       apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
     };
+  }
 
-    # Status line (if enabled)
-  } // lib.optionalAttrs cfg.statusLine.enable {
+  # Status line (if enabled)
+  // lib.optionalAttrs cfg.statusLine.enable {
     statusLine = if cfg.statusLine.enhanced.enable
     && cfg.statusLine.enhanced.package != null then {
       type = "command";

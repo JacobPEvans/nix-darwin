@@ -94,7 +94,9 @@ in {
   # Uses Bitwarden Secrets Manager to securely fetch OAuth token
   apiKeyHelper = {
     enable = true;
-    # Default: .local/bin/claude-api-key-helper
+    # scriptPath default: .local/bin/claude-api-key-helper
+    # keychainService default: bws-claude-automation
+    secretId = "55ebeb62-1327-4967-8f08-b3a5015f5b7b";
   };
 
   plugins = {

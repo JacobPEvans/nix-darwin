@@ -41,7 +41,11 @@ in {
     } // lib.optionalAttrs cfg.apiKeyHelper.enable {
       # API Key Helper script for headless authentication
       "${cfg.apiKeyHelper.scriptPath}" = {
-        source = ./get-api-key.sh;
+        source = pkgs.substituteAll {
+          src = ./get-api-key.sh;
+          keychainService = cfg.apiKeyHelper.keychainService;
+          bwsSecretId = cfg.apiKeyHelper.secretId;
+        };
         executable = true;
       };
     };

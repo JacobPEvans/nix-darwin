@@ -170,6 +170,17 @@ in {
         description =
           "Path (relative to home) where the API key helper script is installed";
       };
+
+      keychainService = mkOption {
+        type = types.str;
+        default = "bws-claude-automation";
+        description = "Keychain service name for the BWS access token";
+      };
+
+      secretId = mkOption {
+        type = types.str;
+        description = "Bitwarden secret ID for the Claude OAuth token";
+      };
     };
 
     # Settings
