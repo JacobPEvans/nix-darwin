@@ -10,16 +10,16 @@
 # Solution: Single workflow that:
 # 1. Always triggers on ALL PRs (no path filters at workflow level)
 # 2. Detects which file categories changed
-# 3. Runs conditional jobs only when needed (skipped = success)
+# 3. Calls reusable workflows conditionally (skipped = success)
 # 4. Final "Merge Gate" job aggregates all results
 #
 # Branch Protection: Set ONLY "Merge Gate" as required check
 #
 # Adding New Checks:
-# 1. Add filter pattern under `changes.steps.filter.with.filters`
-# 2. Add new job with `if: needs.changes.outputs.<filter> == 'true'`
-# 3. Add job name to `gate.needs` array
-# 4. Add job name to `gate.steps.check.with.allowed-skips`
+# 1. Create reusable workflow: _your-check.yml with `on: workflow_call`
+# 2. Add filter pattern under `changes.steps.filter.with.filters`
+# 3. Add job that calls the reusable workflow with appropriate `if:` condition
+# 4. Add job name to `gate.needs` array and `allowed-skips`
 
 name: CI Gate
 
@@ -27,15 +27,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-# Cancel in-progress runs when a new run is triggered
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ============================================================================
+  # ==========================================================================
   # CHANGE DETECTION
-  # ============================================================================
+  # ==========================================================================
   changes:
     name: Detect Changes
     runs-on: ubuntu-latest
@@ -46,13 +45,9 @@ jobs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
       claude: ${{ steps.filter.outputs.claude }}
-      scripts: ${{ steps.filter.outputs.scripts }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Detect changed files
-        uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
@@ -68,150 +63,51 @@ jobs:
               - '.claude/**'
               - 'modules/home-manager/ai-cli/**'
               - 'modules/home-manager/permissions/**'
-            scripts:
-              - 'scripts/**'
-              - '**.sh'
 
-  # ============================================================================
-  # CONDITIONAL CHECKS
-  # ============================================================================
-
-  # --- Nix Build (macOS) ---
+  # ==========================================================================
+  # CONDITIONAL CHECKS (call reusable workflows)
+  # ==========================================================================
   nix-build:
     name: Nix Build
     needs: changes
     if: needs.changes.outputs.nix == 'true'
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+    uses: ./.github/workflows/_nix-build.yml
 
-      - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Determinate Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-        with:
-          use-flakehub: false
-          use-gha-cache: true
-
-      - name: Check Nix formatting
-        run: nix-shell -p nixfmt-classic --run 'find . -name "*.nix" -exec nixfmt --check {} +'
-
-      - name: Build Home Manager
-        run: ./scripts/workflows/build-hm.sh result-hm
-
-      - name: Verify Nix Symlinks
-        run: ./scripts/workflows/verify-symlinks.sh result-hm/home-files
-
-  # --- Nix Validate (Linux - fast) ---
   nix-validate:
     name: Nix Validate
     needs: changes
     if: needs.changes.outputs.nix == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+    uses: ./.github/workflows/_nix-validate.yml
 
-      - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Lint flake.lock
-        uses: DeterminateSystems/flake-checker-action@main
-        with:
-          nixpkgs-keys: nixpkgs
-
-      - name: Check flake
-        run: nix flake check --no-build
-
-  # --- Markdown Lint ---
   markdown-lint:
     name: Markdown Lint
     needs: changes
     if: needs.changes.outputs.markdown == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+    uses: ./.github/workflows/_markdown-lint.yml
 
-      - name: Run markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v21
-        with:
-          globs: |
-            **/*.md
-            !**/node_modules/**
-
-  # --- Claude Settings Validation ---
   claude-settings:
     name: Claude Settings
     needs: changes
     if: needs.changes.outputs.claude == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+    uses: ./.github/workflows/_claude-settings.yml
 
-      - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Fetch schema
-        run: |
-          curl -sL https://json.schemastore.org/claude-code-settings.json \
-            -o claude-code-settings.schema.json
-
-      - name: Extract settings via nix eval
-        run: |
-          nix eval --raw '.#lib.ci.claudeSettingsJson' > settings-generated.json
-
-      - name: Validate settings files
-        run: |
-          nix-shell -p check-jsonschema --run '
-            echo "Validating Claude Code settings..."
-            check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
-            echo "Settings validation passed!"
-          '
-
-  # --- File Size Check ---
   file-size:
-    name: File Size Check
+    name: File Size
     needs: changes
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
-    runs-on: ubuntu-latest
-    env:
-      EXTENDED: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
-      EXEMPT: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+    uses: ./.github/workflows/_file-size.yml
 
-      - name: Check file sizes
-        run: ./scripts/workflows/check-file-sizes.sh "${{ env.EXTENDED }}" "${{ env.EXEMPT }}"
-
-  # ============================================================================
-  # MERGE GATE
-  # ============================================================================
-  # This is the ONLY job that should be set as "required" in branch protection.
-  # It passes if all applicable checks pass or are skipped.
+  # ==========================================================================
+  # MERGE GATE - The ONLY required check in branch protection
+  # ==========================================================================
   gate:
     name: Merge Gate
-    needs:
-      - changes
-      - nix-build
-      - nix-validate
-      - markdown-lint
-      - claude-settings
-      - file-size
+    needs: [changes, nix-build, nix-validate, markdown-lint, claude-settings, file-size]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          # Jobs that may be skipped when their file patterns don't match
           allowed-skips: nix-build, nix-validate, markdown-lint, claude-settings, file-size
           jobs: ${{ toJSON(needs) }}

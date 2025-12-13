@@ -1,24 +1,22 @@
-# File Size Check - Enforce documentation organization guidelines
-# Uses file size (bytes) as proxy for token count.
-# Limits: 8KB recommended, 16KB hard, 32KB extended, or exempt
+# File Size Check (standalone)
+#
+# Runs on push to main for visibility. PRs use ci-gate.yml instead.
+# Calls reusable workflow for DRY.
+
 name: File Size Check
 
 on:
   push:
     branches: [main]
-    paths: ['**.md', '**.nix']
-  pull_request:
-    paths: ['**.md', '**.nix']
+    paths:
+      - '**.md'
+      - '**.nix'
 
-env:
-  EXTENDED: "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
-  EXEMPT: "RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
     name: Check File Sizes
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Check file sizes
-        run: ./scripts/workflows/check-file-sizes.sh "${{ env.EXTENDED }}" "${{ env.EXEMPT }}"
+    uses: ./.github/workflows/_file-size.yml
