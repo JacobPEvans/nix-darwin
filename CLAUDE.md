@@ -2,32 +2,6 @@
 
 **Strict guidance for AI agents modifying this nix-darwin configuration.**
 
-## Table of Contents
-
-- [Scope of This Document](#scope-of-this-document)
-- [Enforced Git Development Workflow](#enforced-git-development-workflow)
-- [Command Execution Preferences](#command-execution-preferences)
-- [Critical Requirements](#critical-requirements)
-- [Task Management Workflow](#task-management-workflow)
-- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
-- [Claude Code Permission Management](#claude-code-permission-management)
-- [Gemini CLI Permission Management](#gemini-cli-permission-management)
-- [GitHub Copilot CLI Permission Management](#github-copilot-cli-permission-management)
-- [VS Code GitHub Copilot Configuration](#vs-code-github-copilot-configuration)
-- [AI CLI Tools Comparison](#ai-cli-tools-comparison)
-- [Pull Request Workflow](#pull-request-workflow)
-- [Workflow](#workflow)
-- [Anthropic Ecosystem Integration](#anthropic-ecosystem-integration)
-- [Agent OS Integration](#agent-os-integration)
-- [Permission Reference](#permission-reference-load-last-for-context-freshness)
-
-**Navigation Note**: Use this TOC to jump to specific sections. Referenced docs
-([TESTING.md](TESTING.md), [RUNBOOK.md](RUNBOOK.md),
-[docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md)) each have their own TOC.
-You do not need to read entire files - navigate via TOC links to relevant sections.
-
----
-
 ## Scope of This Document
 
 This file contains **AI-specific instructions only** - rules and patterns that AI agents need beyond their base training. It should NOT contain:
@@ -39,6 +13,25 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 - Future plans (belongs in PLANNING.md)
 
 **Rule**: If information is useful for humans reading project docs, it belongs in README.md or other project files, not here.
+
+## Session Startup Behavior
+
+**On every session start**, immediately announce:
+
+1. Current model in use (check system info or `/model` command)
+2. Quick status summary
+
+**Format**:
+
+```text
+📊 Session Status
+Model: [current model name]
+Reminder: Switch to Opus (/model opus) for complex architectural decisions,
+multi-file refactoring, or tasks requiring deep reasoning.
+```
+
+**Why**: Default model is Sonnet for cost efficiency. User needs visibility to
+consciously choose Opus when the task warrants it.
 
 ## Enforced Git Development Workflow
 

@@ -8,10 +8,16 @@ let
   cfg = config.programs.claude;
   homeDir = config.home.homeDirectory;
 
+  # Build the env attribute (merge user env vars with apiKeyHelper if enabled)
+  envAttrs = cfg.settings.env // lib.optionalAttrs cfg.apiKeyHelper.enable {
+    apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
+  };
+
   # Build the settings object
   settings = {
     "$schema" = cfg.settings.schemaUrl;
     alwaysThinkingEnabled = cfg.settings.alwaysThinkingEnabled;
+    cleanupPeriodDays = cfg.settings.cleanupPeriodDays;
 
     # Permissions
     permissions = {
@@ -39,12 +45,8 @@ let
       } // lib.optionalAttrs (s.env != { }) { env = s.env; })
       (lib.filterAttrs (_: s: !(s.disabled or false)) cfg.mcpServers);
 
-    # API Key Helper (for headless authentication)
-    # Note: env is only set when apiKeyHelper is enabled; no conflict possible
-    # since this is the sole source of the env attribute in settings.json
-  } // lib.optionalAttrs cfg.apiKeyHelper.enable {
-    env = { apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}"; };
-  }
+    # Environment variables (user-defined + apiKeyHelper if enabled)
+  } // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
 
   # Status line (if enabled)
     // lib.optionalAttrs cfg.statusLine.enable {

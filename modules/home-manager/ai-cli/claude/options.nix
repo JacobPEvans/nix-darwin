@@ -186,31 +186,76 @@ in {
 
     # Settings
     settings = {
+      # Extended thinking mode
       alwaysThinkingEnabled = mkOption {
         type = types.bool;
         default = true;
+        description = ''
+          Enable Claude's extended thinking capability by default.
+          When enabled, Claude can reason through complex problems step-by-step.
+          Token budget controlled by MAX_THINKING_TOKENS in env.
+        '';
       };
+
+      # Session management
+      cleanupPeriodDays = mkOption {
+        type = types.int;
+        default = 14;
+        description = ''
+          Sessions inactive longer than this period are deleted.
+          Default upstream is 30, we use 14 to reduce storage.
+        '';
+      };
+
+      # Permissions
       permissions = {
         allow = mkOption {
           type = types.listOf types.str;
           default = [ ];
+          description = "Commands and operations to auto-approve without prompting";
         };
         deny = mkOption {
           type = types.listOf types.str;
           default = [ ];
+          description = "Commands and operations to permanently block";
         };
         ask = mkOption {
           type = types.listOf types.str;
           default = [ ];
+          description = "Commands and operations requiring user confirmation";
         };
       };
+
       additionalDirectories = mkOption {
         type = types.listOf types.str;
         default = [ ];
+        description = "Directories accessible to Claude Code without prompts";
       };
+
+      # Environment variables for Claude Code
+      # See: https://code.claude.com/docs/en/settings
+      env = mkOption {
+        type = types.attrsOf types.str;
+        default = { };
+        description = ''
+          Environment variables passed to Claude Code.
+          Common variables:
+          - MAX_THINKING_TOKENS: Extended thinking token budget (e.g., "16000")
+          - CLAUDE_CODE_MAX_OUTPUT_TOKENS: Max output tokens (e.g., "16000")
+          - BASH_MAX_OUTPUT_LENGTH: Max bash output chars (e.g., "64000")
+          - BASH_DEFAULT_TIMEOUT_MS: Default bash timeout (e.g., "120000")
+          - DISABLE_PROMPT_CACHING: Disable caching ("1" to disable)
+        '';
+        example = {
+          MAX_THINKING_TOKENS = "16000";
+          CLAUDE_CODE_MAX_OUTPUT_TOKENS = "16000";
+        };
+      };
+
       schemaUrl = mkOption {
         type = types.str;
         default = "https://json.schemastore.org/claude-code-settings.json";
+        description = "JSON schema URL for settings validation";
       };
     };
 

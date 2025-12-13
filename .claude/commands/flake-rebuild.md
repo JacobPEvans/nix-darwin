@@ -17,7 +17,17 @@ Update all flake inputs and rebuild nix-darwin.
 
 ## Steps
 
-### 1. Pre-flight Checks
+### 1. Sync Repository First
+
+**IMPORTANT**: Before starting, run `/git-refresh` to:
+
+- Merge any pending PRs that are ready
+- Sync local main with remote
+- Clean up stale worktrees
+
+This ensures you're working with the latest code and avoids conflicts.
+
+### 2. Pre-flight Checks
 
 Ensure you're on main and it's clean:
 
@@ -29,7 +39,7 @@ git status
 
 If there are uncommitted changes, **STOP** and report to the user.
 
-### 2. Switch to Feature Branch
+### 3. Switch to Feature Branch
 
 Check if the branch already exists. If it does, switch to it. If not, create it.
 
@@ -39,7 +49,7 @@ Branch name format: `chore/flake-update-YYYY-MM-DD` (replace with today's date)
 git checkout chore/flake-update-YYYY-MM-DD 2>/dev/null || git checkout -b chore/flake-update-YYYY-MM-DD
 ```
 
-### 3. Update Flake Inputs
+### 4. Update Flake Inputs
 
 ```bash
 nix flake update
@@ -47,23 +57,23 @@ nix flake update
 
 **On failure**: Switch back to main and report the error.
 
-### 4. Check for Changes
+### 5. Check for Changes
 
 ```bash
 git status
 ```
 
 - If flake.lock is **unchanged**: Switch back to main, report "All flake inputs already up to date" and **STOP**.
-- If flake.lock **changed**: Continue to step 5.
+- If flake.lock **changed**: Continue to step 6.
 
-### 5. Commit the Update
+### 6. Commit the Update
 
 ```bash
 git add flake.lock
 git commit -m "chore(deps): update flake.lock"
 ```
 
-### 6. Rebuild nix-darwin
+### 7. Rebuild nix-darwin
 
 ```bash
 sudo darwin-rebuild switch --flake .
@@ -71,7 +81,7 @@ sudo darwin-rebuild switch --flake .
 
 **On failure**: Report the error but continue to create the PR (the CI will also catch issues).
 
-### 7. Push and Create PR with Auto-Merge
+### 8. Push and Create PR with Auto-Merge
 
 Push the branch:
 
@@ -91,7 +101,7 @@ Enable auto-merge (this will merge automatically when checks pass):
 gh pr merge --auto --squash --delete-branch
 ```
 
-### 8. Return to Main
+### 9. Return to Main
 
 Switch back to main while waiting for auto-merge:
 
@@ -99,7 +109,7 @@ Switch back to main while waiting for auto-merge:
 git checkout main
 ```
 
-### 9. Report Summary
+### 10. Report Summary
 
 Tell the user:
 

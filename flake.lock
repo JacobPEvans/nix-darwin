@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1765510851,
-        "narHash": "sha256-qIktaQtWtHl4oTyFUykzskGa7lGd6MO7LhsNPeFADPE=",
+        "lastModified": 1765638060,
+        "narHash": "sha256-Gg4IEYz8dumCGcUyTHTzREysVDAsQcYeybW4vMmqRpE=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "b4e154673d1407b5c65564209744217fe3415ac2",
+        "rev": "4b8960dd1a6e8bf8e24b3235e734f9a7ef7efaff",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1765502985,
-        "narHash": "sha256-7cC4SLj4M+cHmVXd9oDLw+XFYODvKccTB0EOy0QRH/E=",
+        "lastModified": 1765587595,
+        "narHash": "sha256-X9uJaRMr8FtHX2CQ5/15rO2HjH2bKitmWpv/BmxDXAA=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "2192c86c208b39aa262ada534d89f72f65708a8e",
+        "rev": "eb872450105745e9489c6f6d73fa2fb4ff5a1e9a",
         "type": "github"
       },
       "original": {
@@ -99,11 +99,11 @@
     "claude-cookbooks": {
       "flake": false,
       "locked": {
-        "lastModified": 1764877727,
-        "narHash": "sha256-YiJkIQKOZxA/sWKOuNr+uWH46Y9I+yIuouhoU3Cee5o=",
+        "lastModified": 1765568404,
+        "narHash": "sha256-/GHJQ8IKMChaJgjh3VPctnQgsYKvXygM2PQ0ygUVYTs=",
         "owner": "anthropics",
         "repo": "claude-cookbooks",
-        "rev": "ba29cb59194a34d8a99ae170c6c16482dc8afb9c",
+        "rev": "ef506bc3de0d76f154cafb4dbb0f6a259c896ba2",
         "type": "github"
       },
       "original": {
@@ -115,11 +115,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1764633782,
-        "narHash": "sha256-VdH4H0HSz5Eca2bUVX5c8fQ2KBMGqf/QDrhSF+3XRWE=",
+        "lastModified": 1765587137,
+        "narHash": "sha256-BRW7bHQrnu9C1EtNKaUW+jKc22wUj0M855roesDCg0Y=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "22d3def39e4a6ad96d4fffff7fce5fb28c8d6215",
+        "rev": "19a119f97e361ebdec475cd2bf5667cc4e48e64b",
         "type": "github"
       },
       "original": {
@@ -192,11 +192,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765480374,
-        "narHash": "sha256-HlbvQAqLx7WqZFFQZ8nu5UUJAVlXiV/kqKbyueA8srw=",
+        "lastModified": 1765606130,
+        "narHash": "sha256-KOP4QnkiRwiD5KEOr6ceF67rfTP1OqPmCCft6xDC3k4=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "39cb677ed9e908e90478aa9fe5f3383dfc1a63f3",
+        "rev": "d787ec69c3216ea33be1c0424fe65cb23aa8fb31",
         "type": "github"
       },
       "original": {
