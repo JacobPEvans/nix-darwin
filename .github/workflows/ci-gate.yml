@@ -1,0 +1,114 @@
+# CI Gate - Conditional Required Checks
+#
+# FRAMEWORK: Merge Gatekeeper Pattern
+# ====================================
+# Solves: "Required checks that only run when relevant files change"
+#
+# Problem: GitHub branch protection only supports "always required" or "not required"
+#          Path-filtered workflows that don't run = pending forever = blocks merge
+#
+# Solution: Single workflow that:
+# 1. Always triggers on ALL PRs (no path filters at workflow level)
+# 2. Detects which file categories changed
+# 3. Calls reusable workflows conditionally (skipped = success)
+# 4. Final "Merge Gate" job aggregates all results
+#
+# Branch Protection: Set ONLY "Merge Gate" as required check
+#
+# Adding New Checks:
+# 1. Create reusable workflow: _your-check.yml with `on: workflow_call`
+# 2. Add filter pattern under `changes.steps.filter.with.filters`
+# 3. Add job that calls the reusable workflow with appropriate `if:` condition
+# 4. Add job name to `gate.needs` array and `allowed-skips`
+
+name: CI Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================================================
+  # CHANGE DETECTION
+  # ==========================================================================
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      nix: ${{ steps.filter.outputs.nix }}
+      markdown: ${{ steps.filter.outputs.markdown }}
+      claude: ${{ steps.filter.outputs.claude }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            nix:
+              - '**.nix'
+              - 'flake.lock'
+              - 'modules/**'
+              - 'scripts/**'
+            markdown:
+              - '**.md'
+              - '.markdownlint.json'
+              - '.markdownlint.yml'
+            claude:
+              - '.claude/**'
+              - 'modules/home-manager/ai-cli/**'
+              - 'modules/home-manager/permissions/**'
+
+  # ==========================================================================
+  # CONDITIONAL CHECKS (call reusable workflows)
+  # ==========================================================================
+  nix-build:
+    name: Nix Build
+    needs: changes
+    if: needs.changes.outputs.nix == 'true'
+    uses: ./.github/workflows/_nix-build.yml
+
+  nix-validate:
+    name: Nix Validate
+    needs: changes
+    if: needs.changes.outputs.nix == 'true'
+    uses: ./.github/workflows/_nix-validate.yml
+
+  markdown-lint:
+    name: Markdown Lint
+    needs: changes
+    if: needs.changes.outputs.markdown == 'true'
+    uses: ./.github/workflows/_markdown-lint.yml
+
+  claude-settings:
+    name: Claude Settings
+    needs: changes
+    if: needs.changes.outputs.claude == 'true'
+    uses: ./.github/workflows/_claude-settings.yml
+
+  file-size:
+    name: File Size
+    needs: changes
+    if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
+    uses: ./.github/workflows/_file-size.yml
+
+  # ==========================================================================
+  # MERGE GATE - The ONLY required check in branch protection
+  # ==========================================================================
+  gate:
+    name: Merge Gate
+    needs: [changes, nix-build, nix-validate, markdown-lint, claude-settings, file-size]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all results
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: nix-build, nix-validate, markdown-lint, claude-settings, file-size
+          jobs: ${{ toJSON(needs) }}

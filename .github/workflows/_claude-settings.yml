@@ -1,0 +1,34 @@
+# Reusable: Claude Settings Validation
+# Called by ci-gate.yml and ci-validate-settings.yml
+name: _claude-settings
+
+on:
+  workflow_call:
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Fetch schema
+        run: |
+          curl -sL https://json.schemastore.org/claude-code-settings.json \
+            -o claude-code-settings.schema.json
+
+      - name: Extract settings via nix eval
+        run: |
+          nix eval --raw '.#lib.ci.claudeSettingsJson' > settings-generated.json
+
+      - name: Validate settings files
+        run: |
+          nix-shell -p check-jsonschema --run '
+            echo "Validating Claude Code settings..."
+            check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
+            echo "Settings validation passed!"
+          '

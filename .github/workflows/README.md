@@ -2,65 +2,172 @@
 
 CI/CD workflows for this nix-darwin configuration repository.
 
-## Active Workflows
+## Architecture
 
-### Claude Code Review (`claude.yml`)
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                    REUSABLE WORKFLOWS                       │
+│         (Implementation - workflow_call triggers)           │
+├─────────────────────────────────────────────────────────────┤
+│  _nix-build.yml     │ macOS nix build, format, symlinks    │
+│  _nix-validate.yml  │ Linux flake check                    │
+│  _markdown-lint.yml │ markdownlint                         │
+│  _claude-settings.yml │ Claude settings schema validation  │
+│  _file-size.yml     │ File size enforcement                │
+└─────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+┌─────────────────────────┐     ┌─────────────────────────┐
+│      ci-gate.yml        │     │   Standalone Workflows  │
+│   (PR orchestrator)     │     │    (Push to main)       │
+├─────────────────────────┤     ├─────────────────────────┤
+│ • Detects file changes  │     │ ci-nix.yml              │
+│ • Calls reusable flows  │     │ ci-validate.yml         │
+│ • Merge Gate aggregates │     │ ci-markdownlint.yml     │
+│ • ONLY required check   │     │ ci-validate-settings.yml│
+└─────────────────────────┘     │ ci-file-length.yml      │
+                                └─────────────────────────┘
+```
 
-Automated PR review using [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action).
+## Merge Gatekeeper Framework
 
-**Triggers**: Pull requests (opened, synchronize)
+### The Problem
 
-**Features**:
+GitHub branch protection only supports "always required" OR "not required" checks.
+When path-filtered workflows don't run, the check stays "pending" forever, blocking auto-merge.
 
-- AI-powered code review using Claude
-- Runs the `/review-code` command
-- Posts review comments on PRs
+### The Solution: CI Gate
 
-**Setup**: Add `CLAUDE_CODE_OAUTH_TOKEN` to repository secrets.
+The `ci-gate.yml` workflow implements the **Merge Gatekeeper Pattern**:
 
-### Nix CI (`nix-ci.yml`)
+1. **Always triggers** on all PRs (no path filters at workflow level)
+2. **Detects changes** using `dorny/paths-filter` to categorize modified files
+3. **Calls reusable workflows** conditionally based on what changed
+4. **Skipped = Success** - GitHub treats skipped jobs as successful for dependencies
+5. **Merge Gate** - Final job aggregates all results
 
-Validates Nix flake configuration using Determinate Systems actions.
+### Branch Protection Setup
 
-**Triggers**: Push/PR on `*.nix` or `flake.lock` changes
+Set **only** `Merge Gate` as a required check:
 
-**Features**:
+```text
+Repository Settings → Rules → Rulesets → main
+  → Require status checks to pass
+  → Add: "Merge Gate"
+```
 
-- Installs Nix via [DeterminateSystems/nix-installer-action](https://github.com/DeterminateSystems/nix-installer-action)
-- Free caching via [DeterminateSystems/magic-nix-cache-action](https://github.com/DeterminateSystems/magic-nix-cache-action)
-- Checks flake.lock health via [DeterminateSystems/flake-checker-action](https://github.com/DeterminateSystems/flake-checker-action)
-- Runs `nix flake check` validation
+## Adding New Checks
 
-### Markdown Lint (`markdownlint.yml`)
+### 1. Create Reusable Workflow
 
-Validates markdown file formatting.
+Create `_your-check.yml` with `workflow_call` trigger:
 
-**Triggers**: Push/PR on `*.md` or `.markdownlint.*` changes
+```yaml
+# .github/workflows/_your-check.yml
+name: _your-check
 
-**Features**:
+on:
+  workflow_call:
 
-- Uses [DavidAnson/markdownlint-cli2-action](https://github.com/DavidAnson/markdownlint-cli2-action)
-- Enforces consistent markdown style
-- Configuration in `.markdownlint.json`
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # ... your check implementation
+```
+
+### 2. Add to CI Gate
+
+In `ci-gate.yml`:
+
+```yaml
+# Add filter pattern
+changes:
+  steps:
+    - uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          your-check:
+            - 'path/to/files/**'
+
+# Add conditional job
+your-check:
+  name: Your Check
+  needs: changes
+  if: needs.changes.outputs.your-check == 'true'
+  uses: ./.github/workflows/_your-check.yml
+
+# Add to gate
+gate:
+  needs: [..., your-check]
+  steps:
+    - uses: re-actors/alls-green@release/v1
+      with:
+        allowed-skips: ..., your-check
+```
+
+### 3. (Optional) Add Standalone Caller
+
+For push-to-main visibility:
+
+```yaml
+# .github/workflows/ci-your-check.yml
+name: Your Check
+
+on:
+  push:
+    branches: [main]
+    paths: ['path/to/files/**']
+
+jobs:
+  check:
+    uses: ./.github/workflows/_your-check.yml
+```
+
+## Workflow Reference
+
+### Reusable Workflows (Implementation)
+
+| Workflow | Purpose | Runner |
+|----------|---------|--------|
+| `_nix-build.yml` | Nix format, build, symlink verify | macOS |
+| `_nix-validate.yml` | Flake lint and check | Linux |
+| `_markdown-lint.yml` | Markdown formatting | Linux |
+| `_claude-settings.yml` | Claude settings schema | Linux |
+| `_file-size.yml` | File size limits | Linux |
+
+### CI Gate (PR Orchestrator)
+
+| Check | Triggers On |
+|-------|-------------|
+| Nix Build | `**.nix`, `flake.lock`, `modules/**`, `scripts/**` |
+| Nix Validate | `**.nix`, `flake.lock`, `modules/**`, `scripts/**` |
+| Markdown Lint | `**.md`, `.markdownlint.*` |
+| Claude Settings | `.claude/**`, `modules/home-manager/ai-cli/**` |
+| File Size | `**.nix`, `**.md` |
+
+### Other Workflows
+
+| Workflow | Purpose |
+|----------|---------|
+| `review-code.yml` | Claude Code PR review (Haiku) |
+| `review-deps.yml` | Dependency update reviews |
+| `deps-update-flake.yml` | Scheduled flake.lock updates |
 
 ## Configuration
 
 ### Required Secrets
 
-| Secret | Description | Required By |
-|--------|-------------|-------------|
-| `CLAUDE_CODE_OAUTH_TOKEN` | OAuth token for Claude Code GitHub App | `claude.yml` |
+| Secret | Required By |
+|--------|-------------|
+| `CLAUDE_CODE_OAUTH_TOKEN` | `review-code.yml` |
 
-### Permissions
+### Auto-Merge Compatibility
 
-Workflows use minimal required permissions:
+With the Merge Gatekeeper pattern:
 
-- `contents: read` - Read repository code
-- `pull-requests: write` - Post review comments (Claude only)
-- `id-token: write` - Determinate Systems authentication
-
-## Related Documentation
-
-- [Claude Code Action](https://github.com/anthropics/claude-code-action)
-- [Determinate Systems Actions](https://github.com/DeterminateSystems)
-- [Nix Flakes](https://nixos.wiki/wiki/Flakes)
+1. Enable auto-merge on PRs
+2. `Merge Gate` always reports a status (pass/fail)
+3. Skipped checks don't block merge
+4. Failed checks correctly block merge

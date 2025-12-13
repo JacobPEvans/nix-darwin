@@ -1,10 +1,7 @@
-# Validate Claude Code Settings
+# Validate Claude Settings (standalone)
 #
-# Validates Claude Code settings files against JSON Schema to prevent
-# configuration errors that break permissions.
-#
-# Triggers: Changes to Claude config files or permission definitions
-# Schema: https://json.schemastore.org/claude-code-settings.json
+# Runs on push to main for visibility. PRs use ci-gate.yml instead.
+# Calls reusable workflow for DRY.
 
 name: Validate Claude Settings
 
@@ -15,43 +12,12 @@ on:
       - '.claude/**'
       - 'modules/home-manager/ai-cli/**'
       - 'modules/home-manager/permissions/**'
-  pull_request:
-    paths:
-      - '.claude/**'
-      - 'modules/home-manager/ai-cli/**'
-      - 'modules/home-manager/permissions/**'
 
-# Cancel in-progress runs when a new run is triggered
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
     name: Validate settings
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Fetch schema
-        run: |
-          curl -sL https://json.schemastore.org/claude-code-settings.json \
-            -o claude-code-settings.schema.json
-
-      - name: Extract settings via nix eval
-        run: |
-          # Use CI-friendly flake output to extract settings.json content
-          # Avoids hardcoded usernames and cross-platform build issues
-          nix eval --raw '.#lib.ci.claudeSettingsJson' > settings-generated.json
-
-      - name: Validate settings files
-        run: |
-          nix-shell -p check-jsonschema --run '
-            echo "Validating Claude Code settings..."
-            check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
-            echo "Settings validation passed!"
-          '
+    uses: ./.github/workflows/_claude-settings.yml

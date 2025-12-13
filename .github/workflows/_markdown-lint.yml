@@ -1,0 +1,23 @@
+# Reusable: Markdown Lint
+# Called by ci-gate.yml and ci-markdownlint.yml
+name: _markdown-lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v21
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**

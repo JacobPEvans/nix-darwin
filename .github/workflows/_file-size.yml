@@ -1,0 +1,28 @@
+# Reusable: File Size Check
+# Called by ci-gate.yml and ci-file-length.yml
+name: _file-size
+
+on:
+  workflow_call:
+    inputs:
+      extended:
+        description: 'Space-separated list of files with extended limit (32KB)'
+        required: false
+        default: 'CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING'
+        type: string
+      exempt:
+        description: 'Space-separated list of exempt files'
+        required: false
+        default: 'RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask'
+        type: string
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check file sizes
+        run: ./scripts/workflows/check-file-sizes.sh "${{ inputs.extended }}" "${{ inputs.exempt }}"

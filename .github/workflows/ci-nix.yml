@@ -1,7 +1,7 @@
-# Nix CI - Build workflow
+# Nix CI - Build workflow (standalone)
 #
-# Darwin build with formatting, caching, and symlink verification
-# Only runs when nix-related files change
+# Runs on push to main for visibility. PRs use ci-gate.yml instead.
+# Calls reusable workflow for DRY.
 
 name: Nix Build
 
@@ -9,58 +9,16 @@ on:
   push:
     branches: [main]
     paths:
-      - "**.nix"
-      - "flake.lock"
-      - "modules/**"
-      - "scripts/**"
-  pull_request:
-    paths:
-      - "**.nix"
-      - "flake.lock"
-      - "modules/**"
-      - "scripts/**"
+      - '**.nix'
+      - 'flake.lock'
+      - 'modules/**'
+      - 'scripts/**'
 
-# Cancel in-progress runs when a new run is triggered
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     name: Build Nix
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install Nix
-        uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Determinate Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-        with:
-          use-flakehub: false
-          use-gha-cache: true
-
-      - name: Check Nix formatting
-        # treefmt uses --ci flag (not --check) for CI mode
-        run: nix fmt -- --ci .
-
-      - name: Lint Nix files (statix)
-        run: nix develop --command statix check .
-
-      - name: Check for unused Nix code (deadnix)
-        # -L: ignore lambda pattern names (common in modules: config, lib, pkgs)
-        # --fail: exit with error if unused bindings found
-        run: nix develop --command deadnix -L --fail .
-
-      - name: Check flake health
-        uses: DeterminateSystems/flake-checker-action@main
-
-      - name: Build Home Manager
-        run: ./scripts/workflows/build-hm.sh result-hm
-
-      - name: Verify Nix Symlinks
-        run: ./scripts/workflows/verify-symlinks.sh result-hm/home-files
+    uses: ./.github/workflows/_nix-build.yml

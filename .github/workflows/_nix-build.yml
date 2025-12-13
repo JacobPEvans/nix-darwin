@@ -1,0 +1,36 @@
+# Reusable: Nix Build (macOS)
+# Called by ci-gate.yml and ci-nix.yml
+name: _nix-build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Determinate Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          use-flakehub: false
+          use-gha-cache: true
+
+      - name: Nix quality checks (DRY via flake.nix)
+        # Single source of truth with pre-commit hooks
+        # Runs: formatting (nixfmt-rfc-style), linting (statix), dead code (deadnix)
+        run: nix flake check --print-build-logs
+
+      - name: Build Home Manager
+        run: ./scripts/workflows/build-hm.sh result-hm
+
+      - name: Verify Nix Symlinks
+        run: ./scripts/workflows/verify-symlinks.sh result-hm/home-files

@@ -198,6 +198,20 @@
       # nixfmt-tree = treefmt pre-configured with nixfmt
       formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
 
+      # Quality checks for `nix flake check` (DRY principle)
+      # Single source of truth for pre-commit hooks and GitHub Actions
+      # Definitions in lib/checks.nix for better modularity
+      # Cross-platform: works on all systems
+      checks = nixpkgs.lib.genAttrs [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (system: import ./lib/checks.nix {
+        pkgs = nixpkgs.legacyPackages.${system};
+        src = ./.;
+      });
+
       # Development shell for CI and local nix tooling
       devShells.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.mkShell {
         packages = with nixpkgs.legacyPackages.aarch64-darwin; [
