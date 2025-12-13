@@ -6,22 +6,29 @@
 # Runs Claude autonomously via launchd to perform maintenance tasks on git repos.
 # Designed for full autonomy with safety constraints and structured logging.
 #
-# Configuration (injected via Nix substituteAll):
-# - @targetDir@   : Directory to run maintenance in
-# - @maxBudget@   : Maximum cost per run in USD
-# - @logDir@      : Directory for log files
+# Usage: auto-claude.sh <target_dir> <max_budget_usd> [log_dir]
+#
+# Arguments:
+# - target_dir     : Directory to run maintenance in (required)
+# - max_budget_usd : Maximum cost per run in USD (required)
+# - log_dir        : Directory for log files (optional, defaults to ~/.claude/logs)
 # =============================================================================
 
 set -euo pipefail
 
-# --- CONFIGURATION (from Nix) ---
-TARGET_DIR="@targetDir@"
-MAX_BUDGET_USD="@maxBudget@"
-LOG_DIR="@logDir@"
+# --- ARGUMENT PARSING ---
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <target_dir> <max_budget_usd> [log_dir]" >&2
+  exit 1
+fi
+
+TARGET_DIR="$1"
+MAX_BUDGET_USD="$2"
+LOG_DIR="${3:-$HOME/.claude/logs}"
 
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
-  echo "Error: Directory $TARGET_DIR does not exist."
+  echo "Error: Directory $TARGET_DIR does not exist." >&2
   exit 1
 fi
 
@@ -140,8 +147,8 @@ EXIT_CODE=${pipestatus[1]}
 # --- POST-RUN PROCESSING ---
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
-# Extract final summary from log if present
-FINAL_SUMMARY=$(grep -o '{[^}]*"outcome"[^}]*}' "$LOG_FILE" 2>/dev/null | tail -1)
+# Extract final summary from log if present (using jq for proper JSON parsing)
+FINAL_SUMMARY=$(jq -c 'select(.outcome)' "$LOG_FILE" 2>/dev/null | tail -1)
 
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
