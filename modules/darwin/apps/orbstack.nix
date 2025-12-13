@@ -16,6 +16,13 @@
 #     };
 #   };
 #
+# Migration (one-time setup):
+#   1. Stop OrbStack completely (orb shutdown or quit app)
+#   2. Run darwin-rebuild switch to create the volume
+#   3. Move existing data: mv ~/Library/Group\ Containers/HUAQ24HBR6.dev.orbstack/* /Volumes/ContainerData/
+#   4. Remove original directory: rm -rf ~/Library/Group\ Containers/HUAQ24HBR6.dev.orbstack
+#   5. Then add symlink in home.nix and rebuild
+#
 # Then in home.nix, add the symlink:
 #   home.file."Library/Group Containers/HUAQ24HBR6.dev.orbstack".source =
 #     config.lib.file.mkOutOfStoreSymlink "/Volumes/ContainerData";
@@ -54,6 +61,7 @@ in
 
       apfsContainer = lib.mkOption {
         type = lib.types.str;
+        default = "";
         description = ''
           APFS container identifier where the volume will be created.
           Find yours with: diskutil apfs list
