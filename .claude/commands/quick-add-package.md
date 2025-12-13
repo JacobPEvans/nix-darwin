@@ -10,6 +10,9 @@ Add a package to the Nix configuration using the proper development workflow.
 
 **Input**: `$ARGUMENTS` = package name (e.g., "claude-monitor")
 
+> [!NOTE]
+> All commands should be run from the repository root unless otherwise specified.
+
 ## Workflow Steps
 
 ### 1. Git Refresh (Sync Repository)
@@ -78,7 +81,7 @@ Verify SSH agent is ready before pushing.
 
 ```bash
 git push -u origin feat/add-<pkg-name>
-gh pr create --title "feat(packages): add <pkg-name>" --body "..."
+gh pr create --title "feat(packages): add <pkg-name>" --body "Adds the <pkg-name> package to the Nix configuration."
 ```
 
 ### 10. Wait for Approval
@@ -95,6 +98,21 @@ Once the user approves and merges the PR, they will rebuild:
 sudo darwin-rebuild switch --flake .  # macOS
 # or
 home-manager switch --flake .  # Linux
+```
+
+### 12. Cleanup (After Merge)
+
+Once the PR is merged, clean up your local environment:
+
+```bash
+# Navigate back to the repository root
+cd ~/.config/nix
+
+# Remove the worktree
+git worktree remove worktrees/add-<pkg-name>
+
+# Delete the local feature branch (optional)
+git branch -d feat/add-<pkg-name>
 ```
 
 ---
