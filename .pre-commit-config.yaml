@@ -26,12 +26,18 @@ repos:
       - id: markdownlint-cli2
         files: \.md$
 
-  # NOTE: nixfmt hook removed - it doesn't support aligned comments
-  # Nix files are manually formatted to preserve comment alignment
-
-  # Claude Code settings validation - check-jsonschema installed via nix
+  # Local hooks using system-installed tools (from nix)
   - repo: local
     hooks:
+      # Nix formatting with nixfmt (installed via nix)
+      - id: nixfmt
+        name: Format Nix files
+        entry: nixfmt
+        language: system
+        files: \.nix$
+        types: [file]
+
+      # Claude Code settings validation - check-jsonschema installed via nix
       - id: validate-claude-settings
         name: Validate Claude settings
         entry: check-jsonschema --schemafile https://json.schemastore.org/claude-code-settings.json
