@@ -39,6 +39,12 @@ let
       } // lib.optionalAttrs (s.env != { }) { env = s.env; })
       (lib.filterAttrs (_: s: !(s.disabled or false)) cfg.mcpServers);
 
+    # API Key Helper (for headless authentication)
+  } // lib.optionalAttrs cfg.apiKeyHelper.enable {
+    env = {
+      apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
+    };
+
     # Status line (if enabled)
   } // lib.optionalAttrs cfg.statusLine.enable {
     statusLine = if cfg.statusLine.enhanced.enable

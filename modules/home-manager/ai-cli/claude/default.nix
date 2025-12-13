@@ -38,6 +38,12 @@ in {
       ".claude/plugins/.keep".text = ''
         # Plugin registry managed by Nix
       '';
+    } // lib.optionalAttrs cfg.apiKeyHelper.enable {
+      # API Key Helper script for headless authentication
+      "${cfg.apiKeyHelper.scriptPath}" = {
+        source = ./get-api-key.sh;
+        executable = true;
+      };
     };
 
     # Activation script for directory setup

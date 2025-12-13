@@ -160,6 +160,18 @@ in {
       default = { };
     };
 
+    # API Key Helper (for headless authentication)
+    apiKeyHelper = {
+      enable = mkEnableOption "API key helper for headless Claude authentication";
+
+      scriptPath = mkOption {
+        type = types.str;
+        default = ".local/bin/claude-api-key-helper";
+        description =
+          "Path (relative to home) where the API key helper script is installed";
+      };
+    };
+
     # Settings
     settings = {
       alwaysThinkingEnabled = mkOption {

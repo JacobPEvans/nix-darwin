@@ -90,6 +90,13 @@ let
 in {
   enable = true;
 
+  # API Key Helper for headless authentication (cron jobs, CI/CD)
+  # Uses Bitwarden Secrets Manager to securely fetch OAuth token
+  apiKeyHelper = {
+    enable = true;
+    # Default: .local/bin/claude-api-key-helper
+  };
+
   plugins = {
     marketplaces = {
       "anthropics/claude-code" = {
