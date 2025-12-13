@@ -50,3 +50,4 @@ if ! diskutil apfs addVolume "${CONTAINER}" APFS "${VOLUME_NAME}"; then
     echo "Error: Failed to create volume '${VOLUME_NAME}' on container '${CONTAINER}'" >&2
     exit 1
 fi
+exit 0
