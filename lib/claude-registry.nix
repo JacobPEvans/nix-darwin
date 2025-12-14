@@ -15,7 +15,7 @@
       homeDir ? "/home/user",
       allowRuntimeInstall ? true,
     }:
-    lib.mapAttrs (_: m: {
+    lib.mapAttrs (name: m: {
       source = {
         source = m.source.type;
         inherit (m.source) url;
