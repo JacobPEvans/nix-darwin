@@ -6,7 +6,7 @@
 # - Automatic model selection or explicit routing
 #
 # Installed via Nix flake input, not git clone.
-# Secrets are retrieved at runtime from bws/aws-vault, NEVER stored.
+# Secrets are retrieved at runtime from the configured backend (keychain [default], bws, or aws-vault), NEVER stored.
 { config, lib, pkgs, inputs ? { }, ... }:
 
 let
@@ -15,7 +15,9 @@ let
 
   # Secrets retrieval command based on backend
   secretsCmd =
-    if parentCfg.secretsBackend == "bitwarden"
+    if parentCfg.secretsBackend == "keychain"
+    then "security find-generic-password -w -s"
+    else if parentCfg.secretsBackend == "bitwarden"
     then "bws secret get"
     else "aws-vault exec default -- printenv";
 
@@ -49,8 +51,9 @@ in
       executable = true;
       text = ''
         #!/usr/bin/env python3
-        """PAL MCP wrapper that injects secrets from ${parentCfg.secretsBackend}."""
+        """PAL MCP wrapper that injects secrets from supported backends: keychain, bitwarden, aws-vault."""
         import os
+        import shlex
         import subprocess
         import sys
 
@@ -58,7 +61,7 @@ in
             """Retrieve secret at runtime - NEVER stored in files."""
             try:
                 result = subprocess.run(
-                    ["${secretsCmd}", name],
+                    shlex.split("${secretsCmd}") + [name],
                     capture_output=True,
                     text=True,
                     check=True

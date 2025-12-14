@@ -68,7 +68,7 @@ in
               - OLLAMA_BASE_URL=${parentCfg.ollamaHost}
               - ENABLE_SIGNUP=false
               - ENABLE_ARENA=true
-              - WEBUI_AUTH=false
+              - WEBUI_AUTH=true
             volumes:
               - ${cfg.openWebUIDataDir}:/app/backend/data
             restart: unless-stopped
@@ -90,7 +90,7 @@ in
         set -euo pipefail
 
         if ! command -v llm_benchmark &> /dev/null; then
-          echo "Installing llm-benchmark via pipx..."
+          echo "Installing llm-benchmark via pipx..." >&2
           pipx install llm-benchmark
         fi
 
