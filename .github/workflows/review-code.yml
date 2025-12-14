@@ -20,10 +20,12 @@ concurrency:
 jobs:
   claude:
     name: Claude Code Review
-    # Skip review for automated dependency updates or when explicitly skipped
-    if: |
-      !contains(github.event.pull_request.labels.*.name, 'dependencies') &&
-      !contains(github.event.pull_request.labels.*.name, 'skip-claude')
+    # TEMPORARILY DISABLED - re-enable when ready
+    if: false
+    # Original condition:
+    # if: |
+    #   !contains(github.event.pull_request.labels.*.name, 'dependencies') &&
+    #   !contains(github.event.pull_request.labels.*.name, 'skip-claude')
     runs-on: ubuntu-latest
     permissions:
       contents: read

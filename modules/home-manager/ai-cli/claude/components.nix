@@ -16,7 +16,7 @@ let
       map (c: {
         name = ".claude/${type}s/${c.name}.md";
         value = {
-          source = c.source;
+          inherit (c) source;
         };
       }) components
     );

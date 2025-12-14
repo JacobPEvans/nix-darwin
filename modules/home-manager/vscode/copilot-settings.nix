@@ -13,7 +13,7 @@
 # Based on official VS Code Copilot settings reference:
 # https://code.visualstudio.com/docs/copilot/reference/copilot-settings
 
-{ ... }:
+_:
 
 {
   # === AUTHENTICATION & GENERAL SETTINGS ===

@@ -18,7 +18,7 @@
     lib.mapAttrs (name: m: {
       source = {
         source = m.source.type;
-        url = m.source.url;
+        inherit (m.source) url;
       };
       installLocation =
         if m.flakeInput or null != null then

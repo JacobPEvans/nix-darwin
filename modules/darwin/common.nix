@@ -26,7 +26,7 @@ in
   # User Configuration
   # ==========================================================================
   users.users.${userConfig.user.name} = {
-    name = userConfig.user.name;
+    inherit (userConfig.user) name;
     home = userConfig.user.homeDir;
   };
 

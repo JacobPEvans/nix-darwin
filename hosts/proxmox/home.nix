@@ -28,9 +28,16 @@ in
   # ==========================================================================
   # Home-Manager Required Settings
   # ==========================================================================
-  home.username = userConfig.user.name;
-  home.homeDirectory = "/home/${userConfig.user.name}";
-  home.stateVersion = "24.05";
+  home = {
+    username = userConfig.user.name;
+    homeDirectory = "/home/${userConfig.user.name}";
+    stateVersion = userConfig.nix.homeManagerStateVersion;
+
+    # Proxmox-specific packages (beyond common)
+    packages = with pkgs; [
+      # Add Proxmox-specific tools here if needed
+    ];
+  };
 
   # ==========================================================================
   # Proxmox-Specific Settings
@@ -38,9 +45,4 @@ in
 
   # Disable GUI applications on server
   programs.vscode.enable = lib.mkForce false;
-
-  # Proxmox-specific packages (beyond common)
-  home.packages = with pkgs; [
-    # Add Proxmox-specific tools here if needed
-  ];
 }

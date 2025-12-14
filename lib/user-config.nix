@@ -83,4 +83,15 @@ in
     # Single source of truth - reference this everywhere
     claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
   };
+
+  # ==========================================================================
+  # Nix/NixOS Configuration
+  # ==========================================================================
+  nix = {
+    # Home-manager stateVersion - single source of truth
+    # NixOS 25.05 "Warbler" (released May 2025)
+    # Update this when upgrading to a new NixOS stable release
+    # Reference: https://nixos.org/blog/announcements/
+    homeManagerStateVersion = "25.05";
+  };
 }

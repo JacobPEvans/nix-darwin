@@ -6,7 +6,7 @@
 # Current security policies:
 # - Passwordless sudo for darwin-rebuild only (enables AI assistants to rebuild)
 
-{ ... }:
+_:
 
 let
   userConfig = import ../../lib/user-config.nix;

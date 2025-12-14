@@ -72,225 +72,229 @@ let
   copilotFiles = import ./ai-cli/copilot.nix { inherit config; };
 in
 {
-  home.stateVersion = "24.05";
-
   # ==========================================================================
-  # VS Code
+  # Home Configuration
   # ==========================================================================
-  # Settings from vscode-settings.nix and vscode-copilot-settings.nix
-  # WARNING: Will overwrite local VS Code settings
-  programs.vscode = {
-    enable = true;
-    profiles.default = {
-      # Disable VS Code's built-in update mechanism (Nix manages updates)
-      enableUpdateCheck = false; # Sets update.mode = "none"
-      enableExtensionUpdateCheck = false; # Sets extensions.autoCheckUpdates = false
-      userSettings = {
-        "editor.formatOnSave" = true;
-      }
-      // vscodeGeneralSettings
-      // vscodeGithubCopilotSettings;
-    };
-  };
+  home = {
+    stateVersion = userConfig.nix.homeManagerStateVersion;
 
-  # ==========================================================================
-  # Shell (zsh)
-  # ==========================================================================
-  programs.zsh = {
-    enable = true;
+    # AI CLI Configurations
+    # Each AI CLI has its own file in ai-cli/ directory:
+    # - claude.nix: Claude Code settings + status line script
+    # - gemini.nix: Gemini CLI settings
+    # - copilot.nix: GitHub Copilot CLI config
+    #
+    # Permissions: Now read from JSON in ai-assistant-instructions repo
+    # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
+    # NOTE: claudeFiles removed - now handled by programs.claude module
+    file = npmFiles // awsFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
 
-    # Shell aliases - see shell-aliases.nix for full list and sudo requirements
-    shellAliases = shellAliases;
-
-    # Shell enhancements
-    autosuggestion.enable = true; # Fish-like autosuggestions
-    syntaxHighlighting.enable = true; # Syntax highlighting for commands
-    enableCompletion = true; # Tab completion
-    history = {
-      size = 100000; # Large history for better recall
-      save = 100000;
-      ignoreDups = true; # Don't save duplicate commands
-      ignoreAllDups = true; # Remove older duplicates
-      ignoreSpace = true; # Don't save commands starting with space
-    };
-
-    # Oh My Zsh - framework for managing zsh configuration
-    # Provides themes, plugins, and helper functions
-    oh-my-zsh = {
-      enable = true;
-      theme = "robbyrussell"; # Default theme, clean and informative
-      plugins = [
-        "git" # Git aliases and functions (ga, gc, gp, etc.)
-        "docker" # Docker command completion
-        "macos" # macOS utilities (ofd, cdf, etc.)
-        "z" # Jump to frequently used directories
-        "colored-man-pages" # Colorize man pages for readability
-      ];
-    };
-
-    # Source modular shell functions
-    # NOTE: session-logging.zsh MUST be last (takes over terminal)
-    initContent = ''
-      # GPG: Required for pinentry to prompt for passphrase in terminal
-      export GPG_TTY=$(tty)
-
-      # npm global packages (managed via ~/.npmrc prefix)
-      # Packages installed with: npm install -g <package>
-      # are placed in ~/.npm-packages and available in PATH
-      export PATH="$HOME/.npm-packages/bin:$PATH"
-      export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
-
-      # Claude statusline SSH detection (must run before Claude starts)
-      # Switches between full and mobile configs based on session type
-      source ${./zsh/claude-statusline-switch.zsh}
-
-      source ${./zsh/git-functions.zsh}
-      source ${./zsh/docker-functions.zsh}
-      source ${./zsh/macos-setup.zsh}
-      source ${./zsh/session-logging.zsh}
-    '';
-  };
-
-  # ==========================================================================
-  # Git
-  # ==========================================================================
-  # Fully Nix-managed git config (~/.config/git/config)
-  # Security policy: All commits and tags must be GPG signed
-  # User values from lib/user-config.nix
-  programs.git = {
-    enable = true;
-
-    # GPG signing configuration
-    # NOTE: Key ID is a public identifier, not the private key (safe to commit)
-    signing = {
-      key = userConfig.gpg.signingKey;
-      signByDefault = true; # Enforced by security policy
-    };
-
-    # All git settings (new unified syntax)
-    settings = {
-      # User identity
-      user = {
-        name = userConfig.user.fullName;
-        email = userConfig.user.email;
-      };
-
-      # Core settings
-      core = {
-        editor = userConfig.git.editor;
-        autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
-        whitespace = "trailing-space,space-before-tab"; # Highlight whitespace issues
-        hooksPath = "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
-      };
-
-      # Repository initialization
-      init = {
-        defaultBranch = userConfig.git.defaultBranch;
-        # Auto-install hooks on new clones (Layer 1 of pre-commit enforcement)
-        templateDir = "${config.home.homeDirectory}/.git-templates";
-      };
-
-      # Pull behavior - rebase keeps history cleaner than merge commits
-      pull.rebase = true;
-
-      # Push behavior
-      push = {
-        autoSetupRemote = true; # Auto-track remote branches
-        default = "current"; # Push current branch to same-named remote
-      };
-
-      # Fetch behavior
-      fetch = {
-        prune = true; # Auto-remove deleted remote branches
-        pruneTags = true; # Auto-remove deleted remote tags
-      };
-
-      # Merge & diff improvements
-      merge = {
-        conflictstyle = "diff3"; # Show original in conflicts (easier resolution)
-        ff = "only"; # Only fast-forward merges (use rebase for others)
-      };
-      diff = {
-        algorithm = "histogram"; # Better diff algorithm than default
-        colorMoved = "default"; # Highlight moved lines in different color
-        mnemonicPrefix = true; # Use i/w/c/o instead of a/b in diffs
-      };
-
-      # Rerere - remember merge conflict resolutions
-      rerere = {
-        enabled = true; # Remember how you resolved conflicts
-        autoupdate = true; # Auto-stage rerere resolutions
-      };
-
-      # Sign all tags (security policy)
-      tag.gpgSign = true;
-
-      # Helpful features
-      help.autocorrect = 10; # Auto-correct typos after 1 second
-      status.showStash = true; # Show stash count in git status
-      log.date = "iso"; # Use ISO date format in logs
-      branch.sort = "-committerdate"; # Sort branches by recent commits
-
-      # Git aliases - see git-aliases.nix for full list
-      alias = gitAliases;
-    };
-  };
-
-  # ==========================================================================
-  # Direnv (per-project environments)
-  # ==========================================================================
-  # Automatically loads .envrc files when entering directories
-  # Usage: Create .envrc with "use flake" or "use nix" and run "direnv allow"
-  # See shells/ directory for example flake.nix files
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true; # Faster, cached nix-shell/flake loading
-  };
-
-  # ==========================================================================
-  # Home Manager
-  # ==========================================================================
-  programs.home-manager.enable = true;
-
-  # ==========================================================================
-  # AI CLI Configurations
-  # ==========================================================================
-  # Each AI CLI has its own file in ai-cli/ directory:
-  # - claude.nix: Claude Code settings + status line script
-  # - gemini.nix: Gemini CLI settings
-  # - copilot.nix: GitHub Copilot CLI config
-  #
-  # Permissions: Now read from JSON in ai-assistant-instructions repo
-  # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
-  # NOTE: claudeFiles removed - now handled by programs.claude module
-  home.file =
-    npmFiles // awsFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
-
-  # ==========================================================================
-  # Claude Code (Unified Module)
-  # ==========================================================================
-  # Declarative configuration for Claude Code ecosystem
-  # Manages: plugins, commands, agents, skills, hooks, MCP servers
-  # Configuration extracted to ai-cli/claude-config.nix for clarity
-  programs.claude = claudeConfig;
-
-  # ==========================================================================
-  # Agent OS
-  # ==========================================================================
-  # Spec-driven development system for AI coding agents
-  # Commands and agents installed globally to ~/.claude/ (no per-project setup)
-  # Config stored in ~/agent-os/config.yml
-  programs.agent-os.enable = true;
-
-  # ==========================================================================
-  # Claude Code Settings Validation (post-rebuild)
-  # ==========================================================================
-  # Validates settings.json against JSON Schema after home files are written
-  # Script extracted to scripts/validate-claude-settings.sh for maintainability
-  home.activation.validateClaudeSettings =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # Claude Code Settings Validation (post-rebuild)
+    # Validates settings.json against JSON Schema after home files are written
+    # Script extracted to scripts/validate-claude-settings.sh for maintainability
+    activation.validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
         "${config.home.homeDirectory}/.claude/settings.json" \
         "${userConfig.ai.claudeSchemaUrl}"
     '';
+  };
+
+  # ==========================================================================
+  # Programs Configuration
+  # ==========================================================================
+  programs = {
+    # ==========================================================================
+    # VS Code
+    # ==========================================================================
+    # Settings from vscode-settings.nix and vscode-copilot-settings.nix
+    # WARNING: Will overwrite local VS Code settings
+    vscode = {
+      enable = true;
+      profiles.default = {
+        # Disable VS Code's built-in update mechanism (Nix manages updates)
+        enableUpdateCheck = false; # Sets update.mode = "none"
+        enableExtensionUpdateCheck = false; # Sets extensions.autoCheckUpdates = false
+        userSettings = {
+          "editor.formatOnSave" = true;
+        }
+        // vscodeGeneralSettings
+        // vscodeGithubCopilotSettings;
+      };
+    };
+
+    # ==========================================================================
+    # Shell (zsh)
+    # ==========================================================================
+    zsh = {
+      enable = true;
+
+      # Shell aliases - see shell-aliases.nix for full list and sudo requirements
+      inherit shellAliases;
+
+      # Shell enhancements
+      autosuggestion.enable = true; # Fish-like autosuggestions
+      syntaxHighlighting.enable = true; # Syntax highlighting for commands
+      enableCompletion = true; # Tab completion
+      history = {
+        size = 100000; # Large history for better recall
+        save = 100000;
+        ignoreDups = true; # Don't save duplicate commands
+        ignoreAllDups = true; # Remove older duplicates
+        ignoreSpace = true; # Don't save commands starting with space
+      };
+
+      # Oh My Zsh - framework for managing zsh configuration
+      # Provides themes, plugins, and helper functions
+      oh-my-zsh = {
+        enable = true;
+        theme = "robbyrussell"; # Default theme, clean and informative
+        plugins = [
+          "git" # Git aliases and functions (ga, gc, gp, etc.)
+          "docker" # Docker command completion
+          "macos" # macOS utilities (ofd, cdf, etc.)
+          "z" # Jump to frequently used directories
+          "colored-man-pages" # Colorize man pages for readability
+        ];
+      };
+
+      # Source modular shell functions
+      # NOTE: session-logging.zsh MUST be last (takes over terminal)
+      initContent = ''
+        # GPG: Required for pinentry to prompt for passphrase in terminal
+        export GPG_TTY=$(tty)
+
+        # npm global packages (managed via ~/.npmrc prefix)
+        # Packages installed with: npm install -g <package>
+        # are placed in ~/.npm-packages and available in PATH
+        export PATH="$HOME/.npm-packages/bin:$PATH"
+        export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
+
+        # Claude statusline SSH detection (must run before Claude starts)
+        # Switches between full and mobile configs based on session type
+        source ${./zsh/claude-statusline-switch.zsh}
+
+        source ${./zsh/git-functions.zsh}
+        source ${./zsh/docker-functions.zsh}
+        source ${./zsh/macos-setup.zsh}
+        source ${./zsh/session-logging.zsh}
+      '';
+    };
+
+    # ==========================================================================
+    # Git
+    # ==========================================================================
+    # Fully Nix-managed git config (~/.config/git/config)
+    # Security policy: All commits and tags must be GPG signed
+    # User values from lib/user-config.nix
+    git = {
+      enable = true;
+
+      # GPG signing configuration
+      # NOTE: Key ID is a public identifier, not the private key (safe to commit)
+      signing = {
+        key = userConfig.gpg.signingKey;
+        signByDefault = true; # Enforced by security policy
+      };
+
+      # All git settings (new unified syntax)
+      settings = {
+        # User identity
+        user = {
+          name = userConfig.user.fullName;
+          inherit (userConfig.user) email;
+        };
+
+        # Core settings
+        core = {
+          inherit (userConfig.git) editor;
+          autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
+          whitespace = "trailing-space,space-before-tab"; # Highlight whitespace issues
+          hooksPath = "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
+        };
+
+        # Repository initialization
+        init = {
+          inherit (userConfig.git) defaultBranch;
+          # Auto-install hooks on new clones (Layer 1 of pre-commit enforcement)
+          templateDir = "${config.home.homeDirectory}/.git-templates";
+        };
+
+        # Pull behavior - rebase keeps history cleaner than merge commits
+        pull.rebase = true;
+
+        # Push behavior
+        push = {
+          autoSetupRemote = true; # Auto-track remote branches
+          default = "current"; # Push current branch to same-named remote
+        };
+
+        # Fetch behavior
+        fetch = {
+          prune = true; # Auto-remove deleted remote branches
+          pruneTags = true; # Auto-remove deleted remote tags
+        };
+
+        # Merge & diff improvements
+        merge = {
+          conflictstyle = "diff3"; # Show original in conflicts (easier resolution)
+          ff = "only"; # Only fast-forward merges (use rebase for others)
+        };
+        diff = {
+          algorithm = "histogram"; # Better diff algorithm than default
+          colorMoved = "default"; # Highlight moved lines in different color
+          mnemonicPrefix = true; # Use i/w/c/o instead of a/b in diffs
+        };
+
+        # Rerere - remember merge conflict resolutions
+        rerere = {
+          enabled = true; # Remember how you resolved conflicts
+          autoupdate = true; # Auto-stage rerere resolutions
+        };
+
+        # Sign all tags (security policy)
+        tag.gpgSign = true;
+
+        # Helpful features
+        help.autocorrect = 10; # Auto-correct typos after 1 second
+        status.showStash = true; # Show stash count in git status
+        log.date = "iso"; # Use ISO date format in logs
+        branch.sort = "-committerdate"; # Sort branches by recent commits
+
+        # Git aliases - see git-aliases.nix for full list
+        alias = gitAliases;
+      };
+    };
+
+    # ==========================================================================
+    # Direnv (per-project environments)
+    # ==========================================================================
+    # Automatically loads .envrc files when entering directories
+    # Usage: Create .envrc with "use flake" or "use nix" and run "direnv allow"
+    # See shells/ directory for example flake.nix files
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true; # Faster, cached nix-shell/flake loading
+    };
+
+    # ==========================================================================
+    # Home Manager
+    # ==========================================================================
+    home-manager.enable = true;
+
+    # ==========================================================================
+    # Claude Code (Unified Module)
+    # ==========================================================================
+    # Declarative configuration for Claude Code ecosystem
+    # Manages: plugins, commands, agents, skills, hooks, MCP servers
+    # Configuration extracted to ai-cli/claude-config.nix for clarity
+    claude = claudeConfig;
+
+    # ==========================================================================
+    # Agent OS
+    # ==========================================================================
+    # Spec-driven development system for AI coding agents
+    # Commands and agents installed globally to ~/.claude/ (no per-project setup)
+    # Config stored in ~/agent-os/config.yml
+    agent-os.enable = true;
+  };
 }

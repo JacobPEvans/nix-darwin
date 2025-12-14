@@ -26,7 +26,7 @@
   extraKnownMarketplaces = plugins.marketplaces;
 
   # Enabled plugins from marketplaces
-  enabledPlugins = plugins.enabledPlugins;
+  inherit (plugins) enabledPlugins;
 
   # Permissions from ai-assistant-instructions
   permissions = {

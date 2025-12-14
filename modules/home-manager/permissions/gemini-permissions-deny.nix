@@ -23,7 +23,7 @@
 # - No user confirmation can override these blocks
 # - If a legitimate use case arises, edit this file and rebuild
 
-{ ... }:
+_:
 
 let
   # === CATASTROPHIC FILE DESTRUCTION ===

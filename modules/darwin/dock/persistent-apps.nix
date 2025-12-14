@@ -9,11 +9,11 @@
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
 
-{ ... }:
+_:
 
 let
   userConfig = import ../../../lib/user-config.nix;
-  homeDir = userConfig.user.homeDir;
+  inherit (userConfig.user) homeDir;
 in
 {
   system.defaults.dock = {

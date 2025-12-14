@@ -23,22 +23,19 @@ let
   # Build the settings object
   settings = {
     "$schema" = cfg.settings.schemaUrl;
-    alwaysThinkingEnabled = cfg.settings.alwaysThinkingEnabled;
-    cleanupPeriodDays = cfg.settings.cleanupPeriodDays;
+    inherit (cfg.settings) alwaysThinkingEnabled cleanupPeriodDays;
 
     # Permissions
     permissions = {
-      allow = cfg.settings.permissions.allow;
-      deny = cfg.settings.permissions.deny;
-      ask = cfg.settings.permissions.ask;
-      additionalDirectories = cfg.settings.additionalDirectories;
+      inherit (cfg.settings.permissions) allow deny ask;
+      inherit (cfg.settings) additionalDirectories;
     };
 
     # Plugin configuration
     extraKnownMarketplaces = lib.mapAttrs (_: m: {
       source = {
         source = m.source.type;
-        url = m.source.url;
+        inherit (m.source) url;
       };
     }) cfg.plugins.marketplaces;
 
@@ -48,10 +45,9 @@ let
     mcpServers = lib.mapAttrs (
       _: s:
       {
-        command = s.command;
-        args = s.args;
+        inherit (s) command args;
       }
-      // lib.optionalAttrs (s.env != { }) { env = s.env; }
+      // lib.optionalAttrs (s.env != { }) { inherit (s) env; }
     ) (lib.filterAttrs (_: s: !(s.disabled or false)) cfg.mcpServers);
 
     # Environment variables (user-defined + apiKeyHelper if enabled)

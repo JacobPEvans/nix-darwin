@@ -35,7 +35,7 @@ let
   # Generate config.yml using lib.generators.toYAML for robustness
   configYaml = lib.generators.toYAML { } {
     defaults = {
-      profile = cfg.profile;
+      inherit (cfg) profile;
       claude_code_commands = cfg.claudeCodeCommands;
       use_claude_code_subagents = cfg.useClaudeCodeSubagents;
       standards_as_claude_code_skills = cfg.standardsAsClaudeCodeSkills;

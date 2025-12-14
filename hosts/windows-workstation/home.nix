@@ -15,6 +15,9 @@
   ...
 }:
 
+let
+  userConfig = import ../../lib/user-config.nix;
+in
 {
   # ==========================================================================
   # Placeholder Configuration
@@ -30,5 +33,5 @@
   # - Windows-specific paths
   # - GUI application handling
 
-  home.stateVersion = "24.05";
+  home.stateVersion = userConfig.nix.homeManagerStateVersion;
 }

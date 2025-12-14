@@ -2,7 +2,7 @@
 #
 # Reference: https://nix-darwin.github.io/nix-darwin/manual/options.html
 
-{ ... }:
+_:
 
 {
   system.defaults.trackpad = {

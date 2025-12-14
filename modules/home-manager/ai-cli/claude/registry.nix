@@ -13,9 +13,8 @@ let
 
   # Build the full registry using lib function
   knownMarketplaces = claudeRegistryLib.mkKnownMarketplaces {
-    marketplaces = cfg.plugins.marketplaces;
+    inherit (cfg.plugins) marketplaces allowRuntimeInstall;
     homeDir = config.home.homeDirectory;
-    allowRuntimeInstall = cfg.plugins.allowRuntimeInstall;
   };
 
 in
