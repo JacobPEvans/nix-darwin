@@ -178,5 +178,5 @@ in
   # - History: ~/.ollama/history (not managed by Nix)
   # - Nixpkgs version: 0.13.2 (replaces manual 0.12.10 install)
   # - LaunchAgent starts ollama serve on login (auto-restart if crashes)
-  # - Logs: /tmp/ollama.log, /tmp/ollama.error.log
+  # - Logs: ~/Library/Logs/Ollama/ollama.log, ~/Library/Logs/Ollama/ollama.error.log
 }
