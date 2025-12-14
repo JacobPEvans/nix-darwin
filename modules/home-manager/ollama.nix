@@ -27,11 +27,12 @@ in
       description = "Path to the dedicated APFS volume where Ollama models are stored";
     };
   };
+
   # ============================================================================
   # Ollama Environment Variables
   # ============================================================================
 
-  home.sessionVariables = {
+  config.home.sessionVariables = {
     # ========================================================================
     # Model Storage
     # ========================================================================
@@ -141,7 +142,7 @@ in
   # ============================================================================
   # Ollama models on dedicated APFS volume
   # CRITICAL: 692GB+ of models - NEVER delete ${cfg.modelsVolume}
-  home.file.".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${cfg.modelsVolume}/models";
+  config.home.file.".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${cfg.modelsVolume}/models";
 
   # ============================================================================
   # Notes
