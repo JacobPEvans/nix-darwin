@@ -8,6 +8,9 @@ it runs darwin-rebuild first and blocks the push if it fails.
 Exit codes:
   0 = allow the command
   2 = block the command (shows stderr to Claude)
+
+Input: JSON from stdin with tool_input.command containing the Bash command
+Output: Exit code determines whether command proceeds
 """
 
 import json
