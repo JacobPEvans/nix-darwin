@@ -75,5 +75,7 @@ with pkgs;
   # to avoid hardcoding versions - nixpkgs manages the default Python version.
 
   python3Packages.grip # Preview GitHub Markdown files locally
+  python3Packages.langchain-ollama # LangChain integration for Ollama
+  python3Packages.ollama # Ollama Python library for local LLM interaction
   python3Packages.pygithub # GitHub API v3 Python library
 ]
