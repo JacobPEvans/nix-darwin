@@ -1,7 +1,7 @@
 ---
 description: Add a package to the Nix configuration with proper workflow
 model: sonnet
-allowed-tools: Read, Edit, Bash(nix search:*), Bash(git:*), Bash(darwin-rebuild:*), Bash(sudo darwin-rebuild:*), Bash(home-manager:*), Bash(gh:*), Bash(ssh-add:*)
+allowed-tools: Read, Edit, Bash(nix search:*), Bash(brew:*), Bash(git:*), Bash(darwin-rebuild:*), Bash(sudo darwin-rebuild:*), Bash(home-manager:*), Bash(gh:*), Bash(ssh-add:*)
 ---
 
 # Quick Add Package
@@ -62,6 +62,7 @@ cd worktrees/add-<pkg-name>
 - **CLI tools**: `modules/darwin/common.nix` in `homebrew.brews` list
 - **GUI apps**: `modules/darwin/common.nix` in `homebrew.casks` list
 - Always add a comment explaining why Homebrew is needed (e.g., "not in nixpkgs")
+- Keep package lists sorted alphabetically for maintainability
 
 ### 5. Make Changes
 
