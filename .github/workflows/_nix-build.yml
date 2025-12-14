@@ -1,9 +1,19 @@
 # Reusable: Nix Build (macOS)
 # Called by ci-gate.yml and ci-nix.yml
+#
+# Cache strategy: Download cache on all runs, upload only on push to main
+# This speeds up PR CI by skipping the slow cache upload post-action
 name: _nix-build
 
 on:
   workflow_call:
+    inputs:
+      # Allow callers to disable cache upload (e.g., on PRs)
+      # Values: "enabled" (default), "disabled", "no-preference"
+      use-gha-cache:
+        description: 'GHA cache mode - set to "disabled" on PRs to skip slow upload'
+        type: string
+        default: 'enabled'
 
 jobs:
   build:
@@ -22,7 +32,9 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
         with:
           use-flakehub: false
-          use-gha-cache: true
+          # Pass through caller's cache mode setting
+          # "disabled" on PRs skips slow upload, "enabled" on main keeps cache fresh
+          use-gha-cache: ${{ inputs.use-gha-cache }}
 
       - name: Nix quality checks (DRY via flake.nix)
         # Single source of truth with pre-commit hooks
