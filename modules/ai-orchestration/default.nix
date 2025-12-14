@@ -65,11 +65,14 @@ in
     };
 
     secretsBackend = lib.mkOption {
-      type = lib.types.enum [ "bitwarden" "aws-vault" ];
-      default = "bitwarden";
+      type = lib.types.enum [ "keychain" "bitwarden" "aws-vault" ];
+      default = "keychain";
       description = ''
         How to retrieve API keys at runtime.
         Keys are NEVER stored in files or environment variables.
+        - keychain: macOS Keychain (ai-secrets keychain)
+        - bitwarden: Bitwarden Secrets Manager (bws)
+        - aws-vault: AWS Vault for AWS credentials
       '';
     };
 
