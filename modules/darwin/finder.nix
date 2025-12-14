@@ -6,12 +6,9 @@
 # Reference: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/defaults/finder.nix
 
 { ... }:
-
-let
-  # Available for customization (see NewWindowTargetPath example below)
-  userConfig = import ../../lib/user-config.nix;
-in
 {
+  # NOTE: userConfig available if needed for paths like NewWindowTargetPath
+  # let userConfig = import ../../lib/user-config.nix; in ...
   system.defaults.finder = {
     # ==========================================================================
     # File Visibility

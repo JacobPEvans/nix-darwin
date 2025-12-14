@@ -104,6 +104,7 @@ in
     ];
     brews = [
       # CLI tools (only if not available in nixpkgs)
+      "ccusage" # Claude Code usage analyzer (not in nixpkgs)
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)

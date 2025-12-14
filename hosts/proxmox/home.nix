@@ -12,7 +12,6 @@
 
 let
   userConfig = import ../../lib/user-config.nix;
-  serverConfig = import ../../lib/server-config.nix;
 in
 {
   # ==========================================================================

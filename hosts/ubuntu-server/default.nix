@@ -3,9 +3,6 @@
 # Ubuntu uses apt for system package management.
 # User environment is managed by home-manager (see home.nix).
 
-let
-  serverConfig = import ../../lib/server-config.nix;
-in
 { }
 
 # ==========================================================================

@@ -4,13 +4,9 @@
 # Reference: https://nix-darwin.github.io/nix-darwin/manual/options.html
 
 { ... }:
-
-let
-  # Available for customization (see screencapture.location example)
-  userConfig = import ../../lib/user-config.nix;
-
-in
 {
+  # NOTE: userConfig available if needed for paths like screencapture.location
+  # let userConfig = import ../../lib/user-config.nix; in ...
   system.defaults.NSGlobalDomain = {
     # ==========================================================================
     # Appearance

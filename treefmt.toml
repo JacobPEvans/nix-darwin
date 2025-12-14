@@ -1,0 +1,17 @@
+# treefmt configuration for Nix formatting
+# Used by flake checks and pre-commit hooks
+# Reference: https://treefmt.com/latest/
+
+[global]
+excludes = [
+  # Git directory
+  ".git/**",
+  # Nix build outputs
+  "result/**",
+  # Worktrees (avoid formatting other branches)
+  "worktrees/**",
+]
+
+[formatter.nixfmt]
+command = "nixfmt"
+includes = ["*.nix"]

@@ -18,11 +18,6 @@ let
     allowRuntimeInstall = cfg.plugins.allowRuntimeInstall;
   };
 
-  # Installed plugins registry using lib function
-  installedPlugins = claudeRegistryLib.mkInstalledPlugins {
-    schemaVersion = cfg.features.pluginSchemaVersion;
-  };
-
 in
 {
   config = lib.mkIf cfg.enable {

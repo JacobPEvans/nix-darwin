@@ -1,7 +1,7 @@
 ---
 description: Add a package to the Nix configuration with proper workflow
 model: sonnet
-allowed-tools: Read, Edit, Bash(nix search:*), Bash(git:*), Bash(darwin-rebuild:*), Bash(sudo darwin-rebuild:*), Bash(home-manager:*), Bash(gh:*), Bash(ssh-add:*)
+allowed-tools: Read, Edit, Bash(nix search:*), Bash(brew:*), Bash(git:*), Bash(darwin-rebuild:*), Bash(sudo darwin-rebuild:*), Bash(home-manager:*), Bash(gh:*), Bash(ssh-add:*)
 ---
 
 # Quick Add Package
@@ -23,13 +23,22 @@ Add a package to the Nix configuration using the proper development workflow.
 
 This ensures your local repo is up-to-date before making changes.
 
-### 2. Search nixpkgs
+### 2. Search nixpkgs (then Homebrew if needed)
 
 ```bash
 nix search nixpkgs <pkg-name>
 ```
 
 Verify the package exists and note its attribute name.
+
+**If NOT found in nixpkgs**, check Homebrew as fallback:
+
+```bash
+brew search <pkg-name>
+brew info <pkg-name>
+```
+
+Per project rules: nixpkgs first, Homebrew only when package is unavailable in nixpkgs.
 
 ### 3. Create Worktree
 
@@ -42,11 +51,20 @@ cd worktrees/add-<pkg-name>
 
 ### 4. Determine Installation Location
 
-Search the codebase to find where similar packages are installed:
+**For nixpkgs packages**, search the codebase to find where similar packages are installed:
 
 - **macOS-specific tools**: `modules/darwin/common.nix` in `environment.systemPackages`
 - **Cross-platform tools**: `modules/common/packages.nix`
 - **Claude-specific tools**: Next to `claude-code` in `modules/darwin/common.nix` (Development tools section)
+
+**For Homebrew packages** (when not in nixpkgs):
+
+- **CLI tools**: `modules/darwin/common.nix` in `homebrew.brews` list
+- **GUI apps**: `modules/darwin/common.nix` in `homebrew.casks` list
+- Always add a comment explaining why Homebrew is needed (e.g., "not in nixpkgs")
+
+> [!IMPORTANT]
+> Keep all package lists (nixpkgs and Homebrew) sorted alphabetically for maintainability.
 
 ### 5. Make Changes
 
