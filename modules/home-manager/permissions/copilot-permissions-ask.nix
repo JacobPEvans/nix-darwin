@@ -21,7 +21,7 @@
 # use --deny-tool flags to block dangerous operations, or simply rely on
 # Copilot's default behavior of prompting for approval.
 
-{ ... }:
+_:
 
 {
   # This file is not imported anywhere - it exists for reference only.

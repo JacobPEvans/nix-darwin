@@ -3,159 +3,141 @@
 # NSGlobalDomain settings for appearance, text, and behavior.
 # Reference: https://nix-darwin.github.io/nix-darwin/manual/options.html
 
-{ ... }:
-{
-  # NOTE: userConfig available if needed for paths like screencapture.location
-  # let userConfig = import ../../lib/user-config.nix; in ...
-  system.defaults.NSGlobalDomain = {
+_: {
+  system.defaults = {
     # ==========================================================================
-    # Appearance
+    # NSGlobalDomain Settings
     # ==========================================================================
+    NSGlobalDomain = {
+      # Appearance
+      # Dark mode: null = light, "Dark" = dark
+      AppleInterfaceStyle = "Dark";
 
-    # Dark mode: null = light, "Dark" = dark
-    AppleInterfaceStyle = "Dark";
+      # Auto-switch between light/dark based on time
+      AppleInterfaceStyleSwitchesAutomatically = false;
 
-    # Auto-switch between light/dark based on time
-    AppleInterfaceStyleSwitchesAutomatically = false;
+      # Scrollbar visibility: "WhenScrolling", "Automatic", "Always"
+      AppleShowScrollBars = "Automatic";
 
-    # Scrollbar visibility: "WhenScrolling", "Automatic", "Always"
-    AppleShowScrollBars = "Automatic";
+      # Text & Typing
+      # Auto-capitalization
+      NSAutomaticCapitalizationEnabled = false;
 
-    # ==========================================================================
-    # Text & Typing
-    # ==========================================================================
+      # Smart dashes (-- to em dash)
+      NSAutomaticDashSubstitutionEnabled = false;
 
-    # Auto-capitalization
-    NSAutomaticCapitalizationEnabled = false;
+      # Double-space to period
+      NSAutomaticPeriodSubstitutionEnabled = false;
 
-    # Smart dashes (-- to em dash)
-    NSAutomaticDashSubstitutionEnabled = false;
+      # Smart quotes ("curly" instead of "straight")
+      NSAutomaticQuoteSubstitutionEnabled = false;
 
-    # Double-space to period
-    NSAutomaticPeriodSubstitutionEnabled = false;
+      # Auto spell correction
+      NSAutomaticSpellingCorrectionEnabled = false;
 
-    # Smart quotes ("curly" instead of "straight")
-    NSAutomaticQuoteSubstitutionEnabled = false;
+      # Inline predictive text
+      NSAutomaticInlinePredictionEnabled = true;
 
-    # Auto spell correction
-    NSAutomaticSpellingCorrectionEnabled = false;
+      # Windows & Dialogs
+      # Expand save panel by default
+      NSNavPanelExpandedStateForSaveMode = true;
+      NSNavPanelExpandedStateForSaveMode2 = true;
 
-    # Inline predictive text
-    NSAutomaticInlinePredictionEnabled = true;
+      # Expand print panel by default
+      PMPrintingExpandedStateForPrint = true;
+      PMPrintingExpandedStateForPrint2 = true;
 
-    # ==========================================================================
-    # Windows & Dialogs
-    # ==========================================================================
+      # Save to disk (not iCloud) by default
+      NSDocumentSaveNewDocumentsToCloud = false;
 
-    # Expand save panel by default
-    NSNavPanelExpandedStateForSaveMode = true;
-    NSNavPanelExpandedStateForSaveMode2 = true;
+      # Animations
+      # Window opening/closing animations
+      NSAutomaticWindowAnimationsEnabled = true;
 
-    # Expand print panel by default
-    PMPrintingExpandedStateForPrint = true;
-    PMPrintingExpandedStateForPrint2 = true;
+      # Smooth scrolling
+      NSScrollAnimationEnabled = true;
 
-    # Save to disk (not iCloud) by default
-    NSDocumentSaveNewDocumentsToCloud = false;
+      # Animated focus ring
+      NSUseAnimatedFocusRing = true;
 
-    # ==========================================================================
-    # Animations
-    # ==========================================================================
-
-    # Window opening/closing animations
-    NSAutomaticWindowAnimationsEnabled = true;
-
-    # Smooth scrolling
-    NSScrollAnimationEnabled = true;
-
-    # Animated focus ring
-    NSUseAnimatedFocusRing = true;
+      # Finder Sidebar
+      # Sidebar icon size: 1 = small, 2 = medium, 3 = large
+      NSTableViewDefaultSizeMode = 1;
+    };
 
     # ==========================================================================
-    # Finder Sidebar
+    # Menu Bar Clock
     # ==========================================================================
+    menuExtraClock = {
+      # Show date in menu bar
+      ShowDate = 1; # 0 = When space allows, 1 = Always, 2 = Never
 
-    # Sidebar icon size: 1 = small, 2 = medium, 3 = large
-    NSTableViewDefaultSizeMode = 1;
-  };
+      # Show day of week
+      ShowDayOfWeek = true;
 
-  # ==========================================================================
-  # Menu Bar Clock
-  # ==========================================================================
+      # Show seconds
+      ShowSeconds = false;
 
-  system.defaults.menuExtraClock = {
-    # Show date in menu bar
-    ShowDate = 1; # 0 = When space allows, 1 = Always, 2 = Never
+      # 24-hour time (also set via AppleICUForce24HourTime)
+      Show24Hour = false;
 
-    # Show day of week
-    ShowDayOfWeek = true;
+      # Analog vs digital: true = analog
+      IsAnalog = false;
+    };
 
-    # Show seconds
-    ShowSeconds = false;
+    # ==========================================================================
+    # Login Window
+    # ==========================================================================
+    loginwindow = {
+      # Disable guest account
+      GuestEnabled = false;
 
-    # 24-hour time (also set via AppleICUForce24HourTime)
-    Show24Hour = false;
+      # Show full name instead of username
+      SHOWFULLNAME = false;
+    };
 
-    # Analog vs digital: true = analog
-    IsAnalog = false;
-  };
+    # ==========================================================================
+    # Screensaver & Lock
+    # ==========================================================================
+    screensaver = {
+      # Require password when waking from screensaver
+      askForPassword = true;
 
-  # ==========================================================================
-  # Login Window
-  # ==========================================================================
+      # Grace period before password required (seconds)
+      # 0 = immediately
+      askForPasswordDelay = 0;
+    };
 
-  system.defaults.loginwindow = {
-    # Disable guest account
-    GuestEnabled = false;
+    # ==========================================================================
+    # Screenshots
+    # ==========================================================================
+    screencapture = {
+      # Save location: null = ~/Desktop (default)
+      # location = "/Users/${userConfig.user.name}/Screenshots";
 
-    # Show full name instead of username
-    SHOWFULLNAME = false;
-  };
+      # Image format: png, jpg, gif, pdf, tiff
+      type = "png";
 
-  # ==========================================================================
-  # Screensaver & Lock
-  # ==========================================================================
+      # Disable drop shadow on window screenshots
+      disable-shadow = true;
 
-  system.defaults.screensaver = {
-    # Require password when waking from screensaver
-    askForPassword = true;
+      # Include date in filename
+      include-date = true;
+    };
 
-    # Grace period before password required (seconds)
-    # 0 = immediately
-    askForPasswordDelay = 0;
-  };
+    # ==========================================================================
+    # Control Center (Menu Bar)
+    # ==========================================================================
+    controlcenter = {
+      # Show battery percentage
+      BatteryShowPercentage = true;
 
-  # ==========================================================================
-  # Screenshots
-  # ==========================================================================
-
-  system.defaults.screencapture = {
-    # Save location: null = ~/Desktop (default)
-    # location = "/Users/${userConfig.user.name}/Screenshots";
-
-    # Image format: png, jpg, gif, pdf, tiff
-    type = "png";
-
-    # Disable drop shadow on window screenshots
-    disable-shadow = true;
-
-    # Include date in filename
-    include-date = true;
-  };
-
-  # ==========================================================================
-  # Control Center (Menu Bar)
-  # ==========================================================================
-
-  system.defaults.controlcenter = {
-    # Show battery percentage
-    BatteryShowPercentage = true;
-
-    # Menu bar items visibility (true = show, false = hide)
-    Bluetooth = true;
-    Sound = true;
-    Display = true;
-    FocusModes = true;
-    NowPlaying = true;
+      # Menu bar items visibility (true = show, false = hide)
+      Bluetooth = true;
+      Sound = true;
+      Display = true;
+      FocusModes = true;
+      NowPlaying = true;
+    };
   };
 }

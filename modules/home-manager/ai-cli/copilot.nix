@@ -20,7 +20,7 @@ in
 {
   ".copilot/config.json".text = builtins.toJSON {
     # Trusted directories where Copilot can operate without confirmation
-    trusted_folders = copilotAllow.trusted_folders;
+    inherit (copilotAllow) trusted_folders;
 
     # Additional Copilot CLI settings can be added here
     # Note: Tool-level permissions require CLI flags, not config settings

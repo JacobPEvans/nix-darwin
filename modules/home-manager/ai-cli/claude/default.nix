@@ -63,7 +63,7 @@ in
       # API Key Helper script for headless authentication
       "${cfg.apiKeyHelper.scriptPath}" = {
         source = pkgs.replaceVars ./get-api-key.sh {
-          keychainService = cfg.apiKeyHelper.keychainService;
+          inherit (cfg.apiKeyHelper) keychainService;
           bwsSecretId = cfg.apiKeyHelper.secretId;
         };
         executable = true;

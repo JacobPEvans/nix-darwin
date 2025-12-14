@@ -21,7 +21,7 @@
 # caution when using Gemini with these commands. Consider using Claude Code for
 # tasks involving these operations if you want confirmation prompts.
 
-{ ... }:
+_:
 
 {
   # This file is not imported anywhere - it exists for reference only.

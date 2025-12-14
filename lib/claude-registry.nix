@@ -15,10 +15,10 @@
       homeDir ? "/home/user",
       allowRuntimeInstall ? true,
     }:
-    lib.mapAttrs (name: m: {
+    lib.mapAttrs (_: m: {
       source = {
         source = m.source.type;
-        url = m.source.url;
+        inherit (m.source) url;
       };
       installLocation =
         if m.flakeInput or null != null then

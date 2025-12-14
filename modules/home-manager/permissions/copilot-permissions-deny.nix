@@ -22,7 +22,7 @@
 # Only truly catastrophic operations are listed here. Common commands that might
 # need user approval (like git reset, chmod, rm) are in the ask file for reference.
 
-{ ... }:
+_:
 
 let
   # === CATASTROPHIC FILE DESTRUCTION ===

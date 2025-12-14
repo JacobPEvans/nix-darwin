@@ -33,7 +33,7 @@
 
 let
   # Username for sudo commands (from home-manager config)
-  username = config.home.username;
+  inherit (config.home) username;
 
   # Core read-only tools (always safe)
   coreReadTools = [
