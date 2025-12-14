@@ -12,6 +12,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   claude-code-statusline,
+  superpowers-marketplace,
   ...
 }:
 
@@ -93,6 +94,10 @@ let
     # Migration tools
     "claude-opus-4-5-migration@anthropics/claude-code" = true;
 
+    # Superpowers - comprehensive development workflow
+    # Brainstorming, planning, execution, testing, and review skills
+    "superpowers@obra/superpowers-marketplace" = true;
+
     # Experimental (uncomment to enable)
     # "ralph-wiggum@anthropics/claude-code" = true;  # Autonomous iteration loops
   };
@@ -144,6 +149,15 @@ in
           url = "https://github.com/anthropics/claude-plugins-official.git";
         };
         flakeInput = claude-plugins-official;
+      };
+      # Superpowers - comprehensive software development workflow system
+      # https://github.com/obra/superpowers-marketplace
+      "obra/superpowers-marketplace" = {
+        source = {
+          type = "git";
+          url = "https://github.com/obra/superpowers-marketplace.git";
+        };
+        flakeInput = superpowers-marketplace;
       };
     };
 

@@ -274,7 +274,24 @@
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "superpowers-marketplace": "superpowers-marketplace"
+      }
+    },
+    "superpowers-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764907763,
+        "narHash": "sha256-uQ2GCrlXAnQBKt4Psnz+87yO0dmSj0iwK6iAGgLE4xw=",
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "rev": "284eaf100391d0575311780d02264bc94c322552",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "type": "github"
       }
     },
     "systems": {
