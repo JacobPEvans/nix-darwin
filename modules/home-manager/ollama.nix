@@ -26,11 +26,12 @@ in
     };
   };
 
-  # ============================================================================
-  # Ollama Environment Variables
-  # ============================================================================
+  config = {
+    # ============================================================================
+    # Ollama Environment Variables
+    # ============================================================================
 
-  config.home.sessionVariables = {
+    home.sessionVariables = {
     # ========================================================================
     # Model Storage
     # ========================================================================
@@ -135,13 +136,37 @@ in
   # These are NOT managed by Nix - kept as-is from manual setup
   # Files: ~/.ollama/id_ed25519, ~/.ollama/id_ed25519.pub
 
-  # ============================================================================
-  # Symlink Configuration
-  # ============================================================================
-  # Ollama models on dedicated APFS volume
-  # CRITICAL: 692GB+ of models - NEVER delete ${cfg.modelsVolume}
-  config.home.file.".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${cfg.modelsVolume}/models";
+    # ============================================================================
+    # Symlink Configuration
+    # ============================================================================
+    # Ollama models on dedicated APFS volume
+    # CRITICAL: 692GB+ of models - NEVER delete ${cfg.modelsVolume}
+    home.file.".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${cfg.modelsVolume}/models";
 
+    # ============================================================================
+    # LaunchAgent for Auto-Start
+    # ============================================================================
+    # Start Ollama server on login
+    launchd.agents.ollama = {
+      enable = true;
+      config = {
+        Label = "dev.ollama.server";
+        ProgramArguments = [
+          "/run/current-system/sw/bin/ollama"
+          "serve"
+        ];
+        EnvironmentVariables = {
+          OLLAMA_MODELS = "${cfg.modelsVolume}/models";
+          OLLAMA_CONTEXT_LENGTH = "8192";
+          OLLAMA_KEEP_ALIVE = "1h";
+        };
+        RunAtLoad = true;
+        KeepAlive = true;
+        StandardOutPath = "/tmp/ollama.log";
+        StandardErrorPath = "/tmp/ollama.error.log";
+      };
+    };
+  };
   # ============================================================================
   # Notes
   # ============================================================================
@@ -149,6 +174,6 @@ in
   # - Database: ~/Library/Application Support/Ollama/db.sqlite (not managed by Nix)
   # - History: ~/.ollama/history (not managed by Nix)
   # - Nixpkgs version: 0.13.2 (replaces manual 0.12.10 install)
-  # - For Ollama.app GUI: can coexist with Nix CLI (menu bar, daemon management)
-  # - CLI binary from Nix will take precedence in PATH
+  # - LaunchAgent starts ollama serve on login (auto-restart if crashes)
+  # - Logs: /tmp/ollama.log, /tmp/ollama.error.log
 }
