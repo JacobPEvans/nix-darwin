@@ -5,7 +5,12 @@
 # - Open WebUI: Arena mode for blind A/B model comparison
 #
 # All tools are installed via Nix.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.ai-orchestration.benchmark;

@@ -8,7 +8,12 @@
 # - Generic agent definitions
 #
 # This is a standalone module, NOT under ai-cli.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.ai-orchestration;
@@ -65,7 +70,11 @@ in
     };
 
     secretsBackend = lib.mkOption {
-      type = lib.types.enum [ "keychain" "bitwarden" "aws-vault" ];
+      type = lib.types.enum [
+        "keychain"
+        "bitwarden"
+        "aws-vault"
+      ];
       default = "keychain";
       description = ''
         How to retrieve API keys at runtime.

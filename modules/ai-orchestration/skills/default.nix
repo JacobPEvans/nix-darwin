@@ -6,7 +6,12 @@
 # - Custom skills for multi-model routing
 #
 # All plugins installed declaratively via Nix, not manually.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.ai-orchestration.skills;

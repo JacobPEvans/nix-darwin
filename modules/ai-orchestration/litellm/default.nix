@@ -7,7 +7,12 @@
 #
 # This is a submodule of ai-orchestration, NOT under ai-cli.
 # Migrated from modules/home-manager/ai-cli/litellm/
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.ai-orchestration.litellm;

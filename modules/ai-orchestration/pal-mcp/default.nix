@@ -7,7 +7,13 @@
 #
 # Installed via Nix flake input, not git clone.
 # Secrets are retrieved at runtime from the configured backend (keychain [default], bws, or aws-vault), NEVER stored.
-{ config, lib, pkgs, inputs ? { }, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs ? { },
+  ...
+}:
 
 let
   cfg = config.services.ai-orchestration.pal-mcp;
@@ -15,11 +21,12 @@ let
 
   # Secrets retrieval command based on backend
   secretsCmd =
-    if parentCfg.secretsBackend == "keychain"
-    then "security find-generic-password -w -s"
-    else if parentCfg.secretsBackend == "bitwarden"
-    then "bws secret get"
-    else "aws-vault exec default -- printenv";
+    if parentCfg.secretsBackend == "keychain" then
+      "security find-generic-password -w -s"
+    else if parentCfg.secretsBackend == "bitwarden" then
+      "bws secret get"
+    else
+      "aws-vault exec default -- printenv";
 
 in
 {
@@ -28,7 +35,14 @@ in
 
     disabledTools = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "analyze" "refactor" "testgen" "secaudit" "docgen" "tracer" ];
+      default = [
+        "analyze"
+        "refactor"
+        "testgen"
+        "secaudit"
+        "docgen"
+        "tracer"
+      ];
       description = "Tools to disable (reduces context usage)";
     };
 
@@ -43,7 +57,7 @@ in
     # PAL MCP will be pulled via flake input
     # For now, use uvx to run directly from GitHub
     home.packages = [
-      pkgs.uv  # For uvx command
+      pkgs.uv # For uvx command
     ];
 
     # PAL MCP wrapper that injects secrets at runtime
