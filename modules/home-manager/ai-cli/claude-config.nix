@@ -179,7 +179,7 @@ in
     env = {
       # Model selection (defaults to Sonnet for cost efficiency)
       ANTHROPIC_MODEL = "sonnet";
-      CLAUDE_CODE_SUBAGENT_MODEL = "opus";
+      CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";
