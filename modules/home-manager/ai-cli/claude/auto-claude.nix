@@ -17,8 +17,11 @@ let
   logDir = "${homeDir}/.claude/logs";
 
   # Python with slack-sdk for notifications
+  # Override slack-sdk to disable tests that fail in CI
   pythonWithSlack = pkgs.python3.withPackages (ps: [
-    ps.slack-sdk
+    (ps.slack-sdk.overridePythonAttrs (_: {
+      doCheck = false; # Disable tests - they fail in CI with connection/signal errors
+    }))
     ps.pyyaml
   ]);
 
