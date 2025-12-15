@@ -134,12 +134,14 @@ in
         maxBudget = 25.0;
       };
       nix = {
-        path = "${config.home.homeDirectory}/.config/nix";
+        path = "${config.home.homeDirectory}/git/nix-config";
         schedule.hours = [
           1
           5
           9
+          11
           13
+          15
           17
           21
         ];
