@@ -13,6 +13,7 @@ in
     ./finder.nix
     ./keyboard.nix
     ./security.nix
+    ./terminal.nix
     ./trackpad.nix
     ./system-ui.nix
   ];
@@ -119,20 +120,26 @@ in
     };
   };
 
-  # Enable zsh
-  programs.zsh.enable = true;
+  # ==========================================================================
+  # Programs Configuration
+  # ==========================================================================
+  programs = {
+    zsh.enable = true;
+    raycast.enable = true; # Declarative Raycast preferences
+    terminal.enable = true; # Terminal.app window size (180x80 for Basic profile)
+  };
 
-  # Raycast declarative preferences
-  programs.raycast.enable = true;
-
-  # Disable nix-darwin's Nix management (using Determinate Nix installer instead)
-  # Determinate Nix manages its own daemon - we just need nix-darwin for system config
-  nix.enable = false;
-
-  # Workaround: home-manager's darwin module accesses nix.package even when nix.enable=false
+  # ==========================================================================
+  # Nix Configuration (Determinate Nix compatibility)
+  # ==========================================================================
+  # Disable nix-darwin's Nix management - Determinate Nix manages daemon and nix itself
+  # Workaround: home-manager's darwin module accesses nix.package even when enable=false
   # Using mkForce bypasses the throw in nix-darwin's managedDefault
   # See: https://github.com/nix-community/home-manager/issues/4026
-  nix.package = lib.mkForce pkgs.nix;
+  nix = {
+    enable = false;
+    package = lib.mkForce pkgs.nix;
+  };
 
   # Disable documentation to suppress builtins.toFile warnings
   documentation.enable = false;
