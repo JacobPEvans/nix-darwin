@@ -84,7 +84,7 @@ fi
 
 # Verify orchestrator prompt exists
 if [[ ! -r "$PROMPT_FILE" ]]; then
-  echo "[$RUN_ID] ERROR: Orchestrator prompt not found at $PROMPT_FILE" >> "$FAILURES_LOG"
+  echo "[$RUN_ID] ERROR: Orchestrator prompt not found at $PROMPT_FILE. Please ensure the file exists. If you are using Nix, run 'nix rebuild' to deploy required files." >> "$FAILURES_LOG"
   exit 1
 fi
 
