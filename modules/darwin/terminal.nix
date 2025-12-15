@@ -55,8 +55,7 @@ in
       # Ensure the plist file exists; create it if missing (e.g., fresh install)
       if [ ! -f "$PLIST" ]; then
         # Terminal.app hasn't been launched yet - create minimal plist
-        defaults write com.apple.Terminal "DummyKey" -bool false
-        /usr/libexec/PlistBuddy -c "Delete DummyKey" "$PLIST" 2>/dev/null || true
+        plutil -create xml1 "$PLIST"
         echo "Created Terminal.app plist file" >&2
       fi
 
