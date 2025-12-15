@@ -7,6 +7,7 @@ Step-by-step procedures for common configuration tasks.
 - [Everyday Commands](#everyday-commands)
 - [Adding Packages](#adding-packages)
 - [Updating Packages](#updating-packages)
+  - [Secure Flake Update Workflow](#secure-flake-update-workflow)
 - [Rollback & Recovery](#rollback--recovery)
 - [Dock Configuration](#dock-configuration)
 - [Dev Shells](#dev-shells)
@@ -145,6 +146,113 @@ git revert HEAD
 # Rebuild with old versions
 sudo darwin-rebuild switch --flake .
 ```
+
+### Secure Flake Update Workflow
+
+For production or critical systems, follow this secure workflow before applying updates:
+
+#### 1. Build (Dry-Run)
+
+Preview what would change without actually building:
+
+```bash
+cd ~/.config/nix
+nix flake update  # Update flake.lock
+nix build .#darwinConfigurations.$(hostname).system --dry-run
+```
+
+This shows package changes and download sizes without committing storage.
+
+#### 2. Diff Package Changes
+
+Compare current system with the updated configuration. Choose your preferred diff tool:
+
+##### Option A: Native Nix (always available)
+
+```bash
+# Build the new configuration first
+nix build .#darwinConfigurations.$(hostname).system -o result
+
+# Compare closures
+nix store diff-closures /run/current-system ./result
+```
+
+##### Option B: nvd (if installed)
+
+```bash
+nvd diff /run/current-system ./result
+```
+
+Both tools show version changes, additions, and removals for every package.
+
+#### 3. Audit Critical Packages
+
+**Human review required** - do not automate this step.
+
+Review changes to security-sensitive packages:
+
+- System packages (nix, darwin-rebuild)
+- Security tools (gpg, ssh, certificates)
+- Development tools with network access
+- Packages with privileged access
+
+**Check versions and lifecycles:**
+
+- Review package version changes from step 2
+- Check [endoflife.date](https://endoflife.date/) for NixOS and critical packages
+- Verify packages are within supported lifecycle dates
+- Look for major version jumps that may require configuration changes
+
+**Security advisory check:**
+
+- Search for CVEs affecting packages with significant version changes
+- Review GitHub Security Advisories for key packages
+- Check nixpkgs issue tracker for known problems
+
+#### 4. Switch with Confidence
+
+Only proceed after completing human review:
+
+```bash
+# Commit the flake.lock update
+git add flake.lock
+git commit -m "chore: update flake inputs"
+
+# Apply the update
+sudo darwin-rebuild switch --flake .
+```
+
+#### 5. Rollback Procedures
+
+If issues occur after switching:
+
+**Immediate rollback:**
+
+```bash
+# Rollback to previous generation
+sudo darwin-rebuild --rollback
+```
+
+**Revert flake.lock:**
+
+```bash
+cd ~/.config/nix
+git revert HEAD
+sudo darwin-rebuild switch --flake .
+```
+
+**Switch to specific generation:**
+
+```bash
+# List available generations
+sudo darwin-rebuild --list-generations
+
+# Activate specific generation
+sudo /nix/var/nix/profiles/system-<N>-link/activate
+```
+
+**Note**: This workflow adds safety checks before updates. For development systems or low-risk updates,
+the standard "update and rebuild" workflow in [Updating Packages](#updating-packages) is sufficient.
 
 ---
 
