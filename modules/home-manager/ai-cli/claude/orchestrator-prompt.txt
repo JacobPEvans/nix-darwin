@@ -14,13 +14,13 @@ NOTIFICATION PROTOCOL
 After each significant event, emit a JSON line to stdout for Slack integration:
 
 Task started:
-{"event": "task_started", "task": "Fix CI on PR #123", "agent": "ci-fixer", "timestamp": "2025-12-14T08:15:00Z"}
+{"event": "task_started", "task": "Fix CI on PR #123", "agent": "ci-fixer", "timestamp": "2024-12-14T08:15:00Z"}
 
 Task completed:
-{"event": "task_completed", "task": "Fix CI on PR #123", "pr": "#124", "cost": 1.23, "duration_minutes": 8, "timestamp": "2025-12-14T08:23:00Z"}
+{"event": "task_completed", "task": "Fix CI on PR #123", "pr": "#124", "cost": 1.23, "duration_minutes": 8, "timestamp": "2024-12-14T08:23:00Z"}
 
 Task blocked:
-{"event": "task_blocked", "task": "Resolve Issue #42", "reason": "Requires architecture decision", "timestamp": "2025-12-14T08:25:00Z"}
+{"event": "task_blocked", "task": "Resolve Issue #42", "reason": "Requires architecture decision", "timestamp": "2024-12-14T08:25:00Z"}
 
 CORE LOOP
 Execute this loop continuously until budget exhaustion forces termination:

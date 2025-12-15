@@ -77,13 +77,7 @@ in
                       17
                       22
                     ];
-                    description = ''
-                      List of hours (0-23) to run each day.
-
-                      WARNING: The default runs 5 times/day. Combined with maxBudget ($20),
-                      this could cost up to $100/day per repository. Adjust schedule and
-                      budget based on your needs.
-                    '';
+                    description = "List of hours (0-23) to run each day";
                   };
                 };
               };
@@ -116,15 +110,16 @@ in
   };
 
   config = lib.mkIf (cfg.enable && cfg.autoClaude.enable) {
-    # Ensure each enabled repository has at least one scheduled hour
+    # Ensure each repository has at least one scheduled hour
     assertions = lib.mapAttrsToList (
       name: repoCfg:
       let
         hoursList = getScheduleHours repoCfg.schedule;
       in
       {
-        assertion = (!repoCfg.enabled) || (hoursList != [ ]);
-        message = "programs.claude.autoClaude.repositories.${name} must set schedule.hours or schedule.hour when enabled";
+        assertion = hoursList != [ ];
+        message =
+          "programs.claude.autoClaude.repositories." + name + " must set schedule.hours or schedule.hour";
       }
     ) enabledRepos;
 
