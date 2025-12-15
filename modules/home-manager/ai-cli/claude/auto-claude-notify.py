@@ -41,7 +41,7 @@ def get_slack_token() -> str:
         secret_data = json.loads(result.stdout)
         return secret_data["value"]
     except subprocess.CalledProcessError as e:
-        print(f"Error retrieving secret from bws: {e.stderr}", file=sys.stderr)
+        print(f"Error retrieving secret '{secret_id}' from bws: {e.stderr}", file=sys.stderr)
         sys.exit(1)
     except (json.JSONDecodeError, KeyError) as e:
         print(f"Error parsing bws response: {e}", file=sys.stderr)
