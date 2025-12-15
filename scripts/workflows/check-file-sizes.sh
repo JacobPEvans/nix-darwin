@@ -2,7 +2,7 @@
 # Check file sizes against tier limits (bytes as token proxy)
 # Usage: ./scripts/workflows/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]
 #
-# Limits: 8KB recommended, 16KB hard, 32KB extended
+# Limits: 6KB recommended, 12KB hard, 32KB extended
 #
 # Exit codes:
 #   0 - All files within limits
@@ -22,19 +22,23 @@ for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | so
   # Skip exempt files
   if [[ " $EXEMPT " == *" $base "* ]]; then continue; fi
 
-  # Determine limit: extended (32KB) or standard (16KB)
+  # Determine limit and warning threshold
   if [[ " $EXTENDED " == *" $base "* ]]; then
+    # Extended files: 32KB limit, no warning
     limit=32768
+    warn_threshold=$limit
   else
-    limit=16384
+    # Standard files: 12KB limit, 6KB warning
+    limit=12288
+    warn_threshold=6144
   fi
 
   # Report errors and warnings
   if [ "$size" -gt "$limit" ]; then
     echo "::error file=$f::$f is ${kb}KB (exceeds $((limit/1024))KB limit)"
     ERRORS=$((ERRORS + 1))
-  elif [ "$size" -gt 8192 ]; then
-    echo "::warning file=$f::$f is ${kb}KB (exceeds 8KB recommended)"
+  elif [ "$size" -gt "$warn_threshold" ]; then
+    echo "::warning file=$f::$f is ${kb}KB (exceeds $((warn_threshold/1024))KB recommended)"
   fi
 done
 
