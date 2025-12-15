@@ -3,7 +3,8 @@
 # Ubuntu uses apt for system package management.
 # User environment is managed by home-manager (see home.nix).
 
-{ }
+{
+}
 
 # ==========================================================================
 # Host Information

@@ -12,17 +12,37 @@
 # Note: Unlike Claude/Gemini, Copilot's permission system is primarily
 # CLI-flag based. The config file only manages directory trust.
 
-{ config, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 
 let
   copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config; };
-in
-{
-  ".copilot/config.json".text = builtins.toJSON {
+
+  # Copilot settings object
+  settings = {
     # Trusted directories where Copilot can operate without confirmation
     inherit (copilotAllow) trusted_folders;
 
     # Additional Copilot CLI settings can be added here
     # Note: Tool-level permissions require CLI flags, not config settings
   };
+
+  # Generate pretty-printed JSON using a derivation with jq
+  # This improves readability for debugging and matches Claude's format
+  settingsJson =
+    pkgs.runCommand "copilot-config.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        json = builtins.toJSON settings;
+        passAsFile = [ "json" ];
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
+in
+{
+  ".copilot/config.json".source = settingsJson;
 }

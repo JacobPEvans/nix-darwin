@@ -78,6 +78,7 @@ in
       # GUI applications
       # ========================================================================
       bitwarden-desktop # Password manager desktop app
+      ghostty-bin # GPU-accelerated terminal emulator (prebuilt binary for macOS)
       obsidian # Knowledge base / note-taking (Markdown)
       # OrbStack: Docker & Linux VM manager (lightweight alternative to Docker Desktop)
       # Provides: docker, docker-compose, docker-buildx, kubectl, orb, orbctl

@@ -12,14 +12,18 @@
 # - gemini-permissions-deny.nix - excludeTools (blocked commands)
 # - gemini-permissions-ask.nix - Reference only (Gemini doesn't support ask mode)
 
-{ config, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 
 let
   geminiAllow = import ../permissions/gemini-permissions-allow.nix { inherit config; };
   geminiDeny = import ../permissions/gemini-permissions-deny.nix { };
-in
-{
-  ".gemini/settings.json".text = builtins.toJSON {
+
+  # Gemini settings object
+  settings = {
     # JSON Schema reference for IDE IntelliSense and validation
     # Official schema from google-gemini/gemini-cli repo
     # NOTE: Gemini CLI has a bug where $schema triggers "not allowed" warning
@@ -79,4 +83,20 @@ in
       sandbox = true;
     };
   };
+
+  # Generate pretty-printed JSON using a derivation with jq
+  # This improves readability for debugging and matches Claude's format
+  settingsJson =
+    pkgs.runCommand "gemini-settings.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        json = builtins.toJSON settings;
+        passAsFile = [ "json" ];
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
+in
+{
+  ".gemini/settings.json".source = settingsJson;
 }

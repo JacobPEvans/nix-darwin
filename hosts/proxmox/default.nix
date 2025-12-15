@@ -5,7 +5,8 @@
 #
 # For user environment, see home.nix (managed by home-manager).
 
-{ }
+{
+}
 
 # ==========================================================================
 # Host Information
