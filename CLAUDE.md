@@ -215,6 +215,73 @@ git commit -m "message"
   - File is slightly over 200 lines but logically complete
   - Splitting would create import/dependency complexity
 
+## Version Management
+
+**Single Source of Truth**: All package versions are managed through `flake.lock`.
+
+### AI Agent Responsibilities
+
+**CRITICAL**: AI agents must NOT modify package versions or update flake inputs without explicit user request.
+
+**Never do this automatically:**
+
+- Running `nix flake update` (updates all inputs)
+- Running `nix flake lock --update-input <input>` (updates specific input)
+- Modifying version pins in `flake.nix`
+- Suggesting version updates "while we're at it"
+
+**Why this restriction exists:**
+
+- Version updates can introduce breaking changes
+- Security-sensitive packages require human audit
+- Flake updates affect the entire system
+- Rollback is possible but disruptive
+
+### When Version Updates Are Needed
+
+**If user explicitly requests an update:**
+
+1. Follow the [Secure Flake Update Workflow](RUNBOOK.md#secure-flake-update-workflow) in RUNBOOK.md
+2. Build with dry-run first
+3. Show diff of package changes to user
+4. Wait for explicit approval before applying
+5. Document the update in commit message
+
+**If a package version is outdated but not blocking the current task:**
+
+- Note it in your response
+- Suggest the user run the secure update workflow
+- Do NOT update it yourself
+
+**If a specific package version is required for the current task:**
+
+- Ask user if they want to update that specific input
+- Explain what will change
+- Wait for explicit approval
+- Use `nix flake lock --update-input <specific-input>` (not `nix flake update`)
+
+### Version Lifecycle Reference
+
+For checking package support lifecycles, reference:
+
+- [endoflife.date](https://endoflife.date/) - Lifecycle dates for NixOS and common packages
+- NixOS release calendar for stable channel support windows
+- Package-specific upstream documentation for LTS/stable versions
+
+### Emergency Overrides
+
+In rare cases where a security update is urgent:
+
+1. Explain the security issue to user
+2. Show the specific CVE or advisory
+3. Recommend the minimal update needed
+4. Wait for explicit approval
+5. Apply update following secure workflow
+
+**Remember**: Version stability is a feature, not a bug. Resist the urge to "helpfully" update things.
+
+---
+
 ## Task Management Workflow
 
 **STRICT PATTERN - Follow without exception:**
