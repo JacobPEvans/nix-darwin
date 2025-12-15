@@ -1,0 +1,119 @@
+name: NixOS Release Check
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly on Sundays at 9 AM UTC
+    - cron: '0 9 * * 0'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    name: Check for New NixOS Releases
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check current version
+        id: current
+        run: |
+          # Extract stableVersion from lib/versions.nix
+          if ! grep -q 'stableVersion' lib/versions.nix 2>/dev/null; then
+            echo "::warning::Cannot find stableVersion in lib/versions.nix"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          CURRENT=$(grep 'stableVersion.*=' lib/versions.nix | sed -E 's/.*"(.*)".*/\1/')
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Current stable version: $CURRENT"
+
+      - name: Check latest nixpkgs release
+        id: latest
+        run: |
+          # Get latest release-* branch from nixpkgs
+          LATEST=$(git ls-remote --heads https://github.com/NixOS/nixpkgs.git 'refs/heads/release-*' 2>/dev/null | \
+                   sed 's|.*refs/heads/release-||' | \
+                   sort -V | \
+                   tail -1 || echo "unknown")
+
+          if [[ "$LATEST" == "unknown" ]]; then
+            echo "::warning::Cannot fetch latest release from nixpkgs"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest nixpkgs release: $LATEST"
+
+      - name: Compare versions and notify
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+
+          # Handle edge cases
+          if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
+            echo "⚠️  Unable to compare versions (current: $CURRENT, latest: $LATEST)"
+            exit 0
+          fi
+
+          if [[ "$CURRENT" == "$LATEST" ]]; then
+            echo "✅ Running on latest stable release: $CURRENT"
+          elif [[ "$CURRENT" > "$LATEST" ]]; then
+            echo "⚠️  Ahead of stable (may be on unstable/pre-release): $CURRENT > $LATEST"
+          else
+            echo "::notice title=New NixOS Release Available::NixOS $LATEST is available (current: $CURRENT). See RUNBOOK.md for update workflow."
+            echo "📢 New stable release available: $LATEST (current: $CURRENT)"
+          fi
+
+      - name: Generate summary
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## NixOS Release Status
+
+          | Component | Current | Latest | Status |
+          |-----------|---------|--------|--------|
+          EOF
+
+          # Determine status
+          if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
+            STATUS="⚠️ Unknown"
+          elif [[ "$CURRENT" == "$LATEST" ]]; then
+            STATUS="✅ Up to date"
+          elif [[ "$CURRENT" > "$LATEST" ]]; then
+            STATUS="⚠️ Ahead"
+          else
+            STATUS="📢 Update available"
+          fi
+
+          echo "| nixpkgs stable | $CURRENT | $LATEST | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add update instructions if update available
+          if [[ "$CURRENT" != "unknown" ]] && [[ "$LATEST" != "unknown" ]] && [[ "$CURRENT" < "$LATEST" ]]; then
+            cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### Update Available
+
+          A new stable release of NixOS is available: **$LATEST**
+
+          To update, follow the [Secure Flake Update Workflow](../RUNBOOK.md#secure-flake-update-workflow):
+          1. Update \`lib/versions.nix\` to use \`$LATEST\`
+          2. Run \`nix flake update\`
+          3. Build → Diff → Audit → Switch
+
+          **Resources:**
+          - [NixOS Release Notes](https://nixos.org/manual/nixos/stable/release-notes.html)
+          - [Nixpkgs Release Branch](https://github.com/NixOS/nixpkgs/tree/release-$LATEST)
+          EOF
+          fi
+
+      - name: Always succeed
+        if: always()
+        run: |
+          echo "This check is informational only and never fails"
+          exit 0
