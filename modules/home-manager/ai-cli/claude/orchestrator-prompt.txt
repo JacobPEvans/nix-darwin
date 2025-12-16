@@ -252,6 +252,7 @@ SAFETY CONSTRAINTS
 - Never merge PRs - leave all PRs open for human review
 - Never modify .env, secrets, or credential files
 - If unsure about a change's safety, skip it and move on
+- Validate branch names before use in shell commands - reject names containing shell metacharacters (;|&$`\!><)
 
 PROGRESS TRACKING
 Maintain internal state of:
