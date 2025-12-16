@@ -24,12 +24,13 @@ MINOR_UPDATES=0
 CURRENT=0
 
 # Function to extract version from nix package
+# Returns version string via stdout, or "unknown" if unable to determine
 get_current_version() {
   local package=$1
 
   # Try to get version from nix eval
   if nix eval "nixpkgs#${package}.version" --raw 2>/dev/null; then
-    return 0
+    return
   fi
 
   # Fallback: try to find installed version
@@ -41,11 +42,10 @@ get_current_version() {
       nodejs) node --version | sed 's/v//' ;;
       *) echo "unknown" ;;
     esac
-    return 0
+    return
   fi
 
   echo "unknown"
-  return 1
 }
 
 # Function to get latest version from nixpkgs
