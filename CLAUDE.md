@@ -37,6 +37,53 @@ consciously choose Opus when the task warrants it.
 
 **MANDATORY for all changes.** Follow without exception.
 
+### Repository Structure
+
+This repository uses a **bare git repo with worktrees**:
+
+```text
+~/git/nix-config/              (bare repo - DO NOT cd here directly)
+├── main/                      (main branch worktree - for pulling updates)
+├── <feature-branch>/          (your feature worktree)
+├── <another-feature>/         (another feature worktree)
+└── ...
+```
+
+**Key Points:**
+
+- `~/.config/nix` is a **read-only symlink** to the nix store (production config)
+- All development happens in `~/git/nix-config/<worktree-name>/`
+- Each PR/feature gets its own worktree
+
+### MANDATORY: New Worktree for New Work
+
+**NEVER work directly in an existing worktree for unrelated changes.**
+**NEVER work in the bare repo directory (`~/git/nix-config/`)**
+
+Before making ANY changes:
+
+1. Check if changes relate to current worktree's branch/PR
+2. If NOT related → **create a NEW worktree** for the new work
+3. If related → continue in current worktree
+
+**To create a new worktree:**
+
+```bash
+cd ~/git/nix-config
+git fetch origin
+git worktree add <branch-name> -b <branch-name> origin/main
+cd <branch-name>
+# Now you're ready to work
+```
+
+**Why worktrees?**
+
+- Each PR/feature has isolated working directory
+- No accidental commits to wrong branch
+- Easy parallel development
+- auto-claude manages worktree lifecycle automatically
+- Prevents mixing changes across unrelated features
+
 ### SSH Agent Pre-Flight Check (Required for Remote Git Operations)
 
 Before any `git push`, `git pull`, `git fetch`, or `git clone` over SSH:
@@ -56,10 +103,10 @@ Without this check, authenticated Git operations will fail with authentication e
 
 ### Before Making Changes
 
-1. Check current branch - determine if change relates to current worktree+branch
-2. If on `main`: create new feature branch before modifying any files
-3. If on unrelated branch: switch to main, pull latest, create new dedicated branch
-4. Never make changes directly on `main`
+1. Check current worktree - determine if change relates to current worktree's branch/PR
+2. If change is unrelated → **create a new worktree** (see above)
+3. If in main worktree → only pull updates, **never commit directly to main**
+4. If change is related → continue in current worktree
 
 ### After Completing Changes
 

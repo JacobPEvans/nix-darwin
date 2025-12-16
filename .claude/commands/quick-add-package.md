@@ -42,12 +42,18 @@ Per project rules: nixpkgs first, Homebrew only when package is unavailable in n
 
 ### 3. Create Worktree
 
-Create a dedicated worktree for the change (NEVER work on main):
+Create a dedicated worktree for the change (NEVER work on main).
+
+**From the bare repo root** (`~/git/nix-config`):
 
 ```bash
-git worktree add -b feat/add-<pkg-name> worktrees/add-<pkg-name>
-cd worktrees/add-<pkg-name>
+cd ~/git/nix-config
+git fetch origin
+git worktree add feat/add-<pkg-name> -b feat/add-<pkg-name> origin/main
+cd feat/add-<pkg-name>
 ```
+
+The worktree is created at `~/git/nix-config/feat/add-<pkg-name>/`.
 
 ### 4. Determine Installation Location
 
@@ -123,15 +129,17 @@ home-manager switch --flake .  # Linux
 Once the PR is merged, clean up your local environment:
 
 ```bash
-# Navigate back to the repository root
-cd ~/.config/nix
+# Navigate to the bare repo root
+cd ~/git/nix-config
 
 # Remove the worktree
-git worktree remove worktrees/add-<pkg-name>
+git worktree remove feat/add-<pkg-name>
 
-# Delete the local feature branch (optional)
+# Delete the local feature branch
 git branch -d feat/add-<pkg-name>
 ```
+
+**Note**: auto-claude will automatically clean up merged/closed PR worktrees during its scheduled runs.
 
 ---
 

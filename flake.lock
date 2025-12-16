@@ -230,6 +230,22 @@
         "type": "github"
       }
     },
+    "nix-config-main": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765848284,
+        "narHash": "sha256-GTnijZ+n6xRM1YZ+WT532BkpfNBOEB05DfNzkjd19tY=",
+        "owner": "JacobPEvans",
+        "repo": "nix",
+        "rev": "f713b5bc399548eddbd811e650c72c2195d98669",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "nix",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1754340878,
@@ -274,6 +290,7 @@
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
+        "nix-config-main": "nix-config-main",
         "nixpkgs": "nixpkgs_2",
         "superpowers-marketplace": "superpowers-marketplace"
       }

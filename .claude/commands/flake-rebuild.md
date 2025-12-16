@@ -15,65 +15,72 @@ Update all flake inputs and rebuild nix-darwin.
 1. **NEVER commit to main** - Always create or switch to a feature branch FIRST
 2. **NEVER manually merge** - Use `gh pr merge --auto` to enable auto-merge
 
+## Repository Structure
+
+This repo uses a bare git repo with worktrees:
+
+- `~/git/nix-config/` - bare repo (do not cd here directly)
+- `~/git/nix-config/main/` - main branch worktree
+- `~/git/nix-config/<branch-name>/` - feature worktrees
+
 ## Steps
 
-### 1. Sync Repository First
+### 1. Sync Main Worktree First
 
-**IMPORTANT**: Before starting, run `/git-refresh` to:
-
-- Merge any pending PRs that are ready
-- Sync local main with remote
-- Clean up stale worktrees
-
-This ensures you're working with the latest code and avoids conflicts.
-
-### 2. Pre-flight Checks
-
-Ensure you're on main and it's clean:
+**IMPORTANT**: Update the main worktree before starting:
 
 ```bash
-git checkout main
-git pull
+cd ~/git/nix-config/main
+git fetch origin
+git pull origin main
 git status
 ```
 
 If there are uncommitted changes, **STOP** and report to the user.
 
-### 3. Switch to Feature Branch
+### 2. Create or Switch to Feature Worktree
 
-Check if the branch already exists. If it does, switch to it. If not, create it.
+Branch/worktree name format: `chore/flake-update-YYYY-MM-DD` (replace with today's date)
 
-Branch name format: `chore/flake-update-YYYY-MM-DD` (replace with today's date)
+Check if worktree already exists, otherwise create it:
 
 ```bash
-git checkout chore/flake-update-YYYY-MM-DD 2>/dev/null || git checkout -b chore/flake-update-YYYY-MM-DD
+cd ~/git/nix-config
+# Check if worktree exists
+if [ -d "chore/flake-update-YYYY-MM-DD" ]; then
+  cd chore/flake-update-YYYY-MM-DD
+  git pull origin main  # Update with latest main
+else
+  git worktree add chore/flake-update-YYYY-MM-DD -b chore/flake-update-YYYY-MM-DD origin/main
+  cd chore/flake-update-YYYY-MM-DD
+fi
 ```
 
-### 4. Update Flake Inputs
+### 3. Update Flake Inputs
 
 ```bash
 nix flake update
 ```
 
-**On failure**: Switch back to main and report the error.
+**On failure**: Report the error and stop.
 
-### 5. Check for Changes
+### 4. Check for Changes
 
 ```bash
 git status
 ```
 
-- If flake.lock is **unchanged**: Switch back to main, report "All flake inputs already up to date" and **STOP**.
-- If flake.lock **changed**: Continue to step 6.
+- If flake.lock is **unchanged**: Report "All flake inputs already up to date" and **STOP**.
+- If flake.lock **changed**: Continue to step 5.
 
-### 6. Commit the Update
+### 5. Commit the Update
 
 ```bash
 git add flake.lock
 git commit -m "chore(deps): update flake.lock"
 ```
 
-### 7. Rebuild nix-darwin
+### 6. Rebuild nix-darwin
 
 ```bash
 sudo darwin-rebuild switch --flake .
@@ -81,7 +88,7 @@ sudo darwin-rebuild switch --flake .
 
 **On failure**: Report the error but continue to create the PR (the CI will also catch issues).
 
-### 8. Push and Create PR with Auto-Merge
+### 7. Push and Create PR with Auto-Merge
 
 Push the branch:
 
@@ -101,21 +108,24 @@ Enable auto-merge (this will merge automatically when checks pass):
 gh pr merge --auto --squash --delete-branch
 ```
 
-### 9. Return to Main
+### 8. Return to Main Worktree
 
-Switch back to main while waiting for auto-merge:
+Switch back to the main worktree while waiting for auto-merge:
 
 ```bash
-git checkout main
+cd ~/git/nix-config/main
 ```
 
-### 10. Report Summary
+### 9. Report Summary
 
 Tell the user:
 
 1. What inputs were updated (from the nix flake update output)
 2. The PR URL
 3. That auto-merge is enabled and will merge when checks pass
-4. They can run `git pull` after the PR merges to sync locally
+4. They can run `git pull` in the main worktree after the PR merges
 
 **DO NOT wait for checks** - auto-merge handles this automatically.
+
+**Note**: The worktree at `~/git/nix-config/chore/flake-update-YYYY-MM-DD/` will be automatically
+cleaned up by auto-claude after the PR is merged.

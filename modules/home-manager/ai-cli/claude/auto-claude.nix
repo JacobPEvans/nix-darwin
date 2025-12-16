@@ -25,20 +25,28 @@ let
     ps.pyyaml
   ]);
 
-  # Convert hour to launchd calendar interval
-  mkCalendarInterval = hour: {
-    Hour = hour;
-    Minute = 0;
-  };
+  # Convert time spec to launchd calendar interval
+  # Supports both simple hour (int) and {hour, minute} attrset
+  mkCalendarInterval = time:
+    if builtins.isInt time then {
+      Hour = time;
+      Minute = 0;
+    } else {
+      Hour = time.hour;
+      Minute = time.minute or 0;
+    };
 
-  # Normalize schedule settings (supports single hour or list of hours)
-  getScheduleHours =
+  # Normalize schedule settings (supports single hour, list of hours, or list of times)
+  getScheduleTimes =
     schedule:
     let
+      timesList = schedule.times;
       hoursList = schedule.hours;
       hourOpt = schedule.hour;
     in
-    if hoursList != [ ] then
+    if timesList != [ ] then
+      timesList
+    else if hoursList != [ ] then
       hoursList
     else if hourOpt != null then
       [ hourOpt ]
@@ -68,19 +76,47 @@ in
                   hour = lib.mkOption {
                     type = lib.types.nullOr (lib.types.ints.between 0 23);
                     default = null;
-                    description = "Hour of day to run (0-23). Deprecated in favor of hours.";
+                    description = "Hour of day to run (0-23). Deprecated in favor of hours/times.";
                   };
 
                   hours = lib.mkOption {
                     type = lib.types.listOf (lib.types.ints.between 0 23);
+                    default = [ ];
+                    description = ''
+                      List of hours (0-23) to run each day at minute 0.
+                      Deprecated in favor of times for hour+minute control.
+                    '';
+                  };
+
+                  times = lib.mkOption {
+                    type = lib.types.listOf (lib.types.submodule {
+                      options = {
+                        hour = lib.mkOption {
+                          type = lib.types.ints.between 0 23;
+                          description = "Hour of day (0-23)";
+                        };
+                        minute = lib.mkOption {
+                          type = lib.types.ints.between 0 59;
+                          default = 0;
+                          description = "Minute of hour (0-59)";
+                        };
+                      };
+                    });
                     default = [
-                      14
+                      { hour = 14; minute = 0; }
                     ];
                     description = ''
-                      List of hours (0-23) to run each day.
+                      List of times to run each day. Each time has hour (0-23) and minute (0-59).
 
-                      Default runs once daily at 2pm to minimize unexpected costs.
-                      Add more hours if you want more frequent maintenance runs.
+                      Default runs once daily at 2:00 PM to minimize unexpected costs.
+                      Add more times for more frequent maintenance runs.
+
+                      Example:
+                        times = [
+                          { hour = 9; minute = 30; }   # 9:30 AM
+                          { hour = 14; minute = 0; }   # 2:00 PM
+                          { hour = 18; minute = 30; }  # 6:30 PM
+                        ];
                     '';
                   };
                 };
@@ -121,15 +157,15 @@ in
   };
 
   config = lib.mkIf (cfg.enable && cfg.autoClaude.enable) {
-    # Ensure each enabled repository has at least one scheduled hour
+    # Ensure each enabled repository has at least one scheduled time
     assertions = lib.mapAttrsToList (
       name: repoCfg:
       let
-        hoursList = getScheduleHours repoCfg.schedule;
+        timesList = getScheduleTimes repoCfg.schedule;
       in
       {
-        assertion = (!repoCfg.enabled) || (hoursList != [ ]);
-        message = "programs.claude.autoClaude.repositories.${name} must set schedule.hours or schedule.hour when enabled";
+        assertion = (!repoCfg.enabled) || (timesList != [ ]);
+        message = "programs.claude.autoClaude.repositories.${name} must set schedule.times, schedule.hours, or schedule.hour when enabled";
       }
     ) enabledRepos;
 
@@ -161,7 +197,18 @@ in
           source = ./auto-claude-notify.py;
           executable = true;
         };
+
+        # Deploy control CLI
+        ".claude/scripts/auto-claude-ctl.sh" = {
+          source = ./auto-claude-ctl.sh;
+          executable = true;
+        };
       };
+    };
+
+    # Add shell alias for convenience
+    programs.zsh.shellAliases = {
+      auto-claude-ctl = "${homeDir}/.claude/scripts/auto-claude-ctl.sh";
     };
 
     # Create launchd agents for each repository (Darwin only)
@@ -169,7 +216,7 @@ in
     launchd.agents = lib.mapAttrs' (
       name: repoCfg:
       let
-        hoursList = getScheduleHours repoCfg.schedule;
+        timesList = getScheduleTimes repoCfg.schedule;
         slackArg = if repoCfg.slackChannel != null then repoCfg.slackChannel else "";
       in
       lib.nameValuePair "com.claude.auto-claude-${name}" {
@@ -184,7 +231,7 @@ in
             logDir
             slackArg
           ];
-          StartCalendarInterval = map mkCalendarInterval hoursList;
+          StartCalendarInterval = map mkCalendarInterval timesList;
           StandardOutPath = "${logDir}/launchd-${name}.log";
           StandardErrorPath = "${logDir}/launchd-${name}.err";
           EnvironmentVariables = {

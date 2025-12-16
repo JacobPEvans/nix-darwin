@@ -116,19 +116,21 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
+  # Uses the main worktree, not ~/.config/nix (which is now a read-only symlink)
   autoClaude = {
     enable = true;
     repositories = {
       # ai-assistant-instructions: runs daily at 4am
       ai-assistant-instructions = {
         path = "${config.home.homeDirectory}/git/ai-assistant-instructions";
-        schedule.hour = 4;
+        schedule.times = [ { hour = 4; minute = 0; } ];
         maxBudget = 25.0;
       };
-      # nix config: runs daily at 1pm (13:00)
+      # nix config: runs daily at 1pm (13:00) from the main worktree
+      # ~/.config/nix is a read-only symlink to nix store
       nix = {
-        path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hour = 13;
+        path = "${config.home.homeDirectory}/git/nix-config/main";
+        schedule.times = [ { hour = 13; minute = 0; } ];
         maxBudget = 25.0;
       };
     };
@@ -191,15 +193,9 @@ in
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # Model selection (defaults to Sonnet for cost efficiency)
-      # NOTE: Subagent model was changed from 'opus' to 'sonnet'. While opus is
-      # more capable for complex reasoning, sonnet provides better cost efficiency.
-      # Change back to opus if auto-claude quality degrades for complex tasks.
-      ANTHROPIC_MODEL = "sonnet";
-      CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
-      # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
-      # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
-      # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";
+      # Model selection - use defaults (Anthropic's latest recommended models)
+      # As of Dec 2025, opus 4.5 is the default with token optimization
+      # Slash commands can override with model: sonnet for cost-efficient tasks
 
       # Token budgets
       MAX_THINKING_TOKENS = "16384";
