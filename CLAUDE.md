@@ -50,8 +50,8 @@ This enables concurrent AI sessions and parallel development on separate feature
 ```bash
 # Create new worktree for a feature
 cd ~/git/ai-assistant-instructions/main
-git worktree add ../feat/my-feature -b feat/my-feature
-cd ../feat/my-feature
+git worktree add ../my-feature -b feat/my-feature
+cd ../my-feature
 ```
 
 **Content source**: Permissions, commands, and instruction files come from the **Nix store**

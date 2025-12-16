@@ -81,41 +81,8 @@ let
       ;
   };
 
-  # Commands from agentsmd (Nix store / flake input)
-  # Changes require darwin-rebuild, but ensures reproducibility
-  #
-  # These commands live in .claude/commands/
-  # and are copied to ~/.claude/commands/ for global availability.
-  #
-  # Note: "commit" removed - use /commit from commit-commands plugin instead
-  agentsMdCommands = [
-    "fix-all-pr-ci"
-    "generate-code"
-    "git-refresh"
-    "infrastructure-review"
-    "init-change"
-    "init-worktree"
-    "pull-request"
-    "pull-request-review-feedback"
-    "quick-add-permission"
-    "review-code"
-    "review-docs"
-    "rok-resolve-issues"
-    "rok-respond-to-reviews"
-    "rok-review-pr"
-    "rok-shape-issues"
-    "sync-permissions"
-  ];
-
-  # Create file entries for agentsmd commands from Nix store
-  mkAgentsMdCommandSymlinks = builtins.listToAttrs (
-    map (cmd: {
-      name = ".claude/commands/${cmd}.md";
-      value = {
-        source = "${ai-assistant-instructions}/.claude/commands/${cmd}.md";
-      };
-    }) agentsMdCommands
-  );
+  # NOTE: agentsmd commands are defined in claude-config.nix and processed by
+  # components.nix via commands.fromFlakeInputs. No duplicate definition here.
 
   # Claude Code settings object
   # Generated from lib/claude-settings.nix (shared with CI for cross-platform validation)
@@ -195,7 +162,5 @@ in
     executable = true;
   };
 }
-# Merge with commands and agents from claude-cookbooks
+# Merge with commands and agents from plugins
 // claudePlugins.files
-# Merge with agentsmd command symlinks
-// mkAgentsMdCommandSymlinks
