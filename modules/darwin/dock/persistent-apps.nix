@@ -50,7 +50,7 @@ in
 
       # AI Tools
       "${homeDir}/Applications/Gemini.app"
-      "/Applications/Ollama.app"
+      # Ollama runs headless via LaunchAgent, no dock icon needed
     ];
 
     # ========================================================================

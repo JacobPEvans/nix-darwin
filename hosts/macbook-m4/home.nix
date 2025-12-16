@@ -3,12 +3,15 @@
 # User environment for macbook-m4 host.
 # Imports common home-manager modules with host-specific overrides.
 
-{ config, pkgs, ... }:
+{ config, ... }:
 
 {
   imports = [
     # Common home-manager configuration
     ../../modules/home-manager/common.nix
+
+    # Ollama configuration (models on /Volumes/Ollama)
+    ../../modules/home-manager/ollama.nix
   ];
 
   # ==========================================================================
@@ -17,15 +20,13 @@
   # Settings unique to this machine's user environment
 
   # Additional host-specific packages (beyond common)
-  # home.packages = with pkgs; [ ];
+  # home.packages = with pkgs; [ ];  # Uncomment and add pkgs to args when needed
 
   # Host-specific symlinks for external volumes
   # NOTE: These symlinks point to data on external volumes.
   # Nix does NOT manage the volume contents - only creates symlinks.
   home.file = {
-    # Ollama models on dedicated APFS volume
-    # CRITICAL: 692GB+ of models - NEVER delete /Volumes/Ollama
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/Volumes/Ollama/models";
+    # Ollama models symlink managed by modules/home-manager/ollama.nix
 
     # OrbStack data on dedicated APFS volume
     # Symlinks entire Group Container so ALL OrbStack data lives on volume

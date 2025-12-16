@@ -51,24 +51,20 @@ let
       ;
   };
 
-  # Path to ai-assistant-instructions git repo for symlinks
-  # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
-  # Single source of truth in lib/user-config.nix (DRY - also used by claude.nix)
-  # See user-config.nix for clone instructions if the repo is missing
-  aiInstructionsRepo = userConfig.ai.instructionsRepo;
-
-  # Home directory symlinks to ai-assistant-instructions repo
-  # These provide global access to AI instruction files
+  # AgentsMD files from Nix store (flake input)
+  # Changes require darwin-rebuild, but ensures reproducibility
   # NOTE: .copilot and .gemini directories are NOT symlinked because
   # Nix manages files inside them (config.json, settings.json)
-  aiInstructionsSymlinks = {
+  agentsMdSymlinks = {
     # Root instruction files accessible from home directory
-    "CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/CLAUDE.md";
-    "GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/GEMINI.md";
+    # CLAUDE.md and GEMINI.md are pointers to agentsmd/AGENTS.md
+    # AGENTS.md contains the actual centralized instructions
+    "CLAUDE.md".source = "${ai-assistant-instructions}/CLAUDE.md";
+    "GEMINI.md".source = "${ai-assistant-instructions}/GEMINI.md";
+    "AGENTS.md".source = "${ai-assistant-instructions}/agentsmd/AGENTS.md";
 
-    # AI instruction directories (only those without Nix-managed files inside)
-    ".ai-instructions".source =
-      config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions";
+    # agentsmd - folder containing commands/, rules/, workflows/
+    "agentsmd".source = "${ai-assistant-instructions}/agentsmd";
   };
   geminiFiles = import ./ai-cli/gemini.nix { inherit config pkgs; };
   copilotFiles = import ./ai-cli/copilot.nix { inherit config pkgs; };
@@ -87,9 +83,9 @@ in
     # - copilot.nix: GitHub Copilot CLI config
     #
     # Permissions: Now read from JSON in ai-assistant-instructions repo
-    # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, .ai-instructions/, etc.
+    # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
     # NOTE: claudeFiles removed - now handled by programs.claude module
-    file = npmFiles // awsFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
+    file = npmFiles // awsFiles // geminiFiles // copilotFiles // agentsMdSymlinks // gitHooks;
 
     # Claude Code Settings Validation (post-rebuild)
     # Validates settings.json against JSON Schema after home files are written

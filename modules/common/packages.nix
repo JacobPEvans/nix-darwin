@@ -69,10 +69,15 @@ with pkgs;
   rapidapi # Full-featured HTTP client for testing and describing APIs
 
   # ==========================================================================
-  # Python Tools (python3Packages.*)
+  # Python Environment
   # ==========================================================================
-  # Python packages from nixpkgs. Use python3Packages (not python312Packages)
-  # to avoid hardcoding versions - nixpkgs manages the default Python version.
-
-  python3Packages.grip # Preview GitHub Markdown files locally
+  # Create a unified Python environment with all required packages.
+  # This ensures all modules can be imported in the same interpreter.
+  # Using python3.withPackages instead of individual python3Packages.*
+  (python3.withPackages (ps: [
+    ps.grip # Preview GitHub Markdown files locally
+    ps.langchain-ollama # LangChain integration for Ollama
+    ps.ollama # Ollama Python library for local LLM interaction
+    ps.pygithub # GitHub API v3 Python library
+  ]))
 ]

@@ -1,5 +1,18 @@
 # Dependabot configuration for automated dependency updates
 # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+#
+# NOTE: Nix flake inputs are NOT managed by Dependabot
+# Dependabot doesn't support Nix flakes, so we use custom GitHub Actions workflows:
+#
+# Flake Input Update Strategy:
+# - deps-update-flake.yml: Full update of all inputs (Mon/Thu 6 AM UTC)
+# - deps-update-ai-instructions.yml: Immediate sync with ai-assistant-instructions (on push)
+# - deps-update-anthropic.yml: Daily fast-track for Anthropic repos (6 AM UTC)
+# - deps-monitor-packages.yml: Package version monitoring (Mon 7am, Thu 7pm, Sat 7am UTC)
+#
+# All flake update PRs are automatically reviewed by AI (review-deps.yml) and may auto-merge
+# if deemed low-risk. See .github/workflows/ for implementation details.
+#
 version: 2
 updates:
   # GitHub Actions - keep workflow actions current

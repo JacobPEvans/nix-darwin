@@ -1,0 +1,98 @@
+# Package Version Monitoring
+# Tri-weekly checks for package version updates in nixpkgs
+# Creates/updates a single digest issue with all findings
+name: Monitor Package Versions
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Monday 7 AM UTC (after flake update)
+    - cron: "0 19 * * 4" # Thursday 7 PM UTC (after flake update)
+    - cron: "0 7 * * 6" # Saturday 7 AM UTC (mid-week check)
+  workflow_dispatch: {} # Manual trigger for testing
+
+jobs:
+  check-versions:
+    name: Check Package Versions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Run version check script
+        id: version-check
+        run: |
+          # Run the version check script and capture output
+          set +e # Don't fail on non-zero exit (we use exit codes for logic)
+          OUTPUT=$(./scripts/workflows/check-package-versions.sh)
+          EXIT_CODE=$?
+          set -e
+
+          # Save output to file for issue body
+          echo "$OUTPUT" > version-report.md
+
+          # Set outputs
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "has_updates=$([[ $EXIT_CODE -ne 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+
+      - name: Find existing issue
+        id: find-issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Search for open issue with package-updates label
+          ISSUE_NUMBER=$(gh issue list \
+            --label "package-updates" \
+            --state open \
+            --json number \
+            --jq '.[0].number // ""')
+
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create or update issue
+        if: steps.version-check.outputs.has_updates == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_BODY=$(cat version-report.md)
+          ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+
+          # Determine if any packages need security label
+          if grep -qE "Security.*(🔴|⚠️)" version-report.md; then
+            LABELS="package-updates,security"
+          else
+            LABELS="package-updates"
+          fi
+
+          if [[ -n "$ISSUE_NUMBER" ]]; then
+            # Update existing issue
+            gh issue edit "$ISSUE_NUMBER" --body "$ISSUE_BODY"
+            echo "Updated existing issue #$ISSUE_NUMBER"
+          else
+            # Create new issue
+            gh issue create \
+              --title "📦 Package Version Report" \
+              --body "$ISSUE_BODY" \
+              --label "$LABELS"
+            echo "Created new package version report issue"
+          fi
+
+      - name: Close issue if all current
+        if: steps.version-check.outputs.has_updates == 'false' && steps.find-issue.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+          CLOSE_MESSAGE="✅ All packages are now current. Closing this issue.
+
+          $(cat version-report.md)"
+
+          gh issue comment "$ISSUE_NUMBER" --body "$CLOSE_MESSAGE"
+          gh issue close "$ISSUE_NUMBER"
+          echo "Closed issue #$ISSUE_NUMBER - all packages current"

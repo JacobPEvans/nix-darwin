@@ -5,7 +5,7 @@
 #
 # Reference: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/defaults/dock.nix
 
-{ ... }:
+_:
 
 {
   imports = [ ./persistent-apps.nix ];

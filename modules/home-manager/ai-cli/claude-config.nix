@@ -18,7 +18,10 @@
 
 let
   userConfig = import ../../../lib/user-config.nix;
-  aiInstructionsRepo = userConfig.ai.instructionsRepo;
+
+  # Local repo path - ONLY used for autoClaude (needs writable git for commits)
+  # All other ai-assistant-instructions content comes from Nix store (flake input)
+  autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
 
   # Statusline configuration - flat TOML files (required format for statusline tool)
   # Full config for local terminal, mobile config for SSH sessions
@@ -33,20 +36,26 @@ let
   claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
   claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
-  # Commands from ai-assistant-instructions repo (live updates)
+  # Commands from agentsmd (Nix store / flake input)
+  # Located in .claude/commands/
   # Note: "commit" removed - use /commit from commit-commands plugin instead
-  liveRepoCommands = [
+  agentsMdCommands = [
+    "fix-all-pr-ci"
     "generate-code"
     "git-refresh"
     "infrastructure-review"
+    "init-change"
+    "init-worktree"
     "pull-request"
     "pull-request-review-feedback"
+    "quick-add-permission"
     "review-code"
     "review-docs"
     "rok-resolve-issues"
     "rok-respond-to-reviews"
     "rok-review-pr"
     "rok-shape-issues"
+    "sync-permissions"
   ];
 
   # Commands from claude-cookbooks (immutable from flake)
@@ -120,8 +129,9 @@ in
     enable = true;
     repositories = {
       # ai-assistant-instructions: runs daily at 4am
+      # Uses local repo (not Nix store) because autoClaude needs writable git
       ai-assistant-instructions = {
-        path = "${config.home.homeDirectory}/git/ai-assistant-instructions";
+        path = autoClaudeLocalRepoPath;
         schedule.hour = 4;
         maxBudget = 25.0;
       };
@@ -166,13 +176,19 @@ in
   };
 
   commands = {
-    fromLiveRepo = aiInstructionsRepo;
-    inherit liveRepoCommands;
-
-    fromFlakeInputs = map (name: {
-      inherit name;
-      source = "${claude-cookbooks}/.claude/commands/${name}.md";
-    }) cookbookCommands;
+    # All commands from Nix store (flake inputs) for reproducibility
+    fromFlakeInputs =
+      # Commands from agentsmd (in .claude/commands/)
+      (map (name: {
+        inherit name;
+        source = "${ai-assistant-instructions}/.claude/commands/${name}.md";
+      }) agentsMdCommands)
+      ++
+        # Commands from claude-cookbooks
+        (map (name: {
+          inherit name;
+          source = "${claude-cookbooks}/.claude/commands/${name}.md";
+        }) cookbookCommands);
   };
 
   agents.fromFlakeInputs = map (name: {
