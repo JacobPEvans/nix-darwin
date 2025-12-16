@@ -59,9 +59,13 @@ jobs:
             exit 0
           fi
 
+          # Use sort -V for proper semantic version comparison
+          # This correctly handles YY.MM format (e.g., 24.11 < 25.05)
+          SORTED=$(printf '%s\n%s' "$CURRENT" "$LATEST" | sort -V | head -1)
+
           if [[ "$CURRENT" == "$LATEST" ]]; then
             echo "✅ Running on latest stable release: $CURRENT"
-          elif [[ "$CURRENT" > "$LATEST" ]]; then
+          elif [[ "$SORTED" == "$LATEST" ]]; then
             echo "⚠️  Ahead of stable (may be on unstable/pre-release): $CURRENT > $LATEST"
           else
             echo "::notice title=New NixOS Release Available::NixOS $LATEST is available (current: $CURRENT). See RUNBOOK.md for update workflow."
@@ -80,12 +84,15 @@ jobs:
           |-----------|---------|--------|--------|
           EOF
 
+          # Use sort -V for proper semantic version comparison
+          SORTED=$(printf '%s\n%s' "$CURRENT" "$LATEST" | sort -V | head -1)
+
           # Determine status
           if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
             STATUS="⚠️ Unknown"
           elif [[ "$CURRENT" == "$LATEST" ]]; then
             STATUS="✅ Up to date"
-          elif [[ "$CURRENT" > "$LATEST" ]]; then
+          elif [[ "$SORTED" == "$LATEST" ]]; then
             STATUS="⚠️ Ahead"
           else
             STATUS="📢 Update available"
@@ -94,8 +101,8 @@ jobs:
           echo "| nixpkgs stable | $CURRENT | $LATEST | $STATUS |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Add update instructions if update available
-          if [[ "$CURRENT" != "unknown" ]] && [[ "$LATEST" != "unknown" ]] && [[ "$CURRENT" < "$LATEST" ]]; then
+          # Add update instructions if update available (CURRENT < LATEST means SORTED == CURRENT)
+          if [[ "$CURRENT" != "unknown" ]] && [[ "$LATEST" != "unknown" ]] && [[ "$SORTED" == "$CURRENT" ]] && [[ "$CURRENT" != "$LATEST" ]]; then
             cat >> $GITHUB_STEP_SUMMARY << EOF
           ### Update Available
 
