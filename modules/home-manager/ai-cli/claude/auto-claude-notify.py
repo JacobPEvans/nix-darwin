@@ -14,7 +14,7 @@ Usage:
 
 Secrets:
     Slack bot token retrieved from Bitwarden Secrets Manager (bws).
-    Set BWS_SECRET_ID env var or use default: auto-claude-slack-bot-token
+    Set BWS_SLACK_SECRET_ID env var or use default: auto-claude-slack-bot-token
 """
 
 import argparse
@@ -24,6 +24,9 @@ import subprocess
 import sys
 from datetime import datetime
 from typing import Optional
+
+# Display limits for Slack messages (prevents overly long messages)
+MAX_DISPLAY_ITEMS = 10
 
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -231,9 +234,9 @@ def blocks_run_completed(
 
     # Completed tasks
     if completed:
-        completed_text = "\n".join(f"• {t}" for t in completed[:10])  # Limit to 10
-        if len(completed) > 10:
-            completed_text += f"\n_...and {len(completed) - 10} more_"
+        completed_text = "\n".join(f"• {t}" for t in completed[:MAX_DISPLAY_ITEMS])
+        if len(completed) > MAX_DISPLAY_ITEMS:
+            completed_text += f"\n_...and {len(completed) - MAX_DISPLAY_ITEMS} more_"
         blocks.append(
             {
                 "type": "section",
@@ -243,7 +246,7 @@ def blocks_run_completed(
 
     # PRs created
     if prs:
-        prs_text = "\n".join(f"• {pr}" for pr in prs[:10])
+        prs_text = "\n".join(f"• {pr}" for pr in prs[:MAX_DISPLAY_ITEMS])
         blocks.append(
             {
                 "type": "section",
@@ -253,9 +256,9 @@ def blocks_run_completed(
 
     # Blocked tasks
     if blocked:
-        blocked_text = "\n".join(f"• {b.get('task', 'Unknown')}: _{b.get('reason', 'No reason')}_" for b in blocked[:10])
-        if len(blocked) > 10:
-            blocked_text += f"\n_...and {len(blocked) - 10} more_"
+        blocked_text = "\n".join(f"• {b.get('task', 'Unknown')}: _{b.get('reason', 'No reason')}_" for b in blocked[:MAX_DISPLAY_ITEMS])
+        if len(blocked) > MAX_DISPLAY_ITEMS:
+            blocked_text += f"\n_...and {len(blocked) - MAX_DISPLAY_ITEMS} more_"
         blocks.append(
             {
                 "type": "section",
