@@ -19,325 +19,209 @@ equivalents while preserving unique custom functionality.
 
 ## Phase 1: Preparation and Backup
 
-**Objective**: Create safety net before making any changes
-
-- [x] **1.1** Create backup directory:
-  `mkdir -p ~/backups/claude-plugin-migration-$(date +%Y%m%d)`
-- [x] **1.2** Backup `claude.nix`:
-  `cp ~/.config/nix/modules/home-manager/ai-cli/claude.nix ~/backups/claude-plugin-migration-*/`
-- [x] **1.3** Backup `claude-plugins.nix`:
-  `cp ~/.config/nix/modules/home-manager/ai-cli/claude-plugins.nix ~/backups/claude-plugin-migration-*/`
-- [x] **1.4** Backup current Claude settings:
-  `cp ~/.claude/settings.json ~/backups/claude-plugin-migration-*/settings.json.backup`
-- [x] **1.5** Record current Nix generation number:
-  `darwin-rebuild switch --list-generations | tail -1 > ~/backups/claude-plugin-migration-*/generation.txt`
+- [x] **1.1** Create backup directory: `mkdir -p ~/backups/claude-plugin-migration-$(date +%Y%m%d)`
+- [x] **1.2** Backup `claude.nix`
+- [x] **1.3** Backup `claude-plugins.nix`
+- [x] **1.4** Backup Claude settings
+- [x] **1.5** Record Nix generation number
 - [x] **1.6** Create feature branch: `git checkout -b feat/claude-plugin-migration`
 
 ---
 
 ## Phase 2: Analysis and Validation
 
-**Objective**: Verify official plugins provide equivalent functionality before removing custom commands
-
 ### 2.1 Analyze commit-commands Plugin
 
-- [x] **2.1.1** Read current custom `commit.md` command content from ai-assistant-instructions repository
-- [x] **2.1.2** Test official `/commit` command from `commit-commands` plugin on a test change
-- [x] **2.1.3** Document feature comparison: custom commit vs official /commit
-- [x] **2.1.4** Verify official `/commit` produces compliant commit messages
-- [x] **2.1.5** Confirm `/commit-push-pr` workflow functions correctly (bonus feature)
-- [x] **2.1.6** Decision: Approve removal of custom `commit` command if feature parity confirmed
+- [x] **2.1.1** Read custom `commit.md` command content
+- [x] **2.1.2** Test official `/commit` command
+- [x] **2.1.3** Document feature comparison
+- [x] **2.1.4** Verify compliant commit messages
+- [x] **2.1.5** Confirm `/commit-push-pr` workflow
+- [x] **2.1.6** Decision: Approve removal
 
 ### 2.2 Analyze code-review Plugin
 
-- [x] **2.2.1** Read current `review-pr-ci` cookbook command content
-- [x] **2.2.2** Test official `/code-review` plugin on an existing PR
-- [x] **2.2.3** Document feature comparison: `review-pr-ci` vs `/code-review`
-- [x] **2.2.4** Verify CI integration capabilities of official plugin
-- [x] **2.2.5** Decision: Approve removal of `review-pr-ci` if feature parity confirmed
+- [x] **2.2.1** Read `review-pr-ci` content
+- [x] **2.2.2** Test `/code-review` plugin
+- [x] **2.2.3** Document feature comparison
+- [x] **2.2.4** Verify CI integration
+- [x] **2.2.5** Decision: Approve removal
 
-### 2.3 Analyze review-pr Cookbook Command (Open Question)
+### 2.3 Analyze review-pr Command
 
-- [x] **2.3.1** Read `review-pr` cookbook command content
-- [x] **2.3.2** Compare `review-pr` (interactive) vs `/code-review` plugin functionality
-- [x] **2.3.3** Identify any unique features in `review-pr` not in `/code-review`
-- [x] **2.3.4** Decision: Remove `review-pr` - `/code-review` plugin provides comprehensive coverage
-- [x] **2.3.5** Document decision rationale in spec or migration notes
+- [x] **2.3.1** Read `review-pr` content
+- [x] **2.3.2** Compare vs `/code-review`
+- [x] **2.3.3** Identify unique features
+- [x] **2.3.4** Decision: Remove (plugin provides coverage)
+- [x] **2.3.5** Document rationale
 
 ### 2.4 Verify Retained Commands
 
-- [x] **2.4.1** List all custom commands that will be retained (11 commands)
-- [x] **2.4.2** Verify no naming conflicts between retained custom commands and official plugins
-- [x] **2.4.3** Confirm all 4 retained cookbook commands have no official equivalent
-- [x] **2.4.4** Verify all 7 Agent OS commands remain unchanged
+- [x] **2.4.1** List retained commands (11)
+- [x] **2.4.2** Verify no naming conflicts
+- [x] **2.4.3** Confirm 4 cookbook commands retained
+- [x] **2.4.4** Verify 7 Agent OS commands unchanged
 
 ---
 
 ## Phase 3: Configuration Changes
 
-**Objective**: Update Nix configuration files to remove redundant commands
-
-**Dependency**: Phase 2 complete - Decisions finalized:
-
-- REMOVE: `commit` from aiInstructionsCommands (replaced by /commit plugin)
-- REMOVE: `review-pr-ci` from cookbookCommands (replaced by /code-review plugin)
-- REMOVE: `review-pr` from cookbookCommands (replaced by /code-review plugin)
-
 ### 3.1 Update claude.nix
 
-- [x] **3.1.1** Read current `aiInstructionsCommands` list in claude.nix
-- [x] **3.1.2** Remove `"commit"` from `aiInstructionsCommands` list
-- [x] **3.1.3** Add comment documenting migration:
-  `# Removed: "commit" - replaced by commit-commands plugin (/commit)`
-- [x] **3.1.4** Verify remaining 11 custom commands are present and correctly listed
-- [x] **3.1.5** Save changes to `claude.nix`
+- [x] **3.1.1** Read `aiInstructionsCommands` list
+- [x] **3.1.2** Remove `"commit"`
+- [x] **3.1.3** Add migration comment
+- [x] **3.1.4** Verify 11 commands remain
+- [x] **3.1.5** Save changes
 
 ### 3.2 Update claude-plugins.nix
 
-- [x] **3.2.1** Read current `cookbookCommands` list in claude-plugins.nix
-- [x] **3.2.2** Remove `"review-pr-ci"` from `cookbookCommands` list
-- [x] **3.2.3** Remove `"review-pr"` from `cookbookCommands` list
-- [x] **3.2.4** Add comment documenting migration:
-  `# Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)`
-- [x] **3.2.5** Verify retained cookbook commands are present
-  (4 commands: review-issue, notebook-review, model-check, link-review)
-- [x] **3.2.6** Verify all 12 official plugins remain in `enabledPlugins` list
-- [x] **3.2.7** Save changes to `claude-plugins.nix`
+- [x] **3.2.1** Read `cookbookCommands` list
+- [x] **3.2.2** Remove `"review-pr-ci"`
+- [x] **3.2.3** Remove `"review-pr"`
+- [x] **3.2.4** Add migration comment
+- [x] **3.2.5** Verify 4 cookbook commands
+- [x] **3.2.6** Verify 12 plugins enabled
+- [x] **3.2.7** Save changes
 
 ### 3.3 Validate Configuration
 
-- [x] **3.3.1** Run `nix flake check` in repository root
-- [x] **3.3.2** Fix any Nix syntax errors if check fails
-- [x] **3.3.3** Commit configuration changes with descriptive message
+- [x] **3.3.1** Run `nix flake check`
+- [x] **3.3.2** Fix syntax errors
+- [x] **3.3.3** Commit changes
 
 ---
 
 ## Phase 4: Build and Test
 
-**Objective**: Apply changes and verify all functionality works correctly
-
-**Dependency**: Phase 3 must be complete (configuration valid)
-
 ### 4.1 Apply Changes
 
-- [ ] **4.1.1** Run `sudo darwin-rebuild switch --flake .`
-- [ ] **4.1.2** Verify rebuild completes without errors
-- [ ] **4.1.3** If rebuild fails, analyze error and fix (return to Phase 3 if config issue)
+- [ ] **4.1.1** Run `darwin-rebuild switch --flake .`
+- [ ] **4.1.2** Verify rebuild succeeds
+- [ ] **4.1.3** Fix errors if needed
 
 ### 4.2 Verify Official Plugin Commands
 
-- [ ] **4.2.1** Run `/help` in Claude Code to verify command listing
-- [ ] **4.2.2** Test `/commit` command on a test change
-- [ ] **4.2.3** Test `/code-review` command on a test PR
-- [ ] **4.2.4** Test `/commit-push-pr` command (end-to-end workflow)
-- [ ] **4.2.5** Verify all 12 official plugins show as enabled:
-  `jq '.enabledPlugins' ~/.claude/settings.json`
+- [ ] **4.2.1** Run `/help` to verify commands
+- [ ] **4.2.2** Test `/commit` command
+- [ ] **4.2.3** Test `/code-review` command
+- [ ] **4.2.4** Test `/commit-push-pr` workflow
+- [ ] **4.2.5** Verify 12 plugins enabled
 
 ### 4.3 Verify Retained Custom Commands
 
-- [ ] **4.3.1** Verify custom commands are symlinked: `ls -la ~/.claude/commands/`
-- [ ] **4.3.2** Test `/pull-request` command
-- [ ] **4.3.3** Test `/git-refresh` command
-- [ ] **4.3.4** Test `/review-code` command
-- [ ] **4.3.5** Test `/rok-review-pr` command (representative ROK command)
-- [ ] **4.3.6** Confirm no orphaned symlinks for removed commands
+- [ ] **4.3.1** Check symlinks: `ls -la ~/.claude/commands/`
+- [ ] **4.3.2** Test `/pull-request`
+- [ ] **4.3.3** Test `/git-refresh`
+- [ ] **4.3.4** Test `/review-code`
+- [ ] **4.3.5** Test `/rok-review-pr`
+- [ ] **4.3.6** Confirm no orphaned symlinks
 
-### 4.4 Verify Retained Cookbook Commands
+### 4.4 Verify Cookbook Commands
 
-- [ ] **4.4.1** Verify `/review-issue` command is available
-- [ ] **4.4.2** Verify `/notebook-review` command is available
-- [ ] **4.4.3** Verify `/model-check` command is available
-- [ ] **4.4.4** Verify `/link-review` command is available
-- [ ] **4.4.5** Verify `/review-pr` is absent (removed per Phase 2 decision)
+- [ ] **4.4.1** Verify `/review-issue`
+- [ ] **4.4.2** Verify `/notebook-review`
+- [ ] **4.4.3** Verify `/model-check`
+- [ ] **4.4.4** Verify `/link-review`
+- [ ] **4.4.5** Verify `/review-pr` absent
 
 ### 4.5 Regression Testing
 
-- [ ] **4.5.1** Full development cycle test: create branch, make change, commit, create PR
-- [ ] **4.5.2** Verify no permission prompts for pre-approved commands
-- [ ] **4.5.3** Verify CI workflow triggers correctly on push
+- [ ] **4.5.1** Full dev cycle test
+- [ ] **4.5.2** Verify no permission prompts
+- [ ] **4.5.3** Verify CI triggers
 
 ---
 
 ## Phase 5: Documentation Updates
 
-**Objective**: Update all documentation to reflect new command structure
-
-**Dependency**: Phase 4 must be complete (functionality verified)
-
 ### 5.1 Update ANTHROPIC-ECOSYSTEM.md
 
-- [x] **5.1.1** Read current `docs/ANTHROPIC-ECOSYSTEM.md`
-- [x] **5.1.2** Update "Cookbook Commands" section to remove `review-pr-ci` and `review-pr`
-- [x] **5.1.3** Update command count (from 6 to 4)
-- [x] **5.1.4** Add migration notes section explaining command changes
-- [x] **5.1.5** Update any references to removed commands
-- [x] **5.1.6** Save changes to `ANTHROPIC-ECOSYSTEM.md`
+- [x] **5.1.1** Read current file
+- [x] **5.1.2** Remove `review-pr-ci` and `review-pr`
+- [x] **5.1.3** Update command count (6→4)
+- [x] **5.1.4** Add migration notes
+- [x] **5.1.5** Update references
+- [x] **5.1.6** Save changes
 
 ### 5.2 Update CLAUDE.md
 
-- [x] **5.2.1** Read current `CLAUDE.md`
-- [x] **5.2.2** Update "Anthropic Ecosystem Integration" section cookbook command count
-- [x] **5.2.3** Verify cookbook command count reference is updated (now "4 cookbook commands")
-- [x] **5.2.4** Save changes to `CLAUDE.md`
+- [x] **5.2.1** Read current file
+- [x] **5.2.2** Update cookbook count
+- [x] **5.2.3** Verify "4 cookbook commands"
+- [x] **5.2.4** Save changes
 
-### 5.3 Update .ai-instructions/INSTRUCTIONS.md (if applicable)
+### 5.3 Update INSTRUCTIONS.md
 
-- [ ] **5.3.1** Check if INSTRUCTIONS.md references the removed `commit` command
-- [ ] **5.3.2** Update any references to use `/commit` from official plugin
-- [ ] **5.3.3** Update command tables if they list custom commands
+- [ ] **5.3.1** Check commit references
+- [ ] **5.3.2** Update to `/commit` plugin
+- [ ] **5.3.3** Update command tables
 
 ### 5.4 Add Migration Notes
 
-- [x] **5.4.1** Create or update migration notes for users of removed commands
-- [x] **5.4.2** Document: "Use `/commit` instead of custom `commit` command"
-- [x] **5.4.3** Document: "Use `/code-review` instead of `review-pr-ci` or `review-pr`"
-- [x] **5.4.4** Include rollback instructions in documentation
+- [x] **5.4.1** Create migration notes
+- [x] **5.4.2** Document `/commit` usage
+- [x] **5.4.3** Document `/code-review` usage
+- [x] **5.4.4** Include rollback instructions
 
-### 5.5 Commit Documentation Changes
+### 5.5 Commit Documentation
 
-- [ ] **5.5.1** Stage all documentation changes
-- [ ] **5.5.2** Commit with descriptive message: "docs: update command references for plugin migration"
+- [ ] **5.5.1** Stage changes
+- [ ] **5.5.2** Commit with message
 
 ---
 
-## Phase 6: Final Verification and Completion
-
-**Objective**: Complete testing, create PR, and close out migration
-
-**Dependency**: Phase 5 must be complete (documentation updated)
+## Phase 6: Final Verification
 
 ### 6.1 Final Testing
 
-- [ ] **6.1.1** Run complete end-to-end development workflow test
-- [ ] **6.1.2** Verify no regressions in daily usage patterns
-- [ ] **6.1.3** Test rollback procedure: `darwin-rebuild switch --rollback`
-- [ ] **6.1.4** Verify rollback restores previous configuration
-- [ ] **6.1.5** Re-apply changes: `darwin-rebuild switch --flake .`
+- [ ] **6.1.1** End-to-end workflow test
+- [ ] **6.1.2** Verify no regressions
+- [ ] **6.1.3** Test rollback
+- [ ] **6.1.4** Verify rollback works
+- [ ] **6.1.5** Re-apply changes
 
 ### 6.2 Create Pull Request
 
-- [ ] **6.2.1** Push feature branch to remote: `git push -u origin feat/claude-plugin-migration`
-- [ ] **6.2.2** Create PR with summary of changes and test results
-- [ ] **6.2.3** Reference issue #78 in PR description
-- [ ] **6.2.4** Include test evidence (screenshots or logs) in PR
+- [ ] **6.2.1** Push branch
+- [ ] **6.2.2** Create PR with summary
+- [ ] **6.2.3** Reference issue #78
+- [ ] **6.2.4** Include test evidence
 
 ### 6.3 Post-Merge Cleanup
 
-- [ ] **6.3.1** After PR approval and merge, delete feature branch
-- [ ] **6.3.2** Update CHANGELOG.md with migration completion
-- [ ] **6.3.3** Archive backup files (keep for 30 days)
+- [ ] **6.3.1** Delete feature branch
+- [ ] **6.3.2** Update CHANGELOG.md
+- [ ] **6.3.3** Archive backups (30 days)
 - [ ] **6.3.4** Close issue #78
 
 ---
 
 ## Rollback Procedures
 
-### Immediate Rollback (if issues found during Phase 4)
+**Immediate**: `darwin-rebuild switch --rollback`
 
-```bash
-# Revert to previous Nix generation
-darwin-rebuild switch --rollback
-```
+**Git**: `git revert HEAD --no-edit && darwin-rebuild switch --flake .`
 
-### Git Rollback (if issues found after commit)
-
-```bash
-# Revert the migration commit
-git revert HEAD --no-edit
-darwin-rebuild switch --flake .
-```
-
-### Full Recovery (if above methods fail)
-
-```bash
-# Restore from backup
-cp ~/backups/claude-plugin-migration-*/claude.nix.backup \
-   modules/home-manager/ai-cli/claude.nix
-cp ~/backups/claude-plugin-migration-*/claude-plugins.nix.backup \
-   modules/home-manager/ai-cli/claude-plugins.nix
-git add modules/home-manager/ai-cli/claude.nix modules/home-manager/ai-cli/claude-plugins.nix
-git commit -m "chore: rollback plugin migration"
-darwin-rebuild switch --flake .
-```
+**Full Recovery**: Restore from ~/backups/claude-plugin-migration-*/
 
 ---
 
-## Success Criteria Checklist
+## Success Criteria
 
-### Must Have (Migration cannot be considered complete without these)
+**Must Have**:
 
-- [ ] All 12 official plugins enabled and functional
-- [x] `commit` command removed from `aiInstructionsCommands`
-- [x] `review-pr-ci` removed from `cookbookCommands`
-- [x] `review-pr` removed from `cookbookCommands`
+- [ ] 12 official plugins functional
+- [x] Commands removed from config
 - [x] `nix flake check` passes
-- [ ] `darwin-rebuild switch` succeeds without errors
-- [ ] Official `/commit` command works correctly
-- [ ] Official `/code-review` command works correctly
-- [ ] All retained custom commands function correctly
-- [ ] No orphaned symlinks in `~/.claude/commands/`
+- [ ] `darwin-rebuild switch` succeeds
+- [ ] Official plugins work
+- [ ] Retained commands function
+- [ ] No orphaned symlinks
 
-### Should Have
+**Should Have**:
 
-- [x] Documentation updated in all relevant files
-- [x] Migration notes added for users of removed commands
-- [ ] Command naming does not cause user confusion
-- [ ] No regression in daily development workflow
-
-### Nice to Have
-
-- [ ] Performance improvement from reduced command loading
-- [ ] Simplified maintenance going forward
-- [ ] Clear audit trail of migration decisions
-
----
-
-## Open Questions to Resolve
-
-1. ~~**`review-pr` status**: Does the interactive `review-pr` cookbook command provide unique value
-   over `/code-review` plugin?~~ **RESOLVED**: Remove `review-pr` - `/code-review` provides comprehensive coverage
-
-2. **Plugin command prefixes**: Confirm whether official plugin commands use prefixes
-   (e.g., `/commit-commands:commit`) or short names (e.g., `/commit`)
-
-3. **Feature flags**: Should removed commands be gated behind a feature flag during initial rollout?
-
-4. **Backwards compatibility**: Should aliases be created for removed commands pointing to
-   official equivalents?
-
----
-
-## Files to Modify
-
-| File | Phase | Change Type |
-|------|-------|-------------|
-| `modules/home-manager/ai-cli/claude.nix` | 3.1 | Remove `commit` from list |
-| `modules/home-manager/ai-cli/claude-plugins.nix` | 3.2 | Remove `review-pr-ci`, `review-pr` from list |
-| `docs/ANTHROPIC-ECOSYSTEM.md` | 5.1 | Update command counts and lists |
-| `CLAUDE.md` | 5.2 | Update command references |
-| `.ai-instructions/INSTRUCTIONS.md` | 5.3 | Update command table (if applicable) |
-
----
-
-## Estimated Timeline
-
-| Phase | Duration | Dependencies |
-|-------|----------|--------------|
-| Phase 1: Preparation | 15 minutes | None |
-| Phase 2: Analysis | 1-2 hours | Phase 1 |
-| Phase 3: Configuration | 30 minutes | Phase 2 |
-| Phase 4: Build and Test | 1 hour | Phase 3 |
-| Phase 5: Documentation | 30 minutes | Phase 4 |
-| Phase 6: Final Verification | 1 hour | Phase 5 |
-
-**Total Estimated Time**: 4-5 hours
-
----
-
-## Notes
-
-- All file paths are absolute as required by the project conventions
-- Tasks are ordered to minimize risk and maximize rollback capability
-- Each phase has explicit dependencies to ensure correct execution order
-- Backup tasks are mandatory before any configuration changes
-- Testing is comprehensive to catch regressions early
+- [x] Documentation updated
+- [x] Migration notes added
+- [ ] No user confusion
+- [ ] No regressions

@@ -25,6 +25,9 @@ import sys
 from datetime import datetime
 from typing import Optional
 
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
 
 def escape_slack_markdown(text: str) -> str:
     """Escape special Slack markdown characters to prevent formatting issues."""
@@ -58,9 +61,6 @@ def get_slack_token() -> str:
 def post_message(token: str, channel: str, blocks: list, text: str, thread_ts: Optional[str] = None) -> Optional[str]:
     """Post a message to Slack and return the message ts."""
     try:
-        from slack_sdk import WebClient
-        from slack_sdk.errors import SlackApiError
-
         client = WebClient(token=token)
 
         kwargs = {
@@ -85,9 +85,6 @@ def post_message(token: str, channel: str, blocks: list, text: str, thread_ts: O
 def update_message(token: str, channel: str, ts: str, blocks: list, text: str) -> bool:
     """Update an existing Slack message."""
     try:
-        from slack_sdk import WebClient
-        from slack_sdk.errors import SlackApiError
-
         client = WebClient(token=token)
         client.chat_update(channel=channel, ts=ts, blocks=blocks, text=text)
         return True
@@ -256,7 +253,9 @@ def blocks_run_completed(
 
     # Blocked tasks
     if blocked:
-        blocked_text = "\n".join(f"• {b.get('task', 'Unknown')}: _{b.get('reason', 'No reason')}_" for b in blocked[:5])
+        blocked_text = "\n".join(f"• {b.get('task', 'Unknown')}: _{b.get('reason', 'No reason')}_" for b in blocked[:10])
+        if len(blocked) > 10:
+            blocked_text += f"\n_...and {len(blocked) - 10} more_"
         blocks.append(
             {
                 "type": "section",
@@ -320,7 +319,7 @@ def parse_log_file(log_path: str) -> dict:
         try:
             start = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
             end = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
-            duration_minutes = int((end - start).total_seconds() / 60)
+            duration_minutes = int(abs((end - start).total_seconds()) / 60)
         except (ValueError, TypeError):
             # If timestamps are malformed or missing, leave duration as 0.
             pass
