@@ -65,7 +65,7 @@ jobs:
             echo "Available versions:"
             for version in "${!EOL_DATES[@]}"; do
               eol="${EOL_DATES[$version]}"
-              if [[ "$TODAY" <= "$eol" ]]; then
+              if [[ ! "$TODAY" > "$eol" ]]; then
                 echo "  - $version (supported until $eol)"
               fi
             done | sort
