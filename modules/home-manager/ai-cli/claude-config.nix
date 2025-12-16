@@ -194,7 +194,7 @@ in
     # See: https://code.claude.com/docs/en/model-config
     env = {
       # Model selection - use defaults (Anthropic's latest recommended models)
-      # As of Dec 2025, opus 4.5 is the default with token optimization
+      # As of Dec 2025, Opus 4.5 is the default with token optimization
       # Slash commands can override with model: sonnet for cost-efficient tasks
 
       # Token budgets
