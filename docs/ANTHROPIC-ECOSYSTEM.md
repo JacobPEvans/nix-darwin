@@ -214,7 +214,7 @@ From community contributors, installed to `~/.claude/commands/`:
 | `rok-shape-issues` | Shape raw ideas into actionable GitHub Issues | roksechs |
 | `rok-resolve-issues` | Analyze and resolve GitHub Issues efficiently | roksechs |
 | `rok-review-pr` | Comprehensive PR review with quality checks | roksechs |
-| `rok-respond-to-reviews` | Resolve PR review comments systematically | roksechs |
+| `rok-resolve-pr-review-thread` | Resolve PR review comments systematically | roksechs |
 
 ### Usage
 

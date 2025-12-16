@@ -30,8 +30,8 @@ Reminder: Switch to Opus (/model opus) for complex architectural decisions,
 multi-file refactoring, or tasks requiring deep reasoning.
 ```
 
-**Why**: Default model is Sonnet for cost efficiency. User needs visibility to
-consciously choose Opus when the task warrants it.
+**Why**: Model depends on session configuration. User needs visibility to
+consciously choose the appropriate model (Opus for complex tasks).
 
 ## Enforced Git Development Workflow
 
@@ -120,7 +120,7 @@ run `/compact` on the main conversation before spawning subagents.
    Use: `gh api repos/OWNER/REPO/pulls/NUM/reviews` to get reviews with commit_id.
    Wait until all reviewers have reviewed the current head commit before finishing.
    When a reviewer completes their review (comments, changes requested, or approved),
-   automatically invoke `/rok-respond-to-reviews` to address feedback.
+   automatically invoke `/rok-resolve-pr-review-thread` to address feedback.
    Continue monitoring until PR is merged or closed.
 
 ### Procedure Violations

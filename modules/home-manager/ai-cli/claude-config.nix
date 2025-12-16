@@ -46,13 +46,13 @@ let
     "infrastructure-review"
     "init-change"
     "init-worktree"
-    "pull-request"
-    "pull-request-review-feedback"
+    "pr"
+    "pr-review-feedback"
     "quick-add-permission"
     "review-code"
     "review-docs"
     "rok-resolve-issues"
-    "rok-respond-to-reviews"
+    "rok-resolve-pr-review-thread"
     "rok-review-pr"
     "rok-shape-issues"
     "sync-permissions"
@@ -207,12 +207,10 @@ in
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # Model selection (defaults to Sonnet for cost efficiency)
-      # NOTE: Subagent model was changed from 'opus' to 'sonnet'. While opus is
-      # more capable for complex reasoning, sonnet provides better cost efficiency.
-      # Change back to opus if auto-claude quality degrades for complex tasks.
-      ANTHROPIC_MODEL = "sonnet";
-      CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
+      # Model selection is dynamic (via /model command or shell env).
+      # To set a default in this config, uncomment below.
+      # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
+      # CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";  # For sub-agents; Opus is more capable but costly.
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";

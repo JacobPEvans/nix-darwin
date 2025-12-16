@@ -20,7 +20,7 @@
 #
 # Commands: Symlinked from ai-assistant-instructions repo
 # - rok-* community commands (Shape Up workflow)
-# - Standard commands (pull-request, git-refresh, etc.)
+# - Standard commands (pr, git-refresh, etc.)
 #
 # Migration Notes:
 # - Removed: "commit" - replaced by commit-commands plugin (/commit)
