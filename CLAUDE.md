@@ -68,7 +68,7 @@ Before making ANY changes:
 **To create a new worktree:**
 
 ```bash
-cd ~/git/ai-assistant-instructions
+cd ~/git/nix-config
 git fetch origin
 git worktree add <branch-name> -b <branch-name> origin/main
 cd <branch-name>
