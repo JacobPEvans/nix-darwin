@@ -28,7 +28,7 @@ in
       # Get source from legacy statusLine.enhanced.source for backward compatibility
       # TODO: This should eventually be moved to claudeStatusline.source
       legacyCfg = config.programs.claude.statusLine.enhanced;
-      source = legacyCfg.source;
+      inherit (legacyCfg) source;
 
       statuslinePackage = mkStatuslinePackage source;
 
