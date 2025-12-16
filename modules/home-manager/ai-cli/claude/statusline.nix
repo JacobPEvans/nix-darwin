@@ -1,9 +1,12 @@
-# Claude Code Statusline Module
+# Claude Code Statusline Module (Legacy)
 #
 # Builds and configures claude-code-statusline from flake input.
 # Creates wrapper package and manages config files.
 # Supports SSH detection for mobile-friendly single-line display.
 # Uses bun for ccusage cost tracking integration.
+#
+# NOTE: This is the legacy module. For theme-based statusline, use
+# programs.claudeStatusline with the statusline/options.nix module.
 {
   config,
   lib,
@@ -14,55 +17,8 @@
 let
   cfg = config.programs.claude;
 
-  # Build claude-code-statusline package from source
-  # Only evaluated when enhanced statusline is enabled
-  mkStatuslinePackage =
-    source:
-    pkgs.stdenvNoCC.mkDerivation {
-      pname = "claude-code-statusline";
-      version = "2.1.0";
-      src = source;
-
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      # Note: NOT including coreutils - script expects macOS stat, not GNU stat
-      buildInputs = [
-        pkgs.bash
-        pkgs.jq
-        pkgs.git
-      ];
-
-      installPhase = ''
-        runHook preInstall
-        mkdir -p $out/share/claude-code-statusline $out/bin
-
-        # Copy all source files (statusline.sh, lib/, examples/)
-        cp -r . $out/share/claude-code-statusline/
-
-        # Create wrapper - add bash/jq/git/bun (for ccusage via bunx)
-        # The statusline script uses 'bunx ccusage' for cost tracking
-        makeWrapper $out/share/claude-code-statusline/statusline.sh $out/bin/claude-code-statusline \
-          --prefix PATH : ${
-            lib.makeBinPath [
-              pkgs.bash
-              pkgs.jq
-              pkgs.git
-              pkgs.bun
-            ]
-          } \
-          --set STATUSLINE_HOME $out/share/claude-code-statusline
-
-        chmod +x $out/bin/claude-code-statusline
-        runHook postInstall
-      '';
-
-      meta = with lib; {
-        description = "Modular multi-line statusline for Claude Code";
-        homepage = "https://github.com/rz1989s/claude-code-statusline";
-        license = licenses.mit;
-        platforms = platforms.all;
-        mainProgram = "claude-code-statusline";
-      };
-    };
+  # Import shared package builder
+  inherit (import ./statusline/package.nix { inherit lib pkgs; }) mkStatuslinePackage;
 
 in
 {
