@@ -11,9 +11,9 @@ on:
         default: 'CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING'
         type: string
       exempt:
-        description: 'Space-separated list of exempt files'
+        description: 'Space-separated list of exempt files (no limit)'
         required: false
-        default: 'RUNBOOK copilot-permissions-allow copilot-permissions-ask gemini-permissions-allow gemini-permissions-ask'
+        default: 'RUNBOOK copilot-permissions-allow copilot-permissions-ask copilot-permissions-deny gemini-permissions-allow gemini-permissions-deny'
         type: string
 
 jobs:
