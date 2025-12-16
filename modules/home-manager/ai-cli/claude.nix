@@ -81,14 +81,14 @@ let
       ;
   };
 
-  # Commands from ai-assistant-instructions (Nix store / flake input)
+  # Commands from agentsmd (Nix store / flake input)
   # Changes require darwin-rebuild, but ensures reproducibility
   #
-  # These commands live in .claude/commands/ (moved from old .ai-instructions/commands/)
+  # These commands live in .claude/commands/
   # and are copied to ~/.claude/commands/ for global availability.
   #
   # Note: "commit" removed - use /commit from commit-commands plugin instead
-  aiInstructionsCommands = [
+  agentsMdCommands = [
     "fix-all-pr-ci"
     "generate-code"
     "git-refresh"
@@ -107,14 +107,14 @@ let
     "sync-permissions"
   ];
 
-  # Create file entries for ai-instructions commands from Nix store
-  mkAiInstructionsCommandSymlinks = builtins.listToAttrs (
+  # Create file entries for agentsmd commands from Nix store
+  mkAgentsMdCommandSymlinks = builtins.listToAttrs (
     map (cmd: {
       name = ".claude/commands/${cmd}.md";
       value = {
         source = "${ai-assistant-instructions}/.claude/commands/${cmd}.md";
       };
-    }) aiInstructionsCommands
+    }) agentsMdCommands
   );
 
   # Claude Code settings object
@@ -197,5 +197,5 @@ in
 }
 # Merge with commands and agents from claude-cookbooks
 // claudePlugins.files
-# Merge with ai-instructions command symlinks
-// mkAiInstructionsCommandSymlinks
+# Merge with agentsmd command symlinks
+// mkAgentsMdCommandSymlinks

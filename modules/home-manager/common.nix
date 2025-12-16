@@ -51,11 +51,11 @@ let
       ;
   };
 
-  # AI instruction files from Nix store (flake input)
+  # AgentsMD files from Nix store (flake input)
   # Changes require darwin-rebuild, but ensures reproducibility
   # NOTE: .copilot and .gemini directories are NOT symlinked because
   # Nix manages files inside them (config.json, settings.json)
-  aiInstructionsSymlinks = {
+  agentsMdSymlinks = {
     # Root instruction files accessible from home directory
     # CLAUDE.md and GEMINI.md are pointers to agentsmd/AGENTS.md
     # AGENTS.md contains the actual centralized instructions
@@ -83,9 +83,9 @@ in
     # - copilot.nix: GitHub Copilot CLI config
     #
     # Permissions: Now read from JSON in ai-assistant-instructions repo
-    # Symlinks: ai-instructions provides CLAUDE.md, GEMINI.md, AGENTS.md, agentsmd/
+    # Symlinks: agentsmd provides CLAUDE.md, GEMINI.md, AGENTS.md, agentsmd/
     # NOTE: claudeFiles removed - now handled by programs.claude module
-    file = npmFiles // awsFiles // geminiFiles // copilotFiles // aiInstructionsSymlinks // gitHooks;
+    file = npmFiles // awsFiles // geminiFiles // copilotFiles // agentsMdSymlinks // gitHooks;
 
     # Claude Code Settings Validation (post-rebuild)
     # Validates settings.json against JSON Schema after home files are written

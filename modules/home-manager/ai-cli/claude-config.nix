@@ -36,10 +36,10 @@ let
   claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
   claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
-  # Commands from ai-assistant-instructions (Nix store / flake input)
-  # Located in .claude/commands/ (moved from old .ai-instructions/commands/)
+  # Commands from agentsmd (Nix store / flake input)
+  # Located in .claude/commands/
   # Note: "commit" removed - use /commit from commit-commands plugin instead
-  aiInstructionsCommands = [
+  agentsMdCommands = [
     "fix-all-pr-ci"
     "generate-code"
     "git-refresh"
@@ -178,11 +178,11 @@ in
   commands = {
     # All commands from Nix store (flake inputs) for reproducibility
     fromFlakeInputs =
-      # Commands from ai-assistant-instructions (now in .claude/commands/)
+      # Commands from agentsmd (in .claude/commands/)
       (map (name: {
         inherit name;
         source = "${ai-assistant-instructions}/.claude/commands/${name}.md";
-      }) aiInstructionsCommands)
+      }) agentsMdCommands)
       ++
       # Commands from claude-cookbooks
       (map (name: {
