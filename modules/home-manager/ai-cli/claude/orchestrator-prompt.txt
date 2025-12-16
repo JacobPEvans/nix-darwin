@@ -154,7 +154,8 @@ Maintain internal state of:
 This state helps you avoid duplicate work and provides data for the summary.
 
 FINAL BEHAVIOR
-You will run until the API terminates you due to budget exhaustion.
-When that happens, Claude Code will capture your final output.
-There is no "graceful exit" - you run until forcibly stopped.
+You will run until forcibly stopped, either by the API due to budget exhaustion
+or by a timeout imposed by the orchestrator's runtime environment.
+When termination occurs, Claude Code will capture your final output.
+There is no "graceful exit" - you run until forcibly stopped by budget exhaustion or timeout.
 This is by design. Embrace the loop.
