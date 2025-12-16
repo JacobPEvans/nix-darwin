@@ -38,7 +38,7 @@
 }:
 
 let
-  # User configuration (includes ai.instructionsRepo path)
+  # User configuration
   userConfig = import ../../../lib/user-config.nix;
 
   # Read permissions from JSON files in ai-assistant-instructions
@@ -81,42 +81,8 @@ let
       ;
   };
 
-  # Path to git repo for symlinks (live updates without rebuild)
-  # Defined in lib/user-config.nix for DRY (also used by common.nix)
-  aiInstructionsRepo = userConfig.ai.instructionsRepo;
-
-  # Commands from ai-assistant-instructions to symlink globally
-  # Using mkOutOfStoreSymlink for live updates without darwin-rebuild
-  #
-  # These commands live in .ai-instructions/commands/ and are symlinked
-  # directly to ~/.claude/commands/ for global availability.
-  #
-  # Note: "commit" removed - use /commit from commit-commands plugin instead
-  aiInstructionsCommands = [
-    "generate-code"
-    "git-refresh"
-    "infrastructure-review"
-    "pull-request"
-    "pull-request-review-feedback"
-    "review-code"
-    "review-docs"
-    "rok-resolve-issues"
-    "rok-respond-to-reviews"
-    "rok-review-pr"
-    "rok-shape-issues"
-  ];
-
-  # Create symlink entries for ai-instructions commands
-  # Points directly to .ai-instructions/commands/ source files (not the .claude/commands/ symlinks)
-  # This avoids a chain of symlinks and is more resilient
-  mkAiInstructionsCommandSymlinks = builtins.listToAttrs (
-    map (cmd: {
-      name = ".claude/commands/${cmd}.md";
-      value = {
-        source = config.lib.file.mkOutOfStoreSymlink "${aiInstructionsRepo}/.ai-instructions/commands/${cmd}.md";
-      };
-    }) aiInstructionsCommands
-  );
+  # NOTE: agentsmd commands are defined in claude-config.nix and processed by
+  # components.nix via commands.fromFlakeInputs. No duplicate definition here.
 
   # Claude Code settings object
   # Generated from lib/claude-settings.nix (shared with CI for cross-platform validation)
@@ -196,7 +162,5 @@ in
     executable = true;
   };
 }
-# Merge with commands and agents from claude-cookbooks
+# Merge with commands and agents from plugins
 // claudePlugins.files
-# Merge with ai-instructions command symlinks
-// mkAiInstructionsCommandSymlinks

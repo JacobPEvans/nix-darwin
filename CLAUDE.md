@@ -37,6 +37,27 @@ consciously choose Opus when the task warrants it.
 
 **MANDATORY for all changes.** Follow without exception.
 
+### Worktree-Based Development (Required for ai-assistant-instructions)
+
+The `ai-assistant-instructions` repository uses git worktrees for branch isolation:
+
+- **Main branch**: `~/git/ai-assistant-instructions/main/`
+- **Feature branches**: `~/git/ai-assistant-instructions/<branch-name>/`
+
+**All changes MUST be made on a dedicated worktree/branch** - never edit `main` directly.
+This enables concurrent AI sessions and parallel development on separate features.
+
+```bash
+# Create new worktree for a feature
+cd ~/git/ai-assistant-instructions/main
+git worktree add ../my-feature -b feat/my-feature
+cd ../my-feature
+```
+
+**Content source**: Permissions, commands, and instruction files come from the **Nix store**
+(flake input), not the local repo. The local repo is only used by autoClaude for autonomous
+commits. Changes require `nix flake lock --update-input ai-assistant-instructions` + rebuild.
+
 ### SSH Agent Pre-Flight Check (Required for Remote Git Operations)
 
 Before any `git push`, `git pull`, `git fetch`, or `git clone` over SSH:
@@ -315,14 +336,14 @@ git commit -m "message"
 **Verification steps**:
 
 ```bash
-# Count permissions in source (should match after rebuild)
-jq '.permissions | length' ~/git/ai-assistant-instructions/.claude/permissions/allow.json
-
-# Count permissions in deployed settings
+# Count permissions in deployed settings (from Nix store flake input)
 jq '.permissions.allow | length' ~/.claude/settings.json
 
 # Check for project-level overrides in current directory
 cat ./.claude/settings.local.json 2>/dev/null | jq '.allow | length'
+
+# To check source permissions, view the flake input or local dev repo:
+# jq '.permissions | length' ~/git/ai-assistant-instructions/main/.claude/permissions/allow.json
 ```
 
 **Note**: After fixing permissions, restart Claude Code for changes to take effect.

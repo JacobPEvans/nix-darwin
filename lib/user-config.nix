@@ -68,15 +68,19 @@ in
   # ==========================================================================
   # AI Assistant Configuration
   # ==========================================================================
-  # Paths to AI assistant configuration repositories
-  # NOTE: The ai-assistant-instructions repository must be cloned to the path below
-  # before running darwin-rebuild. If missing, symlinks will be broken.
-  # Clone with: git clone https://github.com/JacobPEvans/ai-assistant-instructions.git ~/git/ai-assistant-instructions
+  # NOTE: Most ai-assistant-instructions content comes from Nix store (flake input).
+  # The local repo path below is ONLY used by autoClaude for autonomous commits.
+  #
+  # Repository uses git worktrees:
+  #   - Main branch: ~/git/ai-assistant-instructions/main/
+  #   - Feature branches: ~/git/ai-assistant-instructions/<branch-name>/
+  # Clone with worktree setup:
+  #   git clone --bare https://github.com/JacobPEvans/ai-assistant-instructions.git ~/git/ai-assistant-instructions
+  #   cd ~/git/ai-assistant-instructions && git worktree add main main
   ai = {
-    # Path to ai-assistant-instructions repo (must be cloned here)
-    # Used by claude.nix and common.nix for symlinks
-    # Single source of truth - DRY principle
-    instructionsRepo = "${homeDir}/git/ai-assistant-instructions";
+    # Local repo path - ONLY for autoClaude (needs writable git for commits)
+    # All other content (permissions, commands, instruction files) comes from flake input
+    instructionsRepo = "${homeDir}/git/ai-assistant-instructions/main";
 
     # Claude Code settings JSON Schema URL (official schema store)
     # Used by: settings.json $schema, pre-commit hooks, CI validation, activation hooks
