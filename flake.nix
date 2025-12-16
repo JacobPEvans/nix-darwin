@@ -79,6 +79,14 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
+    # Superpowers - comprehensive software development workflow system
+    # Provides brainstorming, planning, execution, testing, and review skills
+    # https://github.com/obra/superpowers
+    superpowers-marketplace = {
+      url = "github:obra/superpowers-marketplace";
+      flake = false; # Not a flake, just fetch the repo
+    };
+
   };
 
   outputs =
@@ -94,6 +102,7 @@
       agent-os,
       ai-assistant-instructions,
       claude-code-statusline,
+      superpowers-marketplace,
       ...
     }:
     let
@@ -140,6 +149,7 @@
           agent-os
           ai-assistant-instructions
           claude-code-statusline
+          superpowers-marketplace
           ;
       };
       # Define configuration once, assign to multiple names

@@ -12,6 +12,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   claude-code-statusline,
+  superpowers-marketplace,
   ...
 }:
 
@@ -93,6 +94,10 @@ let
     # Migration tools
     "claude-opus-4-5-migration@anthropics/claude-code" = true;
 
+    # Superpowers - comprehensive development workflow
+    # Brainstorming, planning, execution, testing, and review skills
+    "superpowers@obra/superpowers-marketplace" = true;
+
     # Experimental (uncomment to enable)
     # "ralph-wiggum@anthropics/claude-code" = true;  # Autonomous iteration loops
   };
@@ -145,6 +150,15 @@ in
         };
         flakeInput = claude-plugins-official;
       };
+      # Superpowers - comprehensive software development workflow system
+      # https://github.com/obra/superpowers-marketplace
+      "obra/superpowers-marketplace" = {
+        source = {
+          type = "git";
+          url = "https://github.com/obra/superpowers-marketplace.git";
+        };
+        flakeInput = superpowers-marketplace;
+      };
     };
 
     enabled = enabledPlugins;
@@ -178,6 +192,9 @@ in
     # See: https://code.claude.com/docs/en/model-config
     env = {
       # Model selection (defaults to Sonnet for cost efficiency)
+      # NOTE: Subagent model was changed from 'opus' to 'sonnet'. While opus is
+      # more capable for complex reasoning, sonnet provides better cost efficiency.
+      # Change back to opus if auto-claude quality degrades for complex tasks.
       ANTHROPIC_MODEL = "sonnet";
       CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";

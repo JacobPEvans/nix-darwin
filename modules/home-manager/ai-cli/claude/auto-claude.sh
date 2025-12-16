@@ -84,7 +84,7 @@ fi
 
 # Verify orchestrator prompt exists
 if [[ ! -r "$PROMPT_FILE" ]]; then
-  echo "[$RUN_ID] ERROR: Orchestrator prompt not found at $PROMPT_FILE. Please ensure the file exists. If you are using Nix, run 'nix rebuild' to deploy required files." >> "$FAILURES_LOG"
+  echo "[$RUN_ID] ERROR: Orchestrator prompt not found at $PROMPT_FILE. Please ensure the file exists. If you are using Nix, run 'darwin-rebuild switch --flake .' (for macOS) or 'home-manager switch' (for home-manager only) to deploy required files." >> "$FAILURES_LOG"
   exit 1
 fi
 
@@ -131,14 +131,10 @@ $TIMEOUT_CMD claude -p "$ORCHESTRATOR_PROMPT" \
   --no-session-persistence \
   2>&1 | tee "$LOG_FILE"
 
-# Capture exit code from the pipeline (zsh uses pipestatus, bash uses PIPESTATUS)
-if [[ -n "${pipestatus+x}" ]]; then
-  EXIT_CODE=${pipestatus[1]}
-elif [[ -n "${PIPESTATUS+x}" ]]; then
-  EXIT_CODE=${PIPESTATUS[0]}
-else
-  EXIT_CODE=$?
-fi
+# Capture exit code from the claude command in the pipeline
+# This is a zsh script (per shebang), so use pipestatus (1-indexed)
+# pipestatus[1] is the first command (timeout/claude), pipestatus[2] would be tee
+EXIT_CODE=${pipestatus[1]}
 set -e
 
 # --- POST-RUN PROCESSING ---

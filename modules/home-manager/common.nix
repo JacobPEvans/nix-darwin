@@ -8,6 +8,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   claude-code-statusline,
+  superpowers-marketplace,
   ...
 }:
 
@@ -46,6 +47,7 @@ let
       anthropic-skills
       ai-assistant-instructions
       claude-code-statusline
+      superpowers-marketplace
       ;
   };
 
