@@ -1,0 +1,57 @@
+# ============================================================================
+# TEMPLATE: Trigger workflow for ai-assistant-instructions repository
+# ============================================================================
+#
+# This file should be added to the ai-assistant-instructions repository at:
+# .github/workflows/trigger-nix-update.yml
+#
+# Prerequisites:
+# 1. Create a GitHub Personal Access Token (PAT) with 'repo' scope
+# 2. Add the PAT as a secret in ai-assistant-instructions repository:
+#    Settings → Secrets and variables → Actions → New repository secret
+#    Name: NIX_CONFIG_DISPATCH_TOKEN
+#    Value: [your PAT]
+#
+# 3. The PAT must have permission to trigger workflows in the nix-config repo
+#
+# What this does:
+# - Triggers on every push to main branch in ai-assistant-instructions
+# - Sends repository_dispatch event to nix-config repository
+# - Causes deps-update-ai-instructions.yml to run immediately
+# - Creates PR in nix-config with updated permissions/instructions
+#
+# ============================================================================
+
+name: Trigger Nix Config Update
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {} # Manual trigger for testing
+
+jobs:
+  notify-nix-config:
+    name: Notify Nix Config Repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send repository dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.NIX_CONFIG_DISPATCH_TOKEN }}
+          repository: JacobPEvans/nix-config
+          event-type: ai-instructions-updated
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "repository": "${{ github.repository }}",
+              "sender": "${{ github.actor }}"
+            }
+
+      - name: Report success
+        run: |
+          echo "::notice::Successfully triggered nix-config update workflow"
+          echo "Repository: JacobPEvans/nix-config"
+          echo "Event type: ai-instructions-updated"
+          echo "Source commit: ${{ github.sha }}"

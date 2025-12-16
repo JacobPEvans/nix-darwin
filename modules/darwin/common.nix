@@ -23,6 +23,12 @@ in
   # ==========================================================================
   nixpkgs.config.allowUnfree = true;
 
+  # Overlays for package overrides (e.g., updating outdated packages)
+  # See overlays/ directory for individual overlay files
+  nixpkgs.overlays = [
+    (import ../../overlays/python-packages.nix)
+  ];
+
   # ==========================================================================
   # User Configuration
   # ==========================================================================
@@ -72,8 +78,9 @@ in
       gh # GitHub CLI
       mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
-      # NOTE: ollama not included - nixpkgs build fails; using manual Ollama.app install
-      # See hosts/macbook-m4/home.nix for models symlink to /Volumes/Ollama
+      ollama # LLM runtime (nixpkgs 0.13.2, replaces manual 0.12.10 install)
+      # Models stored on dedicated APFS volume /Volumes/Ollama/models
+      # See hosts/macbook-m4/home.nix for symlink configuration
 
       # ========================================================================
       # GUI applications

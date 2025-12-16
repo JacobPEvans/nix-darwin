@@ -5,7 +5,7 @@
 #
 # Add new app configuration files here and import them below.
 
-{ ... }:
+_:
 
 {
   imports = [

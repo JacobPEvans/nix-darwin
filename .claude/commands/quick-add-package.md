@@ -65,7 +65,7 @@ cd worktrees/add-<pkg-name>
 
 > [!IMPORTANT]
 > Keep all package lists (nixpkgs and Homebrew) sorted alphabetically for maintainability.
-
+>
 ### 5. Make Changes
 
 **Read** the target file to understand existing sections, then **Add** the package with a brief comment.
