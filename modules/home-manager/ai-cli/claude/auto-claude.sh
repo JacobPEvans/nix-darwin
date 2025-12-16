@@ -33,6 +33,12 @@ MAX_BUDGET_USD="$2"
 LOG_DIR="${3:-$HOME/.claude/logs}"
 SLACK_CHANNEL="${4:-}"
 
+# --- DEPENDENCY CHECKS ---
+if ! command -v jq &>/dev/null; then
+  echo "Error: jq is not installed. Please install it to use this script." >&2
+  exit 1
+fi
+
 # --- CONTROL FILE CHECK ---
 CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
 

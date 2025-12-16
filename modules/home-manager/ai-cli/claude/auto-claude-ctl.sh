@@ -23,6 +23,12 @@
 
 set -euo pipefail
 
+# Check for required dependencies
+if ! command -v jq &> /dev/null; then
+  echo "Error: jq is not installed. Please install it to use this script." >&2
+  exit 1
+fi
+
 CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
 SCRIPT_DIR="${HOME}/.claude/scripts"
 AUTO_CLAUDE_SCRIPT="${SCRIPT_DIR}/auto-claude.sh"
@@ -83,31 +89,73 @@ cmd_now() {
 }
 
 # Command: run - actually run auto-claude now
+# Usage: auto-claude-ctl run [repo-name]
+# If repo-name is provided, runs that specific repo. Otherwise, lists available repos.
 cmd_run() {
   init_control_file
+  local target_repo="${1:-}"
 
   # Find configured repository paths from launchd plists
   local plist_dir="${HOME}/Library/LaunchAgents"
-  local repo_path=""
-  local max_budget=""
-  local log_dir="${HOME}/.claude/logs"
-  local slack_channel=""
+  local found_plists=()
+  local found_names=()
 
-  # Try to find auto-claude plist
+  # Collect all auto-claude plists
   for plist in "$plist_dir"/com.claude.auto-claude-*.plist; do
     if [[ -f "$plist" ]]; then
-      # Extract arguments from plist (ProgramArguments array)
-      repo_path=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:1" "$plist" 2>/dev/null || true)
-      max_budget=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:2" "$plist" 2>/dev/null || true)
-      log_dir=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:3" "$plist" 2>/dev/null || true)
-      slack_channel=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:4" "$plist" 2>/dev/null || true)
-      break
+      local name=$(basename "$plist" | sed 's/com.claude.auto-claude-//; s/.plist//')
+      found_plists+=("$plist")
+      found_names+=("$name")
     fi
   done
 
-  if [[ -z "$repo_path" || -z "$max_budget" ]]; then
-    echo "Error: Could not find auto-claude configuration in LaunchAgents" >&2
+  if [[ ${#found_plists[@]} -eq 0 ]]; then
+    echo "Error: No auto-claude configurations found in LaunchAgents" >&2
     echo "Looking for: $plist_dir/com.claude.auto-claude-*.plist" >&2
+    exit 1
+  fi
+
+  # If no target specified and multiple repos exist, show list
+  if [[ -z "$target_repo" && ${#found_plists[@]} -gt 1 ]]; then
+    echo "Multiple repositories configured. Please specify which one to run:"
+    echo ""
+    for name in "${found_names[@]}"; do
+      echo "  auto-claude-ctl run $name"
+    done
+    exit 0
+  fi
+
+  # Find the target plist
+  local selected_plist=""
+  if [[ -z "$target_repo" ]]; then
+    # Only one repo, use it
+    selected_plist="${found_plists[1]}"
+  else
+    # Find matching repo
+    for i in {1..${#found_names[@]}}; do
+      if [[ "${found_names[$i]}" == "$target_repo" ]]; then
+        selected_plist="${found_plists[$i]}"
+        break
+      fi
+    done
+  fi
+
+  if [[ -z "$selected_plist" ]]; then
+    echo "Error: Repository '$target_repo' not found. Available repositories:" >&2
+    for name in "${found_names[@]}"; do
+      echo "  - $name" >&2
+    done
+    exit 1
+  fi
+
+  # Extract arguments from selected plist
+  local repo_path=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:1" "$selected_plist" 2>/dev/null || true)
+  local max_budget=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:2" "$selected_plist" 2>/dev/null || true)
+  local log_dir=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:3" "$selected_plist" 2>/dev/null || true)
+  local slack_channel=$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:4" "$selected_plist" 2>/dev/null || true)
+
+  if [[ -z "$repo_path" || -z "$max_budget" ]]; then
+    echo "Error: Could not read configuration from $selected_plist" >&2
     exit 1
   fi
 
@@ -233,8 +281,8 @@ cmd_schedule() {
         echo "Error: Invalid time format '$time'. Use H:MM or HH:MM (e.g., 9:30 or 14:00)" >&2
         exit 1
       fi
-      local hour="${BASH_REMATCH[1]}"
-      local minute="${BASH_REMATCH[2]}"
+      local hour="${match[1]}"
+      local minute="${match[2]}"
 
       if [[ "$hour" -lt 0 || "$hour" -gt 23 ]]; then
         echo "Error: Hour must be 0-23, got $hour" >&2
@@ -276,7 +324,8 @@ case "${1:-}" in
     cmd_now
     ;;
   run)
-    cmd_run
+    shift
+    cmd_run "$@"
     ;;
   pause)
     shift
@@ -307,7 +356,7 @@ Usage: auto-claude-ctl <command> [args...]
 
 Commands:
   now                   Set flag for next scheduled trigger to run
-  run                   Run auto-claude immediately (bypass scheduler)
+  run [repo-name]       Run auto-claude immediately (bypass scheduler)
   pause <hours>         Pause all runs for specified hours
   skip <count>          Skip the next N scheduled runs
   resume                Clear pause/skip, resume normal schedule
