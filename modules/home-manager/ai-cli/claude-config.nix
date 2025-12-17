@@ -17,6 +17,12 @@
 }:
 
 let
+  userConfig = import ../../../lib/user-config.nix;
+
+  # Local repo path - ONLY used for autoClaude (needs writable git for commits)
+  # All other ai-assistant-instructions content comes from Nix store (flake input)
+  autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
+
   # Statusline configuration - flat TOML files (required format for statusline tool)
   # Full config for local terminal, mobile config for SSH sessions
   statuslineConfigFull = ./claude/statusline/config.toml;
@@ -40,13 +46,13 @@ let
     "infrastructure-review"
     "init-change"
     "init-worktree"
-    "pull-request"
-    "pull-request-review-feedback"
+    "pr"
+    "pr-review-feedback"
     "quick-add-permission"
     "review-code"
     "review-docs"
     "rok-resolve-issues"
-    "rok-respond-to-reviews"
+    "rok-resolve-pr-review-thread"
     "rok-review-pr"
     "rok-shape-issues"
     "sync-permissions"
@@ -119,32 +125,20 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
-  # Uses the main worktree, not ~/.config/nix (which is now a read-only symlink)
   autoClaude = {
     enable = true;
     repositories = {
       # ai-assistant-instructions: runs daily at 4am
       # Uses local repo (not Nix store) because autoClaude needs writable git
       ai-assistant-instructions = {
-        path = "${config.home.homeDirectory}/git/ai-assistant-instructions";
-        schedule.times = [
-          {
-            hour = 4;
-            minute = 0;
-          }
-        ];
+        path = autoClaudeLocalRepoPath;
+        schedule.hour = 4;
         maxBudget = 25.0;
       };
-      # nix config: runs daily at 1pm (13:00) from the main worktree
-      # ~/.config/nix is a read-only symlink to nix store
+      # nix config: runs daily at 1pm (13:00)
       nix = {
-        path = "${config.home.homeDirectory}/git/nix-config/main";
-        schedule.times = [
-          {
-            hour = 13;
-            minute = 0;
-          }
-        ];
+        path = "${config.home.homeDirectory}/.config/nix";
+        schedule.hour = 13;
         maxBudget = 25.0;
       };
     };
@@ -213,8 +207,13 @@ in
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # By default, uses Anthropic's latest recommended model with token optimization
-      # Slash commands can override with model: sonnet for cost-efficient tasks
+      # Model selection is dynamic (via /model command or shell env).
+      # To set a default in this config, uncomment below.
+      # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
+      # CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";  # For sub-agents; Opus is more capable but costly.
+      # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
+      # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
+      # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";
 
       # Token budgets
       MAX_THINKING_TOKENS = "16384";

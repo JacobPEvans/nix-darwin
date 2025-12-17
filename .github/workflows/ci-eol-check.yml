@@ -58,14 +58,18 @@ jobs:
           TODAY=$(date +%Y-%m-%d)
           echo "Today's date: $TODAY"
 
-          # String comparison works for ISO 8601 dates (YYYY-MM-DD)
-          if [[ "$TODAY" > "$EOL_DATE" ]]; then
+          # Use sort -V for proper date comparison (ISO 8601: YYYY-MM-DD)
+          # Check if TODAY is after EOL_DATE
+          SORTED=$(printf '%s\n%s\n' "$EOL_DATE" "$TODAY" | sort -V | head -1)
+          if [[ "$SORTED" == "$EOL_DATE" && "$TODAY" != "$EOL_DATE" ]]; then
             echo "::error file=lib/versions.nix,line=7::NixOS $STABLE_VERSION reached end-of-life on $EOL_DATE. Update lib/versions.nix to a supported version."
             echo ""
             echo "Available versions:"
             for version in "${!EOL_DATES[@]}"; do
               eol="${EOL_DATES[$version]}"
-              if [[ ! "$TODAY" > "$eol" ]]; then
+              # Check if TODAY is before or equal to eol
+              SORTED_EOL=$(printf '%s\n%s\n' "$TODAY" "$eol" | sort -V | head -1)
+              if [[ "$SORTED_EOL" == "$TODAY" ]]; then
                 echo "  - $version (supported until $eol)"
               fi
             done | sort
