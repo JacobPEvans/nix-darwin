@@ -17,6 +17,69 @@
 
 set -euo pipefail
 
+# --- CONTROL FILE ---
+CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
+
+# Convert ISO8601 timestamp to epoch seconds
+# Supports both macOS (BSD date) and Linux (GNU date)
+iso_to_epoch() {
+  local iso="$1"
+  if date --version >/dev/null 2>&1; then
+    # GNU date (Linux)
+    date -d "$iso" "+%s" 2>/dev/null
+  else
+    # BSD date (macOS)
+    date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%%.*}" "+%s" 2>/dev/null
+  fi
+}
+
+# Check control file for pause/skip states
+# Returns 0 if should run, exits 0 if should skip
+check_control_file() {
+  # Skip checks if FORCE_RUN is set (from auto-claude-ctl run)
+  if [[ "${FORCE_RUN:-}" == "1" ]]; then
+    return 0
+  fi
+
+  # If control file doesn't exist, proceed normally
+  if [[ ! -f "$CONTROL_FILE" ]]; then
+    return 0
+  fi
+
+  # Check pause_until timestamp
+  local pause_until=$(jq -r '.pause_until // empty' "$CONTROL_FILE" 2>/dev/null)
+  if [[ -n "$pause_until" && "$pause_until" != "null" ]]; then
+    local now_epoch=$(date +%s)
+    local pause_epoch=$(iso_to_epoch "$pause_until")
+    if [[ -n "$pause_epoch" && "$now_epoch" -lt "$pause_epoch" ]]; then
+      echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Paused until $pause_until" >> "${HOME}/.claude/logs/summary.log"
+      exit 0
+    fi
+  fi
+
+  # Check skip_count
+  local skip_count=$(jq -r '.skip_count // 0' "$CONTROL_FILE" 2>/dev/null)
+  if [[ "$skip_count" -gt 0 ]] 2>/dev/null; then
+    # Decrement skip count
+    local tmp=$(mktemp)
+    jq ".skip_count = $((skip_count - 1))" "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
+    echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Skip count was $skip_count, now $((skip_count - 1))" >> "${HOME}/.claude/logs/summary.log"
+    exit 0
+  fi
+
+  return 0
+}
+
+# Update control file with last run info
+update_last_run() {
+  local repo="$1"
+  if [[ -f "$CONTROL_FILE" ]] && command -v jq &>/dev/null; then
+    local tmp=$(mktemp)
+    local now=$(date "+%Y-%m-%dT%H:%M:%S")
+    jq ".last_run = \"$now\" | .last_run_repo = \"$repo\"" "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
+  fi
+}
+
 # --- ARGUMENT PARSING ---
 if [[ $# -lt 2 ]]; then
   echo "Usage: $0 <target_dir> <max_budget_usd> [log_dir] [slack_channel]" >&2
@@ -65,11 +128,77 @@ SCRIPT_DIR="${HOME}/.claude/scripts"
 NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
 PROMPT_FILE="${SCRIPT_DIR}/orchestrator-prompt.txt"
 
+# --- CONTROL FILE CHECK ---
+# Must run early, before expensive operations
+check_control_file
+
 # --- PRE-FLIGHT CHECKS ---
 cd "$TARGET_DIR" || {
   echo "[$RUN_ID] ERROR: Cannot cd to $TARGET_DIR" >> "$FAILURES_LOG"
   exit 1
 }
+
+# --- GIT PRE-FLIGHT CHECKS ---
+# Ensure repository is in a clean, synced state before running
+pre_flight_git_check() {
+  # Get current branch
+  local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    echo "[$RUN_ID] WARNING: Not a git repository or git not available" >> "$SUMMARY_LOG"
+    return 0  # Continue anyway - might not be a git repo
+  fi
+
+  # Must be on main or master branch
+  if [[ "$branch" != "main" && "$branch" != "master" ]]; then
+    echo "[$RUN_ID] ERROR: Not on main/master branch (currently on: $branch). Switch to main first." >> "$FAILURES_LOG"
+    exit 1
+  fi
+
+  # Fetch latest from remote (silently)
+  if ! git fetch origin "$branch" --quiet 2>/dev/null; then
+    echo "[$RUN_ID] WARNING: Could not fetch from origin (network issue?)" >> "$SUMMARY_LOG"
+    # Continue anyway - might be offline
+  fi
+
+  # Check for divergence between local and remote
+  local local_sha=$(git rev-parse HEAD 2>/dev/null)
+  local remote_sha=$(git rev-parse "origin/$branch" 2>/dev/null || echo "")
+
+  if [[ -n "$remote_sha" && "$local_sha" != "$remote_sha" ]]; then
+    # Determine divergence type using merge-base
+    local base=$(git merge-base HEAD "origin/$branch" 2>/dev/null || echo "")
+
+    if [[ "$base" == "$remote_sha" ]]; then
+      # Local is ahead of remote - this is OK (unpushed commits)
+      echo "[$RUN_ID] INFO: Local is ahead of origin (unpushed commits exist)" >> "$SUMMARY_LOG"
+    elif [[ "$base" == "$local_sha" ]]; then
+      # Local is behind remote - fast-forward pull
+      echo "[$RUN_ID] INFO: Pulling latest from origin (fast-forward)..." >> "$SUMMARY_LOG"
+      if ! git pull --ff-only origin "$branch" 2>/dev/null; then
+        echo "[$RUN_ID] ERROR: Fast-forward pull failed" >> "$FAILURES_LOG"
+        exit 1
+      fi
+    else
+      # Branches have diverged - cannot auto-resolve
+      echo "[$RUN_ID] ERROR: Branch has diverged from origin. Manual resolution required." >> "$FAILURES_LOG"
+      echo "[$RUN_ID]   Local:  $local_sha" >> "$FAILURES_LOG"
+      echo "[$RUN_ID]   Remote: $remote_sha" >> "$FAILURES_LOG"
+      echo "[$RUN_ID]   Base:   $base" >> "$FAILURES_LOG"
+      exit 1
+    fi
+  fi
+
+  # Ensure working tree is clean (no uncommitted changes)
+  if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+    echo "[$RUN_ID] ERROR: Working tree has uncommitted changes. Commit or stash them first." >> "$FAILURES_LOG"
+    git status --short >> "$FAILURES_LOG"
+    exit 1
+  fi
+
+  echo "[$RUN_ID] INFO: Git pre-flight checks passed" >> "$SUMMARY_LOG"
+}
+
+pre_flight_git_check
 
 # Verify claude CLI is available
 if ! command -v claude &>/dev/null; then
@@ -159,5 +288,8 @@ if [[ "$SLACK_ENABLED" == "true" ]] && [[ -n "$PARENT_TS" ]]; then
 fi
 
 echo "" >> "$SUMMARY_LOG"
+
+# --- UPDATE CONTROL FILE ---
+update_last_run "$REPO_NAME"
 
 exit "$EXIT_CODE"

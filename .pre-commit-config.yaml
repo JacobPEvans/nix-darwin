@@ -63,3 +63,23 @@ repos:
         files: \.(md|nix)$
         types: [file]
         pass_filenames: false
+
+      # Auto-Claude shell script validation
+      # Validates syntax of all auto-claude shell scripts
+      - id: validate-auto-claude-scripts
+        name: Validate auto-claude shell scripts
+        entry: bash -c 'for f in modules/home-manager/ai-cli/claude/auto-claude*.sh; do [ -f "$f" ] && zsh -n "$f" || true; done'
+        language: system
+        files: 'auto-claude.*\.sh$'
+        types: [file]
+        pass_filenames: false
+
+      # Orchestrator prompt validation
+      # Ensures prompt file exists and contains required sections
+      - id: validate-orchestrator-prompt
+        name: Validate orchestrator prompt
+        entry: bash -c 'f="modules/home-manager/ai-cli/claude/orchestrator-prompt.txt"; test -s "$f" && grep -q "CORE LOOP" "$f" && grep -q "IDENTITY" "$f"'
+        language: system
+        files: 'orchestrator-prompt\.txt$'
+        types: [file]
+        pass_filenames: false

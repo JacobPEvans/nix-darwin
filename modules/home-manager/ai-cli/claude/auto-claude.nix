@@ -151,6 +151,12 @@ in
           executable = true;
         };
 
+        # Deploy control script for runtime pause/resume/status
+        ".claude/scripts/auto-claude-ctl.sh" = {
+          source = ./auto-claude-ctl.sh;
+          executable = true;
+        };
+
         # Deploy orchestrator prompt
         ".claude/scripts/orchestrator-prompt.txt" = {
           source = ./orchestrator-prompt.txt;
@@ -161,6 +167,11 @@ in
           source = ./auto-claude-notify.py;
           executable = true;
         };
+      };
+
+      # Shell alias for convenient access to control script
+      shellAliases = {
+        auto-claude-ctl = "${homeDir}/.claude/scripts/auto-claude-ctl.sh";
       };
     };
 
