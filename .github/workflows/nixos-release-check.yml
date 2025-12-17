@@ -26,7 +26,7 @@ jobs:
             exit 0
           fi
 
-          CURRENT=$(grep 'stableVersion.*=' lib/versions.nix | sed -E 's/.*"(.*)".*/\1/')
+          CURRENT=$(sed -n 's/^[[:space:]]*stableVersion[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' lib/versions.nix)
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "Current stable version: $CURRENT"
 
@@ -34,13 +34,19 @@ jobs:
         id: latest
         run: |
           # Get latest release-* branch from nixpkgs
-          LATEST=$(git ls-remote --heads https://github.com/NixOS/nixpkgs.git 'refs/heads/release-*' 2>/dev/null | \
-                   sed 's|.*refs/heads/release-||' | \
-                   sort -V | \
-                   tail -1 || echo "unknown")
+          # Capture output first, then check for errors
+          GIT_OUTPUT=$(git ls-remote --heads https://github.com/NixOS/nixpkgs.git 'refs/heads/release-*' 2>/dev/null)
 
-          if [[ "$LATEST" == "unknown" ]]; then
+          if [[ $? -ne 0 ]] || [[ -z "$GIT_OUTPUT" ]]; then
             echo "::warning::Cannot fetch latest release from nixpkgs"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          LATEST=$(echo "$GIT_OUTPUT" | sed 's|.*refs/heads/release-||' | grep -E '^[0-9]{2}\.[0-9]{2}$' | sort -V | tail -1)
+
+          if [[ -z "$LATEST" ]]; then
+            echo "::warning::Cannot parse release branches from nixpkgs"
             echo "version=unknown" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -48,30 +54,57 @@ jobs:
           echo "version=$LATEST" >> $GITHUB_OUTPUT
           echo "Latest nixpkgs release: $LATEST"
 
-      - name: Compare versions and notify
+      - name: Analyze version relationship
+        id: compare
         run: |
           CURRENT="${{ steps.current.outputs.version }}"
           LATEST="${{ steps.latest.outputs.version }}"
 
           # Handle edge cases
           if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
-            echo "⚠️  Unable to compare versions (current: $CURRENT, latest: $LATEST)"
+            echo "status=unknown" >> $GITHUB_OUTPUT
             exit 0
           fi
 
+          # Use sort -V for proper semantic version comparison
+          # This correctly handles YY.MM format (e.g., 24.11 < 25.05)
+          SORTED=$(printf '%s\n%s' "$CURRENT" "$LATEST" | sort -V | head -1)
+
           if [[ "$CURRENT" == "$LATEST" ]]; then
-            echo "✅ Running on latest stable release: $CURRENT"
-          elif [[ "$(printf '%s\n%s\n' "$LATEST" "$CURRENT" | sort -V | tail -1)" == "$CURRENT" && "$CURRENT" != "$LATEST" ]]; then
-            echo "⚠️  Ahead of stable (may be on unstable/pre-release): $CURRENT > $LATEST"
+            echo "status=up-to-date" >> $GITHUB_OUTPUT
+          elif [[ "$SORTED" == "$LATEST" ]]; then
+            echo "status=ahead" >> $GITHUB_OUTPUT
           else
-            echo "::notice title=New NixOS Release Available::NixOS $LATEST is available (current: $CURRENT). See RUNBOOK.md for update workflow."
-            echo "📢 New stable release available: $LATEST (current: $CURRENT)"
+            echo "status=update-available" >> $GITHUB_OUTPUT
           fi
+
+      - name: Compare versions and notify
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+          STATUS="${{ steps.compare.outputs.status }}"
+
+          case "$STATUS" in
+            "unknown")
+              echo "⚠️  Unable to compare versions (current: $CURRENT, latest: $LATEST)"
+              ;;
+            "up-to-date")
+              echo "✅ Running on latest stable release: $CURRENT"
+              ;;
+            "ahead")
+              echo "⚠️  Ahead of stable (may be on unstable/pre-release): $CURRENT > $LATEST"
+              ;;
+            "update-available")
+              echo "::notice title=New NixOS Release Available::NixOS $LATEST is available (current: $CURRENT). See RUNBOOK.md for update workflow."
+              echo "📢 New stable release available: $LATEST (current: $CURRENT)"
+              ;;
+          esac
 
       - name: Generate summary
         run: |
           CURRENT="${{ steps.current.outputs.version }}"
           LATEST="${{ steps.latest.outputs.version }}"
+          STATUS="${{ steps.compare.outputs.status }}"
 
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## NixOS Release Status
@@ -80,22 +113,27 @@ jobs:
           |-----------|---------|--------|--------|
           EOF
 
-          # Determine status
-          if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
-            STATUS="⚠️ Unknown"
-          elif [[ "$CURRENT" == "$LATEST" ]]; then
-            STATUS="✅ Up to date"
-          elif [[ "$(printf '%s\n%s\n' "$LATEST" "$CURRENT" | sort -V | tail -1)" == "$CURRENT" && "$CURRENT" != "$LATEST" ]]; then
-            STATUS="⚠️ Ahead"
-          else
-            STATUS="📢 Update available"
-          fi
+          # Map status to human-readable format
+          case "$STATUS" in
+            "unknown")
+              DISPLAY_STATUS="⚠️ Unknown"
+              ;;
+            "up-to-date")
+              DISPLAY_STATUS="✅ Up to date"
+              ;;
+            "ahead")
+              DISPLAY_STATUS="⚠️ Ahead"
+              ;;
+            "update-available")
+              DISPLAY_STATUS="📢 Update available"
+              ;;
+          esac
 
-          echo "| nixpkgs stable | $CURRENT | $LATEST | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| nixpkgs stable | $CURRENT | $LATEST | $DISPLAY_STATUS |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Add update instructions if update available
-          if [[ "$CURRENT" != "unknown" ]] && [[ "$LATEST" != "unknown" ]] && [[ "$(printf '%s\n%s\n' "$CURRENT" "$LATEST" | sort -V | tail -1)" == "$LATEST" && "$CURRENT" != "$LATEST" ]]; then
+          if [[ "$STATUS" == "update-available" ]]; then
             cat >> $GITHUB_STEP_SUMMARY << EOF
           ### Update Available
 
@@ -111,9 +149,3 @@ jobs:
           - [Nixpkgs Release Branch](https://github.com/NixOS/nixpkgs/tree/release-$LATEST)
           EOF
           fi
-
-      - name: Always succeed
-        if: always()
-        run: |
-          echo "This check is informational only and never fails"
-          exit 0
