@@ -20,11 +20,16 @@
     # revoked on every rebuild because Nix store paths change.
     mac-app-util = {
       url = "github:hraban/mac-app-util";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # WORKAROUND: gitlab.common-lisp.net has Anubis anti-bot protection
-      # blocking automated fetches. Use fork with GitHub mirror URLs.
-      # See: https://github.com/hraban/mac-app-util/issues/39
-      inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
+      # Consolidate all input overrides in a single attrset
+      # - nixpkgs: use our root nixpkgs
+      # - treefmt-nix: transitive dependency, prevent duplicate nixpkgs in flake.lock
+      # - cl-nix-lite: WORKAROUND for gitlab.common-lisp.net Anubis anti-bot protection
+      #   See: https://github.com/hraban/mac-app-util/issues/39
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+        cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
+      };
     };
 
     # Official Anthropic repositories for Claude Code plugins/commands
