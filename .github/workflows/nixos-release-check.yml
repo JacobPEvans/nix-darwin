@@ -1,0 +1,151 @@
+name: NixOS Release Check
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly on Sundays at 9 AM UTC
+    - cron: '0 9 * * 0'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    name: Check for New NixOS Releases
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check current version
+        id: current
+        run: |
+          # Extract stableVersion from lib/versions.nix
+          if ! grep -q 'stableVersion' lib/versions.nix 2>/dev/null; then
+            echo "::warning::Cannot find stableVersion in lib/versions.nix"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          CURRENT=$(sed -n 's/^[[:space:]]*stableVersion[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' lib/versions.nix)
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Current stable version: $CURRENT"
+
+      - name: Check latest nixpkgs release
+        id: latest
+        run: |
+          # Get latest release-* branch from nixpkgs
+          # Capture output first, then check for errors
+          GIT_OUTPUT=$(git ls-remote --heads https://github.com/NixOS/nixpkgs.git 'refs/heads/release-*' 2>/dev/null)
+
+          if [[ $? -ne 0 ]] || [[ -z "$GIT_OUTPUT" ]]; then
+            echo "::warning::Cannot fetch latest release from nixpkgs"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          LATEST=$(echo "$GIT_OUTPUT" | sed 's|.*refs/heads/release-||' | grep -E '^[0-9]{2}\.[0-9]{2}$' | sort -V | tail -1)
+
+          if [[ -z "$LATEST" ]]; then
+            echo "::warning::Cannot parse release branches from nixpkgs"
+            echo "version=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest nixpkgs release: $LATEST"
+
+      - name: Analyze version relationship
+        id: compare
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+
+          # Handle edge cases
+          if [[ "$CURRENT" == "unknown" ]] || [[ "$LATEST" == "unknown" ]]; then
+            echo "status=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Use sort -V for proper semantic version comparison
+          # This correctly handles YY.MM format (e.g., 24.11 < 25.05)
+          SORTED=$(printf '%s\n%s' "$CURRENT" "$LATEST" | sort -V | head -1)
+
+          if [[ "$CURRENT" == "$LATEST" ]]; then
+            echo "status=up-to-date" >> $GITHUB_OUTPUT
+          elif [[ "$SORTED" == "$LATEST" ]]; then
+            echo "status=ahead" >> $GITHUB_OUTPUT
+          else
+            echo "status=update-available" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compare versions and notify
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+          STATUS="${{ steps.compare.outputs.status }}"
+
+          case "$STATUS" in
+            "unknown")
+              echo "⚠️  Unable to compare versions (current: $CURRENT, latest: $LATEST)"
+              ;;
+            "up-to-date")
+              echo "✅ Running on latest stable release: $CURRENT"
+              ;;
+            "ahead")
+              echo "⚠️  Ahead of stable (may be on unstable/pre-release): $CURRENT > $LATEST"
+              ;;
+            "update-available")
+              echo "::notice title=New NixOS Release Available::NixOS $LATEST is available (current: $CURRENT). See RUNBOOK.md for update workflow."
+              echo "📢 New stable release available: $LATEST (current: $CURRENT)"
+              ;;
+          esac
+
+      - name: Generate summary
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+          STATUS="${{ steps.compare.outputs.status }}"
+
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## NixOS Release Status
+
+          | Component | Current | Latest | Status |
+          |-----------|---------|--------|--------|
+          EOF
+
+          # Map status to human-readable format
+          case "$STATUS" in
+            "unknown")
+              DISPLAY_STATUS="⚠️ Unknown"
+              ;;
+            "up-to-date")
+              DISPLAY_STATUS="✅ Up to date"
+              ;;
+            "ahead")
+              DISPLAY_STATUS="⚠️ Ahead"
+              ;;
+            "update-available")
+              DISPLAY_STATUS="📢 Update available"
+              ;;
+          esac
+
+          echo "| nixpkgs stable | $CURRENT | $LATEST | $DISPLAY_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add update instructions if update available
+          if [[ "$STATUS" == "update-available" ]]; then
+            cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### Update Available
+
+          A new stable release of NixOS is available: **$LATEST**
+
+          To update, follow the [Secure Flake Update Workflow](RUNBOOK.md#secure-flake-update-workflow):
+          1. Update \`lib/versions.nix\` to use \`$LATEST\`
+          2. Run \`nix flake update\`
+          3. Build → Diff → Audit → Switch
+
+          **Resources:**
+          - [NixOS Release Notes](https://nixos.org/manual/nixos/stable/release-notes.html)
+          - [Nixpkgs Release Branch](https://github.com/NixOS/nixpkgs/tree/release-$LATEST)
+          EOF
+          fi
