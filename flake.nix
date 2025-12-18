@@ -76,14 +76,6 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Claude Code Statusline - modular multi-line terminal statusline
-    # Provides git status, MCP monitoring, cost tracking, themes
-    # https://github.com/rz1989s/claude-code-statusline
-    claude-code-statusline = {
-      url = "github:rz1989s/claude-code-statusline";
-      flake = false; # Not a flake, just fetch the repo
-    };
-
     # Superpowers - comprehensive software development workflow system
     # Provides brainstorming, planning, execution, testing, and review skills
     # https://github.com/obra/superpowers
@@ -106,7 +98,6 @@
       anthropic-skills,
       agent-os,
       ai-assistant-instructions,
-      claude-code-statusline,
       superpowers-marketplace,
       ...
     }:
@@ -153,7 +144,6 @@
           anthropic-skills
           agent-os
           ai-assistant-instructions
-          claude-code-statusline
           superpowers-marketplace
           ;
       };

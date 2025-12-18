@@ -7,7 +7,6 @@
   claude-plugins-official,
   anthropic-skills,
   ai-assistant-instructions,
-  claude-code-statusline,
   superpowers-marketplace,
   ...
 }:
@@ -46,7 +45,6 @@ let
       claude-plugins-official
       anthropic-skills
       ai-assistant-instructions
-      claude-code-statusline
       superpowers-marketplace
       ;
   };
@@ -167,9 +165,8 @@ in
         export PATH="$HOME/.npm-packages/bin:$PATH"
         export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
 
-        # Claude statusline SSH detection (must run before Claude starts)
-        # Switches between full and mobile configs based on session type
-        source ${./zsh/claude-statusline-switch.zsh}
+        # Claude statusline SSH detection (disabled - enhanced statusline unavailable)
+        # source ${./zsh/claude-statusline-switch.zsh}
 
         source ${./zsh/git-functions.zsh}
         source ${./zsh/docker-functions.zsh}

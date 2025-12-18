@@ -11,7 +11,6 @@
   claude-plugins-official,
   anthropic-skills,
   ai-assistant-instructions,
-  claude-code-statusline,
   superpowers-marketplace,
   ...
 }:
@@ -22,11 +21,6 @@ let
   # Local repo path - ONLY used for autoClaude (needs writable git for commits)
   # All other ai-assistant-instructions content comes from Nix store (flake input)
   autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
-
-  # Statusline configuration - flat TOML files (required format for statusline tool)
-  # Full config for local terminal, mobile config for SSH sessions
-  statuslineConfigFull = ./claude/statusline/config.toml;
-  statuslineConfigMobile = ./claude/statusline/config-mobile.toml;
 
   # Read permissions from ai-assistant-instructions
   # Helper to reduce repetition (DRY)
@@ -210,7 +204,7 @@ in
       # Model selection is dynamic (via /model command or shell env).
       # To set a default in this config, uncomment below.
       # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
-      # CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";  # For sub-agents; Opus is more capable but costly.
+      CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";
@@ -252,13 +246,13 @@ in
   statusLine = {
     enable = true;
     enhanced = {
-      enable = true;
-      # Pulls from flake input - auto-updated via Dependabot
-      source = claude-code-statusline;
+      # Disabled: upstream repository no longer available (404)
+      # Repository: https://github.com/rz1989s/claude-code-statusline
+      enable = false;
       # Full config for local terminal
-      configFile = statuslineConfigFull;
+      # configFile = statuslineConfigFull;
       # Mobile config for SSH sessions (single-line, minimal)
-      mobileConfigFile = statuslineConfigMobile;
+      # mobileConfigFile = statuslineConfigMobile;
     };
   };
 }
