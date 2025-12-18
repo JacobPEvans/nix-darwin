@@ -67,11 +67,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1765922767,
-        "narHash": "sha256-Q0bHaOrLRJWk6w8+HOhnVB+YDOIr+YSQjT57r/8WAxY=",
+        "lastModified": 1766015723,
+        "narHash": "sha256-Uc1ZCXFGvCayt04zgXqBPpwrdvS0m1zY2wucIH/MdgE=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "4392352687b2c86d09937daba71ca278f80a9089",
+        "rev": "b31e2fd1822fe883f7093dd9a00cf9273a0a66c6",
         "type": "github"
       },
       "original": {
@@ -265,11 +265,11 @@
     "superpowers-marketplace": {
       "flake": false,
       "locked": {
-        "lastModified": 1765868946,
-        "narHash": "sha256-u8YM03hWtB/YuSZsPyf+IV6sUg3bESbkzthy0SAUI9A=",
+        "lastModified": 1766020287,
+        "narHash": "sha256-f1GCLsVj6znb84PQfz666s69k7jXyVo41c9/y3yRo98=",
         "owner": "obra",
         "repo": "superpowers-marketplace",
-        "rev": "c96d56969965273afe3ff5530d623e6bd92abd68",
+        "rev": "6be092098e61a36893be2597f3d73addfa988427",
         "type": "github"
       },
       "original": {
