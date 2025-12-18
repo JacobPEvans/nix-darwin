@@ -5,9 +5,13 @@
 #
 # App locations:
 #   - System apps: /System/Applications/
-#   - Nix-managed: /Applications/Nix Apps/
+#   - Nix system packages: /Applications/Nix Apps/
+#   - Home Manager trampolines: ~/Applications/Home Manager Trampolines/
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
+#
+# NOTE: TCC-sensitive apps (Zoom, OrbStack) use Home Manager trampolines
+# for persistent macOS permissions across darwin-rebuild.
 
 _:
 
@@ -30,7 +34,7 @@ in
       # Communication
       "/System/Applications/Messages.app"
       "/Applications/Slack.app"
-      "/Applications/Nix Apps/zoom.us.app"
+      "${homeDir}/Applications/Home Manager Trampolines/zoom.us.app"
       "/Applications/Webex.app"
 
       # Knowledge & Notes
@@ -42,7 +46,7 @@ in
       "/Applications/Nix Apps/Visual Studio Code.app"
       "/System/Applications/Utilities/Terminal.app"
       "/Applications/Nix Apps/Bitwarden.app"
-      "/Applications/OrbStack.app"
+      "${homeDir}/Applications/Home Manager Trampolines/OrbStack.app"
 
       # Browsers
       "/Applications/Safari.app"

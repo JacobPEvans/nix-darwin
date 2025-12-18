@@ -88,14 +88,13 @@ in
       bitwarden-desktop # Password manager desktop app
       ghostty-bin # GPU-accelerated terminal emulator (prebuilt binary for macOS)
       obsidian # Knowledge base / note-taking (Markdown)
-      # OrbStack: Docker & Linux VM manager (lightweight alternative to Docker Desktop)
-      # Provides: docker, docker-compose, docker-buildx, kubectl, orb, orbctl
-      # CLIs installed to /usr/local/bin via OrbStack's helper tool
-      # Docker socket: /var/run/docker.sock (managed by programs.orbstack module)
-      orbstack
+      # NOTE: OrbStack and Zoom moved to home.packages for better handling of TCC
+      # (camera/mic/screen) permissions via stable trampolines (wrapper apps with
+      # stable paths; see hosts/macbook-m4/home.nix). Apps that frequently need
+      # these permissions (e.g., Zoom for video calls, OrbStack for VM/system
+      # access) benefit most.
       raycast # Productivity launcher (replaces Spotlight)
       vscode # Visual Studio Code editor
-      zoom-us # Video conferencing
     ]);
 
   # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
