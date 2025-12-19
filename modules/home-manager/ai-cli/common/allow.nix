@@ -284,7 +284,6 @@ _:
     "sleep"
     "true"
     "false"
-    "zsh"
     "source"
   ];
 
