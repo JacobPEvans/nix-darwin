@@ -33,6 +33,7 @@
     #
     # Trampolines location: ~/Applications/Home Manager Trampolines/
     packages = with pkgs; [
+      ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
       zoom-us # Video conferencing - needs camera/mic TCC permissions
       orbstack # Docker/Linux VMs - needs various system permissions
     ];
