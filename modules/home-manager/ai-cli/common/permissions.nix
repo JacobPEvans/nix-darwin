@@ -22,9 +22,9 @@
 }:
 
 let
-  # Username for sudo commands
-  username = config.home.username or "jevans";
-  homeDir = config.home.homeDirectory or "/Users/${username}";
+  # Username for sudo commands - rely on config values, fail early if not set
+  username = config.home.username;
+  homeDir = config.home.homeDirectory;
 
 in
 {
@@ -50,7 +50,7 @@ in
       "curl -X PATCH"
       "curl --request POST"
       "curl --request PUT"
-      "curl --request DELETE"
+     Ãurl --request DELETE"
       "curl --request PATCH"
       "curl -d"
       "curl --data"
