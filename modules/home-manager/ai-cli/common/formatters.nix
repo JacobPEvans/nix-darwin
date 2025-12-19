@@ -34,7 +34,7 @@ in
   # CLAUDE CODE FORMATTER
   # ============================================================================
   # Format: Bash(cmd:*) for shell commands
-  # The :* suffix allows any arguments after the command
+  # The :* suffix is Claude-specific wildcard syntax: it matches "cmd:" followed by any arguments
 
   claude = {
     # Format a single shell command for Claude

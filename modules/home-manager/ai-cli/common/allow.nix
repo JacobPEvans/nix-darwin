@@ -235,7 +235,7 @@ _:
     "delta"
     "eza"
     "fd"
-    "fzp"
+    "fzf"
     "htop"
     "ncdu"
     "tldr"
