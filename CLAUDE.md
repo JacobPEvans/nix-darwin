@@ -129,27 +129,28 @@ If user indicates workflow was not followed, immediately reread this file into c
 
 ## Command Execution Preferences
 
-### Avoid Command Chaining with &&
+### Prefer Auto-Approved Commands
 
-- **NEVER chain commands with `&&`** - permission patterns don't match compound commands
-- Run each command separately in its own Bash tool call
-- This ensures each command matches its permission pattern correctly
+Claude has 323+ auto-approved command patterns. Always prefer commands matching these patterns to avoid permission prompts.
 
-**Bad:**
+**Permission source**: Commands are defined in `ai-assistant-instructions/.claude/permissions/allow.json` (flake input) and
+compiled into `~/.claude/settings.json` (read-only, Nix-managed).
 
-```bash
-git add -A && git commit -m "message"
-```
+**Pattern format**: `Bash(command:*)` where `*` matches any arguments
 
-**Good:** (two separate tool calls)
+**Examples of allowed commands**:
 
-```bash
-git add -A
-```
+- Git: `git status`, `git add`, `git commit`, `git push`, `git log`, `git diff`
+- Nix: `nix flake check`, `nix search`, `nix develop`, `nix build`
+- Homebrew: `brew list`, `brew search`, `brew info`
+- Node.js: `npm run`, `npm test`, `npm install`
+- Docker: `docker ps`, `docker logs`, `docker build`
+- Kubernetes: `kubectl get`, `kubectl describe`, `kubectl logs`
 
-```bash
-git commit -m "message"
-```
+**Key principle**: If a command variant is in the allowed list, use it. If you're considering a workaround (like `git -C`),
+check if the simpler form is already allowed.
+
+**Command chaining**: The `&&` operator works fine with auto-approved commands. For example, `git add -A && git commit -m "message"` will match the allowed patterns.
 
 ### Prefer Parallel Execution
 
@@ -354,11 +355,13 @@ In rare cases where a security update is urgent:
 
 **Layered Strategy**: Nix manages baseline, settings.local.json for ad-hoc approvals
 
-**Permission files** (`modules/home-manager/permissions/`):
+**Permission source** (`ai-assistant-instructions` flake input):
 
-- `claude-permissions-allow.nix` - Auto-approved commands (280+ in 25 categories)
-- `claude-permissions-ask.nix` - Commands requiring user confirmation
-- `claude-permissions-deny.nix` - Permanently blocked (catastrophic operations)
+- `allow.json` - Auto-approved commands (323+ command patterns)
+- `ask.json` - Commands requiring user confirmation
+- `deny.json` - Permanently blocked (catastrophic operations)
+- Located in `.claude/permissions/` within the flake input
+- Compiled into `~/.claude/settings.json` (read-only, Nix-managed)
 
 **User-managed** (`~/.claude/settings.local.json`):
 
@@ -375,9 +378,10 @@ In rare cases where a security update is urgent:
 
 **To add commands permanently**:
 
-1. Edit appropriate file in `modules/home-manager/permissions/`
+1. Edit appropriate JSON file in `ai-assistant-instructions` repository
 2. Add to appropriate category (allow, ask, or deny)
-3. Commit and rebuild
+3. Update flake input: `nix flake lock --update-input ai-assistant-instructions`
+4. Rebuild to apply changes
 
 **For quick approval**: Just click "accept indefinitely" in Claude UI
 
@@ -535,8 +539,8 @@ exists for reference to maintain sync with Claude/Gemini structures.
 | **Permission model** | allow/ask/deny lists | coreTools/excludeTools | trusted_folders + flags | settings-based |
 | **Command format** | `Bash(cmd:*)` | `ShellTool(cmd)` | `shell(cmd)` patterns | N/A (editor-based) |
 | **Runtime control** | settings.local.json | settings.json | CLI flags | VS Code UI |
-| **Nix file** | `permissions/claude-*.nix` | `permissions/gemini-*.nix` | `permissions/copilot-*.nix` | `vscode/copilot-settings.nix` |
-| **Categories** | 24 categories, 277+ cmds | Mirrors Claude structure | Directory trust only | 50+ settings |
+| **Nix source** | `ai-assistant-instructions` | `permissions/gemini-*.nix` | `permissions/copilot-*.nix` | `vscode/copilot-settings.nix` |
+| **Categories** | 323+ command patterns | Mirrors Claude structure | Directory trust only | 50+ settings |
 | **Security model** | Three-tier (allow/ask/deny) | Two-tier (allow/exclude) | Trust + runtime flags | Per-language enable |
 
 **Consistency philosophy**:
