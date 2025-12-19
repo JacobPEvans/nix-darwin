@@ -56,22 +56,22 @@ consciously choose the appropriate model (Opus for complex tasks).
 This repository uses a **bare git repo with worktrees**:
 
 ```text
-~/git/ai-assistant-instructions/   (bare repo - DO NOT cd here directly)
-├── main/                          (main branch worktree - for pulling updates)
-├── <feature-branch>/              (your feature worktree)
+~/git/nix-config/   (bare repo - DO NOT cd here directly)
+├── main/           (main branch worktree - for pulling updates)
+├── <feature-branch>/  (your feature worktree)
 └── ...
 ```
 
 **Key Points:**
 
-- **Content Source:** Permissions and commands come from the **Nix store** (flake input), not just the local files.
-- **Isolation:** All development happens in `~/git/ai-assistant-instructions/<worktree-name>/`.
-- **Updates:** Changes usually require `nix flake lock --update-input ai-assistant-instructions` + rebuild.
+- **Content Source:** Some permissions and commands come from the **ai-assistant-instructions** flake input (Nix store).
+- **Isolation:** All development happens in `~/git/nix-config/<worktree-name>/`.
+- **Updates:** Permission changes require `nix flake lock --update-input ai-assistant-instructions` + rebuild.
 
 ### MANDATORY: New Worktree for New Work
 
 **NEVER work directly in an existing worktree for unrelated changes.**
-**NEVER work in the bare repo directory (`~/git/ai-assistant-instructions/`)**
+**NEVER work in the bare repo directory (`~/git/nix-config/`)**
 
 Before making ANY changes:
 

@@ -15,6 +15,9 @@ EXEMPT="${2:-}"
 ERRORS=0
 
 for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
+  # Skip symlinks (they point to files that are already checked)
+  if [ -L "$f" ]; then continue; fi
+
   base=$(basename "$f" | sed 's/\.[^.]*$//')
   size=$(wc -c < "$f" | tr -d ' ')
   kb=$((size / 1024))
