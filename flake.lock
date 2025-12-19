@@ -80,6 +80,22 @@
         "type": "github"
       }
     },
+    "claude-code-statusline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765965162,
+        "narHash": "sha256-8/f7Xbz3aV9hAg8J9SSys5HxPzIMXO44rOFWu5ynKXQ=",
+        "owner": "rz1989s",
+        "repo": "claude-code-statusline",
+        "rev": "68a6a18515813c87340ca2f8357f598160002aa4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rz1989s",
+        "repo": "claude-code-statusline",
+        "type": "github"
+      }
+    },
     "claude-cookbooks": {
       "flake": false,
       "locked": {
@@ -109,6 +125,22 @@
       "original": {
         "owner": "anthropics",
         "repo": "claude-plugins-official",
+        "type": "github"
+      }
+    },
+    "claude-powerline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1766090310,
+        "narHash": "sha256-R++dUHePqkOKP6/N7XoY9uTFUPbORV5cEqxp4l4ypJk=",
+        "owner": "Owloops",
+        "repo": "claude-powerline",
+        "rev": "f3f01acb6ef0799812d5fe7321126cffb1cfe9f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Owloops",
+        "repo": "claude-powerline",
         "type": "github"
       }
     },
@@ -252,8 +284,10 @@
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",
+        "claude-code-statusline": "claude-code-statusline",
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
+        "claude-powerline": "claude-powerline",
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",

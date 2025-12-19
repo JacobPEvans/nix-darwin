@@ -6,6 +6,11 @@
 
 with lib;
 
+let
+  # Import shared theme definitions
+  themes = import ./themes.nix { };
+  inherit (themes) availableThemes;
+in
 {
   options.programs.claudeStatusline = {
     enable = mkEnableOption "Claude Code statusline with theme support";
@@ -28,40 +33,73 @@ with lib;
       example = "robbyrussell";
     };
 
-    # Theme-specific configuration (for future use)
-    # These are placeholders for Issues #81 and #82
+    # Theme-specific configuration
     powerline = mkOption {
       type = types.submodule {
         options = {
           style = mkOption {
-            type = types.str;
+            type = types.enum [
+              "default"
+              "minimal"
+              "rainbow"
+              "gruvbox"
+              "dracula"
+              "nord"
+            ];
             default = "default";
-            description = "Powerline style variant (for future use in Issue #81)";
+            description = ''
+              Powerline style variant.
+
+              Available styles:
+              - default: Standard powerline look
+              - minimal: Clean, simple
+              - rainbow: Colorful segments
+              - gruvbox: Gruvbox color scheme
+              - dracula: Dracula theme
+              - nord: Nord color palette
+            '';
           };
         };
       };
       default = { };
-      description = "Powerline theme-specific options (for future use in Issue #81)";
+      description = "Powerline theme-specific options";
     };
 
     advanced = mkOption {
       type = types.submodule {
         options = {
           theme = mkOption {
-            type = types.str;
+            type = types.enum availableThemes;
             default = "gruvbox";
-            description = "Color theme for advanced statusline (for future use in Issue #82)";
+            description = ''
+              Color theme for advanced statusline.
+
+              Available themes (18+):
+              - gruvbox (default)
+              - nord
+              - dracula
+              - monokai
+              - solarized-dark, solarized-light
+              - tokyo-night
+              - catppuccin-mocha, catppuccin-latte, catppuccin-frappe, catppuccin-macchiato
+              - onedark
+              - github-dark, github-light
+              - material
+              - palenight
+              - ayu-dark, ayu-light
+            '';
+            example = "nord";
           };
 
           showSystemInfo = mkOption {
             type = types.bool;
             default = true;
-            description = "Show system information in advanced statusline (for future use in Issue #82)";
+            description = "Show system information in advanced statusline (CPU, memory, disk)";
           };
         };
       };
       default = { };
-      description = "Advanced theme-specific options (for future use in Issue #82)";
+      description = "Advanced theme-specific options (Issue #82)";
     };
   };
 }

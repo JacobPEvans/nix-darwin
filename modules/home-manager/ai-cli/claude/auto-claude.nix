@@ -89,6 +89,9 @@ in
                     description = ''
                       List of hours (0-23) to run each day at minute 0.
                       Deprecated in favor of times for hour+minute control.
+
+                      If empty and schedule.hour is set, falls back to that single hour.
+                      Example: To run every 2 hours, set to [0 2 4 6 8 10 12 14 16 18 20 22].
                     '';
                   };
 
@@ -108,15 +111,11 @@ in
                         };
                       }
                     );
-                    default = [
-                      {
-                        hour = 14;
-                        minute = 0;
-                      }
-                    ];
+                    default = [ ];
                     description = ''
                       List of times to run each day. Each time has hour (0-23) and minute (0-59).
 
+                      If empty, falls back to the deprecated 'hours' or 'hour' options.
                       Default runs once daily at 2:00 PM to minimize unexpected costs.
                       Add more times for more frequent maintenance runs.
 
@@ -196,6 +195,12 @@ in
           executable = true;
         };
 
+        # Deploy control script for runtime pause/resume/status
+        ".claude/scripts/auto-claude-ctl.sh" = {
+          source = ./auto-claude-ctl.sh;
+          executable = true;
+        };
+
         # Deploy orchestrator prompt
         ".claude/scripts/orchestrator-prompt.txt" = {
           source = ./orchestrator-prompt.txt;
@@ -206,16 +211,10 @@ in
           source = ./auto-claude-notify.py;
           executable = true;
         };
-
-        # Deploy control CLI
-        ".claude/scripts/auto-claude-ctl.sh" = {
-          source = ./auto-claude-ctl.sh;
-          executable = true;
-        };
       };
     };
 
-    # Add shell alias for convenience
+    # Add shell alias for convenient access to control script
     programs.zsh.shellAliases = {
       auto-claude-ctl = "${homeDir}/.claude/scripts/auto-claude-ctl.sh";
     };

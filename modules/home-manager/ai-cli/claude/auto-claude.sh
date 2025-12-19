@@ -22,6 +22,88 @@
 
 set -euo pipefail
 
+# --- CONTROL FILE ---
+CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
+
+# Convert ISO8601 timestamp to epoch seconds
+# Supports both macOS (BSD date) and Linux (GNU date)
+iso_to_epoch() {
+  local iso="$1"
+  if date --version >/dev/null 2>&1; then
+    # GNU date (Linux)
+    date -d "$iso" "+%s" 2>/dev/null
+  else
+    # BSD date (macOS)
+    date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%%.*}" "+%s" 2>/dev/null
+  fi
+}
+
+# Check control file for pause/skip states
+# Returns 0 if should run, exits 0 if should skip
+check_control_file() {
+  # Skip checks if FORCE_RUN is set (from auto-claude-ctl run)
+  if [[ "${FORCE_RUN:-}" == "1" ]]; then
+    return 0
+  fi
+
+  # If control file doesn't exist, proceed normally
+  if [[ ! -f "$CONTROL_FILE" ]]; then
+    return 0
+  fi
+
+  # Check pause_until timestamp
+  local pause_until=$(jq -r '.pause_until // empty' "$CONTROL_FILE" 2>/dev/null)
+  if [[ -n "$pause_until" && "$pause_until" != "null" ]]; then
+    local now_epoch=$(date +%s)
+    local pause_epoch=$(iso_to_epoch "$pause_until")
+    if [[ -n "$pause_epoch" && "$now_epoch" -lt "$pause_epoch" ]]; then
+      # Note: LOG_DIR is passed as argument, SUMMARY_LOG defined at line 150
+      local log_dir="${3:-$HOME/.claude/logs}"
+      echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Paused until $pause_until" >> "${log_dir}/summary.log"
+      exit 0
+    fi
+  fi
+
+  # Check skip_count
+  local skip_count=$(jq -r '.skip_count // 0' "$CONTROL_FILE" 2>/dev/null)
+  if [[ "$skip_count" -gt 0 ]] 2>/dev/null; then
+    # Decrement skip count
+    local tmp
+    local log_dir="${3:-$HOME/.claude/logs}"
+    tmp=$(mktemp) || {
+      echo "[$(date +%Y%m%d_%H%M%S)] WARNING: Could not create temp file for skip_count update" >> "${log_dir}/summary.log"
+      exit 0
+    }
+    if jq ".skip_count = $((skip_count - 1))" "$CONTROL_FILE" > "$tmp"; then
+      mv "$tmp" "$CONTROL_FILE"
+    else
+      rm -f "$tmp"
+    fi
+    echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Skip count was $skip_count, now $((skip_count - 1))" >> "${log_dir}/summary.log"
+    exit 0
+  fi
+
+  return 0
+}
+
+# Update control file with last run info
+update_last_run() {
+  local repo="$1"
+  if [[ -f "$CONTROL_FILE" ]] && command -v jq &>/dev/null; then
+    local tmp
+    tmp=$(mktemp) || {
+      echo "[$RUN_ID] WARNING: Could not create temp file for last_run update" >> "$SUMMARY_LOG"
+      return 0
+    }
+    local now=$(date "+%Y-%m-%dT%H:%M:%S")
+    if jq ".last_run = \"$now\" | .last_run_repo = \"$repo\"" "$CONTROL_FILE" > "$tmp"; then
+      mv "$tmp" "$CONTROL_FILE"
+    else
+      rm -f "$tmp"
+    fi
+  fi
+}
+
 # --- ARGUMENT PARSING ---
 if [[ $# -lt 2 ]]; then
   echo "Usage: $0 <target_dir> <max_budget_usd> [log_dir] [slack_channel]" >&2
@@ -38,70 +120,6 @@ if ! command -v jq &>/dev/null; then
   echo "Error: jq is not installed. Please install it to use this script." >&2
   exit 1
 fi
-
-# --- CONTROL FILE CHECK ---
-CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
-
-# Convert ISO8601 timestamp to epoch seconds for reliable comparison
-# Supports both macOS (BSD date) and Linux (GNU date)
-iso_to_epoch() {
-  local iso="$1"
-  if date --version >/dev/null 2>&1; then
-    # GNU date (Linux)
-    date -d "$iso" "+%s" 2>/dev/null
-  else
-    # BSD date (macOS)
-    date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%%.*}" "+%s" 2>/dev/null
-  fi
-}
-
-check_control_file() {
-  # Skip checks if FORCE_RUN is set
-  if [[ "${FORCE_RUN:-}" == "1" ]]; then
-    return 0
-  fi
-
-  # Skip if control file doesn't exist
-  if [[ ! -f "$CONTROL_FILE" ]]; then
-    return 0
-  fi
-
-  local now=$(date "+%Y-%m-%dT%H:%M:%S")
-
-  # Check pause_until
-  local pause_until=$(jq -r '.pause_until // empty' "$CONTROL_FILE" 2>/dev/null)
-  if [[ -n "$pause_until" && "$pause_until" != "null" ]]; then
-    local now_epoch=$(iso_to_epoch "$now")
-    local pause_until_epoch=$(iso_to_epoch "$pause_until")
-    if [[ -z "$now_epoch" || -z "$pause_until_epoch" ]]; then
-      echo "Warning: Could not parse pause_until or current time. Skipping pause check." >&2
-    elif [[ "$now_epoch" -lt "$pause_until_epoch" ]]; then
-      echo "Auto-claude paused until $pause_until. Skipping this run." >&2
-      echo "Run 'auto-claude-ctl resume' to resume earlier." >&2
-      exit 0
-    fi
-  fi
-
-  # Check skip_count
-  local skip_count=$(jq -r '.skip_count // 0' "$CONTROL_FILE" 2>/dev/null)
-  if [[ "$skip_count" -gt 0 ]] 2>/dev/null; then
-    local new_count=$((skip_count - 1))
-    local tmp=$(mktemp)
-    jq ".skip_count = $new_count" "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
-    echo "Skipping this run ($new_count remaining). Run 'auto-claude-ctl resume' to clear." >&2
-    exit 0
-  fi
-
-  # Clear run_now flag if set (we're about to run)
-  local run_now=$(jq -r '.run_now // false' "$CONTROL_FILE" 2>/dev/null)
-  if [[ "$run_now" == "true" ]]; then
-    local tmp=$(mktemp)
-    jq '.run_now = false' "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
-  fi
-}
-
-# Run control file check
-check_control_file
 
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
@@ -140,11 +158,92 @@ SCRIPT_DIR="${HOME}/.claude/scripts"
 NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
 PROMPT_FILE="${SCRIPT_DIR}/orchestrator-prompt.txt"
 
+# --- CONTROL FILE CHECK ---
+# Must run early, before expensive operations
+check_control_file
+
 # --- PRE-FLIGHT CHECKS ---
 cd "$TARGET_DIR" || {
   echo "[$RUN_ID] ERROR: Cannot cd to $TARGET_DIR" >> "$FAILURES_LOG"
   exit 1
 }
+
+# --- GIT PRE-FLIGHT CHECKS ---
+# Ensure repository is in a clean, synced state before running
+pre_flight_git_check() {
+  # Get current branch
+  local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    echo "[$RUN_ID] WARNING: Not a git repository or git not available" >> "$SUMMARY_LOG"
+    return 0  # Continue anyway - might not be a git repo
+  fi
+
+  # Ensure we are on an allowed branch.
+  # Default allowed branches are "main" and "master", but this can be overridden
+  # by setting CLAUDE_ALLOWED_BRANCHES to a space-separated list of branch names.
+  local allowed_branches="${CLAUDE_ALLOWED_BRANCHES:-main master}"
+  local branch_allowed=1
+  for b in $allowed_branches; do
+    if [[ "$branch" == "$b" ]]; then
+      branch_allowed=0
+      break
+    fi
+  done
+  if (( branch_allowed != 0 )); then
+    echo "[$RUN_ID] ERROR: Current branch '$branch' is not in allowed branches: $allowed_branches. Switch to an allowed branch first." >> "$FAILURES_LOG"
+    exit 1
+  fi
+
+  # Fetch latest from remote (silently)
+  if ! git fetch origin "$branch" --quiet 2>/dev/null; then
+    echo "[$RUN_ID] WARNING: Could not fetch from origin (network issue?)" >> "$SUMMARY_LOG"
+    # Continue anyway - might be offline
+  fi
+
+  # Check for divergence between local and remote
+  local local_sha=$(git rev-parse HEAD 2>/dev/null)
+  local remote_sha=$(git rev-parse "origin/$branch" 2>/dev/null || echo "")
+
+  if [[ -n "$remote_sha" ]]; then
+    if [[ "$local_sha" == "$remote_sha" ]]; then
+      # Branches are synchronized
+      echo "[$RUN_ID] INFO: Local and origin are synchronized" >> "$SUMMARY_LOG"
+    else
+      # Branches differ - determine divergence type using merge-base
+      local base=$(git merge-base HEAD "origin/$branch" 2>/dev/null || echo "")
+
+      if [[ "$base" == "$remote_sha" ]]; then
+        # Local is ahead of remote - this is OK (unpushed commits)
+        echo "[$RUN_ID] INFO: Local is ahead of origin (unpushed commits exist)" >> "$SUMMARY_LOG"
+      elif [[ "$base" == "$local_sha" ]]; then
+        # Local is behind remote - fast-forward pull
+        echo "[$RUN_ID] INFO: Pulling latest from origin (fast-forward)..." >> "$SUMMARY_LOG"
+        if ! git pull --ff-only origin "$branch" 2>/dev/null; then
+          echo "[$RUN_ID] ERROR: Fast-forward pull failed" >> "$FAILURES_LOG"
+          exit 1
+        fi
+      else
+        # Branches have diverged - cannot auto-resolve
+        echo "[$RUN_ID] ERROR: Branch has diverged from origin. Manual resolution required." >> "$FAILURES_LOG"
+        echo "[$RUN_ID]   Local:  $local_sha" >> "$FAILURES_LOG"
+        echo "[$RUN_ID]   Remote: $remote_sha" >> "$FAILURES_LOG"
+        echo "[$RUN_ID]   Base:   $base" >> "$FAILURES_LOG"
+        exit 1
+      fi
+    fi
+  fi
+
+  # Ensure working tree is clean (no uncommitted changes)
+  if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+    echo "[$RUN_ID] ERROR: Working tree has uncommitted changes. Commit or stash them first." >> "$FAILURES_LOG"
+    git status --short >> "$FAILURES_LOG"
+    exit 1
+  fi
+
+  echo "[$RUN_ID] INFO: Git pre-flight checks passed" >> "$SUMMARY_LOG"
+}
+
+pre_flight_git_check
 
 # Verify claude CLI is available
 if ! command -v claude &>/dev/null; then
@@ -233,13 +332,11 @@ if [[ "$SLACK_ENABLED" == "true" ]] && [[ -n "$PARENT_TS" ]]; then
     --log-file "$LOG_FILE" 2>/dev/null || true
 fi
 
-# --- UPDATE CONTROL FILE WITH LAST RUN (only on success) ---
-if [[ $EXIT_CODE -eq 0 ]] && [[ -f "$CONTROL_FILE" ]]; then
-  LAST_RUN_TS=$(date "+%Y-%m-%dT%H:%M:%S")
-  CTRL_TMP=$(mktemp)
-  jq ".last_run = \"$LAST_RUN_TS\" | .last_run_repo = \"$REPO_NAME\"" "$CONTROL_FILE" > "$CTRL_TMP" && mv "$CTRL_TMP" "$CONTROL_FILE"
-fi
-
 echo "" >> "$SUMMARY_LOG"
+
+# --- UPDATE CONTROL FILE (only on success) ---
+if [[ $EXIT_CODE -eq 0 ]]; then
+  update_last_run "$REPO_NAME"
+fi
 
 exit "$EXIT_CODE"
