@@ -61,13 +61,17 @@ in
       eza # Modern ls replacement with git integration
       fd # Faster, user-friendly find alternative
       fzf # Fuzzy finder for interactive selection
+      gnugrep # GNU grep with zgrep for compressed files
+      gnutar # GNU tar as 'gtar' (Mac-safe tar without ._* files)
       htop # Interactive process viewer (better top)
       jq # JSON parsing for config files and API responses
-      yq # YAML parsing (like jq but for YAML/XML/TOML)
       ncdu # NCurses disk usage analyzer
-      ripgrep # Fast grep alternative (rg)
+      ngrep # Network packet grep (useful for debugging)
+      procps # Process utilities including pgrep, pkill
+      ripgrep # Fast grep alternative (rg) - essential for AI agents
       tldr # Simplified, community-driven man pages
       tree # Directory tree visualization
+      yq # YAML parsing (like jq but for YAML/XML/TOML)
 
       # ========================================================================
       # Development tools

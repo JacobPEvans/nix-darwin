@@ -84,6 +84,14 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
+    # Self-referential: Production nix config from main branch
+    # This creates a read-only copy at ~/.config/nix (via symlink to nix store)
+    # Prevents accidental edits - development work goes in ~/git/nix-config worktrees
+    nix-config-main = {
+      url = "github:JacobPEvans/nix";
+      flake = false; # Fetch repo contents, don't evaluate as flake
+    };
+
   };
 
   outputs =
@@ -99,6 +107,7 @@
       agent-os,
       ai-assistant-instructions,
       superpowers-marketplace,
+      nix-config-main,
       ...
     }:
     let
@@ -145,6 +154,7 @@
           agent-os
           ai-assistant-instructions
           superpowers-marketplace
+          nix-config-main
           ;
       };
       # Define configuration once, assign to multiple names
@@ -166,10 +176,12 @@
               # mac-app-util: Also needed for home.packages if any GUI apps there
               # Agent OS: Proper home-manager module for spec-driven AI development
               # Claude: Unified configuration for Claude Code ecosystem
+              # nix-config-symlink: Read-only ~/.config/nix pointing to main branch
               sharedModules = [
                 mac-app-util.homeManagerModules.default
                 ./modules/home-manager/ai-cli/agent-os
                 ./modules/home-manager/ai-cli/claude
+                ./modules/home-manager/nix-config-symlink.nix
               ];
             };
           }
