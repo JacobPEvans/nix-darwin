@@ -228,17 +228,88 @@ mac-app-util = {
 
 ### macOS TCC Permissions Reset After Rebuild
 
-**Problem**: Camera, microphone, or screen recording permissions revoked after `darwin-rebuild switch`.
+**Problem**: Camera, microphone, screen recording, or App Management permissions revoked after `darwin-rebuild switch`.
 
-**Cause**: macOS TCC (Transparency, Consent, Control) treats different Nix store paths as different applications. Every rebuild changes the path, revoking permissions.
+**Cause**: macOS TCC (Transparency, Consent, Control) tracks permissions by full file path.
+Every Nix rebuild changes the `/nix/store/...` path, causing macOS to treat apps as "new"
+and revoke permissions.
 
-**Solution**: This configuration uses `mac-app-util` to create stable trampolines. If permissions still reset, verify mac-app-util is working:
+**Solution Architecture**:
+
+This configuration uses multiple layers to ensure TCC permissions persist:
+
+1. **mac-app-util trampolines**: Apps in `home.packages` get stable wrapper apps at `~/Applications/Home Manager Trampolines/` that don't change paths across rebuilds
+
+2. **TCC-sensitive apps in home.packages**: Ghostty, Zoom, and OrbStack are in
+   `home.packages` (see `hosts/macbook-m4/home.nix`) (not system packages) to get
+   stable trampolines
+
+3. **AssociatedBundleIdentifiers**: Auto-claude launchd agents are linked to Ghostty's bundle identifier so they can inherit its TCC permissions
+
+4. **/bin/zsh fallback**: The system shell has a permanent path and can be granted Full Disk Access as a backup
+
+### Setting Up TCC Permissions (One-Time)
+
+After a fresh install or if permissions aren't working:
+
+1. **Grant Full Disk Access to Ghostty trampoline**:
+   - Open System Settings > Privacy & Security > Full Disk Access
+   - Click the `+` button
+   - Navigate to `~/Applications/Home Manager Trampolines/Ghostty.app`
+   - Enable the toggle
+
+2. **Grant Full Disk Access to /bin/zsh** (fallback):
+   - In Full Disk Access, click `+`
+   - Press `Cmd+Shift+G` and enter `/bin/zsh`
+   - Enable the toggle
+
+3. **Verify trampolines exist**:
 
 ```bash
-# Check that trampolines exist in /Applications
-ls -la /Applications/*.app
-# Apps should be real directories, not symlinks to /nix/store
+# Check Home Manager trampolines
+ls -la "~/Applications/Home Manager Trampolines/"
+# Should show Ghostty.app, Zoom.app, OrbStack.app
+
+# Check system apps (these do NOT get stable TCC)
+ls -la /Applications/Nix\ Apps/
+# Apps here change paths on rebuild - don't grant TCC to these
 ```
+
+### Why This Works
+
+- **Trampoline paths are stable**: `~/Applications/Home Manager Trampolines/Ghostty.app` never changes, even when the underlying Nix store path does
+- **TCC stores permissions by path**: Once Ghostty trampoline has Full Disk Access, it persists across rebuilds
+- **Launchd agents inherit permissions**: With `AssociatedBundleIdentifiers`, auto-claude agents inherit Ghostty's TCC permissions
+- **/bin/zsh is immutable**: Apple's system shell path never changes, providing a reliable fallback
+
+### Troubleshooting TCC Issues
+
+**darwin-rebuild fails with permission errors**:
+
+```bash
+# Verify you're running from Ghostty (not Terminal.app)
+echo $TERM_PROGRAM
+# Should show: Ghostty
+
+# If using Terminal.app, grant it Full Disk Access or switch to Ghostty
+```
+
+**auto-claude launchd agents fail with permission errors**:
+
+```bash
+# Check if agents have AssociatedBundleIdentifiers
+find ~/Library/LaunchAgents -name 'com.claude.auto-claude-*.plist' -exec plutil -p {} + | grep Associated
+
+# Verify Ghostty trampoline has Full Disk Access
+# System Settings > Privacy & Security > Full Disk Access
+```
+
+**Permissions revoked after macOS update**:
+
+macOS updates can sometimes reset TCC. Re-grant permissions to:
+
+- `~/Applications/Home Manager Trampolines/Ghostty.app`
+- `/bin/zsh`
 
 ### GPG "unsafe ownership" Warning
 

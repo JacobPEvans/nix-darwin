@@ -90,7 +90,8 @@ in
       # GUI applications
       # ========================================================================
       bitwarden-desktop # Password manager desktop app
-      ghostty-bin # GPU-accelerated terminal emulator (prebuilt binary for macOS)
+      # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
+      # See hosts/macbook-m4/home.nix for details
       obsidian # Knowledge base / note-taking (Markdown)
       # NOTE: OrbStack and Zoom moved to home.packages for better handling of TCC
       # (camera/mic/screen) permissions via stable trampolines (wrapper apps with

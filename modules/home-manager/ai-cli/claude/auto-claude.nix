@@ -236,6 +236,9 @@ in
         enable = repoCfg.enabled;
         config = {
           Label = "com.claude.auto-claude-${name}";
+          # Link to Ghostty for TCC permission inheritance
+          # Agents associated with an app can inherit its Full Disk Access
+          AssociatedBundleIdentifiers = [ "com.mitchellh.ghostty" ];
           # Pass arguments at runtime instead of baking them into the script
           ProgramArguments = [
             scriptPath

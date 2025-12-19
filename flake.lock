@@ -249,11 +249,11 @@
     "nix-config-main": {
       "flake": false,
       "locked": {
-        "lastModified": 1766170386,
-        "narHash": "sha256-TS+V7/ED1KGML3p9G9krb7Zd3Q4XD4S/AqlXtE8UWKA=",
+        "lastModified": 1766178464,
+        "narHash": "sha256-q2PJbReery+1hoDFaIrNOCdrcvifg6xZ2+Ti9e3oP4w=",
         "owner": "JacobPEvans",
         "repo": "nix",
-        "rev": "4dc23e95cc10be3e49c96f5f9808ab49f7d470da",
+        "rev": "41ee5f590e7ed7e3791869f7329d989ebb3a5428",
         "type": "github"
       },
       "original": {
