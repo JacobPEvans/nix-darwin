@@ -65,13 +65,14 @@ repos:
         pass_filenames: false
 
       # Auto-Claude shell script validation
-      # Validates syntax of changed auto-claude shell scripts only
+      # Validates syntax of all auto-claude shell scripts
       - id: validate-auto-claude-scripts
         name: Validate auto-claude shell scripts
-        entry: bash -c 'for f in "$@"; do zsh -n "$f" || exit 1; done' --
+        entry: bash -c 'shopt -s nullglob; rc=0; for f in modules/home-manager/ai-cli/claude/auto-claude*.sh; do zsh -n "$f" || rc=1; done; exit $rc'
         language: system
         files: '^modules/home-manager/ai-cli/claude/auto-claude.*\.sh$'
         types: [file]
+        pass_filenames: false
 
       # Orchestrator prompt validation
       # Ensures prompt file exists and contains required sections
@@ -80,5 +81,15 @@ repos:
         entry: bash -c 'f="modules/home-manager/ai-cli/claude/orchestrator-prompt.txt"; test -s "$f" && grep -q "CORE LOOP" "$f" && grep -q "IDENTITY" "$f"'
         language: system
         files: '^modules/home-manager/ai-cli/claude/orchestrator-prompt\.txt$'
+        types: [file]
+        pass_filenames: false
+
+      # Flake input updates - run on .nix file changes
+      # Updates critical inputs to stay current with upstream
+      - id: update-flake-inputs
+        name: Update flake inputs (nixpkgs, ai-assistant-instructions, agent-os, nix-config-main)
+        entry: nix flake lock --update-input nixpkgs --update-input ai-assistant-instructions --update-input agent-os --update-input nix-config-main
+        language: system
+        files: \.nix$
         types: [file]
         pass_filenames: false
