@@ -14,12 +14,13 @@
 
 {
   config,
+  lib,
   pkgs,
   ...
 }:
 
 let
-  copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config; };
+  copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config lib; };
 
   # Copilot settings object
   settings = {
