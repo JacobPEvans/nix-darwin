@@ -34,6 +34,24 @@ in
         # Advanced Claude Code Statusline Configuration
         # Generated from Nix configuration
         # Theme: ${advancedCfg.theme}
+        #
+        # NOTE:
+        # This configuration is intentionally minimal. It only sets:
+        #   - [theme].name              : which advanced theme to use
+        #   - [display].show_system_info: whether to show system information
+        #
+        # All other statusline options (display lines, components, labels,
+        # plugins, performance tuning, etc.) use the upstream defaults from
+        # the claude-code-statusline project.
+        #
+        # For a full list of available options and their default values,
+        # see the example configuration files in the claude-code-statusline
+        # repository:
+        #   - config.toml
+        #   - config-mobile.toml
+        #
+        # You can copy additional sections from those files into your own
+        # config if you want to override more settings.
 
         [theme]
         name = "${advancedCfg.theme}"

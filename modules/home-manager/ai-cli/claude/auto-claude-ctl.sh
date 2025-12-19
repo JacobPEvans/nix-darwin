@@ -9,7 +9,6 @@
 # Usage: auto-claude-ctl <command> [args...]
 #
 # Commands:
-#   now                   Trigger immediate run (sets flag for next launchd trigger)
 #   run                   Actually run auto-claude immediately (bypasses scheduler)
 #   pause <hours>         Pause all runs for specified hours
 #   skip <count>          Skip the next N scheduled runs
@@ -43,7 +42,6 @@ init_control_file() {
 {
   "pause_until": null,
   "skip_count": 0,
-  "run_now": false,
   "override_schedule": null,
   "last_run": null,
   "last_run_repo": null,
@@ -89,16 +87,6 @@ iso_to_epoch() {
     # BSD date (macOS)
     date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%%.*}" "+%s" 2>/dev/null
   fi
-}
-
-# Command: now - set flag for next run
-cmd_now() {
-  init_control_file
-  update_field "run_now" "true"
-  echo "Run-now flag set. Auto-claude will run on next launchd trigger."
-  echo ""
-  echo "To run immediately without waiting for scheduler:"
-  echo "  auto-claude-ctl run"
 }
 
 # Command: run - actually run auto-claude now
@@ -177,10 +165,7 @@ cmd_run() {
   echo "  Budget: \$${max_budget}"
   echo ""
 
-  # Clear run_now flag since we're running
-  update_field "run_now" "false"
-
-  # Run with --force to bypass pause/skip checks
+  # Run with FORCE_RUN=1 to bypass pause/skip checks
   FORCE_RUN=1 "$AUTO_CLAUDE_SCRIPT" "$repo_path" "$max_budget" "$log_dir" "$slack_channel"
 }
 
@@ -244,7 +229,6 @@ cmd_status() {
 
   local pause_until=$(read_field "pause_until")
   local skip_count=$(read_field "skip_count")
-  local run_now=$(read_field "run_now")
   local override=$(jq -c '.override_schedule // empty' "$CONTROL_FILE" 2>/dev/null)
   local last_run=$(read_field "last_run")
   local last_repo=$(read_field "last_run_repo")
@@ -269,7 +253,6 @@ cmd_status() {
   fi
 
   echo ""
-  echo "Run-now flag: $run_now"
   echo "Skip count: ${skip_count:-0}"
   echo ""
 
@@ -348,9 +331,6 @@ cmd_clear_schedule() {
 
 # Main dispatch
 case "${1:-}" in
-  now)
-    cmd_now
-    ;;
   run)
     shift
     cmd_run "$@"
@@ -383,7 +363,6 @@ auto-claude-ctl: Runtime control for auto-claude scheduler
 Usage: auto-claude-ctl <command> [args...]
 
 Commands:
-  now                   Set flag for next scheduled trigger to run
   run [repo-name]       Run auto-claude immediately (bypass scheduler)
   pause <hours>         Pause all runs for specified hours
   skip <count>          Skip the next N scheduled runs

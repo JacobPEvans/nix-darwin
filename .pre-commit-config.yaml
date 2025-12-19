@@ -65,14 +65,13 @@ repos:
         pass_filenames: false
 
       # Auto-Claude shell script validation
-      # Validates syntax of all auto-claude shell scripts
+      # Validates syntax of changed auto-claude shell scripts only
       - id: validate-auto-claude-scripts
         name: Validate auto-claude shell scripts
-        entry: zsh -c 'setopt NULL_GLOB; rc=0; for f in modules/home-manager/ai-cli/claude/auto-claude*.sh; do zsh -n "$f" || rc=1; done; exit $rc'
+        entry: bash -c 'for f in "$@"; do zsh -n "$f" || exit 1; done' --
         language: system
         files: '^modules/home-manager/ai-cli/claude/auto-claude.*\.sh$'
         types: [file]
-        pass_filenames: false
 
       # Orchestrator prompt validation
       # Ensures prompt file exists and contains required sections

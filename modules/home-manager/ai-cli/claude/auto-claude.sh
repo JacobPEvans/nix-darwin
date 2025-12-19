@@ -57,7 +57,9 @@ check_control_file() {
     local now_epoch=$(date +%s)
     local pause_epoch=$(iso_to_epoch "$pause_until")
     if [[ -n "$pause_epoch" && "$now_epoch" -lt "$pause_epoch" ]]; then
-      echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Paused until $pause_until" >> "${HOME}/.claude/logs/summary.log"
+      # Note: LOG_DIR is passed as argument, SUMMARY_LOG defined at line 150
+      local log_dir="${3:-$HOME/.claude/logs}"
+      echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Paused until $pause_until" >> "${log_dir}/summary.log"
       exit 0
     fi
   fi
@@ -67,8 +69,9 @@ check_control_file() {
   if [[ "$skip_count" -gt 0 ]] 2>/dev/null; then
     # Decrement skip count
     local tmp
+    local log_dir="${3:-$HOME/.claude/logs}"
     tmp=$(mktemp) || {
-      echo "[$(date +%Y%m%d_%H%M%S)] WARNING: Could not create temp file for skip_count update" >> "${HOME}/.claude/logs/summary.log"
+      echo "[$(date +%Y%m%d_%H%M%S)] WARNING: Could not create temp file for skip_count update" >> "${log_dir}/summary.log"
       exit 0
     }
     if jq ".skip_count = $((skip_count - 1))" "$CONTROL_FILE" > "$tmp"; then
@@ -76,7 +79,7 @@ check_control_file() {
     else
       rm -f "$tmp"
     fi
-    echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Skip count was $skip_count, now $((skip_count - 1))" >> "${HOME}/.claude/logs/summary.log"
+    echo "[$(date +%Y%m%d_%H%M%S)] SKIPPED: Skip count was $skip_count, now $((skip_count - 1))" >> "${log_dir}/summary.log"
     exit 0
   fi
 
@@ -175,9 +178,19 @@ pre_flight_git_check() {
     return 0  # Continue anyway - might not be a git repo
   fi
 
-  # Must be on main or master branch
-  if [[ "$branch" != "main" && "$branch" != "master" ]]; then
-    echo "[$RUN_ID] ERROR: Not on main/master branch (currently on: $branch). Switch to main first." >> "$FAILURES_LOG"
+  # Ensure we are on an allowed branch.
+  # Default allowed branches are "main" and "master", but this can be overridden
+  # by setting CLAUDE_ALLOWED_BRANCHES to a space-separated list of branch names.
+  local allowed_branches="${CLAUDE_ALLOWED_BRANCHES:-main master}"
+  local branch_allowed=1
+  for b in $allowed_branches; do
+    if [[ "$branch" == "$b" ]]; then
+      branch_allowed=0
+      break
+    fi
+  done
+  if (( branch_allowed != 0 )); then
+    echo "[$RUN_ID] ERROR: Current branch '$branch' is not in allowed branches: $allowed_branches. Switch to an allowed branch first." >> "$FAILURES_LOG"
     exit 1
   fi
 
