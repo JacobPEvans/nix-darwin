@@ -6,6 +6,11 @@
 
 with lib;
 
+let
+  # Import shared theme definitions
+  themes = import ./themes.nix { };
+  inherit (themes) availableThemes;
+in
 {
   options.programs.claudeStatusline = {
     enable = mkEnableOption "Claude Code statusline with theme support";
@@ -64,20 +69,37 @@ with lib;
       type = types.submodule {
         options = {
           theme = mkOption {
-            type = types.str;
+            type = types.enum availableThemes;
             default = "gruvbox";
-            description = "Color theme for advanced statusline (for future use in Issue #82)";
+            description = ''
+              Color theme for advanced statusline.
+
+              Available themes (18+):
+              - gruvbox (default)
+              - nord
+              - dracula
+              - monokai
+              - solarized-dark, solarized-light
+              - tokyo-night
+              - catppuccin-mocha, catppuccin-latte, catppuccin-frappe, catppuccin-macchiato
+              - onedark
+              - github-dark, github-light
+              - material
+              - palenight
+              - ayu-dark, ayu-light
+            '';
+            example = "nord";
           };
 
           showSystemInfo = mkOption {
             type = types.bool;
             default = true;
-            description = "Show system information in advanced statusline (for future use in Issue #82)";
+            description = "Show system information in advanced statusline (CPU, memory, disk)";
           };
         };
       };
       default = { };
-      description = "Advanced theme-specific options (for future use in Issue #82)";
+      description = "Advanced theme-specific options (Issue #82)";
     };
   };
 }
