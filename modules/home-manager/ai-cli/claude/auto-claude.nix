@@ -212,12 +212,6 @@ in
           source = ./auto-claude-notify.py;
           executable = true;
         };
-
-        # Deploy control CLI
-        ".claude/scripts/auto-claude-ctl.sh" = {
-          source = ./auto-claude-ctl.sh;
-          executable = true;
-        };
       };
 
       # Shell alias for convenient access to control script
