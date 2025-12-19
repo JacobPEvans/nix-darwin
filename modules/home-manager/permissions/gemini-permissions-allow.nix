@@ -11,7 +11,7 @@
 
 {
   config,
-  lib ? import <nixpkgs/lib>,
+  lib,
   ...
 }:
 
