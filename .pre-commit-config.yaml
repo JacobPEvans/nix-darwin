@@ -51,13 +51,14 @@ repos:
 
       # File size check - DRY with GitHub Actions via shared script
       # Blocks at 12KB hard limit, warns at 6KB recommended
-      # Extended (32KB): CLAUDE, ANTHROPIC-ECOSYSTEM, TROUBLESHOOTING
+      # Extended (32KB): AGENTS (unified AI instructions), ANTHROPIC-ECOSYSTEM, TROUBLESHOOTING
+      # Note: CLAUDE.md and copilot-instructions.md are symlinks to AGENTS.md
       # Exempt (no limit): RUNBOOK, *-permissions-*.nix files
       - id: file-size-check
         name: File size check (6KB warn, 12KB fail)
         entry: scripts/workflows/check-file-sizes.sh
         args:
-          - "CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
+          - "AGENTS CLAUDE copilot-instructions ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
           - "RUNBOOK copilot-permissions-allow copilot-permissions-ask copilot-permissions-deny gemini-permissions-allow gemini-permissions-deny"
         language: system
         files: \.(md|nix)$

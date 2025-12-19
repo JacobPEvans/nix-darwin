@@ -41,6 +41,17 @@ let
       disableAutoUpdate = true;
     };
 
+    # Context file configuration
+    # Recognize AGENTS.md for cross-tool compatibility alongside GEMINI.md
+    # AGENTS.md is the unified instruction file used by Claude, Copilot, and Gemini
+    # See: https://google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html
+    context = {
+      fileName = [
+        "AGENTS.md"
+        "GEMINI.md"
+      ];
+    };
+
     # Security settings
     # See: https://geminicli.com/docs/cli/trusted-folders/
     security = {
