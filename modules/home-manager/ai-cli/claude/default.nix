@@ -32,6 +32,7 @@ in
     ./components.nix
     ./settings.nix
     ./statusline.nix
+    ./statusline # New modular statusline (Issue #80)
     ./mcp.nix
     ./auto-claude.nix
   ];

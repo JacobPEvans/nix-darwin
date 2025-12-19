@@ -119,53 +119,23 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
-  # Uses alternating hourly schedules to distribute load:
-  # - ai-assistant-instructions: Even hours (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)
-  # - nix-config: Odd hours (1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23)
-  #
-  # Control via: auto-claude-ctl pause/resume/status/run
+  # Alternating schedule: one repo runs every hour
   autoClaude = {
     enable = true;
     repositories = {
-      # ai-assistant-instructions: runs on EVEN hours
+      # ai-assistant-instructions: runs at even hours (0, 2, 4, ...)
       # Uses local repo (not Nix store) because autoClaude needs writable git
       ai-assistant-instructions = {
         path = autoClaudeLocalRepoPath;
-        schedule.hours = [
-          0
-          2
-          4
-          6
-          8
-          10
-          12
-          14
-          16
-          18
-          20
-          22
-        ];
+        schedule.hours = lib.lists.genList (i: i * 2) 12;
         maxBudget = 25.0;
         # TODO: Configure Slack channel ID for this repo
         # slackChannel = "C_AI_INSTRUCTIONS";
       };
-      # nix-config: runs on ODD hours
+      # nix config: runs at odd hours (1, 3, 5, ...)
       nix = {
         path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hours = [
-          1
-          3
-          5
-          7
-          9
-          11
-          13
-          15
-          17
-          19
-          21
-          23
-        ];
+        schedule.hours = lib.lists.genList (i: i * 2 + 1) 12;
         maxBudget = 25.0;
         # TODO: Configure Slack channel ID for this repo
         # slackChannel = "C_NIX_CONFIG";
