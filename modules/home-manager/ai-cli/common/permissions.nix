@@ -22,10 +22,7 @@
 }:
 
 let
-  # Username for sudo commands - rely on config values, fail early if not set
-  username = config.home.username;
   homeDir = config.home.homeDirectory;
-
 in
 {
   # Auto-approved commands (imported from separate file for size)
