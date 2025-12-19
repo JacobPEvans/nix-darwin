@@ -28,20 +28,36 @@ with lib;
       example = "robbyrussell";
     };
 
-    # Theme-specific configuration (for future use)
-    # These are placeholders for Issues #81 and #82
+    # Theme-specific configuration
     powerline = mkOption {
       type = types.submodule {
         options = {
           style = mkOption {
-            type = types.str;
+            type = types.enum [
+              "default"
+              "minimal"
+              "rainbow"
+              "gruvbox"
+              "dracula"
+              "nord"
+            ];
             default = "default";
-            description = "Powerline style variant (for future use in Issue #81)";
+            description = ''
+              Powerline style variant.
+
+              Available styles:
+              - default: Standard powerline look
+              - minimal: Clean, simple
+              - rainbow: Colorful segments
+              - gruvbox: Gruvbox color scheme
+              - dracula: Dracula theme
+              - nord: Nord color palette
+            '';
           };
         };
       };
       default = { };
-      description = "Powerline theme-specific options (for future use in Issue #81)";
+      description = "Powerline theme-specific options";
     };
 
     advanced = mkOption {
