@@ -1,20 +1,14 @@
 # Reusable: File Size Check
 # Called by ci-gate.yml and ci-file-length.yml
+#
+# Configuration: scripts/workflows/file-size-config.sh (single source of truth)
+# This ensures pre-commit and CI always use the same limits.
 name: _file-size
 
 on:
   workflow_call:
-    inputs:
-      extended:
-        description: 'Space-separated list of files with extended limit (32KB)'
-        required: false
-        default: 'CLAUDE ANTHROPIC-ECOSYSTEM TROUBLESHOOTING'
-        type: string
-      exempt:
-        description: 'Space-separated list of exempt files (no limit)'
-        required: false
-        default: 'RUNBOOK copilot-permissions-allow copilot-permissions-ask copilot-permissions-deny gemini-permissions-allow gemini-permissions-deny'
-        type: string
+    # No inputs - config is read from file-size-config.sh
+    # This prevents drift between pre-commit and CI
 
 jobs:
   check:
@@ -25,4 +19,5 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Check file sizes
-        run: ./scripts/workflows/check-file-sizes.sh "${{ inputs.extended }}" "${{ inputs.exempt }}"
+        # No args = reads from scripts/workflows/file-size-config.sh
+        run: ./scripts/workflows/check-file-sizes.sh
