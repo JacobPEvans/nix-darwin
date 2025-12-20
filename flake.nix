@@ -91,14 +91,6 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Self-referential: Production nix config from main branch
-    # This creates a read-only copy at ~/.config/nix (via symlink to nix store)
-    # Prevents accidental edits - development work goes in ~/git/nix-config worktrees
-    nix-config-main = {
-      url = "github:JacobPEvans/nix";
-      flake = false; # Fetch repo contents, don't evaluate as flake
-    };
-
   };
 
   outputs =
@@ -115,7 +107,6 @@
       ai-assistant-instructions,
       claude-powerline,
       superpowers-marketplace,
-      nix-config-main,
       ...
     }:
     let
@@ -163,7 +154,6 @@
           ai-assistant-instructions
           claude-powerline
           superpowers-marketplace
-          nix-config-main
           ;
       };
       # Define configuration once, assign to multiple names

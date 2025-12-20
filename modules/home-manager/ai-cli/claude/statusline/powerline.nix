@@ -4,9 +4,12 @@
 # Builds the package from source using Nix for reproducible, hermetic deployment.
 #
 # Features:
-# - Powerline-style arrow separators
-# - Multi-line layout
-# - Enhanced git status display
+# - Multi-line layout (4 lines by default)
+# - 5-hour billing block tracking with reset timer
+# - Session and daily cost tracking
+# - Full directory path display
+# - Git info (branch, SHA, stash count)
+# - Context window usage
 # - 6 customizable color themes
 #
 # Repository: https://github.com/Owloops/claude-powerline
@@ -21,6 +24,7 @@
 let
   cfg = config.programs.claudeStatusline;
   powerlineStyle = cfg.powerline.style;
+  homeDir = config.home.homeDirectory;
 
   # Build claude-powerline as a Nix package from the flake input
   # This ensures reproducible builds without runtime network dependencies
@@ -45,8 +49,100 @@ let
     };
   };
 
-  # Build the theme argument for the statusline script
-  themeArg = lib.optionalString (powerlineStyle != "default") "--theme=${powerlineStyle}";
+  # Map our style names to claude-powerline theme names
+  themeMap = {
+    "default" = "dark";
+    "minimal" = "dark";
+    "rainbow" = "dark";
+    "gruvbox" = "gruvbox";
+    "dracula" = "dark"; # closest match
+    "nord" = "nord";
+  };
+  themeName = themeMap.${powerlineStyle} or "dark";
+
+  # Rich multi-line configuration for claude-powerline
+  # Displays: directory, git, model, session costs, 5-hour block, daily usage, context
+  powerlineConfig = {
+    theme = themeName;
+    style = "powerline";
+    charset = "unicode";
+
+    display = {
+      lines = [
+        # Line 1: Directory (full path), Git info, Model
+        {
+          segments = {
+            directory = {
+              enabled = true;
+              style = "full"; # Show full path from ~
+            };
+            git = {
+              enabled = true;
+              showSha = true;
+              showStash = true;
+              showUpstream = true;
+            };
+            model = {
+              enabled = true;
+            };
+          };
+        }
+        # Line 2: Session cost, 5-hour block, Daily usage
+        {
+          segments = {
+            session = {
+              enabled = true;
+              type = "breakdown"; # Show input/output split
+            };
+            block = {
+              enabled = true;
+              type = "weighted"; # Account for model multipliers
+              burnType = "cost"; # Show burn rate
+            };
+            today = {
+              enabled = true;
+              type = "breakdown";
+            };
+          };
+        }
+        # Line 3: Context window, Metrics
+        {
+          segments = {
+            context = {
+              enabled = true;
+            };
+            metrics = {
+              enabled = true;
+            };
+            version = {
+              enabled = true;
+            };
+          };
+        }
+      ];
+    };
+
+    # Budget warnings at 80%
+    budget = {
+      session = {
+        amount = 10.0;
+        warningThreshold = 80;
+      };
+      today = {
+        amount = 25.0;
+        warningThreshold = 80;
+      };
+      block = {
+        amount = 15.0;
+        type = "cost";
+        warningThreshold = 80;
+      };
+    };
+  };
+
+  # Write config to JSON file
+  configFile = pkgs.writeText "claude-powerline.json" (builtins.toJSON powerlineConfig);
+
 in
 {
   config = lib.mkIf (cfg.enable && cfg.theme == "powerline") {
@@ -60,8 +156,8 @@ in
       script = ''
         #!/usr/bin/env bash
         # Claude Powerline statusline wrapper
-        # Calls the Nix-built claude-powerline package from the store
-        ${claude-powerline-pkg}/bin/claude-powerline ${themeArg} "$@"
+        # Rich multi-line display with cost tracking
+        ${claude-powerline-pkg}/bin/claude-powerline --config=${configFile} "$@"
       '';
     };
   };

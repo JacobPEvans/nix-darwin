@@ -2,6 +2,8 @@
 # Check file sizes against tier limits (bytes as token proxy)
 # Usage: ./scripts/workflows/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]
 #
+# If no arguments provided, reads from file-size-config.sh
+#
 # Limits: 6KB recommended, 12KB hard, 32KB extended
 #
 # Exit codes:
@@ -10,11 +12,23 @@
 
 set -euo pipefail
 
-EXTENDED="${1:-}"
-EXEMPT="${2:-}"
+# Load config from shared file if no args provided
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ $# -eq 0 ]] && [[ -f "$SCRIPT_DIR/file-size-config.sh" ]]; then
+  # shellcheck source=file-size-config.sh
+  source "$SCRIPT_DIR/file-size-config.sh"
+  EXTENDED="${FILE_SIZE_EXTENDED:-}"
+  EXEMPT="${FILE_SIZE_EXEMPT:-}"
+else
+  EXTENDED="${1:-}"
+  EXEMPT="${2:-}"
+fi
 ERRORS=0
 
 for f in $(find . \( -name "*.md" -o -name "*.nix" \) -not -path "./.git/*" | sort); do
+  # Skip symlinks (they point to files that are already checked)
+  if [ -L "$f" ]; then continue; fi
+
   base=$(basename "$f" | sed 's/\.[^.]*$//')
   size=$(wc -c < "$f" | tr -d ' ')
   kb=$((size / 1024))
