@@ -143,6 +143,12 @@ in
     };
   };
 
+  # Menu bar status indicator via SwiftBar
+  menubar = {
+    enable = true;
+    refreshInterval = 30; # Update every 30 seconds
+  };
+
   plugins = {
     marketplaces = {
       "anthropics/claude-code" = {

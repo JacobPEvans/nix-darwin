@@ -99,6 +99,7 @@ in
       # these permissions (e.g., Zoom for video calls, OrbStack for VM/system
       # access) benefit most.
       raycast # Productivity launcher (replaces Spotlight)
+      swiftbar # Menu bar customization (auto-claude status)
       vscode # Visual Studio Code editor
     ]);
 
