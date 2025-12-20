@@ -76,15 +76,7 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Claude Code Statusline - Advanced integration with 18+ themes
-    # Configurable statusline for Claude Code with git and cost tracking
-    # Used by modules/home-manager/ai-cli/claude/statusline/advanced.nix
-    claude-code-statusline = {
-      url = "github:rz1989s/claude-code-statusline";
-      flake = false; # Not a flake, just fetch the repo
-    };
-
-    # Claude Powerline - alternative statusline with 6 theme variants
+    # Claude Powerline - statusline with 6 theme variants
     # Provides powerline-style statuslines with multiple color schemes
     # https://github.com/Owloops/claude-powerline
     claude-powerline = {
@@ -97,14 +89,6 @@
     superpowers-marketplace = {
       url = "github:obra/superpowers-marketplace";
       flake = false; # Not a flake, just fetch the repo
-    };
-
-    # Self-referential: Production nix config from main branch
-    # This creates a read-only copy at ~/.config/nix (via symlink to nix store)
-    # Prevents accidental edits - development work goes in ~/git/nix-config worktrees
-    nix-config-main = {
-      url = "github:JacobPEvans/nix";
-      flake = false; # Fetch repo contents, don't evaluate as flake
     };
 
   };
@@ -121,10 +105,8 @@
       anthropic-skills,
       agent-os,
       ai-assistant-instructions,
-      claude-code-statusline,
       claude-powerline,
       superpowers-marketplace,
-      nix-config-main,
       ...
     }:
     let
@@ -170,10 +152,8 @@
           anthropic-skills
           agent-os
           ai-assistant-instructions
-          claude-code-statusline
           claude-powerline
           superpowers-marketplace
-          nix-config-main
           ;
       };
       # Define configuration once, assign to multiple names

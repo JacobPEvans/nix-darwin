@@ -67,32 +67,16 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1766182394,
-        "narHash": "sha256-SleLxTUjM7HNHc78YklikuFwix2DPaTDIACUnsSQCrA=",
+        "lastModified": 1766105965,
+        "narHash": "sha256-87ihjeqklcYtbIjHrcDrtGz+MUZ2Pie86HjBhokjZTw=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "d213a74fc8e3b6efded52729196e0c2d4c3abb3e",
+        "rev": "52115592ba30e818ba147d7fdfd47ee367f81708",
         "type": "github"
       },
       "original": {
         "owner": "anthropics",
         "repo": "claude-code",
-        "type": "github"
-      }
-    },
-    "claude-code-statusline": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1765965162,
-        "narHash": "sha256-8/f7Xbz3aV9hAg8J9SSys5HxPzIMXO44rOFWu5ynKXQ=",
-        "owner": "rz1989s",
-        "repo": "claude-code-statusline",
-        "rev": "68a6a18515813c87340ca2f8357f598160002aa4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "rz1989s",
-        "repo": "claude-code-statusline",
         "type": "github"
       }
     },
@@ -246,22 +230,6 @@
         "type": "github"
       }
     },
-    "nix-config-main": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1766205954,
-        "narHash": "sha256-D6USqiKobL5f2aubhyWT7fPirLvGch1chzCtNTbD/GE=",
-        "owner": "JacobPEvans",
-        "repo": "nix",
-        "rev": "86e41c24349f0aebe9e3a9fc6351083285d6e951",
-        "type": "github"
-      },
-      "original": {
-        "owner": "JacobPEvans",
-        "repo": "nix",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1766125104,
@@ -284,14 +252,12 @@
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",
-        "claude-code-statusline": "claude-code-statusline",
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
         "claude-powerline": "claude-powerline",
         "darwin": "darwin",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
-        "nix-config-main": "nix-config-main",
         "nixpkgs": "nixpkgs",
         "superpowers-marketplace": "superpowers-marketplace"
       }

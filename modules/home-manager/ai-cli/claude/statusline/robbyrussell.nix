@@ -1,9 +1,11 @@
 # Robbyrussell Theme - Claude Code Statusline
 #
-# Simple, clean statusline theme inspired by the robbyrussell oh-my-zsh theme.
-# This is the current default implementation, extracted from the original statusline.nix.
+# DEPRECATED: The upstream claude-code-statusline repository (github:rz1989s/claude-code-statusline)
+# is no longer available (404). This theme is disabled until an alternative is found.
 #
-# Features:
+# Use the "powerline" theme instead, which uses github:Owloops/claude-powerline.
+#
+# Original features (when working):
 # - Lightweight and fast
 # - Single-line display optimized for SSH/mobile
 # - Git integration
@@ -11,46 +13,34 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
 let
   cfg = config.programs.claudeStatusline;
-
-  # Import shared package builder
-  inherit (import ./package.nix { inherit lib pkgs; }) mkStatuslinePackage;
-
 in
 {
-  config = lib.mkIf (cfg.enable && cfg.theme == "robbyrussell") (
-    let
-      # Get source from legacy statusLine.enhanced.source for backward compatibility
-      # TODO: This should eventually be moved to claudeStatusline.source
-      legacyCfg = config.programs.claude.statusLine.enhanced;
-      inherit (legacyCfg) source;
+  config = lib.mkIf (cfg.enable && cfg.theme == "robbyrussell") {
+    # Fail with helpful message - the upstream repo is 404
+    assertions = [
+      {
+        assertion = false;
+        message = ''
+          The "robbyrussell" statusline theme is currently unavailable.
 
-      statuslinePackage = mkStatuslinePackage source;
+          The upstream repository (github:rz1989s/claude-code-statusline) has been deleted.
+          Please use the "powerline" theme instead:
 
-      # Config files - full (local) and mobile (SSH)
-      configFull =
-        if legacyCfg.configFile != null then legacyCfg.configFile else "${source}/examples/Config.toml";
+            programs.claudeStatusline = {
+              enable = true;
+              theme = "powerline";
+              powerline.style = "minimal";  # or: default, rainbow, gruvbox, dracula, nord
+            };
 
-      configMobile = legacyCfg.mobileConfigFile;
-    in
-    {
-      # Install the statusline package
-      home.packages = [ statuslinePackage ];
-
-      # Deploy config files
-      home.file = {
-        # Full config (always deployed)
-        ".claude/statusline/config-full.toml".source = configFull;
+          The powerline theme uses github:Owloops/claude-powerline which is actively maintained.
+          Use "minimal" style for a clean, simple look similar to robbyrussell.
+        '';
       }
-      // lib.optionalAttrs (configMobile != null) {
-        # Mobile config (only if specified)
-        ".claude/statusline/config-mobile.toml".source = configMobile;
-      };
-    }
-  );
+    ];
+  };
 }
