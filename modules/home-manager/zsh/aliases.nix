@@ -35,12 +35,14 @@
   # ===========================================================================
   # REQUIRES SUDO: darwin-rebuild modifies system-level configurations
   # This activates both system (nix-darwin) and user (home-manager) configs
-  # Usage: d-r .  OR  d-r ~/git/nix-config/main
-  d-r = "sudo darwin-rebuild switch --flake";
+  # Usage: d-r            # Use current directory as flake
+  d-r = "sudo darwin-rebuild switch --flake .";
 
   # NO SUDO: Updates flake.lock to latest nixpkgs (must commit before d-r)
-  # Usage: nf-u .  OR  nf-u ~/git/nix-config/main
-  nf-u = "nix flake update --flake";
+  # Usage: nf-u            # update flake in current directory
+  #        nf-u --flake .  # explicit current directory
+  #        nf-u --flake ~/git/nix-config/main
+  nf-u = "nix flake update";
 
   # ===========================================================================
   # Python
