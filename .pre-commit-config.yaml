@@ -79,13 +79,3 @@ repos:
         files: '^modules/home-manager/ai-cli/claude/orchestrator-prompt\.txt$'
         types: [file]
         pass_filenames: false
-
-      # Flake input updates - run on .nix file changes
-      # Updates critical inputs to stay current with upstream
-      - id: update-flake-inputs
-        name: Update flake inputs (nixpkgs, ai-assistant-instructions, agent-os, nix-config-main)
-        entry: nix flake lock --update-input nixpkgs --update-input ai-assistant-instructions --update-input agent-os --update-input nix-config-main
-        language: system
-        files: \.nix$
-        types: [file]
-        pass_filenames: false
