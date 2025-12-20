@@ -166,7 +166,9 @@ in
     };
 
     enabled = enabledPlugins;
-    allowRuntimeInstall = true;
+    # Disable local/experimental marketplace (for developing local plugins)
+    # Plugins from official marketplaces can still be installed at runtime
+    allowRuntimeInstall = false;
   };
 
   commands = {
