@@ -308,14 +308,15 @@ cmd_schedule() {
     local schedule="["
     local first=true
     for time in "$@"; do
-      if [[ ! "$time" =~ ^([0-9]+):([0-9]+)$ ]]; then
+      if [[ "$time" =~ '^([0-9]+):([0-9]+)$' ]]; then
+        # Extract hour and minute using zsh's match array (populated by =~ operator)
+        # Note: zsh arrays are 1-indexed, and match[1] is first capture group
+        local hour="${match[1]}"
+        local minute="${match[2]}"
+      else
         echo "Error: Invalid time format '$time'. Use H:MM or HH:MM (e.g., 9:30 or 14:00)" >&2
         exit 1
       fi
-      # Extract hour and minute using zsh's match array (populated by =~ operator)
-      # Note: zsh arrays are 1-indexed, and match[1] is first capture group
-      local hour="${match[1]}"
-      local minute="${match[2]}"
 
       if [[ "$hour" -lt 0 || "$hour" -gt 23 ]]; then
         echo "Error: Hour must be 0-23, got $hour" >&2
