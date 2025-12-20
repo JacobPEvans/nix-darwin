@@ -26,24 +26,21 @@ spec:
               containerPort: 9000
               protocol: TCP
           env:
-            # Managed Edge mode - connects to Cribl Cloud
+            # Edge mode for standalone operation
+            # Change to "managed-edge" when Cribl Cloud is configured
             - name: CRIBL_DIST_MODE
-              value: "managed-edge"
-            # Cribl Cloud URL - set your organization URL
-            # Format: https://your-org.cribl.cloud:4200
-            - name: CRIBL_DIST_MASTER_URL
-              valueFrom:
-                secretKeyRef:
-                  name: cribl-cloud-config
-                  key: master-url
-                  optional: true
-            # Fleet enrollment token
-            - name: CRIBL_DIST_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: cribl-cloud-config
-                  key: auth-token
-                  optional: true
+              value: "edge"
+            # Cribl Cloud URL - uncomment when Cribl Cloud is configured
+            # - name: CRIBL_DIST_MASTER_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: cribl-cloud-config
+            #       key: master-url
+            # - name: CRIBL_DIST_AUTH_TOKEN
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: cribl-cloud-config
+            #       key: auth-token
           volumeMounts:
             # Mount Claude logs
             - name: claude-logs
@@ -68,17 +65,23 @@ spec:
               memory: "1Gi"
               cpu: "1"
           livenessProbe:
-            httpGet:
-              path: /api/v1/health
-              port: 9000
-            initialDelaySeconds: 30
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "curl -sf http://127.0.0.1:9420/api/v1/health || exit 1"
+            initialDelaySeconds: 60
             periodSeconds: 30
+            failureThreshold: 5
           readinessProbe:
-            httpGet:
-              path: /api/v1/health
-              port: 9000
-            initialDelaySeconds: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "curl -sf http://127.0.0.1:9420/api/v1/health || exit 1"
+            initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 5
       volumes:
         # OrbStack mounts macOS paths automatically
         - name: claude-logs

@@ -18,7 +18,8 @@ spec:
     spec:
       containers:
         - name: splunk
-          image: splunk/splunk:latest
+          # Force amd64 image for Rosetta emulation on ARM64
+          image: splunk/splunk@sha256:a455c77bc5e6b14395c7dd0a6665b4a93820f2742d6ac87359098cad96791300
           ports:
             - name: web
               containerPort: 8000
@@ -35,6 +36,8 @@ spec:
           env:
             - name: SPLUNK_START_ARGS
               value: "--accept-license"
+            - name: SPLUNK_GENERAL_TERMS
+              value: "--accept-sgt-current-at-splunk-com"
             - name: SPLUNK_PASSWORD
               valueFrom:
                 secretKeyRef:

@@ -7,6 +7,10 @@ metadata:
     app: otel-collector
 data:
   otel-collector-config.yaml: |
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
     receivers:
       otlp:
         protocols:
@@ -47,9 +51,9 @@ data:
       otlphttp:
         endpoint: http://cribl-edge:9420
 
-      # Debug logging
-      logging:
-        loglevel: info
+      # Debug logging (replaced deprecated 'logging' exporter)
+      debug:
+        verbosity: normal
         sampling_initial: 5
         sampling_thereafter: 200
 
@@ -62,16 +66,17 @@ data:
         index: claude
 
     service:
+      extensions: [health_check]
       pipelines:
         traces:
           receivers: [otlp]
           processors: [batch, resource]
-          exporters: [otlphttp, logging]
+          exporters: [otlphttp, debug]
         metrics:
           receivers: [otlp]
           processors: [batch, resource]
-          exporters: [otlphttp, logging]
+          exporters: [otlphttp, debug]
         logs:
           receivers: [otlp, filelog]
           processors: [batch, resource]
-          exporters: [otlphttp, splunk_hec, logging]
+          exporters: [otlphttp, splunk_hec, debug]
