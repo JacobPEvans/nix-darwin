@@ -5,6 +5,7 @@ import json
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 HOME = Path.home()
 CONTROL_FILE = HOME / ".claude" / "auto-claude-control.json"
@@ -25,7 +26,7 @@ def get_active_sessions() -> int:
         return 0
 
 
-def parse_iso_time(iso_str: str):
+def parse_iso_time(iso_str: str) -> Optional[datetime]:
     """Parse ISO timestamp."""
     try:
         return datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
@@ -33,7 +34,7 @@ def parse_iso_time(iso_str: str):
         return None
 
 
-def get_status():
+def get_status() -> tuple[str, str, str]:
     """Return (icon, status_text, color)."""
     if not CONTROL_FILE.exists():
         return "🤖", "No control file", "gray"
@@ -51,15 +52,18 @@ def get_status():
     pause_until = data.get("pause_until")
     if pause_until:
         pause_time = parse_iso_time(pause_until)
-        now = datetime.now()
         if pause_time:
-            # Handle timezone-aware vs naive comparison
+            # Ensure `now` and `pause_time` are comparable (both naive or both aware)
             try:
-                if pause_time.tzinfo:
-                    now = now.astimezone()
+                if pause_time.tzinfo is not None:
+                    now = datetime.now(pause_time.tzinfo)
+                else:
+                    now = datetime.now()
                 if now < pause_time:
                     return "⏸️", f"Paused until {pause_time.strftime('%H:%M')}", "orange"
             except Exception:
+                # If anything goes wrong comparing times (e.g. unexpected tzinfo),
+                # ignore the pause and fall through to the normal status logic.
                 pass
 
     skip_count = data.get("skip_count", 0)
@@ -69,7 +73,7 @@ def get_status():
     return "🤖", "Active", "green"
 
 
-def get_recent_logs(limit: int = 5):
+def get_recent_logs(limit: int = 5) -> list[tuple[str, str, str]]:
     """Return [(name, size, path), ...] for recent logs."""
     if not LOG_DIR.exists():
         return []
@@ -78,10 +82,10 @@ def get_recent_logs(limit: int = 5):
     result = []
     for log in logs[:limit]:
         size = log.stat().st_size
-        if size > 1_000_000:
-            size_str = f"{size / 1_000_000:.1f}MB"
-        elif size > 1000:
-            size_str = f"{size / 1000:.1f}KB"
+        if size > 1024 * 1024:
+            size_str = f"{size / (1024 * 1024):.1f}MB"
+        elif size > 1024:
+            size_str = f"{size / 1024:.1f}KB"
         else:
             size_str = f"{size}B"
         result.append((log.stem, size_str, str(log)))

@@ -25,9 +25,9 @@ in
     enable = lib.mkEnableOption "Auto-Claude menu bar status via SwiftBar";
 
     refreshInterval = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.ints.between 1 86400;
       default = 30;
-      description = "Refresh interval in seconds for the menu bar plugin";
+      description = "Refresh interval in seconds for the menu bar plugin (1 second to 24 hours)";
     };
   };
 
