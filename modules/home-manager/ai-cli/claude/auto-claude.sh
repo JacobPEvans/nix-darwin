@@ -164,6 +164,16 @@ set +e
 [[ -r "$HOME/.profile" ]] && source "$HOME/.profile" 2>/dev/null
 set -e
 
+# --- BWS AUTHENTICATION ---
+# Retrieve BWS access token from macOS Keychain for Bitwarden Secrets Manager
+# This is required for Slack notifications (bot token stored in BWS)
+if [[ -z "${BWS_ACCESS_TOKEN:-}" ]]; then
+  BWS_TOKEN=$(security find-generic-password -s "bws-claude-automation" -w 2>/dev/null) || true
+  if [[ -n "$BWS_TOKEN" ]]; then
+    export BWS_ACCESS_TOKEN="$BWS_TOKEN"
+  fi
+fi
+
 # --- EARLY SETUP FOR SLACK NOTIFICATIONS (needed for skip notifications) ---
 SCRIPT_DIR="${HOME}/.claude/scripts"
 NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
