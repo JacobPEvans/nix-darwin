@@ -50,22 +50,19 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.theme == "powerline") {
-    # Create statusline wrapper script that calls the Nix-built package
-    home.file.".claude/statusline-command.sh" = {
-      executable = true;
-      text = ''
+    # Use ONLY the script option with actual content
+    # settings.nix will:
+    #   1. Create ~/.claude/statusline-command.sh with this content
+    #   2. Add statusLine to settings.json pointing to that script
+    # DO NOT also use home.file - that causes duplicate file creation = fork bomb!
+    programs.claude.statusLine = {
+      enable = true;
+      script = ''
         #!/usr/bin/env bash
         # Claude Powerline statusline wrapper
         # Calls the Nix-built claude-powerline package from the store
         ${claude-powerline-pkg}/bin/claude-powerline ${themeArg} "$@"
       '';
-    };
-
-    # Bridge configuration: register the statusline script with settings.nix
-    # This ensures the script is referenced in ~/.claude/settings.json
-    programs.claude.statusLine = {
-      enable = true;
-      script = "${config.home.homeDirectory}/.claude/statusline-command.sh";
     };
   };
 }
