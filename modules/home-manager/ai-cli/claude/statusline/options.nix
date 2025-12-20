@@ -17,20 +17,21 @@ in
 
     theme = mkOption {
       type = types.enum [
-        "robbyrussell"
         "powerline"
+        "robbyrussell"
         "advanced"
       ];
-      default = "robbyrussell";
+      default = "powerline";
       description = ''
         Statusline theme to use.
 
         Available themes:
-        - robbyrussell: Simple, clean single-line statusline (current default)
-        - powerline: Multi-line statusline with powerline-style graphics (Issue #81)
-        - advanced: Full-featured statusline with system info (Issue #82)
+        - powerline: Multi-line statusline with powerline-style graphics (RECOMMENDED)
+          Uses github:Owloops/claude-powerline (actively maintained)
+        - robbyrussell: DEPRECATED (upstream repo 404)
+        - advanced: DEPRECATED (upstream repo 404)
       '';
-      example = "robbyrussell";
+      example = "powerline";
     };
 
     # Theme-specific configuration

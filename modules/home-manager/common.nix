@@ -285,6 +285,17 @@ in
     claude = claudeConfig;
 
     # ==========================================================================
+    # Claude Statusline
+    # ==========================================================================
+    # Powerline-style statusline for Claude Code terminal
+    # Uses Owloops/claude-powerline (working alternative to defunct rz1989s repo)
+    claudeStatusline = {
+      enable = true;
+      theme = "powerline";
+      powerline.style = "dracula"; # Options: default, minimal, rainbow, gruvbox, dracula, nord
+    };
+
+    # ==========================================================================
     # Agent OS
     # ==========================================================================
     # Spec-driven development system for AI coding agents
