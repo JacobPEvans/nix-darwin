@@ -11,7 +11,6 @@
 
 let
   cfg = config.programs.claude;
-  homeDir = config.home.homeDirectory;
 
   # SwiftBar plugin script
   menubarScript = pkgs.writeShellScript "auto-claude-status.sh" ''
