@@ -35,6 +35,7 @@ let
   # Note: "commit" removed - use /commit from commit-commands plugin instead
   agentsMdCommands = [
     "fix-all-pr-ci"
+    "fix-pr-ci"
     "generate-code"
     "git-refresh"
     "infrastructure-review"
@@ -45,11 +46,15 @@ let
     "quick-add-permission"
     "review-code"
     "review-docs"
+    "rok-manage-pr"
     "rok-resolve-issues"
     "rok-resolve-pr-review-thread"
     "rok-review-pr"
     "rok-shape-issues"
+    "sync-main"
+    "sync-main-all"
     "sync-permissions"
+    "sync-prs-with-main"
   ];
 
   # Commands from claude-cookbooks (immutable from flake)
