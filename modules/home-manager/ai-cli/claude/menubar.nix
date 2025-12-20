@@ -137,10 +137,11 @@ in
 
   config = lib.mkIf (cfg.enable && cfg.menubar.enable) {
     # Deploy the SwiftBar plugin with the correct filename for refresh interval
-    home.file."Library/Application Support/SwiftBar/Plugins/auto-claude.${toString cfg.menubar.refreshInterval}s.sh" = {
-      source = menubarScript;
-      executable = true;
-    };
+    home.file."Library/Application Support/SwiftBar/Plugins/auto-claude.${toString cfg.menubar.refreshInterval}s.sh" =
+      {
+        source = menubarScript;
+        executable = true;
+      };
 
     # Add a note about SwiftBar setup
     warnings = lib.optional (!config.programs.claude.autoClaude.enable) ''
