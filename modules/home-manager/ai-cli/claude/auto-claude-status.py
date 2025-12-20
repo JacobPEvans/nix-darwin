@@ -2,6 +2,7 @@
 """SwiftBar Auto-Claude Status Plugin."""
 
 import json
+import shlex
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -14,10 +15,14 @@ CTL_SCRIPT = HOME / ".claude" / "scripts" / "auto-claude-ctl.sh"
 
 
 def get_active_sessions() -> int:
-    """Count running Claude sessions."""
+    """Count running auto-claude sessions.
+
+    Auto-claude runs: claude -p <prompt> --output-format stream-json ...
+    We look for the specific --output-format flag used by auto-claude.
+    """
     try:
         result = subprocess.run(
-            ["pgrep", "-f", "claude.*--print"],
+            ["pgrep", "-f", "claude.*--output-format stream-json"],
             capture_output=True,
             text=True,
         )
@@ -123,24 +128,27 @@ def main():
     logs = get_recent_logs()
     if logs:
         for name, size, path in logs:
-            print(f"  {name} ({size}) | bash='open -R \"{path}\"' terminal=false")
+            # Properly escape path for shell safety
+            escaped_path = shlex.quote(path)
+            print(f"  {name} ({size}) | bash='open -R {escaped_path}' terminal=false")
     else:
         print("  No logs found | color=gray")
 
     print("---")
 
-    # Actions
-    ctl = str(CTL_SCRIPT)
+    # Actions - escape paths to prevent potential shell injection
+    ctl = shlex.quote(str(CTL_SCRIPT))
+    log_dir = shlex.quote(str(LOG_DIR))
     print("Actions | size=12")
-    print(f"  Resume | bash='{ctl}' param1='resume' terminal=true refresh=true")
-    print(f"  Pause 1 hour | bash='{ctl}' param1='pause' param2='1' terminal=true refresh=true")
-    print(f"  Pause 4 hours | bash='{ctl}' param1='pause' param2='4' terminal=true refresh=true")
-    print(f"  Skip next run | bash='{ctl}' param1='skip' param2='1' terminal=true refresh=true")
+    print(f"  Resume | bash={ctl} param1='resume' terminal=true refresh=true")
+    print(f"  Pause 1 hour | bash={ctl} param1='pause' param2='1' terminal=true refresh=true")
+    print(f"  Pause 4 hours | bash={ctl} param1='pause' param2='4' terminal=true refresh=true")
+    print(f"  Skip next run | bash={ctl} param1='skip' param2='1' terminal=true refresh=true")
     print("---")
-    print(f"  Run Now... | bash='{ctl}' param1='run' terminal=true")
+    print(f"  Run Now... | bash={ctl} param1='run' terminal=true")
     print("---")
-    print(f"Open Logs Folder | bash='open \"{LOG_DIR}\"' terminal=false")
-    print(f"View Status | bash='{ctl}' param1='status' terminal=true")
+    print(f"Open Logs Folder | bash='open {log_dir}' terminal=false")
+    print(f"View Status | bash={ctl} param1='status' terminal=true")
     print("---")
     print("Refresh | refresh=true")
 
