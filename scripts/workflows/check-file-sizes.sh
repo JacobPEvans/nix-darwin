@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # Check file sizes against tier limits (bytes as token proxy)
-# Usage: ./scripts/workflows/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]
+# Usage: ./scripts/workflows/check-file-sizes.sh [EXTENDED_LIST] [EXEMPT_LIST]‰	#	If no arguments provided, reads from file-size-config.sh
 #
-# If no arguments provided, reads from file-size-config.sh
-#
-# Limits: 6KB recommended, 12KB hard, 32KB extended
+# Limits: 6KB recommended, 12KB hard, 32K extended
 #
 # Exit codes:
 #   0 - All files within limits
@@ -26,9 +24,6 @@ fi
 ERRORS=0
 
 while IFS= read -r -d '' f; do
-  # Skip symlinks (they point to files that are already checked)
-  if [ -L "$f" ]; then continue; fi
-
   base=$(basename "$f" | sed 's/\.[^.]*$//')
   size=$(wc -c < "$f" | tr -d ' ')
   kb=$((size / 1024))
@@ -54,6 +49,6 @@ while IFS= read -r -d '' f; do
   elif [ "$size" -gt "$warn_threshold" ]; then
     echo "::warning file=$f::$f is ${kb}KB (exceeds $((warn_threshold/1024))KB recommended)"
   fi
-done < <(find . -path './.git' -prune -o \( -name "*.md" -o -name "*.nix" \) -type f -print0 | sort -z)
+done < <(find . -path './.git' -prune -o \( -name "*.md" -o -name "*.nix" \) -type f -print0 | sort -z"
 
 exit $ERRORS
