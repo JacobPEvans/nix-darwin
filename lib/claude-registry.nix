@@ -9,26 +9,51 @@
 
 {
   # Generate the full known_marketplaces.json structure
+  # Matches native Claude Code format exactly
   mkKnownMarketplaces =
     {
       marketplaces,
       homeDir ? "/home/user",
       allowRuntimeInstall ? true,
     }:
-    lib.mapAttrs (name: m: {
-      source = {
-        source = m.source.type;
-        inherit (m.source) url;
-      };
-      installLocation =
-        if m.flakeInput or null != null then
-          toString m.flakeInput
-        else
-          "${homeDir}/.claude/plugins/marketplaces/${lib.replaceStrings [ "/" ] [ "-" ] name}";
-      lastUpdated = "2025-12-08T00:00:00.000Z"; # Static - file is in nix store
-    }) marketplaces
+    let
+      # Extract marketplace name from "owner/repo" format
+      # e.g., "anthropics/claude-plugins-official" -> "claude-plugins-official"
+      getMarketplaceName =
+        name:
+        let
+          parts = lib.splitString "/" name;
+        in
+        if builtins.length parts > 1 then builtins.elemAt parts 1 else name;
+
+      # Convert marketplace config to native format
+      toNativeFormat =
+        name: m:
+        let
+          marketplaceName = getMarketplaceName name;
+          # Native format uses local paths, not Nix store
+          localPath = "${homeDir}/.claude/plugins/marketplaces/${marketplaceName}";
+        in
+        lib.nameValuePair marketplaceName {
+          # Field order matches native: source, installLocation, lastUpdated
+          source =
+            if m.source.type == "github" || m.source.type == "git" then
+              {
+                source = "github";
+                repo = name; # "owner/repo" format
+              }
+            else
+              {
+                source = m.source.type;
+                inherit (m.source) url;
+              };
+          installLocation = localPath;
+          lastUpdated = "2025-12-08T00:00:00.000Z";
+        };
+    in
+    lib.listToAttrs (lib.mapAttrsToList toNativeFormat marketplaces)
     // lib.optionalAttrs allowRuntimeInstall {
-      "local/experimental" = {
+      "local" = {
         source = {
           source = "directory";
           path = "~/.claude/plugins/local";
