@@ -35,19 +35,19 @@ def has_nix_changes():
             upstream = result.stdout.strip()
 
         # Get list of changed files between upstream and HEAD
+        # Use -z to handle filenames with spaces/newlines robustly
         result = subprocess.run(
-            ["git", "diff", "--name-only", upstream, "HEAD"],
+            ["git", "diff", "-z", "--name-only", upstream, "HEAD"],
             capture_output=True,
-            text=True,
         )
         if result.returncode != 0:
             # If diff fails, be conservative and run the check
             return True
 
-        changed_files = result.stdout.strip().split("\n")
-        return any(f.endswith(".nix") for f in changed_files if f)
-    except Exception:
-        # On any error, be conservative and run the check
+        changed_files_bytes = result.stdout.strip(b'\0').split(b'\0')
+        return any(f.endswith(b".nix") for f in changed_files_bytes if f)
+    except (OSError, subprocess.SubprocessError):
+        # On subprocess/OS errors, be conservative and run the check
         return True
 
 
