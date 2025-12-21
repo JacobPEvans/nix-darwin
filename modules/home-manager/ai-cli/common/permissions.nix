@@ -35,7 +35,16 @@ let
         jsonFiles = lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".json" n) files;
       in
       lib.mapAttrs' (
-        name: _: lib.nameValuePair name (builtins.fromJSON (builtins.readFile "${dir}/${name}"))
+        name: _:
+        let
+          filePath = "${dir}/${name}";
+          fileContents = builtins.readFile filePath;
+          parsed = builtins.tryEval (builtins.fromJSON fileContents);
+        in
+        if parsed.success then
+          lib.nameValuePair name parsed.value
+        else
+          throw "Invalid JSON in AI permission file: ${filePath}"
       ) jsonFiles
     else
       { };
