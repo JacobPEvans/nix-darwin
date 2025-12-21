@@ -20,8 +20,6 @@ Main repository documentation is in the root directory:
 - **[CLAUDE.md](../CLAUDE.md)** - AI agent instructions and guidelines
 - **[ARCHITECTURE.md](../ARCHITECTURE.md)** - System architecture and design patterns
 - **[SETUP.md](../SETUP.md)** - Setup and installation guide
-- **[PLANNING.md](../PLANNING.md)** - Project roadmap and future work
-- **[CHANGELOG.md](../CHANGELOG.md)** - Historical changes and release notes
 - **[TROUBLESHOOTING.md](../TROUBLESHOOTING.md)** - Common issues and solutions
 
 ## Contributing

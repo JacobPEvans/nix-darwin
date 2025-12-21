@@ -83,6 +83,9 @@ let
       ai-assistant-instructions
       ;
   };
+  geminiCommands = import ./ai-cli/gemini-commands.nix {
+    inherit lib ai-assistant-instructions;
+  };
   copilotFiles = import ./ai-cli/copilot.nix {
     inherit
       config
@@ -112,6 +115,7 @@ in
       npmFiles
       // awsFiles
       // geminiFiles
+      // geminiCommands
       // copilotFiles
       // agentsMdSymlinks
       // gitHooks
