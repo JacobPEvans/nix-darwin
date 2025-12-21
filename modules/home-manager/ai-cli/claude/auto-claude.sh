@@ -227,10 +227,17 @@ fi
 # --- ENVIRONMENT ---
 # Source shell configs for full environment (API keys, PATH, git credentials)
 # Required because launchd runs in a minimal shell
-set +e
-[[ -r "$HOME/.zshrc" ]] && source "$HOME/.zshrc" 2>/dev/null
-[[ -r "$HOME/.profile" ]] && source "$HOME/.profile" 2>/dev/null
-set -e
+if [[ -r "$HOME/.zshrc" ]]; then
+  if ! source "$HOME/.zshrc" 2>/dev/null; then
+    echo "WARNING: Failed to source .zshrc" >&2
+  fi
+fi
+
+if [[ -r "$HOME/.profile" ]]; then
+  if ! source "$HOME/.profile" 2>/dev/null; then
+    echo "WARNING: Failed to source .profile" >&2
+  fi
+fi
 
 # --- LOGGING SETUP ---
 if ! mkdir -p "$LOG_DIR"; then
