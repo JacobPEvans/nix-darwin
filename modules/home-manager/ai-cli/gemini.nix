@@ -3,12 +3,25 @@
 # Returns home.file entries for Google Gemini Code Assist CLI.
 # Imported by home.nix for clean separation of AI CLI configs.
 #
+# CRITICAL - tools.allowed vs tools.core:
+# =========================================
+# DO NOT USE tools.core FOR AUTO-APPROVAL!
+#
+# Per the official Gemini CLI schema:
+# - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
+# - tools.core = "Allowlist to RESTRICT built-in tools to a specific set" (LIMITS usage!)
+#
+# Using tools.core LIMITS what tools Gemini can use, it does NOT grant permissions.
+# Always use tools.allowed for auto-approved commands.
+#
+# Schema reference: https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json
+#
 # Configuration format:
-# - coreTools: List of allowed built-in tools and shell commands
+# - allowedTools: List of auto-approved tools (bypass confirmation dialog)
 # - excludeTools: List of permanently blocked commands
 #
 # Permission files:
-# - gemini-permissions-allow.nix - coreTools (allowed commands)
+# - gemini-permissions-allow.nix - allowedTools (auto-approved commands)
 # - gemini-permissions-deny.nix - excludeTools (blocked commands)
 # - gemini-permissions-ask.nix - Reference only (Gemini doesn't support ask mode)
 
@@ -83,10 +96,14 @@ let
 
     # Tools configuration (must be nested under "tools" key)
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
+    #
+    # CRITICAL: Use "allowed" NOT "core" for auto-approval!
+    # - "allowed" = bypass confirmation dialog (what we want)
+    # - "core" = RESTRICT available tools (NOT what we want!)
     tools = {
-      # Allowed tools (safe, read-focused operations)
+      # Auto-approved tools (bypass confirmation dialog)
       # "allow always" selections are written here
-      core = geminiAllow.coreTools;
+      allowed = geminiAllow.allowedTools;
 
       # Blocked tools (catastrophic operations)
       exclude = geminiDeny.excludeTools;
