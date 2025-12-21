@@ -102,7 +102,6 @@ let
     # - "core" = RESTRICT available tools (NOT what we want!)
     tools = {
       # Auto-approved tools (bypass confirmation dialog)
-      # "allow always" selections are written here
       allowed = geminiAllow.allowedTools;
 
       # Blocked tools (catastrophic operations)

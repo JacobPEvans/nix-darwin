@@ -60,7 +60,7 @@ in
       map (cmd: "Bash(${cmd}:*)") allCommands;
 
     # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.claude.core or [ ];
+    getToolPermissions = permissions: permissions.toolSpecific.claude.builtin or [ ];
   };
 
   # ============================================================================
@@ -93,8 +93,8 @@ in
       let
         allCommands = flattenCommands permissions.allow;
         shellTools = map (cmd: "ShellTool(${cmd})") allCommands;
-        # Built-in Gemini tools (ReadFileTool, etc.) - these are Nix variable names
-        builtinTools = permissions.toolSpecific.gemini.core or [ ];
+        # Built-in Gemini tools (ReadFileTool, etc.) from permissions.nix
+        builtinTools = permissions.toolSpecific.gemini.builtin or [ ];
       in
       builtinTools ++ shellTools;
 
@@ -107,7 +107,7 @@ in
       map (cmd: "ShellTool(${cmd})") allCommands;
 
     # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.gemini.core or [ ];
+    getToolPermissions = permissions: permissions.toolSpecific.gemini.builtin or [ ];
   };
 
   # ============================================================================
