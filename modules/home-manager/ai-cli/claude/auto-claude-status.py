@@ -140,10 +140,18 @@ def main():
     ctl = shlex.quote(str(CTL_SCRIPT))
     log_dir = shlex.quote(str(LOG_DIR))
     print("Actions | size=12")
-    print(f"  Resume | bash={ctl} param1='resume' terminal=true refresh=true")
-    print(f"  Pause 1 hour | bash={ctl} param1='pause' param2='1' terminal=true refresh=true")
-    print(f"  Pause 4 hours | bash={ctl} param1='pause' param2='4' terminal=true refresh=true")
-    print(f"  Skip next run | bash={ctl} param1='skip' param2='1' terminal=true refresh=true")
+    print(f"  Resume | bash={ctl} param1='resume' terminal=false refresh=true")
+    # Pause duration submenu with multiple options
+    print("--Pause Duration")
+    for hours in [1, 2, 4, 6, 8, 12]:
+        label = f"{hours} hour" if hours == 1 else f"{hours} hours"
+        print(f"----{label} | bash={ctl} param1='pause' param2='{hours}' terminal=false refresh=true")
+    # Calculate hours until midnight for "pause until midnight" option
+    now = datetime.now()
+    midnight = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    hours_until_midnight = max(1, int((midnight - now).total_seconds() / 3600) + 1)
+    print(f"----Until midnight | bash={ctl} param1='pause' param2='{hours_until_midnight}' terminal=false refresh=true")
+    print(f"--Skip next run | bash={ctl} param1='skip' param2='1' terminal=false refresh=true")
     print("---")
     print(f"  Run Now... | bash={ctl} param1='run' terminal=true")
     print("---")

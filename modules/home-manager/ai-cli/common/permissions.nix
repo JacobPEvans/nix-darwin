@@ -79,6 +79,34 @@ in
       "git push --force origin master"
       "git push -f origin main"
       "git push -f origin master"
+      # Note: git -C is not denied here because:
+      # 1. It's used by trusted Nix-managed scripts (e.g., statusline)
+      # 2. It's not catastrophic like force push to main
+      # 3. AI agents are instructed via CLAUDE.md not to use it (breaks permission matching)
+    ];
+
+    gitHookBypasses = [
+      "git commit --no-verify"
+      "git commit -n"
+      "git merge --no-verify"
+      "git cherry-pick --no-verify"
+      "git rebase --no-verify"
+      "git config core.hooksPath"
+      "git -c core.hooksPath"
+      "pre-commit uninstall"
+      "rm -rf .git/hooks"
+      "chmod -x .git/hooks/"
+    ];
+
+    shellDangerous = [
+      # Block dangerous bulk operations via xargs
+      # Note: xargs can bypass permission matching by constructing commands from input
+      # Allow safe read-only uses (xargs echo, find | xargs wc) by only blocking dangerous patterns
+      "xargs rm"
+      "xargs -0 rm"
+      "xargs sudo"
+      # Block for loops - they break permission matching and force sequential execution
+      "for"
     ];
   };
 
@@ -117,12 +145,72 @@ in
     ];
 
     # Claude built-in tools (non-shell)
-    claude.builtin = [
-      "Read"
-      "Glob"
-      "Grep"
-      "WebFetch"
-      "WebSearch"
-    ];
+    # NOTE: Deny rules (denyRead) take precedence over allow rules (builtin)
+    # as enforced by Claude Code at runtime when it evaluates these patterns,
+    # not by this Nix configuration itself. Even though Read(**) allows reading
+    # any file, the denyRead patterns will block sensitive files (.env, SSH keys,
+    # etc.) when Claude Code processes the permission lists.
+    claude = {
+      # Core built-in tools with glob patterns
+      builtin = [
+        "Read(**)"
+        "Glob(**)"
+        "Grep(**)"
+        "WebSearch"
+        "TodoWrite"
+        "TodoRead"
+        "SlashCommand(**)"
+      ];
+
+      # WebFetch with allowed domains
+      webFetch = [
+        "WebFetch(domain:github.com)"
+        "WebFetch(domain:githubusercontent.com)"
+        "WebFetch(domain:anthropic.com)"
+        "WebFetch(domain:nixos.org)"
+        "WebFetch(domain:hashicorp.com)"
+        "WebFetch(domain:terraform.io)"
+        "WebFetch(domain:geminicli.com)"
+        "WebFetch(domain:google.dev)"
+        "WebFetch(domain:npmjs.com)"
+        "WebFetch(domain:docker.com)"
+        "WebFetch(domain:kubernetes.io)"
+        "WebFetch(domain:python.org)"
+        "WebFetch(domain:pypi.org)"
+        "WebFetch(domain:readthedocs.io)"
+        "WebFetch(domain:rust-lang.org)"
+        "WebFetch(domain:typescriptlang.org)"
+        "WebFetch(domain:stackoverflow.com)"
+        "WebFetch(domain:mozilla.org)"
+        "WebFetch(domain:openai.com)"
+        "WebFetch(domain:raycast.com)"
+        "WebFetch(domain:apple.com)"
+        "WebFetch(domain:google.com)"
+        "WebFetch(domain:github.io)"
+      ];
+
+      # Special read patterns
+      read = [
+        "Read(/nix/store/**)"
+      ];
+
+      # Deny patterns for sensitive files (Claude-specific Read tool)
+      denyRead = [
+        "Read(.env)"
+        "Read(.env.*)"
+        "Read(**/.env)"
+        "Read(**/.env.*)"
+        "Read(**/secrets/**)"
+        "Read(**/credentials/**)"
+        "Read(**/*_rsa)"
+        "Read(**/*_dsa)"
+        "Read(**/*_ecdsa)"
+        "Read(**/*_ed25519)"
+        # Use homeDir interpolation instead of tilde expansion for reliable pattern matching
+        "Read(${homeDir}/.ssh/id_*)"
+        "Read(${homeDir}/.aws/credentials)"
+        "Read(${homeDir}/.gnupg/**)"
+      ];
+    };
   };
 }
