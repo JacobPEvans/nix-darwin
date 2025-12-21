@@ -1,13 +1,19 @@
 # Gemini CLI User-Prompted Commands (ASK List - REFERENCE ONLY)
 #
 # IMPORTANT: Gemini CLI does NOT have an "ask" mode. Commands are either allowed
-# (coreTools) or blocked (excludeTools). This file exists ONLY for reference to
-# keep sync with Claude and Copilot permission structures.
+# (tools.allowed) or blocked (tools.exclude). This file exists ONLY for reference
+# to keep sync with Claude and Copilot permission structures.
+#
+# CRITICAL - tools.allowed vs tools.core:
+# Per the official Gemini CLI schema:
+# - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
+# - tools.core = "Allowlist to RESTRICT built-in tools" (LIMITS usage!)
+# NEVER use tools.core for auto-approval - it restricts, not grants!
 #
 # FILE STRUCTURE:
-# - gemini-permissions-allow.nix - Auto-approved commands (coreTools)
+# - gemini-permissions-allow.nix - allowedTools → tools.allowed (auto-approved)
 # - gemini-permissions-ask.nix (this file) - Commands that would require confirmation (reference only)
-# - gemini-permissions-deny.nix - Permanently blocked commands (excludeTools)
+# - gemini-permissions-deny.nix - excludeTools → tools.exclude (permanently blocked)
 #
 # NOTE: These permission lists are kept in sync across Claude, Gemini, and Copilot.
 # Currently each AI has separate files. Future improvement: DRY refactor to share

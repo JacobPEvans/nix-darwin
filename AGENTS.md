@@ -403,6 +403,20 @@ In rare cases where a security update is urgent:
 
 **Permanent additions**: Edit source files → `nix flake lock --update-input ai-assistant-instructions` → rebuild
 
+### CRITICAL: Gemini tools.allowed vs tools.core
+
+**DO NOT USE tools.core FOR AUTO-APPROVAL!**
+
+Per the official Gemini CLI schema:
+
+- `tools.allowed` = "Tool names that bypass the confirmation dialog" (**AUTO-APPROVE**)
+- `tools.core` = "Allowlist to RESTRICT built-in tools to a specific set" (**LIMITS** usage!)
+
+Using `tools.core` **restricts** what tools Gemini can use - it does NOT grant permissions!
+Always use `tools.allowed` for auto-approved commands. Never rename `allowedTools` to `coreTools`.
+
+Schema: <https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json>
+
 ## Pull Request Workflow
 
 **CRITICAL: NEVER auto-merge PRs without explicit user approval.**
