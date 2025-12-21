@@ -69,4 +69,30 @@ in
   home.sessionVariables = {
     # Add Linux-specific environment variables here
   };
+
+  # ==========================================================================
+  # Nix Configuration
+  # ==========================================================================
+
+  # Automatic Garbage Collection
+  # Removes old Nix store generations to free disk space without manual intervention
+  # Uses home-manager's nix.gc for standalone Nix installations on Linux
+  nix.gc = {
+    # Enable automatic garbage collection
+    automatic = true;
+
+    # Run weekly - balances disk space with keeping recent builds
+    frequency = "weekly";
+
+    # Options passed to nix-collect-garbage
+    # --delete-older-than 30d: Keep generations from last 30 days
+    # Provides rollback capability for recent changes while cleaning old builds
+    options = "--delete-older-than 30d";
+  };
+
+  # Additional Nix settings for garbage collection behavior
+  nix.settings = {
+    # Automatically optimize store (hard-link identical files) during GC
+    auto-optimise-store = true;
+  };
 }
