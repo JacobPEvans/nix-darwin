@@ -10,6 +10,7 @@ in
   imports = [
     ./apps
     ./dock
+    ./file-associations.nix
     ./finder.nix
     ./keyboard.nix
     ./security.nix
@@ -156,24 +157,11 @@ in
     package = lib.mkForce pkgs.nix;
 
     # Automatic Garbage Collection
-    # Removes old Nix store generations to free disk space without manual intervention
-    gc = {
-      # Enable automatic garbage collection via launchd
-      automatic = true;
-
-      # Run weekly (every 7 days) - balances disk space with keeping recent builds
-      # Alternative: "daily" for more aggressive cleanup
-      interval = {
-        Weekday = 0; # Sunday
-        Hour = 3; # 3 AM
-        Minute = 15;
-      };
-
-      # Options passed to nix-collect-garbage
-      # --delete-older-than 30d: Keep generations from last 30 days
-      # Provides rollback capability for recent changes while cleaning old builds
-      options = "--delete-older-than 30d";
-    };
+    # DISABLED: nix.gc.automatic requires nix.enable = true, which conflicts with
+    # Determinate Nix (which manages its own daemon). For gc, use manual:
+    #   nix-collect-garbage --delete-older-than 30d
+    # Or consider a launchd plist that runs nix-collect-garbage directly.
+    gc.automatic = false;
   };
 
   # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
