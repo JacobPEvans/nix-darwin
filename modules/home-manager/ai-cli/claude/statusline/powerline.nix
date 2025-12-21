@@ -80,6 +80,7 @@ let
               showSha = true;
               showStash = true;
               showUpstream = true;
+              showRepoName = true; # Show repo name to help identify worktree
             };
             model = {
               enabled = true;
@@ -156,6 +157,28 @@ in
         #!/usr/bin/env bash
         # Claude Powerline statusline wrapper
         # Rich multi-line display with cost tracking
+        # Enhanced with worktree detection (Issue #108)
+
+        # Detect and display worktree information
+        worktree_info=""
+        if command -v git &> /dev/null && git rev-parse --git-dir &> /dev/null 2>&1; then
+          # Get the git directory path
+          git_dir=$(git rev-parse --git-dir 2>/dev/null)
+
+          # Check if this is a worktree (git-dir points to .git/worktrees/*)
+          if [[ "$git_dir" =~ \.git/worktrees/([^/]+)$ ]]; then
+            worktree_name="''${BASH_REMATCH[1]}"
+            # Format: [worktree: name]
+            worktree_info="[worktree: $worktree_name] "
+          fi
+        fi
+
+        # If we have worktree info, display it before the powerline output
+        if [[ -n "$worktree_info" ]]; then
+          echo -e "\033[1;36m$worktree_info\033[0m"
+        fi
+
+        # Run claude-powerline with config
         ${claude-powerline-pkg}/bin/claude-powerline --config=${configFile} "$@"
       '';
     };
