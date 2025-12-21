@@ -172,13 +172,10 @@ in
       # Provides rollback capability for recent changes while cleaning old builds
       options = "--delete-older-than 30d";
     };
-
-    # Additional Nix settings for garbage collection behavior
-    settings = {
-      # Automatically optimize store (hard-link identical files) during GC
-      auto-optimise-store = true;
-    };
   };
+
+  # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
+  environment.etc."nix/conf.d/gc.conf".text = "auto-optimise-store = true";
 
   # Disable documentation to suppress builtins.toFile warnings
   documentation.enable = false;
