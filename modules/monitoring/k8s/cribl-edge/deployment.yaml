@@ -87,15 +87,15 @@ spec:
         # OrbStack mounts macOS paths automatically
         - name: claude-logs
           hostPath:
-            path: /Users/jevans/.claude/logs
+            path: "@homeDir@/.claude/logs"
             type: DirectoryOrCreate
         - name: ollama-logs
           hostPath:
-            path: /Users/jevans/Library/Logs/Ollama
+            path: "@homeDir@/Library/Logs/Ollama"
             type: DirectoryOrCreate
         - name: terminal-logs
           hostPath:
-            path: /Users/jevans/logs
+            path: "@homeDir@/logs"
             type: DirectoryOrCreate
         - name: cribl-data
           emptyDir: {}

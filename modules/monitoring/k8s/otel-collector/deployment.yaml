@@ -73,5 +73,5 @@ spec:
         # Path: /Users/<username>/.claude/logs
         - name: claude-logs
           hostPath:
-            path: /Users/jevans/.claude/logs
+            path: "@homeDir@/.claude/logs"
             type: DirectoryOrCreate

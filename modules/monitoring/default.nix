@@ -79,14 +79,19 @@ in
         ".config/monitoring/k8s/namespace.yaml".source = ./k8s/namespace.yaml;
         ".config/monitoring/k8s/kustomization.yaml".source = ./k8s/kustomization.yaml;
 
-        # OTEL Collector manifests
-        ".config/monitoring/k8s/otel-collector/deployment.yaml".source =
-          ./k8s/otel-collector/deployment.yaml;
+        # OTEL Collector manifests (substitute homeDir for hostPath volumes)
+        ".config/monitoring/k8s/otel-collector/deployment.yaml".source = pkgs.substituteAll {
+          src = ./k8s/otel-collector/deployment.yaml;
+          homeDir = config.home.homeDirectory;
+        };
         ".config/monitoring/k8s/otel-collector/configmap.yaml".source = ./k8s/otel-collector/configmap.yaml;
         ".config/monitoring/k8s/otel-collector/service.yaml".source = ./k8s/otel-collector/service.yaml;
 
-        # Cribl Edge manifests
-        ".config/monitoring/k8s/cribl-edge/deployment.yaml".source = ./k8s/cribl-edge/deployment.yaml;
+        # Cribl Edge manifests (substitute homeDir for hostPath volumes)
+        ".config/monitoring/k8s/cribl-edge/deployment.yaml".source = pkgs.substituteAll {
+          src = ./k8s/cribl-edge/deployment.yaml;
+          homeDir = config.home.homeDirectory;
+        };
         ".config/monitoring/k8s/cribl-edge/service.yaml".source = ./k8s/cribl-edge/service.yaml;
 
         # Splunk manifests
