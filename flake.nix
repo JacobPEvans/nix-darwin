@@ -175,12 +175,15 @@
               # mac-app-util: Also needed for home.packages if any GUI apps there
               # Agent OS: Proper home-manager module for spec-driven AI development
               # Claude: Unified configuration for Claude Code ecosystem
-              # nix-config-symlink: Read-only ~/.config/nix pointing to main branch
+              # Monitoring: K8s-based observability stack (OTEL, Cribl, Splunk)
+              # Note: nix-config-symlink module intentionally removed.
+              # It conflicted with ~/.config/nix being a git worktree.
+              # See PLANNING-monitoring.md for details.
               sharedModules = [
                 mac-app-util.homeManagerModules.default
                 ./modules/home-manager/ai-cli/agent-os
                 ./modules/home-manager/ai-cli/claude
-                ./modules/home-manager/nix-config-symlink.nix
+                ./modules/monitoring
               ];
             };
           }

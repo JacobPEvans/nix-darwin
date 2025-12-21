@@ -405,6 +405,37 @@ def cmd_run_completed(args):
     return 0
 
 
+def blocks_run_skipped(repo: str, reason: str) -> tuple[list, str]:
+    """Create blocks for run skipped notification."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": "⏭️ Auto-Claude Run Skipped", "emoji": True},
+        },
+        {
+            "type": "section",
+            "fields": [
+                {"type": "mrkdwn", "text": f"*Repository:*\n{escape_markdown(repo)}"},
+                {"type": "mrkdwn", "text": f"*Time:*\n{timestamp}"},
+            ],
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Reason:*\n{escape_markdown(reason)}"},
+        },
+    ]
+    return blocks, f"Auto-Claude run skipped for {repo}: {reason}"
+
+
+def cmd_run_skipped(args):
+    """Handle run_skipped event."""
+    token = get_slack_token()
+    blocks, text = blocks_run_skipped(args.repo, args.reason)
+    result = post_message(token, args.channel, blocks, text)
+    return 0 if result else 1
+
+
 def main():
     parser = argparse.ArgumentParser(description="Auto-Claude Slack Notifier")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -455,6 +486,13 @@ def main():
     p_complete.add_argument("--run-id", help="Run ID for parent update")
     p_complete.add_argument("--log-file", help="Path to JSONL log file")
     p_complete.set_defaults(func=cmd_run_completed)
+
+    # run_skipped
+    p_skipped = subparsers.add_parser("run_skipped", help="Notify run skipped")
+    p_skipped.add_argument("--repo", required=True, help="Repository name")
+    p_skipped.add_argument("--reason", required=True, help="Skip reason")
+    p_skipped.add_argument("--channel", required=True, help="Slack channel ID")
+    p_skipped.set_defaults(func=cmd_run_skipped)
 
     args = parser.parse_args()
     return args.func(args)

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cribl-stream
+  namespace: monitoring
+  labels:
+    app: cribl-stream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cribl-stream
+  template:
+    metadata:
+      labels:
+        app: cribl-stream
+    spec:
+      containers:
+        - name: cribl-stream
+          image: cribl/cribl:latest
+          ports:
+            - name: api
+              containerPort: 9000
+              protocol: TCP
+            - name: inputs
+              containerPort: 10080
+              protocol: TCP
+            - name: leader
+              containerPort: 4200
+              protocol: TCP
+          env:
+            # Leader mode for single-instance Stream
+            - name: CRIBL_DIST_MODE
+              value: "master"
+            # Default admin credentials (change after first login)
+            - name: CRIBL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cribl-stream-admin
+                  key: password
+                  optional: true
+          volumeMounts:
+            - name: cribl-data
+              mountPath: /opt/cribl/data
+            - name: cribl-state
+              mountPath: /opt/cribl/state
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 9000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+      volumes:
+        - name: cribl-data
+          emptyDir: {}
+        - name: cribl-state
+          emptyDir: {}
