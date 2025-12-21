@@ -14,5 +14,5 @@ spec:
     - name: ui
       port: 9000
       targetPort: 9000
-      nodePort: 30900
+      nodePort: 30901  # Changed from 30900 to avoid conflict with cribl-stream-ui
       protocol: TCP

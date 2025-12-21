@@ -194,10 +194,17 @@ notify_skipped() {
       --reason "$reason" \
       --channel "$SLACK_CHANNEL" 2>/dev/null || true
   fi
-  # Also emit structured event
+  # Also emit structured event (using jq for proper JSON escaping)
   local timestamp=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
   local run_id=$(date "+%Y%m%d_%H%M%S")
-  echo "{\"event\":\"run_skipped\",\"timestamp\":\"$timestamp\",\"run_id\":\"$run_id\",\"repo\":\"$REPO_NAME\",\"reason\":\"$reason\"}" >> "${HOME}/.claude/logs/events.jsonl"
+  jq -n \
+    --arg event "run_skipped" \
+    --arg timestamp "$timestamp" \
+    --arg run_id "$run_id" \
+    --arg repo "$REPO_NAME" \
+    --arg reason "$reason" \
+    '{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo, reason: $reason}' \
+    >> "${HOME}/.claude/logs/events.jsonl"
 }
 
 # --- CONTROL FILE CHECK ---

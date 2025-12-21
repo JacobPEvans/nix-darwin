@@ -108,10 +108,10 @@ if (baseline) {
   }
 }
 
-// Update baseline
+// Update baseline (simple moving average)
 C.State.set('baseline_' + __e.repo, {
-  avg_cost: (baseline?.avg_cost || __e.total_cost + __e.total_cost) / 2,
-  avg_duration: (baseline?.avg_duration || __e.duration_minutes + __e.duration_minutes) / 2
+  avg_cost: baseline ? (baseline.avg_cost + __e.total_cost) / 2 : __e.total_cost,
+  avg_duration: baseline ? (baseline.avg_duration + __e.duration_minutes) / 2 : __e.duration_minutes
 });
 ```
 

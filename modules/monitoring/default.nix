@@ -110,10 +110,7 @@ in
 
         echo "Deploying monitoring stack to context: $CONTEXT"
 
-        # Apply namespace first
-        kubectl --context "$CONTEXT" apply -f "$MANIFEST_DIR/namespace.yaml"
-
-        # Apply all resources via kustomization
+        # Apply all resources via kustomization (includes namespace.yaml)
         kubectl --context "$CONTEXT" apply -k "$MANIFEST_DIR"
 
         echo "Monitoring stack deployed to namespace: $NAMESPACE"
