@@ -79,6 +79,28 @@ in
       "git push --force origin master"
       "git push -f origin main"
       "git push -f origin master"
+      "git -C"
+    ];
+
+    gitHookBypasses = [
+      "git commit --no-verify"
+      "git commit -n"
+      "git merge --no-verify"
+      "git cherry-pick --no-verify"
+      "git rebase --no-verify"
+      "git config core.hooksPath"
+      "git -c core.hooksPath"
+      "pre-commit uninstall"
+      "rm .git/hooks"
+      "rm -rf .git/hooks"
+      "rm .git/hooks/"
+      "rm -rf .git/hooks/"
+      "chmod -x .git/hooks/"
+    ];
+
+    shellDangerous = [
+      "xargs"
+      "for "
     ];
   };
 
@@ -112,12 +134,66 @@ in
       "WebFetchTool"
     ];
 
-    claude.core = [
-      "Read"
-      "Glob"
-      "Grep"
-      "WebFetch"
-      "WebSearch"
-    ];
+    claude = {
+      # Core tools with glob patterns
+      core = [
+        "Read(**)"
+        "Glob(**)"
+        "Grep(**)"
+        "WebSearch"
+        "TodoWrite"
+        "TodoRead"
+        "SlashCommand(**)"
+      ];
+
+      # WebFetch with allowed domains
+      webFetch = [
+        "WebFetch(domain:github.com)"
+        "WebFetch(domain:githubusercontent.com)"
+        "WebFetch(domain:anthropic.com)"
+        "WebFetch(domain:nixos.org)"
+        "WebFetch(domain:hashicorp.com)"
+        "WebFetch(domain:terraform.io)"
+        "WebFetch(domain:geminicli.com)"
+        "WebFetch(domain:google.dev)"
+        "WebFetch(domain:npmjs.com)"
+        "WebFetch(domain:docker.com)"
+        "WebFetch(domain:kubernetes.io)"
+        "WebFetch(domain:python.org)"
+        "WebFetch(domain:pypi.org)"
+        "WebFetch(domain:readthedocs.io)"
+        "WebFetch(domain:rust-lang.org)"
+        "WebFetch(domain:typescriptlang.org)"
+        "WebFetch(domain:stackoverflow.com)"
+        "WebFetch(domain:mozilla.org)"
+        "WebFetch(domain:openai.com)"
+        "WebFetch(domain:raycast.com)"
+        "WebFetch(domain:apple.com)"
+        "WebFetch(domain:google.com)"
+        "WebFetch(domain:github.io)"
+      ];
+
+      # Special read patterns
+      read = [
+        "Read(//nix/store/**)"
+      ];
+
+      # Deny patterns for sensitive files (Claude-specific Read tool)
+      denyRead = [
+        "Read(.env)"
+        "Read(.env.*)"
+        "Read(**/.env)"
+        "Read(**/.env.*)"
+        "Read(**/secrets/**)"
+        "Read(**/credentials/**)"
+        "Read(**/*_rsa)"
+        "Read(**/*_dsa)"
+        "Read(**/*_ecdsa)"
+        "Read(**/*_ed25519)"
+        "Read(~/.ssh/id_*)"
+        "Read(~/.aws/credentials)"
+        "Read(~/.gnupg/**)"
+      ];
+    };
   };
 }

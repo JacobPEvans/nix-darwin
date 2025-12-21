@@ -43,24 +43,44 @@ in
     # Format a list of shell commands
     formatShellCommands = cmds: map (cmd: "Bash(${cmd}:*)") cmds;
 
-    # Format all allowed commands from permissions
+    # Format all allowed commands from permissions (shell + tool-specific)
     formatAllowed =
       permissions:
       let
         allCommands = flattenCommands permissions.allow;
+        shellPermissions = map (cmd: "Bash(${cmd}:*)") allCommands;
+        claudePerms = permissions.toolSpecific.claude or { };
+        toolPermissions =
+          (claudePerms.core or [ ]) ++ (claudePerms.webFetch or [ ]) ++ (claudePerms.read or [ ]);
       in
-      map (cmd: "Bash(${cmd}:*)") allCommands;
+      toolPermissions ++ shellPermissions;
 
-    # Format all denied commands
+    # Format all denied commands (shell + tool-specific)
     formatDenied =
       permissions:
       let
         allCommands = flattenCommands permissions.deny;
+        shellDenied = map (cmd: "Bash(${cmd}:*)") allCommands;
+        claudePerms = permissions.toolSpecific.claude or { };
+        toolDenied = claudePerms.denyRead or [ ];
       in
-      map (cmd: "Bash(${cmd}:*)") allCommands;
+      toolDenied ++ shellDenied;
 
-    # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.claude.core or [ ];
+    # Get all tool-specific permissions (non-shell) - for backwards compatibility
+    getToolPermissions =
+      permissions:
+      let
+        claudePerms = permissions.toolSpecific.claude or { };
+      in
+      (claudePerms.core or [ ]) ++ (claudePerms.webFetch or [ ]) ++ (claudePerms.read or [ ]);
+
+    # Get tool-specific deny permissions
+    getDenyPermissions =
+      permissions:
+      let
+        claudePerms = permissions.toolSpecific.claude or { };
+      in
+      claudePerms.denyRead or [ ];
   };
 
   # ============================================================================

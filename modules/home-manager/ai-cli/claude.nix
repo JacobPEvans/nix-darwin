@@ -8,9 +8,9 @@
 # 2. settings.local.json remains WRITABLE - for interactive "accept indefinitely"
 # 3. Claude merges both: local overrides base
 #
-# Permissions: Read from JSON in ai-assistant-instructions repo
-# - Centralized, portable permission definitions
-# - Single source of truth across projects
+# Permissions: Generated from unified ai-cli/common/permissions.nix
+# - Single source of truth for all AI CLI tools (Claude, Gemini, Copilot)
+# - Tool-specific formatting via ai-cli/common/formatters.nix
 #
 # Validation: CI validates generated settings via validate-claude-settings.yml
 #
@@ -24,6 +24,7 @@
 #
 # Migration Notes:
 # - Removed: "commit" - replaced by commit-commands plugin (/commit)
+# - Migrated: permissions from JSON to unified Nix definitions (2024-12)
 
 {
   config,
@@ -41,33 +42,11 @@ let
   # User configuration
   userConfig = import ../../../lib/user-config.nix;
 
-  # Read permissions from JSON files in ai-assistant-instructions
-  # These are read at Nix evaluation time from the flake input
-  #
-  # Expected JSON structure for each file:
-  # {
-  #   "permissions": [
-  #     "PermissionPattern1",
-  #     "PermissionPattern2",
-  #     ...
-  #   ]
-  # }
-  #
-  # If the file is missing, malformed, or lacks the "permissions" key,
-  # Nix evaluation will fail with a descriptive error.
-  readPermissionsJson =
-    path:
-    let
-      json = builtins.fromJSON (builtins.readFile path);
-    in
-    if builtins.isAttrs json && json ? permissions then
-      json
-    else
-      builtins.throw "Invalid permissions JSON at ${path}: must contain a 'permissions' key";
-
-  claudeAllowJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/allow.json";
-  claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
-  claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
+  # Import unified permissions from wrapper modules
+  # These use ai-cli/common/permissions.nix as single source of truth
+  claudeAllow = import ../permissions/claude-permissions-allow.nix { inherit config lib; };
+  claudeDeny = import ../permissions/claude-permissions-deny.nix { inherit config lib; };
+  claudeAsk = import ../permissions/claude-permissions-ask.nix { inherit config lib; };
 
   # Import plugin configuration (official Anthropic repos)
   claudePlugins = import ./claude-plugins.nix {
@@ -90,9 +69,9 @@ let
     homeDir = config.home.homeDirectory;
     schemaUrl = userConfig.ai.claudeSchemaUrl;
     permissions = {
-      allow = claudeAllowJson.permissions;
-      deny = claudeDenyJson.permissions;
-      ask = claudeAskJson.permissions;
+      allow = claudeAllow.allow;
+      deny = claudeDeny.deny;
+      ask = claudeAsk.ask;
     };
     plugins = claudePlugins.pluginConfig;
   };
