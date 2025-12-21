@@ -141,10 +141,6 @@ All plugins are from the `anthropics/claude-code` marketplace:
 - **explanatory-output-style** - Educational insights hook
 - **learning-output-style** - Interactive learning mode
 
-#### Migration Tools
-
-- **claude-opus-4-5-migration** - Model migration skill
-
 #### Experimental
 
 - **ralph-wiggum** - Autonomous iteration loops (commented out by default)
