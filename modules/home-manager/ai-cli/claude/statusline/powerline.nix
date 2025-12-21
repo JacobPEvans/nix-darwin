@@ -8,7 +8,7 @@
 # - 5-hour billing block tracking with reset timer
 # - Session and daily cost tracking
 # - Full directory path display
-# - Git info (branch, SHA, stash count)
+# - Git info (branch, worktree, SHA, stash count, upstream)
 # - Context window usage
 # - 6 customizable color themes
 #
@@ -60,7 +60,7 @@ let
   themeName = themeMap.${powerlineStyle} or "dark";
 
   # Rich multi-line configuration for claude-powerline
-  # Displays: directory, git, model, session costs, 5-hour block, daily usage, context
+  # Displays: directory, git (branch, worktree, SHA, stash, upstream), model, session costs, 5-hour block, daily usage, context
   powerlineConfig = {
     theme = themeName;
     style = "powerline";
@@ -68,7 +68,7 @@ let
 
     display = {
       lines = [
-        # Line 1: Directory (full path), Git info, Model
+        # Line 1: Directory (full path), Git info (branch, worktree, SHA, stash, upstream), Model
         {
           segments = {
             directory = {
@@ -77,6 +77,8 @@ let
             };
             git = {
               enabled = true;
+              showBranch = true; # Always show current branch
+              showWorktree = true; # Show worktree name/path when in a worktree
               showSha = true;
               showStash = true;
               showUpstream = true;
