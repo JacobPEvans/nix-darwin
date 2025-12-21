@@ -160,7 +160,7 @@ in
     # Removes old Nix store generations to free disk space without manual intervention
     gc = {
       # Enable automatic garbage collection via launchd
-      automatic = true;
+      automatic = false;
 
       # Run weekly (every 7 days) - balances disk space with keeping recent builds
       # Alternative: "daily" for more aggressive cleanup

@@ -24,12 +24,13 @@
 {
   config,
   lib,
+  ai-assistant-instructions,
   ...
 }:
 
 let
   # Import unified permissions and formatters
-  aiCommon = import ../ai-cli/common { inherit lib config; };
+  aiCommon = import ../ai-cli/common { inherit lib config ai-assistant-instructions; };
   inherit (aiCommon) permissions formatters;
 
 in
