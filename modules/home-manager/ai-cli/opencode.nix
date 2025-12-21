@@ -24,10 +24,6 @@
 }:
 
 let
-  # Import unified permission definitions
-  permissions = import ./common/permissions.nix { inherit lib config; };
-  formatters = import ./common/formatters.nix { inherit lib; };
-
   # OpenCode settings object
   settings = {
     # UI configuration
@@ -40,8 +36,7 @@ let
     };
 
     # TODO: Add shared permissions once OpenCode permission format is determined
-    # The formatters.opencode placeholder exists but needs implementation
-    # based on OpenCode's actual permission syntax
+    # Will use common/permissions.nix and common/formatters.nix when needed
   };
 
   # Generate pretty-printed JSON using a derivation with jq
