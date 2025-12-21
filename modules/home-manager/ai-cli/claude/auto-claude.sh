@@ -245,56 +245,33 @@ emit_event() {
   shift
   local timestamp=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
 
-  # Use jq if available for proper JSON encoding (safer)
-  if command -v jq &> /dev/null; then
-    local -a jq_args=(
-      -n
-      --arg event "$event_type"
-      --arg timestamp "$timestamp"
-      --arg run_id "$RUN_ID"
-      --arg repo "$REPO_NAME"
-    )
+  # Use jq for proper JSON encoding (required by script dependency check)
+  local -a jq_args=(
+    -n
+    --arg event "$event_type"
+    --arg timestamp "$timestamp"
+    --arg run_id "$RUN_ID"
+    --arg repo "$REPO_NAME"
+  )
 
-    local jq_filter='{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo}'
+  local jq_filter='{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo}'
 
-    while [[ $# -ge 2 ]]; do
-      local key="$1"
-      local value="$2"
-      if [[ "$value" =~ ^[0-9]+\.?[0-9]*$ ]]; then
-        jq_args+=(--argjson "$key" "$value")
-      else
-        jq_args+=(--arg "$key" "$value")
-      fi
-      jq_filter+=" + {\"$key\": \$$key}"
-      shift 2
-    done
+  while [[ $# -ge 2 ]]; do
+    local key="$1"
+    local value="$2"
+    if [[ "$value" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+      jq_args+=(--argjson "$key" "$value")
+    else
+      jq_args+=(--arg "$key" "$value")
+    fi
+    jq_filter+=" + {\"$key\": \$$key}"
+    shift 2
+  done
 
-    local event_json
-    event_json=$(jq "${jq_args[@]}" "$jq_filter")
-    echo "$event_json" >> "$EVENTS_LOG"
-    echo "$event_json"
-  else
-    # Fallback: basic JSON construction (less robust)
-    echo "Warning: 'jq' not found. Using basic JSON construction." >&2
-    local event_json="{\"event\":\"$event_type\",\"timestamp\":\"$timestamp\",\"run_id\":\"$RUN_ID\",\"repo\":\"$REPO_NAME\""
-
-    while [[ $# -ge 2 ]]; do
-      local key="$1"
-      local value="$2"
-      if [[ "$value" =~ ^[0-9]+\.?[0-9]*$ ]]; then
-        event_json="$event_json,\"$key\":$value"
-      else
-        # Basic escaping (not fully robust)
-        value="${value//\"/\\\"}"
-        event_json="$event_json,\"$key\":\"$value\""
-      fi
-      shift 2
-    done
-
-    event_json="$event_json}"
-    echo "$event_json" >> "$EVENTS_LOG"
-    echo "$event_json"
-  fi
+  local event_json
+  event_json=$(jq "${jq_args[@]}" "$jq_filter")
+  echo "$event_json" >> "$EVENTS_LOG"
+  echo "$event_json"
 }
 
 # --- SCRIPT PATHS ---

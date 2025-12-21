@@ -18,6 +18,15 @@
   # Host-Specific Home Settings
   # ==========================================================================
   # Settings unique to this machine's user environment
+
+  # Enable monitoring infrastructure (K8s manifests, helper scripts)
+  monitoring = {
+    enable = true;
+    kubernetes.enable = true;
+    otel.enable = true;
+    cribl.enable = true;
+  };
+
   home = {
     # ========================================================================
     # TCC-Sensitive GUI Applications (require proper trampolines)
