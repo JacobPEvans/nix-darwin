@@ -10,6 +10,7 @@ in
   imports = [
     ./apps
     ./dock
+    ./file-extensions.nix
     ./finder.nix
     ./keyboard.nix
     ./security.nix
