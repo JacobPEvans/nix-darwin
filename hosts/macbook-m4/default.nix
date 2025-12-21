@@ -37,11 +37,18 @@ in
   # ==========================================================================
   # OrbStack Configuration
   # ==========================================================================
-  # Container runtime with dedicated APFS volume for data storage
-  # Data symlink configured in home.nix using mkOutOfStoreSymlink
+  # Container runtime as system-level application
+  # - System-wide installation via nix-darwin
+  # - Dedicated APFS volume for data storage
+  # - Data symlink configured in home.nix using mkOutOfStoreSymlink
+  #
+  # NOTE: package.enable = true installs OrbStack system-wide
+  # TCC permissions (Docker/Linux VM access) may need re-granting after rebuilds
+  # For TCC stability, set package.enable = false and add to home.packages instead
 
   programs.orbstack = {
     enable = true;
+    package.enable = true; # Install system-wide (machine-level service)
     dataVolume = {
       enable = true;
       name = "ContainerData";
