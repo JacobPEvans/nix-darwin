@@ -32,31 +32,26 @@
     NIX_CONFIG_PATH="$HOME/.config/nix"
     NIX_CONFIG_TARGET="$HOME/git/nix-config/main"
 
-    # If target doesn't exist, skip (will be created by user's worktree setup)
+    # CRITICAL: Never use "exit" in activation scripts - it kills the ENTIRE activation!
+    # Use if/elif/else control flow instead.
+
     if [ ! -d "$NIX_CONFIG_TARGET" ]; then
+      # Target doesn't exist yet, skip (will be created by user's worktree setup)
       echo "WARNING: $NIX_CONFIG_TARGET does not exist yet."
       echo "After initializing your worktrees, run: sudo darwin-rebuild switch"
-      exit 0
-    fi
-
-    # Check if ~/.config/nix exists and is not pointing to the right place
-    if [ -e "$NIX_CONFIG_PATH" ] || [ -L "$NIX_CONFIG_PATH" ]; then
-      # If it's a symlink, check if it points to the right place
-      if [ -L "$NIX_CONFIG_PATH" ]; then
-        CURRENT_TARGET=$(readlink "$NIX_CONFIG_PATH")
-        if [ "$CURRENT_TARGET" = "$NIX_CONFIG_TARGET" ]; then
-          # Already points to the right place, nothing to do
-          exit 0
-        fi
+    elif [ -L "$NIX_CONFIG_PATH" ] && [ "$(readlink "$NIX_CONFIG_PATH")" = "$NIX_CONFIG_TARGET" ]; then
+      # Already points to the right place, nothing to do
+      true
+    else
+      # Need to create or fix the symlink
+      if [ -e "$NIX_CONFIG_PATH" ] || [ -L "$NIX_CONFIG_PATH" ]; then
+        # Backup existing file/symlink before replacing
+        echo "Backing up existing ~/.config/nix"
+        mv "$NIX_CONFIG_PATH" "$NIX_CONFIG_PATH.backup.$(date +%Y%m%d_%H%M%S)"
       fi
-
-      # Either it's not a symlink, or it points to the wrong place
-      echo "Backing up existing ~/.config/nix"
-      mv "$NIX_CONFIG_PATH" "$NIX_CONFIG_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+      # Create symlink
+      ln -s "$NIX_CONFIG_TARGET" "$NIX_CONFIG_PATH"
+      echo "Created symlink: $NIX_CONFIG_PATH -> $NIX_CONFIG_TARGET"
     fi
-
-    # Create symlink
-    ln -s "$NIX_CONFIG_TARGET" "$NIX_CONFIG_PATH"
-    echo "Created symlink: $NIX_CONFIG_PATH -> $NIX_CONFIG_TARGET"
   '';
 }
