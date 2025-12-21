@@ -308,7 +308,7 @@ cmd_schedule() {
     local schedule="["
     local first=true
     for time in "$@"; do
-      if [[ ! "$time" =~ '^([0-9]+):([0-9]+)$' ]]; then
+      if [[ ! "$time" =~ ^([0-9]+):([0-9]+)$ ]]; then
         echo "Error: Invalid time format '$time'. Use H:MM or HH:MM (e.g., 9:30 or 14:00)" >&2
         exit 1
       fi
