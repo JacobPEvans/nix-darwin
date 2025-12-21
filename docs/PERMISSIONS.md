@@ -16,7 +16,7 @@ All AI CLI tools use a Nix-managed permission system with the following philosop
 | Feature | Claude Code | Gemini CLI | Copilot CLI | VS Code Copilot |
 |---------|-------------|------------|-------------|-----------------|
 | **Config file** | `.claude/settings.json` | `.gemini/settings.json` | `.copilot/config.json` | VS Code `settings.json` |
-| **Permission model** | allow/ask/deny lists | coreTools/excludeTools | trusted_folders + flags | settings-based |
+| **Permission model** | allow/ask/deny lists | tools.allowed/tools.exclude | trusted_folders + flags | settings-based |
 | **Command format** | `Bash(cmd:*)` | `ShellTool(cmd)` | `shell(cmd)` patterns | N/A (editor-based) |
 | **Runtime control** | settings.local.json | settings.json | CLI flags | VS Code UI |
 | **Nix source** | `ai-assistant-instructions` | `permissions/gemini-*.nix` | `permissions/copilot-*.nix` | `vscode/copilot-settings.nix` |
@@ -113,7 +113,19 @@ See `.claude/permissions/deny.json`:
 
 ## Gemini CLI
 
-**Strategy**: Nix-managed configuration using coreTools and excludeTools
+**Strategy**: Nix-managed configuration using tools.allowed and tools.exclude
+
+### CRITICAL: tools.allowed vs tools.core
+
+Per the official Gemini CLI schema:
+
+- `tools.allowed` = "Tool names that bypass the confirmation dialog" (**AUTO-APPROVE**)
+- `tools.core` = "Allowlist to RESTRICT built-in tools to a specific set" (**LIMITS** usage!)
+
+**NEVER use tools.core for auto-approval!** Using `tools.core` restricts what tools Gemini can use.
+Always use `tools.allowed` for commands you want to auto-approve.
+
+Schema reference: <https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json>
 
 ### Configuration
 
@@ -121,9 +133,9 @@ See `.claude/permissions/deny.json`:
 
 **Permission files** (`modules/home-manager/permissions/`):
 
-- `gemini-permissions-allow.nix` - coreTools (allowed commands)
+- `gemini-permissions-allow.nix` - allowedTools (auto-approved commands → tools.allowed)
 - `gemini-permissions-ask.nix` - Reference only (Gemini has no ask mode)
-- `gemini-permissions-deny.nix` - excludeTools (permanently blocked)
+- `gemini-permissions-deny.nix` - excludeTools (permanently blocked → tools.exclude)
 
 ### Permission Model
 
@@ -136,9 +148,12 @@ See `.claude/permissions/deny.json`:
 ### Adding Commands
 
 1. Edit appropriate file in `modules/home-manager/permissions/`
-2. Add to `coreTools` (allow) or `excludeTools` (deny)
+2. Add to `allowedTools` (auto-approve) or `excludeTools` (block)
 3. Use format: `ShellTool(command)` for shell commands
 4. Commit and rebuild
+
+**IMPORTANT**: The Nix attribute `allowedTools` maps to `tools.allowed` in settings.json.
+Never rename it to `coreTools` - that would break auto-approval!
 
 ### Security Notes
 

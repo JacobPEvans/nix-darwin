@@ -94,7 +94,14 @@ in
     # Permissions: Now read from JSON in ai-assistant-instructions repo
     # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
     # NOTE: claudeFiles removed - now handled by programs.claude module
-    file = npmFiles // awsFiles // geminiFiles // copilotFiles // agentsMdSymlinks // gitHooks // gitMergeDrivers;
+    file =
+      npmFiles
+      // awsFiles
+      // geminiFiles
+      // copilotFiles
+      // agentsMdSymlinks
+      // gitHooks
+      // gitMergeDrivers;
 
     # Claude Code Settings Validation (post-rebuild)
     # Validates settings.json against JSON Schema after home files are written

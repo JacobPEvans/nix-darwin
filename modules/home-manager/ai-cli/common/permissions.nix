@@ -103,16 +103,21 @@ in
     home = [ homeDir ];
   };
 
-  # Tool-specific identifiers (non-shell)
+  # Tool-specific identifiers (non-shell, built-in tools)
+  # NOTE: These are BUILT-IN tools (like ReadFileTool), not shell commands.
+  # The attribute names here (builtin) refer to the tool's built-in capabilities,
+  # not to be confused with the JSON key "tools.core" which restricts tool usage.
   toolSpecific = {
-    gemini.core = [
+    # Gemini built-in tools (non-shell) - maps to tools.allowed, NOT tools.core
+    gemini.builtin = [
       "ReadFileTool"
       "GlobTool"
       "GrepTool"
       "WebFetchTool"
     ];
 
-    claude.core = [
+    # Claude built-in tools (non-shell)
+    claude.builtin = [
       "Read"
       "Glob"
       "Grep"

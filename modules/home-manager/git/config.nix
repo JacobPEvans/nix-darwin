@@ -2,7 +2,11 @@
 #
 # Programs.git settings for home-manager.
 # Imported by common.nix
-{ config, userConfig, gitAliases }:
+{
+  config,
+  userConfig,
+  gitAliases,
+}:
 
 {
   enable = true;
