@@ -22,7 +22,7 @@
   ll = "ls -ahlFG -D '%Y-%m-%d %H:%M:%S'";
   llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'"; # sorted by time
   lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'"; # show size
-  "ll@" = "ls -la@"; # show extended attributes (macOS)
+  "ll@" = "ls -@ahlFG -D '%Y-%m-%d %H:%M:%S'"; # show extended attributes (macOS)
 
   # ===========================================================================
   # Docker (no sudo needed - user in docker group)
