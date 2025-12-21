@@ -11,7 +11,12 @@
 #
 # Reference: https://github.com/moretension/duti
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -20,7 +25,8 @@ let
 
   # Convert extension mapping to duti command
   # Example: { extension = "spl"; uti = "public.tar-archive"; } -> duti command
-  associationToDutiCommand = assoc:
+  associationToDutiCommand =
+    assoc:
     let
       # Use Archive Utility as the default handler for archives
       # This is the built-in macOS app that handles .tar.gz files
@@ -50,28 +56,30 @@ in
     };
 
     customExtensions = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          extension = mkOption {
-            type = types.str;
-            description = "File extension (without leading dot)";
-            example = "spl";
-          };
+      type = types.listOf (
+        types.submodule {
+          options = {
+            extension = mkOption {
+              type = types.str;
+              description = "File extension (without leading dot)";
+              example = "spl";
+            };
 
-          uti = mkOption {
-            type = types.str;
-            description = "Uniform Type Identifier for the file type";
-            example = "public.tar-archive";
-          };
+            uti = mkOption {
+              type = types.str;
+              description = "Uniform Type Identifier for the file type";
+              example = "public.tar-archive";
+            };
 
-          description = mkOption {
-            type = types.str;
-            default = "";
-            description = "Human-readable description of the file type";
-            example = "Splunk archive";
+            description = mkOption {
+              type = types.str;
+              default = "";
+              description = "Human-readable description of the file type";
+              example = "Splunk archive";
+            };
           };
-        };
-      });
+        }
+      );
 
       default = [
         {
@@ -135,7 +143,8 @@ in
     system.activationScripts.postActivation.text = mkAfter ''
       echo ""
       echo "File associations configured for:"
-      ${concatMapStringsSep "\n" (assoc:
+      ${concatMapStringsSep "\n" (
+        assoc:
         ''echo "  - .${assoc.extension} → ${assoc.uti}${
           optionalString (assoc.description != "") " (${assoc.description})"
         }"''
