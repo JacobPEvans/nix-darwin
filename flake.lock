@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1766239923,
-        "narHash": "sha256-VXd13XM5YQ7hmcy6lV0t2d+8F43hr6323+oTBAdv31w=",
+        "lastModified": 1766251138,
+        "narHash": "sha256-8YshmJwsbCYLV++eIMjQfJScQnKZvGTTC4WBHfgR3Dg=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "b1bba5c89da1368024bbca32e0f3bd7c65b204d8",
+        "rev": "ec96d871bccf1cd86bcab714d9ad7139dd82853b",
         "type": "github"
       },
       "original": {
