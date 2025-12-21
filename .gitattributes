@@ -1,0 +1,6 @@
+# Git attributes for nix-config repository
+
+# flake.lock - auto-regenerate on merge conflict
+# Uses custom merge driver defined in git config (merge.flakelock.driver)
+# Driver runs: nix flake lock --no-update-lock-file
+flake.lock merge=flakelock

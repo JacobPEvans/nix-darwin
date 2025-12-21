@@ -60,7 +60,7 @@ in
       map (cmd: "Bash(${cmd}:*)") allCommands;
 
     # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.claude.core or [ ];
+    getToolPermissions = permissions: permissions.toolSpecific.claude.builtin or [ ];
   };
 
   # ============================================================================
@@ -68,6 +68,16 @@ in
   # ============================================================================
   # Format: ShellTool(cmd) for shell commands
   # No wildcard suffix - exact command match or prefix match
+  #
+  # CRITICAL - tools.allowed vs tools.core in settings.json:
+  # =========================================================
+  # Per the official Gemini CLI schema:
+  # - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
+  # - tools.core = "Allowlist to RESTRICT built-in tools to a specific set" (LIMITS usage!)
+  #
+  # This formatter provides formatAllowedTools for the "allowed" key.
+  # NEVER use formatAllowedTools output for "core" - that would break permissions!
+  # Schema: https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json
 
   gemini = {
     # Format a single shell command for Gemini
@@ -76,15 +86,17 @@ in
     # Format a list of shell commands
     formatShellCommands = cmds: map (cmd: "ShellTool(${cmd})") cmds;
 
-    # Format all allowed commands (coreTools)
-    formatCoreTools =
+    # Format all auto-approved commands for tools.allowed (NOT tools.core!)
+    # Output goes to settings.json "tools.allowed" to bypass confirmation dialog
+    formatAllowedTools =
       permissions:
       let
         allCommands = flattenCommands permissions.allow;
         shellTools = map (cmd: "ShellTool(${cmd})") allCommands;
-        coreTools = permissions.toolSpecific.gemini.core or [ ];
+        # Built-in Gemini tools (ReadFileTool, etc.) from permissions.nix
+        builtinTools = permissions.toolSpecific.gemini.builtin or [ ];
       in
-      coreTools ++ shellTools;
+      builtinTools ++ shellTools;
 
     # Format all denied commands (excludeTools)
     formatExcludeTools =
@@ -95,7 +107,7 @@ in
       map (cmd: "ShellTool(${cmd})") allCommands;
 
     # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.gemini.core or [ ];
+    getToolPermissions = permissions: permissions.toolSpecific.gemini.builtin or [ ];
   };
 
   # ============================================================================

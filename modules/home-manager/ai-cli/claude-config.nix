@@ -30,39 +30,27 @@ let
   claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
   claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
+  # Dynamic command discovery from flake inputs
+  # No more hardcoded lists - discovers all .md files automatically
+  discoverCommands =
+    dir:
+    let
+      files = if builtins.pathExists dir then builtins.readDir dir else { };
+      mdFiles = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name) files;
+    in
+    map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
+
   # Commands from agentsmd (Nix store / flake input)
-  # Located in .claude/commands/
-  # Note: "commit" removed - use /commit from commit-commands plugin instead
-  agentsMdCommands = [
-    "fix-all-pr-ci"
-    "generate-code"
-    "git-refresh"
-    "infrastructure-review"
-    "init-change"
-    "init-worktree"
-    "pr"
-    "pr-review-feedback"
-    "quick-add-permission"
-    "review-code"
-    "review-docs"
-    "rok-resolve-issues"
-    "rok-resolve-pr-review-thread"
-    "rok-review-pr"
-    "rok-shape-issues"
-    "sync-permissions"
-  ];
+  # Auto-discovers all .md files in agentsmd/commands/
+  agentsMdCommands = discoverCommands "${ai-assistant-instructions}/agentsmd/commands";
 
   # Commands from claude-cookbooks (immutable from flake)
-  # Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)
-  cookbookCommands = [
-    "review-issue"
-    "notebook-review"
-    "model-check"
-    "link-review"
-  ];
+  # Auto-discovers all .md files in .claude/commands/
+  cookbookCommands = discoverCommands "${claude-cookbooks}/.claude/commands";
 
   # Agents from claude-cookbooks
-  cookbookAgents = [ "code-reviewer" ];
+  # Auto-discovers all .md files in .claude/agents/
+  cookbookAgents = discoverCommands "${claude-cookbooks}/.claude/agents";
 
   # Marketplace shorthands for DRY plugin enablement
   # NOTE: These must match the KEY format in known_marketplaces.json (not the repo path)
@@ -130,6 +118,12 @@ in
         # slackChannel = "C_NIX_CONFIG";
       };
     };
+  };
+
+  # Menu bar status indicator via SwiftBar
+  menubar = {
+    enable = true;
+    refreshInterval = 30; # Update every 30 seconds
   };
 
   plugins = {
