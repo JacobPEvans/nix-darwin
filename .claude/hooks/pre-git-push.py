@@ -20,24 +20,25 @@ import sys
 
 
 def is_nix_config_repo():
-    """Check if current directory is a nix-config worktree."""
+    """Check if the current repository is the nix-config repository."""
     try:
-        # Get the git common directory (bare repo path)
+        # Get the remote origin URL
         result = subprocess.run(
-            ["git", "rev-parse", "--git-common-dir"],
+            ["git", "config", "--get", "remote.origin.url"],
             capture_output=True,
             text=True,
             check=True,
         )
-        common_dir = result.stdout.strip()
-        # Resolve to absolute path
-        common_dir = os.path.abspath(common_dir)
+        remote_url = result.stdout.strip()
 
-        # Check if this is the nix-config repo
-        nix_config_dir = os.path.expanduser("~/git/nix-config/.git")
-        return common_dir == nix_config_dir
-    except (OSError, subprocess.SubprocessError):
-        # If we can't determine, skip the hook (safer to not block)
+        # This is more robust than checking the local path as it works for any
+        # clone location and handles both SSH and HTTPS remote URLs.
+        return remote_url.endswith("JacobPEvans/nix-config.git") or remote_url.endswith("JacobPEvans/nix.git")
+    except subprocess.CalledProcessError:
+        # Git command failed (not in a git repo, no remote configured, etc.)
+        return False
+    except FileNotFoundError:
+        # Git executable not found
         return False
 
 
