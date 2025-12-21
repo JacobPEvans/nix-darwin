@@ -22,6 +22,7 @@
   ll = "ls -ahlFG -D '%Y-%m-%d %H:%M:%S'";
   llt = "ls -ahltFG -D '%Y-%m-%d %H:%M:%S'"; # sorted by time
   lls = "ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'"; # show size
+  "ll@" = "ls -@ahlFG -D '%Y-%m-%d %H:%M:%S'"; # show extended attributes (macOS)
 
   # ===========================================================================
   # Docker (no sudo needed - user in docker group)
@@ -35,10 +36,14 @@
   # ===========================================================================
   # REQUIRES SUDO: darwin-rebuild modifies system-level configurations
   # This activates both system (nix-darwin) and user (home-manager) configs
-  d-r = "sudo darwin-rebuild switch --flake ~/.config/nix";
+  # Usage: d-r            # Use current directory as flake
+  d-r = "sudo darwin-rebuild switch --flake .";
 
   # NO SUDO: Updates flake.lock to latest nixpkgs (must commit before d-r)
-  nf-u = "nix flake update --flake ~/.config/nix";
+  # Usage: nf-u            # update flake in current directory
+  #        nf-u --flake .  # explicit current directory
+  #        nf-u --flake ~/git/nix-config/main
+  nf-u = "nix flake update";
 
   # ===========================================================================
   # Python

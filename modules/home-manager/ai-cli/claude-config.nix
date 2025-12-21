@@ -30,80 +30,57 @@ let
   claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
   claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
 
+  # Dynamic command discovery from flake inputs
+  # No more hardcoded lists - discovers all .md files automatically
+  discoverCommands =
+    dir:
+    let
+      files = if builtins.pathExists dir then builtins.readDir dir else { };
+      mdFiles = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name) files;
+    in
+    map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
+
   # Commands from agentsmd (Nix store / flake input)
-  # Located in .claude/commands/
-  # Note: "commit" removed - use /commit from commit-commands plugin instead
-  agentsMdCommands = [
-    "fix-all-pr-ci"
-    "generate-code"
-    "git-refresh"
-    "infrastructure-review"
-    "init-change"
-    "init-worktree"
-    "pr"
-    "pr-review-feedback"
-    "quick-add-permission"
-    "review-code"
-    "review-docs"
-    "rok-resolve-issues"
-    "rok-resolve-pr-review-thread"
-    "rok-review-pr"
-    "rok-shape-issues"
-    "sync-permissions"
-  ];
+  # Auto-discovers all .md files in agentsmd/commands/
+  agentsMdCommands = discoverCommands "${ai-assistant-instructions}/agentsmd/commands";
 
   # Commands from claude-cookbooks (immutable from flake)
-  # Removed: "review-pr-ci", "review-pr" - replaced by code-review plugin (/code-review)
-  cookbookCommands = [
-    "review-issue"
-    "notebook-review"
-    "model-check"
-    "link-review"
-  ];
+  # Auto-discovers all .md files in .claude/commands/
+  cookbookCommands = discoverCommands "${claude-cookbooks}/.claude/commands";
 
   # Agents from claude-cookbooks
-  cookbookAgents = [ "code-reviewer" ];
+  # Auto-discovers all .md files in .claude/agents/
+  cookbookAgents = discoverCommands "${claude-cookbooks}/.claude/agents";
 
-  # Plugin enablement
-  # See: https://github.com/anthropics/claude-code/tree/main/plugins
-  enabledPlugins = {
-    # Git workflow
-    "commit-commands@anthropics/claude-code" = true;
+  # Marketplace shorthands for DRY plugin enablement
+  # NOTE: These must match the KEY format in known_marketplaces.json (not the repo path)
+  # Native Claude installs use "claude-plugins-official" not "anthropics/claude-plugins-official"
+  official = "claude-plugins-official";
+  superpowersMarketplace = "superpowers-marketplace";
 
-    # Code review
-    "code-review@anthropics/claude-code" = true;
-    "pr-review-toolkit@anthropics/claude-code" = true;
+  # Helper to create plugin@marketplace entries
+  mkPlugins = marketplace: plugins: lib.genAttrs (map (p: "${p}@${marketplace}") plugins) (_: true);
 
-    # Development workflow
-    "feature-dev@anthropics/claude-code" = true;
-
-    # Security
-    "security-guidance@anthropics/claude-code" = true;
-
-    # Plugin/hook development
-    "plugin-dev@anthropics/claude-code" = true;
-    "hookify@anthropics/claude-code" = true;
-
-    # SDK development
-    "agent-sdk-dev@anthropics/claude-code" = true;
-
-    # UI/UX
-    "frontend-design@anthropics/claude-code" = true;
-
-    # Output styles
-    "explanatory-output-style@anthropics/claude-code" = true;
-    "learning-output-style@anthropics/claude-code" = true;
-
-    # Migration tools
-    "claude-opus-4-5-migration@anthropics/claude-code" = true;
-
-    # Superpowers - comprehensive development workflow
-    # Brainstorming, planning, execution, testing, and review skills
-    "superpowers@obra/superpowers-marketplace" = true;
-
-    # Experimental (uncomment to enable)
-    # "ralph-wiggum@anthropics/claude-code" = true;  # Autonomous iteration loops
-  };
+  # Plugin enablement - map plugin names to their marketplace
+  # See: https://github.com/anthropics/claude-plugins-official
+  enabledPlugins =
+    mkPlugins official [
+      "commit-commands" # Git workflow
+      "code-review" # Code review
+      "pr-review-toolkit"
+      "feature-dev" # Development workflow
+      "security-guidance" # Security
+      "plugin-dev" # Plugin/hook development
+      "hookify"
+      "agent-sdk-dev" # SDK development
+      "frontend-design" # UI/UX
+      "explanatory-output-style" # Output styles
+      "learning-output-style"
+      # "ralph-wiggum"  # Experimental: autonomous iteration loops
+    ]
+    // mkPlugins superpowersMarketplace [
+      "superpowers"
+    ];
 
 in
 {
@@ -145,15 +122,16 @@ in
     };
   };
 
+  # Menu bar status indicator via SwiftBar
+  menubar = {
+    enable = true;
+    refreshInterval = 30; # Update every 30 seconds
+  };
+
   plugins = {
     marketplaces = {
-      "anthropics/claude-code" = {
-        source = {
-          type = "git";
-          url = "https://github.com/anthropics/claude-code.git";
-        };
-        flakeInput = claude-code-plugins;
-      };
+      # Superset marketplace: 13 Anthropic plugins + 10 LSP servers + 11 MCP integrations
+      # (Replaces anthropics/claude-code which was a subset)
       "anthropics/claude-plugins-official" = {
         source = {
           type = "git";
@@ -173,7 +151,9 @@ in
     };
 
     enabled = enabledPlugins;
-    allowRuntimeInstall = true;
+    # Disable local/experimental marketplace (for developing local plugins)
+    # Plugins from official marketplaces can still be installed at runtime
+    allowRuntimeInstall = false;
   };
 
   commands = {
