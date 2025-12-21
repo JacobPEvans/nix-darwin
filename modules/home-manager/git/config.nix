@@ -32,6 +32,7 @@
       autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
       whitespace = "trailing-space,space-before-tab"; # Highlight whitespace issues
       hooksPath = "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
+      bare = false; # Enable bare repo + worktree workflow (allows 'git clone --bare' repos to add worktrees)
     };
 
     # Repository initialization
