@@ -28,6 +28,22 @@ let
       ) attrs
     );
 
+  # Claude-specific helper: Get all tool-specific permissions (non-shell)
+  getClaudeToolPermissions =
+    permissions:
+    let
+      claudePerms = permissions.toolSpecific.claude or { };
+    in
+    (claudePerms.builtin or [ ]) ++ (claudePerms.webFetch or [ ]) ++ (claudePerms.read or [ ]);
+
+  # Claude-specific helper: Get tool-specific deny permissions
+  getClaudeDenyPermissions =
+    permissions:
+    let
+      claudePerms = permissions.toolSpecific.claude or { };
+    in
+    claudePerms.denyRead or [ ];
+
 in
 {
   # ============================================================================
@@ -43,24 +59,29 @@ in
     # Format a list of shell commands
     formatShellCommands = cmds: map (cmd: "Bash(${cmd}:*)") cmds;
 
-    # Format all allowed commands from permissions
+    # Format all allowed commands from permissions (shell + tool-specific)
+    # Note: Tool-specific permissions are placed before shell permissions.
+    # This ordering matches formatDenied and ensures consistent evaluation by Claude Code.
     formatAllowed =
       permissions:
       let
         allCommands = flattenCommands permissions.allow;
+        shellPermissions = map (cmd: "Bash(${cmd}:*)") allCommands;
       in
-      map (cmd: "Bash(${cmd}:*)") allCommands;
+      (getClaudeToolPermissions permissions) ++ shellPermissions;
 
-    # Format all denied commands
+    # Format all denied commands (shell + tool-specific)
     formatDenied =
       permissions:
       let
         allCommands = flattenCommands permissions.deny;
+        shellDenied = map (cmd: "Bash(${cmd}:*)") allCommands;
       in
-      map (cmd: "Bash(${cmd}:*)") allCommands;
+      (getClaudeDenyPermissions permissions) ++ shellDenied;
 
-    # Get tool-specific permissions (non-shell)
-    getToolPermissions = permissions: permissions.toolSpecific.claude.builtin or [ ];
+    # Export helpers for external use
+    getToolPermissions = getClaudeToolPermissions;
+    getDenyPermissions = getClaudeDenyPermissions;
   };
 
   # ============================================================================

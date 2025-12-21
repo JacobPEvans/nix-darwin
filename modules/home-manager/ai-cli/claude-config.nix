@@ -149,8 +149,9 @@ in
     };
 
     enabled = enabledPlugins;
-    # Disable local/experimental marketplace (for developing local plugins)
-    # Plugins from official marketplaces can still be installed at runtime
+    # Disable the local/experimental marketplace used for developing local plugins.
+    # With this disabled, plugins from configured/official marketplaces must be
+    # declared in Nix (via flake inputs) rather than installed dynamically at runtime.
     allowRuntimeInstall = false;
   };
 

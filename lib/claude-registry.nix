@@ -17,14 +17,10 @@
       allowRuntimeInstall ? true,
     }:
     let
-      # Extract marketplace name from "owner/repo" format
+      # Extract marketplace name from the identifier
       # e.g., "anthropics/claude-plugins-official" -> "claude-plugins-official"
-      getMarketplaceName =
-        name:
-        let
-          parts = lib.splitString "/" name;
-        in
-        if builtins.length parts > 1 then builtins.elemAt parts 1 else name;
+      #       "org/team/repo" -> "repo"
+      getMarketplaceName = name: lib.last (lib.splitString "/" name);
 
       # Convert marketplace config to native format
       toNativeFormat =
