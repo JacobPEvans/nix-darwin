@@ -53,8 +53,7 @@ let
   opencodeSettings = {
     "$schema" = cfg.schemaUrl;
 
-    theme = cfg.settings.theme;
-    defaultModel = cfg.settings.defaultModel;
+    inherit (cfg.settings) theme defaultModel;
 
     # Provider configurations
     providers = lib.mapAttrs (
