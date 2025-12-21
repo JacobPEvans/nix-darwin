@@ -19,6 +19,29 @@ import subprocess
 import sys
 
 
+def is_nix_config_repo():
+    """Check if the current repository is the nix-config repository."""
+    try:
+        # Get the remote origin URL
+        result = subprocess.run(
+            ["git", "config", "--get", "remote.origin.url"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        remote_url = result.stdout.strip()
+
+        # This is more robust than checking the local path as it works for any
+        # clone location and handles both SSH and HTTPS remote URLs.
+        return remote_url.endswith("JacobPEvans/nix-config.git") or remote_url.endswith("JacobPEvans/nix.git")
+    except subprocess.CalledProcessError:
+        # Git command failed (not in a git repo, no remote configured, etc.)
+        return False
+    except FileNotFoundError:
+        # Git executable not found
+        return False
+
+
 def has_nix_changes():
     """Check if any .nix files were modified in commits being pushed."""
     try:
@@ -64,6 +87,10 @@ def main():
 
     # Only act on git push commands
     if "git push" not in command:
+        return 0
+
+    # Skip hook for non-nix-config repositories
+    if not is_nix_config_repo():
         return 0
 
     # Skip darwin-rebuild in CI/automated workflows
