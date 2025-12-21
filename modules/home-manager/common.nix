@@ -21,6 +21,17 @@ let
   # Git hooks (auto-installed via templates)
   gitHooks = import ./git/hooks.nix { inherit config pkgs; };
 
+  # Git configuration (extracted to reduce file size)
+  gitConfig = import ./git/config.nix { inherit config userConfig gitAliases; };
+
+  # Git merge driver for flake.lock (auto-regenerate on conflict)
+  gitMergeDrivers = {
+    ".local/bin/git-merge-flakelock" = {
+      source = ./git/merge-flakelock.sh;
+      executable = true;
+    };
+  };
+
   # Shell aliases (macOS - see file for sudo requirements)
   shellAliases = import ./zsh/aliases.nix;
 
@@ -83,7 +94,7 @@ in
     # Permissions: Now read from JSON in ai-assistant-instructions repo
     # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
     # NOTE: claudeFiles removed - now handled by programs.claude module
-    file = npmFiles // awsFiles // geminiFiles // copilotFiles // agentsMdSymlinks // gitHooks;
+    file = npmFiles // awsFiles // geminiFiles // copilotFiles // agentsMdSymlinks // gitHooks // gitMergeDrivers;
 
     # Claude Code Settings Validation (post-rebuild)
     # Validates settings.json against JSON Schema after home files are written
@@ -178,87 +189,9 @@ in
     # ==========================================================================
     # Git
     # ==========================================================================
-    # Fully Nix-managed git config (~/.config/git/config)
+    # Configuration extracted to git/config.nix to reduce file size
     # Security policy: All commits and tags must be GPG signed
-    # User values from lib/user-config.nix
-    git = {
-      enable = true;
-
-      # GPG signing configuration
-      # NOTE: Key ID is a public identifier, not the private key (safe to commit)
-      signing = {
-        key = userConfig.gpg.signingKey;
-        signByDefault = true; # Enforced by security policy
-      };
-
-      # All git settings (new unified syntax)
-      settings = {
-        # User identity
-        user = {
-          name = userConfig.user.fullName;
-          inherit (userConfig.user) email;
-        };
-
-        # Core settings
-        core = {
-          inherit (userConfig.git) editor;
-          autocrlf = "input"; # LF on commit, unchanged on checkout (Unix-style)
-          whitespace = "trailing-space,space-before-tab"; # Highlight whitespace issues
-          hooksPath = "${config.home.homeDirectory}/.git-templates/hooks"; # Global hooks for ALL repos
-        };
-
-        # Repository initialization
-        init = {
-          inherit (userConfig.git) defaultBranch;
-          # Auto-install hooks on new clones (Layer 1 of pre-commit enforcement)
-          templateDir = "${config.home.homeDirectory}/.git-templates";
-        };
-
-        # Pull behavior - rebase keeps history cleaner than merge commits
-        pull.rebase = true;
-
-        # Push behavior
-        push = {
-          autoSetupRemote = true; # Auto-track remote branches
-          default = "current"; # Push current branch to same-named remote
-        };
-
-        # Fetch behavior
-        fetch = {
-          prune = true; # Auto-remove deleted remote branches
-          pruneTags = true; # Auto-remove deleted remote tags
-        };
-
-        # Merge & diff improvements
-        merge = {
-          conflictstyle = "diff3"; # Show original in conflicts (easier resolution)
-          ff = "only"; # Only fast-forward merges (use rebase for others)
-        };
-        diff = {
-          algorithm = "histogram"; # Better diff algorithm than default
-          colorMoved = "default"; # Highlight moved lines in different color
-          mnemonicPrefix = true; # Use i/w/c/o instead of a/b in diffs
-        };
-
-        # Rerere - remember merge conflict resolutions
-        rerere = {
-          enabled = true; # Remember how you resolved conflicts
-          autoupdate = true; # Auto-stage rerere resolutions
-        };
-
-        # Sign all tags (security policy)
-        tag.gpgSign = true;
-
-        # Helpful features
-        help.autocorrect = 10; # Auto-correct typos after 1 second
-        status.showStash = true; # Show stash count in git status
-        log.date = "iso"; # Use ISO date format in logs
-        branch.sort = "-committerdate"; # Sort branches by recent commits
-
-        # Git aliases - see git-aliases.nix for full list
-        alias = gitAliases;
-      };
-    };
+    git = gitConfig;
 
     # ==========================================================================
     # Direnv (per-project environments)
