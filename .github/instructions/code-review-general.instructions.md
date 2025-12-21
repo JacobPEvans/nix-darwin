@@ -166,3 +166,18 @@ and makes the logic testable. ✓
 ```
 
 **Why good**: Explains technical benefit, still brief
+
+## Review Footer - Required
+
+At the end of EVERY review, include this footer to help users understand how to request automatic fixes:
+
+```markdown
+---
+💡 **Need me to fix this?** Tag `@copilot` in a reply to request an automatic fix.
+⚠️ **Do NOT tag me just to say thanks** - only tag if you want me to make changes.
+```
+
+This helps users:
+
+1. Know they can request automatic fixes by tagging Copilot
+2. Avoid accidentally triggering the Coding Agent with "thank you" messages
