@@ -79,7 +79,7 @@ in
           Install OrbStack as a system-level application.
 
           When enabled: App installed to /Applications/Nix Apps/OrbStack.app
-          When disabled: Install via home.packages for stable TCC permissions
+          When disabled: The package is not installed by this module. It is recommended to install via home.packages for stable TCC permissions.
 
           See module documentation for detailed comparison of installation patterns.
         '';
