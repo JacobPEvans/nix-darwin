@@ -83,6 +83,8 @@ in
       (getClaudeToolPermissions permissions) ++ shellPermissions;
 
     # Format all denied commands (shell + tool-specific)
+    # Note: Tool-specific permissions are placed before shell permissions.
+    # This ordering matches formatAllowed and ensures consistent evaluation by Claude Code.
     formatDenied =
       permissions:
       let

@@ -25,40 +25,48 @@
 let
   homeDir = config.home.homeDirectory;
 
-  # Read all JSON files from a directory and extract commands
-  readPermissionDir =
+  # Read all JSON files from a directory into an attribute set
+  # Returns {filename = parsed-json-content} for efficient reuse
+  readJsonsFromDir =
     dir:
-    let
-      files = builtins.readDir dir;
-      jsonFiles = lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".json" n) files;
-      readJson = name: (builtins.fromJSON (builtins.readFile "${dir}/${name}")).commands or [ ];
-    in
-    lib.flatten (map readJson (builtins.attrNames jsonFiles));
+    if builtins.pathExists dir then
+      let
+        files = builtins.readDir dir;
+        jsonFiles = lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".json" n) files;
+      in
+      lib.mapAttrs' (
+        name: _: lib.nameValuePair name (builtins.fromJSON (builtins.readFile "${dir}/${name}"))
+      ) jsonFiles
+    else
+      { };
 
   # Paths to permission directories in ai-assistant-instructions
   allowDir = "${ai-assistant-instructions}/agentsmd/permissions/allow";
   denyDir = "${ai-assistant-instructions}/agentsmd/permissions/deny";
   domainsFile = "${ai-assistant-instructions}/agentsmd/permissions/domains/webfetch.json";
 
-  # Read deny file for both commands and patterns
-  denyDangerousFile = "${denyDir}/dangerous.json";
-  denyDangerousJson = builtins.fromJSON (builtins.readFile denyDangerousFile);
+  # Read all permission files once to avoid redundant I/O
+  allowJsons = readJsonsFromDir allowDir;
+  denyJsons = readJsonsFromDir denyDir;
 
 in
 {
   # Auto-approved commands from ai-assistant-instructions
-  allow = readPermissionDir allowDir;
+  allow = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) allowJsons);
 
   # Denied commands from ai-assistant-instructions
-  # Combine all deny/*.json files into a flat list
-  deny = readPermissionDir denyDir;
+  deny = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) denyJsons);
 
   # WebFetch domains
-  webfetchDomains = (builtins.fromJSON (builtins.readFile domainsFile)).domains;
+  webfetchDomains =
+    if builtins.pathExists domainsFile then
+      (builtins.fromJSON (builtins.readFile domainsFile)).domains
+    else
+      [ ];
 
   # File patterns to deny (for Claude Read tool)
   # These come from dangerous.json's "patterns" field
-  denyPatterns = denyDangerousJson.patterns or [ ];
+  denyPatterns = denyJsons."dangerous.json".patterns or [ ];
 
   # Trusted directories (local config)
   directories = {
