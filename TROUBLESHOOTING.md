@@ -363,6 +363,10 @@ Error: Access token is not in a valid format: Doesn't contain a decryption key
 
 **Solution**:
 
+> **Note**: These instructions use the default keychain service name `bws-claude-automation`.
+> If you've customized this via `programs.claude.apiKeyHelper.keychainService` in your Nix
+> configuration, replace `bws-claude-automation` with your configured value throughout these steps.
+
 1. **Delete the corrupted token**:
 
    ```bash
