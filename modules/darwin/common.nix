@@ -156,7 +156,6 @@ in
     enable = false;
     package = lib.mkForce pkgs.nix;
 
-    # Automatic Garbage Collection
     # DISABLED: nix.gc.automatic requires nix.enable = true, which conflicts with
     # Determinate Nix (which manages its own daemon). For gc, use manual:
     #   nix-collect-garbage --delete-older-than 30d

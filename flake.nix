@@ -114,34 +114,41 @@
       hmDefaults = import ./lib/home-manager-defaults.nix;
 
       # Pure settings generator for CI (no derivations, cross-platform)
-      # Reads permissions from flake inputs and generates settings attrset
-      ciClaudeSettings = import ./lib/claude-settings.nix {
-        homeDir = "/home/user"; # Placeholder - CI only validates schema structure
-        schemaUrl = userConfig.ai.claudeSchemaUrl;
-        permissions = {
-          allow =
-            (builtins.fromJSON (
-              builtins.readFile "${ai-assistant-instructions}/.claude/permissions/allow.json"
-            )).permissions;
-          deny =
-            (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/deny.json"))
-            .permissions;
-          ask =
-            (builtins.fromJSON (builtins.readFile "${ai-assistant-instructions}/.claude/permissions/ask.json"))
-            .permissions;
-        };
-        plugins =
-          (import ./modules/home-manager/ai-cli/claude-plugins.nix {
-            inherit
-              claude-code-plugins
-              claude-cookbooks
-              claude-plugins-official
-              anthropic-skills
-              ;
+      # Reads permissions from unified ai-assistant-instructions structure
+      ciClaudeSettings =
+        let
+          # Import unified permissions using the common module
+          # Minimal config for CI - only needs lib and placeholder homeDir
+          aiCommon = import ./modules/home-manager/ai-cli/common {
+            inherit ai-assistant-instructions;
             inherit (nixpkgs) lib;
-            config = { }; # Unused but required by signature
-          }).pluginConfig;
-      };
+            config = {
+              home.homeDirectory = "/home/user"; # Placeholder for CI
+            };
+          };
+          inherit (aiCommon) permissions;
+          inherit (aiCommon) formatters;
+        in
+        import ./lib/claude-settings.nix {
+          homeDir = "/home/user"; # Placeholder - CI only validates schema structure
+          schemaUrl = userConfig.ai.claudeSchemaUrl;
+          permissions = {
+            allow = formatters.claude.formatAllowed permissions;
+            deny = formatters.claude.formatDenied permissions;
+            ask = [ ]; # No ask permissions defined yet
+          };
+          plugins =
+            (import ./modules/home-manager/ai-cli/claude-plugins.nix {
+              inherit
+                claude-code-plugins
+                claude-cookbooks
+                claude-plugins-official
+                anthropic-skills
+                ;
+              inherit (nixpkgs) lib;
+              config = { }; # Unused but required by signature
+            }).pluginConfig;
+        };
 
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
