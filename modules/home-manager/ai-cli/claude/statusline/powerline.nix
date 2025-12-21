@@ -8,7 +8,7 @@
 # - 5-hour billing block tracking with reset timer
 # - Session and daily cost tracking
 # - Full directory path display
-# - Git info (branch, SHA, stash count)
+# - Git info (branch, worktree, SHA, stash count, upstream)
 # - Context window usage
 # - 6 customizable color themes
 #
@@ -60,7 +60,7 @@ let
   themeName = themeMap.${powerlineStyle} or "dark";
 
   # Rich multi-line configuration for claude-powerline
-  # Displays: directory, git, model, session costs, 5-hour block, daily usage, context
+  # Displays: directory, git (branch, worktree, SHA, stash, upstream), model, session costs, 5-hour block, daily usage, context
   powerlineConfig = {
     theme = themeName;
     style = "powerline";
@@ -68,7 +68,7 @@ let
 
     display = {
       lines = [
-        # Line 1: Directory (full path), Git info, Model
+        # Line 1: Directory (full path), Git info (branch, worktree, SHA, stash, upstream), Model
         {
           segments = {
             directory = {
@@ -77,9 +77,12 @@ let
             };
             git = {
               enabled = true;
+              showBranch = true; # Always show current branch
+              showWorktree = true; # Show worktree name/path when in a worktree
               showSha = true;
               showStash = true;
               showUpstream = true;
+              showRepoName = true; # Show repo name to help identify worktree
             };
             model = {
               enabled = true;
@@ -156,6 +159,29 @@ in
         #!/usr/bin/env bash
         # Claude Powerline statusline wrapper
         # Rich multi-line display with cost tracking
+        # Enhanced with worktree detection (Issue #108)
+
+        # Detect and display worktree information
+        worktree_info=""
+        if command -v git &> /dev/null; then
+          # Try to get the git directory path. This command will fail if not in a git repo.
+          if git_dir=$(git rev-parse --git-dir 2>/dev/null); then
+            # Check if this is a worktree (git-dir contains .git/worktrees/ anywhere in path)
+            # This handles both relative (.git/worktrees/name) and absolute (/path/.git/worktrees/name) paths
+            if [[ "$git_dir" =~ \.git/worktrees/([^/]+)$ ]]; then
+              worktree_name="''${BASH_REMATCH[1]}"
+              # Format: [worktree: name]
+              worktree_info="[worktree: $worktree_name] "
+            fi
+          fi
+        fi
+
+        # If we have worktree info, display it before the powerline output
+        if [[ -n "$worktree_info" ]]; then
+          printf '\033[1;36m%s\033[0m\n' "$worktree_info"
+        fi
+
+        # Run claude-powerline with config
         ${claude-powerline-pkg}/bin/claude-powerline --config=${configFile} "$@"
       '';
     };

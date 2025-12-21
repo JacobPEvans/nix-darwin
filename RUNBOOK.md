@@ -5,6 +5,7 @@ Step-by-step procedures for common configuration tasks.
 ## Table of Contents
 
 - [Everyday Commands](#everyday-commands)
+- [Shell Aliases](#shell-aliases)
 - [Adding Packages](#adding-packages)
 - [Updating Packages](#updating-packages)
   - [Secure Flake Update Workflow](#secure-flake-update-workflow)
@@ -30,6 +31,65 @@ sudo darwin-rebuild --rollback
 # List all generations
 sudo darwin-rebuild --list-generations
 ```
+
+---
+
+## Shell Aliases
+
+Configured shell aliases make common tasks faster. All aliases are defined in `modules/home-manager/zsh/aliases.nix`.
+
+### Directory Listing
+
+| Alias | Command | Purpose |
+|-------|---------|---------|
+| `ll` | `ls -ahlFG -D '%Y-%m-%d %H:%M:%S'` | Long listing with human-readable sizes |
+| `ll@` | `ls -@ahlFG -D '%Y-%m-%d %H:%M:%S'` | Long listing with extended attributes (macOS) |
+| `llt` | `ls -ahltFG -D '%Y-%m-%d %H:%M:%S'` | Long listing sorted by modification time |
+| `lls` | `ls -ahlsFG -D '%Y-%m-%d %H:%M:%S'` | Long listing with file sizes |
+
+**Extended Attributes**: The `ll@` alias displays macOS extended attributes (xattr), useful for viewing security contexts, quarantine flags, and other metadata:
+
+```bash
+# View extended attributes
+ll@
+
+# Example output:
+# -rw-r--r--@ 1 user  staff  1024 2025-01-15 14:30:00 file.txt
+#   com.apple.quarantine      57
+#   com.apple.metadata:kMDItemWhereFroms      183
+```
+
+### Docker
+
+| Alias | Command | Purpose |
+|-------|---------|---------|
+| `dps` | `docker ps -a` | List all containers |
+| `dcu` | `docker compose up -d` | Start compose stack (detached) |
+| `dcd` | `docker compose down` | Stop compose stack |
+
+### Nix / Darwin
+
+| Alias | Command | Purpose |
+|-------|---------|---------|
+| `d-r` | `sudo darwin-rebuild switch --flake .` | Rebuild system configuration |
+| `nf-u` | `nix flake update` | Update flake.lock to latest versions |
+
+### AWS
+
+| Alias | Command | Purpose |
+|-------|---------|---------|
+| `av` | `aws-vault exec` | Execute command with AWS profile |
+| `avl` | `aws-vault list` | List profiles in vault |
+| `avd` | `aws-vault exec default --` | Execute with default profile |
+| `ava` | `aws-vault add` | Add profile to vault |
+| `avr` | `aws-vault remove` | Remove profile from vault |
+
+### Other
+
+| Alias | Command | Purpose |
+|-------|---------|---------|
+| `python` | `python3` | Use Python 3 by default |
+| `tgz` | `tar --disable-copyfile --exclude='.DS_Store' -czf` | Create tar.gz (macOS-friendly) |
 
 ---
 

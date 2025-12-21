@@ -1,20 +1,45 @@
 # OrbStack Configuration Module (Darwin)
 #
 # Manages macOS-specific OrbStack configuration:
+# - System-level application installation (optional)
 # - Dedicated APFS data volume (created at boot via launchd)
 #
-# The data volume symlink is managed by home-manager in hosts/<host>/home.nix
-# using mkOutOfStoreSymlink (see Ollama pattern for example).
+# Installation Patterns:
 #
-# Usage:
-#   programs.orbstack = {
-#     enable = true;
-#     dataVolume = {
-#       enable = true;
-#       name = "ContainerData";
-#       apfsContainer = "disk3";  # Find with: diskutil apfs list
-#     };
-#   };
+# 1. SYSTEM-LEVEL (Recommended for single-user machines):
+#    programs.orbstack = {
+#      enable = true;
+#      package.enable = true;  # Install system-wide
+#      dataVolume = {
+#        enable = true;
+#        name = "ContainerData";
+#        apfsContainer = "disk3";  # Find with: diskutil apfs list
+#      };
+#    };
+#
+#    Pros: Machine-wide service, integrates with nix-darwin
+#    Cons: TCC permissions may reset on rebuilds (requires re-granting)
+#    App location: /Applications/Nix Apps/OrbStack.app
+#
+# 2. PER-USER (For multi-user machines or when TCC stability is critical):
+#    In hosts/<host>/default.nix:
+#      programs.orbstack = {
+#        enable = true;
+#        package.enable = false;  # Don't install system-wide
+#        dataVolume = { ... };    # Volume is still system-wide
+#      };
+#
+#    In hosts/<host>/home.nix:
+#      home.packages = [ pkgs.orbstack ];  # Install per-user
+#
+#    Pros: mac-app-util provides stable trampolines for TCC permissions
+#    Cons: Requires per-user configuration for each user
+#    App location: ~/Applications/Home Manager Trampolines/OrbStack.app
+#
+# The data volume symlink is managed by home-manager in hosts/<host>/home.nix
+# using mkOutOfStoreSymlink (see Ollama pattern for example):
+#   home.file."Library/Group Containers/HUAQ24HBR6.dev.orbstack".source =
+#     config.lib.file.mkOutOfStoreSymlink "/Volumes/ContainerData";
 #
 # Migration (one-time setup):
 #   1. Stop OrbStack completely (orb shutdown or quit app)
@@ -22,10 +47,6 @@
 #   3. Move existing data: mv ~/Library/Group\ Containers/HUAQ24HBR6.dev.orbstack/* /Volumes/ContainerData/
 #   4. Remove original directory: rm -rf ~/Library/Group\ Containers/HUAQ24HBR6.dev.orbstack
 #   5. Then add symlink in home.nix and rebuild
-#
-# Then in home.nix, add the symlink:
-#   home.file."Library/Group Containers/HUAQ24HBR6.dev.orbstack".source =
-#     config.lib.file.mkOutOfStoreSymlink "/Volumes/ContainerData";
 #
 # Why a separate volume?
 # - OrbStack stores data in ~/Library/Group Containers/... by default
@@ -49,6 +70,21 @@ in
 {
   options.programs.orbstack = {
     enable = lib.mkEnableOption "OrbStack configuration";
+
+    package = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Install OrbStack as a system-level application.
+
+          When enabled: App installed to /Applications/Nix Apps/OrbStack.app
+          When disabled: The package is not installed by this module. It is recommended to install via home.packages for stable TCC permissions.
+
+          See module documentation for detailed comparison of installation patterns.
+        '';
+      };
+    };
 
     dataVolume = {
       enable = lib.mkEnableOption "dedicated APFS volume for OrbStack data";
@@ -91,6 +127,9 @@ in
         message = "programs.orbstack.dataVolume.apfsContainer must be set. Find yours with: diskutil apfs list";
       }
     ];
+
+    # Install OrbStack system-wide if package.enable is true
+    environment.systemPackages = lib.mkIf cfg.package.enable [ pkgs.orbstack ];
 
     # Launchd daemon to ensure APFS volume exists at boot
     launchd.daemons.orbstack-volume = lib.mkIf cfg.dataVolume.enable {
