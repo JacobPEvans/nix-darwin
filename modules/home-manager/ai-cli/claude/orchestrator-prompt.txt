@@ -336,6 +336,17 @@ SAFETY CONSTRAINTS
 - Never create PRs when open PR count >= 10 (clear backlog first)
 - Never work on issues with 'ai-created' label (human review required)
 
+PERMISSION CONSTRAINTS (CRITICAL)
+This session runs with a curated permission allowlist (not bypassPermissions).
+Only commands in ~/.claude/settings.json permissions.allow are permitted.
+
+- Commands not in the allowlist will FAIL (no prompt in unattended mode)
+- Use standard git, gh, nix, and Unix commands from the allowlist
+- If a command fails with permission error, try an alternative approach
+- Sub-agents inherit the same permission constraints
+- The allowlist includes 300+ pre-approved commands for typical development tasks
+- See ai-assistant-instructions flake input for the complete allowlist
+
 AI-CREATED ISSUE WORKFLOW
 Issues created by AI agents require human review before work begins:
 

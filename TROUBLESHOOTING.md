@@ -345,6 +345,60 @@ programs.vscode.userSettings = { ... };
 programs.vscode.profiles.default.userSettings = { ... };
 ```
 
+### Invalid BWS Access Token
+
+**Problem**: Auto-claude or other automation fails with BWS error:
+
+```text
+Error: Access token is not in a valid format: Doesn't contain a decryption key
+```
+
+**Cause**: The BWS (Bitwarden Secrets Manager) access token stored in macOS Keychain is corrupted or invalid.
+
+**Impact**:
+
+- Slack notifications fail silently
+- Headless Claude authentication fails (cron jobs, LaunchAgent automation)
+- `claude-api-key-helper` script fails
+
+**Solution**:
+
+> **Note**: These instructions use the default keychain service name `bws-claude-automation`.
+> If you've customized this via `programs.claude.apiKeyHelper.keychainService` in your Nix
+> configuration, replace `bws-claude-automation` with your configured value throughout these steps.
+
+1. **Delete the corrupted token**:
+
+   ```bash
+   security delete-generic-password -s "bws-claude-automation"
+   ```
+
+2. **Get a new Machine Account token**:
+   - Go to [Bitwarden Secrets Manager](https://vault.bitwarden.com)
+   - Navigate to your Machine Accounts
+   - Create or regenerate an access token
+
+3. **Add the new token to keychain**:
+
+   ```bash
+   security add-generic-password -s "bws-claude-automation" -a "$USER" -w "NEW_TOKEN_HERE"
+   ```
+
+4. **Verify the token works**:
+
+   ```bash
+   export BWS_ACCESS_TOKEN=$(security find-generic-password -s "bws-claude-automation" -w)
+   bws secret list
+   ```
+
+   Expected: List of secrets (not an error)
+
+**Prevention**: BWS tokens can become invalid if:
+
+- They are revoked in Bitwarden Secrets Manager
+- The Machine Account is deleted or regenerated
+- Token expiration (if configured)
+
 ---
 
 ## File Recovery
