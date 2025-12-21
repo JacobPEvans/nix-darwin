@@ -111,10 +111,10 @@ equivalents while preserving unique custom functionality.
 ### 4.3 Verify Retained Custom Commands
 
 - [ ] **4.3.1** Check symlinks: `ls -la ~/.claude/commands/`
-- [ ] **4.3.2** Test `/pr`
+- [ ] **4.3.2** Test `/manage-pr`
 - [ ] **4.3.3** Test `/git-refresh`
 - [ ] **4.3.4** Test `/review-code`
-- [ ] **4.3.5** Test `/rok-review-pr`
+- [ ] **4.3.5** Test `/review-pr`
 - [ ] **4.3.6** Confirm no orphaned symlinks
 
 ### 4.4 Verify Cookbook Commands

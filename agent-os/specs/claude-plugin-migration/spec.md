@@ -31,13 +31,13 @@ functionality that does not exist in official offerings.
 
 ### Commands RETAINED (unique functionality)
 
-**Git/PR Workflow**: `pr`, `git-refresh`, `pr-review-feedback`
+**Git/PR Workflow**: `manage-pr`, `git-refresh`, `pr-review-feedback`
 
 **Reviews**: `review-code`, `review-docs`, `review-issue`, `infrastructure-review`, `link-review`
 
 **Specialized**: `model-check`, `notebook-review`, `generate-code`
 
-**ROK/Shape Up**: `rok-shape-issues`, `rok-resolve-issues`, `rok-review-pr`, `rok-resolve-pr-review-thread`
+**ROK/Shape Up**: `shape-issues`, `resolve-issues`, `review-pr`, `resolve-pr-review-thread`
 
 ## Files Modified
 
@@ -56,9 +56,9 @@ functionality that does not exist in official offerings.
 
 ### Custom Commands (11)
 
-`generate-code`, `git-refresh`, `infrastructure-review`, `pr`,
+`generate-code`, `git-refresh`, `infrastructure-review`, `manage-pr`,
 `pr-review-feedback`, `review-code`, `review-docs`,
-`rok-resolve-issues`, `rok-resolve-pr-review-thread`, `rok-review-pr`, `rok-shape-issues`
+`resolve-issues`, `resolve-pr-review-thread`, `review-pr`, `shape-issues`
 
 ### Agent OS Commands (7, unchanged)
 

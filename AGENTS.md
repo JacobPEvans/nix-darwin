@@ -158,7 +158,7 @@ run `/compact` on the main conversation before spawning subagents.
    Use: `gh api repos/OWNER/REPO/pulls/NUM/reviews` to get reviews with commit_id.
    Wait until all reviewers have reviewed the current head commit before finishing.
    When a reviewer completes their review (comments, changes requested, or approved),
-   automatically invoke `/rok-resolve-pr-review-thread` to address feedback.
+   automatically invoke `/resolve-pr-review-thread` to address feedback.
    Continue monitoring until PR is merged or closed.
 
 ### Procedure Violations
