@@ -63,33 +63,42 @@ Added `emit_event()` function for consistent JSONL event logging to `~/.claude/l
 | Component | Status | Notes |
 |-----------|--------|-------|
 | OTEL Collector | ✅ Running | Watching `~/.claude/logs/*.jsonl` |
-| Cribl Edge | ✅ Running | Standalone "edge" mode |
+| Cribl Stream | ✅ Running | Local data routing/transformation |
+| Cribl Edge (K8s) | ✅ Running | Managed by Cribl Cloud |
 | Splunk | ❌ Disabled | ARM64/Rosetta incompatible (KVStore fails) |
 
 **Deployment Fixes Applied:**
 
 - OTEL: Added `health_check` extension on port 13133
-- Cribl Edge: Changed to standalone "edge" mode (was "worker")
+- Cribl Edge: Changed to managed-edge mode connected to Cribl Cloud
 - Cribl Edge: Changed probe to `exec` on `127.0.0.1:9420` (service binds to localhost)
-- Splunk: Added ARM64 digest + license acceptance (disabled due to KVStore incompatibility)
+- Cribl Stream: Added as local leader for data processing
+- Splunk: Disabled due to KVStore incompatibility with Rosetta
 
 **Secrets Created:**
 
 ```bash
-# Splunk (created but unused - service disabled)
-kubectl -n monitoring get secret splunk-admin
-kubectl -n monitoring get secret splunk-hec-token
+# Cribl Cloud connection
+kubectl -n monitoring get secret cribl-cloud-config
 ```
 
-**Cribl Cloud (optional, not configured):**
+### 4. Native Cribl Edge (macOS)
 
-```bash
-kubectl -n monitoring create secret generic cribl-cloud-config \
-  --from-literal=master-url='https://YOUR_ORG.cribl.cloud:4200' \
-  --from-literal=auth-token='YOUR_FLEET_TOKEN'
-```
+**Status:** ✅ Running as root
 
-### 4. Documentation
+**Installation:** `/opt/cribl/`
+
+**Configuration:**
+
+- Connected to Cribl Cloud fleet: `main-stoic-kaminsky-d9o9i3r.cribl.cloud`
+- Running as root (required for FDA bypass - see `docs/cribl-edge-macos-fda-attempts.md`)
+- Launchd service: `/Library/LaunchDaemons/io.cribl.plist`
+
+**FDA Workaround:** Multiple attempts to grant Full Disk Access to non-root cribl user
+failed. Running as root bypasses TCC/FDA entirely. See detailed documentation in
+`modules/monitoring/docs/cribl-edge-macos-fda-attempts.md`.
+
+### 5. Documentation
 
 **Main:** `docs/MONITORING.md` - Overview and quick reference
 
@@ -101,7 +110,7 @@ kubectl -n monitoring create secret generic cribl-cloud-config \
 - `SPLUNK.md` - SPL queries, dashboards, saved searches, data models
 - `OLLAMA.md` - AI-powered log enrichment, Cribl pipelines
 
-### 5. Flake Changes
+### 6. Flake Changes
 
 **File:** `flake.nix`
 
@@ -189,6 +198,9 @@ The Slack bot token (`auto-claude-slack-bot-token`) in BWS hasn't been verified 
 3. `b96f91e` - fix(auto-claude): retrieve BWS_ACCESS_TOKEN from keychain for Slack
 4. `93e8604` - docs: add PLANNING-monitoring.md for session continuity
 5. `2c9c7f2` - feat(monitoring): deploy K8s stack to OrbStack with fixes
+6. `ce1ee81` - docs: update PLANNING-monitoring.md with K8s deployment status
+7. `f533f17` - feat(monitoring): add Cribl Stream and connect Edge to Cribl Cloud
+8. `d1bf1f0` - docs(monitoring): document Cribl Edge macOS FDA workaround attempts
 
 ## Testing Commands
 
@@ -214,26 +226,32 @@ sudo darwin-rebuild switch --flake .
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           Log Sources                                    │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  Auto-Claude     │  Claude Code    │  Ollama        │  Terminal         │
+│  Claude Logs     │  Claude Code    │  Ollama        │  Terminal         │
 │  ~/.claude/logs/ │  OTEL native    │  ~/Library/... │  ~/logs/          │
 └────────┬─────────┴────────┬────────┴───────┬────────┴────────┬──────────┘
          │                  │                │                 │
-         ▼                  ▼                ▼                 ▼
+         ▼                  │                │                 │
+┌──────────────────┐        │                │                 │
+│ Native Cribl Edge│        │                │                 │
+│ (runs as root)   │        │                │                 │
+└────────┬─────────┘        │                │                 │
+         │                  ▼                ▼                 ▼
+         │    ┌───────────────────────────────────────────────────────────┐
+         │    │              OrbStack Kubernetes Cluster                   │
+         │    ├───────────────────────────────────────────────────────────┤
+         │    │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+         │    │  │ OTEL         │  │ Cribl Edge   │  │ Cribl Stream │     │
+         │    │  │ Collector    │  │ (K8s logs)   │  │ (leader)     │     │
+         │    │  └──────────────┘  └──────────────┘  └──────────────┘     │
+         │    └───────────────────────────────────────────────────────────┘
+         │                              │
+         ▼                              ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    OrbStack Kubernetes Cluster                           │
+│                         Cribl Cloud                                      │
+│  main-stoic-kaminsky-d9o9i3r.cribl.cloud                                │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                   │
-│  │ OTEL         │  │ Cribl Edge   │  │ Splunk       │                   │
-│  │ Collector    │──│ (log shipper)│──│ (local SIEM) │                   │
-│  └──────┬───────┘  └──────┬───────┘  └──────────────┘                   │
-│         │                 │                                              │
-└─────────┼─────────────────┼──────────────────────────────────────────────┘
-          │                 │
-          ▼                 ▼
-┌─────────────────┐  ┌─────────────────┐
-│ Cribl Cloud     │  │ Cribl Lake      │
-│ Stream          │──│ (long-term)     │
-└─────────────────┘  └─────────────────┘
+│  Fleet Management  │  Stream Processing  │  Cribl Lake (long-term)      │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Related Files

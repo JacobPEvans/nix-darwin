@@ -1,7 +1,7 @@
 # Cribl Edge macOS FDA Workaround Attempts
 
 **Date**: 2024-12-20
-**Outcome**: Failed - decided to reinstall as root instead
+**Outcome**: FDA workarounds failed - running as root is the working solution
 
 ## Problem
 
@@ -107,20 +107,26 @@ sudo ln -sf /opt/cribl/log .
 
 ---
 
+## What Works
+
+1. **Run as root** ✅: Confirmed working. Root bypasses TCC/FDA entirely.
+   Edit `/Library/LaunchDaemons/io.cribl.plist` and change `<key>UserName</key>` from
+   `cribl` to `root`, then reload the service.
+
 ## What Might Work (Not Tested)
 
-1. **Run as root**: The user's chosen solution. Root bypasses TCC/FDA entirely.
-
-2. **MDM/PPPC Profile**: Enterprise deployment can push a Privacy Preferences Policy Control
+1. **MDM/PPPC Profile**: Enterprise deployment can push a Privacy Preferences Policy Control
    profile that grants FDA to specific binaries by code signature or bundle ID.
    Requires MDM infrastructure.
 
-3. **Signing the .app**: If the .app bundle were properly code-signed with an Apple Developer
+2. **Signing the .app**: If the .app bundle were properly code-signed with an Apple Developer
    certificate, FDA might work better. The unsigned .app may have been rejected by Gatekeeper.
 
-4. **Using `open -a CriblEdge.app`**: Launching via the `open` command sometimes helps with FDA inheritance, but doesn't work for launchd daemons.
+3. **Using `open -a CriblEdge.app`**: Launching via the `open` command sometimes helps
+   with FDA inheritance, but doesn't work for launchd daemons.
 
-5. **Terminal.app FDA**: Granting FDA to Terminal.app would allow commands run from Terminal to access protected files, but this doesn't help launchd services.
+4. **Terminal.app FDA**: Granting FDA to Terminal.app would allow commands run from Terminal
+   to access protected files, but this doesn't help launchd services.
 
 ---
 
