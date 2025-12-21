@@ -26,6 +26,7 @@ _:
       "git name-rev"
       "git rev-list"
       "git merge-base"
+      "git show-ref"
     ];
     branch = [
       "git branch"
@@ -36,6 +37,10 @@ _:
       "git worktree add"
       "git worktree remove"
       "git worktree prune"
+      "git worktree lock"
+      "git worktree move"
+      "git worktree repair"
+      "git worktree unlock"
     ];
     write = [
       "git add"
@@ -85,6 +90,7 @@ _:
     repo = [
       "gh repo view"
       "gh repo clone"
+      "gh repo list"
     ];
     api = [
       "gh api"
@@ -252,6 +258,7 @@ _:
     "which"
     "whereis"
     "ps"
+    "pgrep"
     "top -l 1"
     "df"
     "du"
@@ -576,12 +583,17 @@ _:
     "check-jsonschema"
     "markdownlint-cli2"
     "pre-commit"
+    "shellcheck"
   ];
 
   claude = [
     "claude doctor"
     "claude config list"
     "claude config get"
+  ];
+
+  ai = [
+    "ollama list"
   ];
 
   orbstack = [
