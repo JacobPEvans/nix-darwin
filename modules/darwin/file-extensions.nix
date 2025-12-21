@@ -25,11 +25,15 @@
 #
 # Reference: https://developer.apple.com/documentation/uniformtypeidentifiers
 
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.file-extensions;
-  userConfig = import ../../lib/user-config.nix;
 in
 {
   options.programs.file-extensions = {
@@ -75,12 +79,14 @@ in
       trap "rm -f $DUTI_CONFIG" EXIT
 
       # Generate duti configuration for each custom extension
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (ext: uti: ''
-        # Map ${ext} to ${uti}
-        # Format: UTI handler role
-        # Role: all = default handler for this type
-        echo "${uti} ${ext} all" >> "$DUTI_CONFIG"
-      '') cfg.customMappings)}
+      ${lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (ext: uti: ''
+          # Map ${ext} to ${uti}
+          # Format: UTI handler role
+          # Role: all = default handler for this type
+          echo "${uti} ${ext} all" >> "$DUTI_CONFIG"
+        '') cfg.customMappings
+      )}
 
       # Apply the configuration with duti
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
@@ -95,9 +101,11 @@ in
 
       # Display configured mappings
       echo "Configured mappings:" >&2
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (ext: uti: ''
-        echo "  ${ext} → ${uti}" >&2
-      '') cfg.customMappings)}
+      ${lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (ext: uti: ''
+          echo "  ${ext} → ${uti}" >&2
+        '') cfg.customMappings
+      )}
     '';
 
     # Inform user about activation
