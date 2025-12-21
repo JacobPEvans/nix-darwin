@@ -93,11 +93,13 @@ in
       # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
       # See hosts/macbook-m4/home.nix for details
       obsidian # Knowledge base / note-taking (Markdown)
-      # NOTE: OrbStack and Zoom moved to home.packages for better handling of TCC
+      # NOTE: OrbStack managed via programs.orbstack module for system-level
+      # installation. See modules/darwin/apps/orbstack.nix and
+      # hosts/macbook-m4/default.nix for configuration.
+      # NOTE: Zoom moved to home.packages for better handling of TCC
       # (camera/mic/screen) permissions via stable trampolines (wrapper apps with
       # stable paths; see hosts/macbook-m4/home.nix). Apps that frequently need
-      # these permissions (e.g., Zoom for video calls, OrbStack for VM/system
-      # access) benefit most.
+      # these permissions (e.g., Zoom for video calls) benefit most.
       raycast # Productivity launcher (replaces Spotlight)
       swiftbar # Menu bar customization (auto-claude status)
       vscode # Visual Studio Code editor
