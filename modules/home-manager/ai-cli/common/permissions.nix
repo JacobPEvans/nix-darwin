@@ -43,11 +43,13 @@ let
   # Paths to permission directories in ai-assistant-instructions
   allowDir = "${ai-assistant-instructions}/agentsmd/permissions/allow";
   denyDir = "${ai-assistant-instructions}/agentsmd/permissions/deny";
+  askDir = "${ai-assistant-instructions}/agentsmd/permissions/ask";
   domainsFile = "${ai-assistant-instructions}/agentsmd/permissions/domains/webfetch.json";
 
   # Read all permission files once to avoid redundant I/O
   allowJsons = readJsonsFromDir allowDir;
   denyJsons = readJsonsFromDir denyDir;
+  askJsons = readJsonsFromDir askDir;
 
 in
 {
@@ -56,6 +58,9 @@ in
 
   # Denied commands from ai-assistant-instructions
   deny = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) denyJsons);
+
+  # Commands that require explicit user confirmation
+  ask = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) askJsons);
 
   # WebFetch domains
   webfetchDomains =
