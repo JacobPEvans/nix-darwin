@@ -56,3 +56,24 @@ gw-a() {
   # Change into the new worktree
   cd "$repo_root/$branch"
 }
+
+# gw-clean - Clean up stale worktree references
+# Usage: gw-clean
+#
+# Removes worktree administrative files for deleted worktrees.
+# Safe to run repeatedly - only removes references to directories that no longer exist.
+gw-clean() {
+  echo "Pruning worktree administrative files..."
+  git worktree prune --verbose
+
+  echo "\nRemaining worktrees:"
+  git worktree list
+}
+
+# gw-l - List all worktrees with their branches
+# Usage: gw-l
+#
+# Shows all worktrees in the repository with their paths and branches.
+gw-l() {
+  git worktree list
+}

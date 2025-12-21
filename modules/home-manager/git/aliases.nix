@@ -41,4 +41,8 @@
 
   # Cleanup
   cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d";
+
+  # Worktree operations
+  wl = "worktree list"; # List all worktrees
+  wp = "worktree prune"; # Clean up stale worktree administrative files
 }
