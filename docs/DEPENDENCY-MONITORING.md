@@ -11,7 +11,7 @@ flake inputs and packages current while minimizing noise and maximizing safety:
 |------|------|----------|---------|----------|----------|
 | **Instant** | ai-assistant-instructions | On push to main | repository_dispatch | deps-update-ai-instructions.yml | `ai-instructions` |
 | **Daily** | Anthropic repos (4 inputs) | 6 AM UTC daily | Scheduled | deps-update-anthropic.yml | `anthropic` |
-| **Bi-weekly** | All flake inputs (11 total) | Mon/Thu 6 AM UTC | Scheduled | deps-update-flake.yml | `dependencies` |
+| **Daily** | All flake inputs (11 total) | 6 AM UTC daily | Scheduled | deps-update-flake.yml | `dependencies` |
 | **Tri-weekly** | Package versions (8 packages) | Mon 7am, Thu 7pm, Sat 7am | Scheduled | deps-monitor-packages.yml | `package-updates` |
 
 ## Workflows
@@ -54,13 +54,14 @@ Updates fast-moving Anthropic repositories daily to stay current with Claude Cod
 gh workflow run deps-update-anthropic.yml
 ```
 
-### 3. Bi-Weekly Full Update: All Inputs
+### 3. Daily Full Update: All Inputs
 
 **Workflow**: `.github/workflows/deps-update-flake.yml`
 
 Comprehensive update of all 11 flake inputs including nixpkgs, darwin, home-manager, and other dependencies.
+Changed from bi-weekly to daily to ensure fast-moving packages like `claude-code` stay current.
 
-**Schedule**: Monday and Thursday at 6 AM UTC
+**Schedule**: Daily at 6 AM UTC (10-11 PM PT previous day)
 
 **Manual trigger:**
 
@@ -224,22 +225,26 @@ schedule:
 If migrating from manual `nix flake update`:
 
 1. ✅ These workflows replace manual updates
-2. ✅ Existing bi-weekly schedule remains unchanged
-3. ✅ New: Daily Anthropic updates (more current tooling)
-4. ✅ New: Instant ai-instructions sync (immediate permission updates)
-5. ✅ New: Package version visibility (proactive monitoring)
+2. ✅ Daily flake updates (changed from bi-weekly for faster claude-code updates)
+3. ✅ Daily Anthropic updates (current tooling)
+4. ✅ Instant ai-instructions sync (immediate permission updates)
+5. ✅ Package version visibility (proactive monitoring)
+6. ✅ Auto-merge for low-risk updates (no manual PR approval needed)
 
-**No breaking changes** - the bi-weekly full update (deps-update-flake.yml) continues as before.
+**Daily workflow**: Updates flow overnight (6 AM UTC) → auto-merge → you pull and rebuild when ready.
 
 ## Future Enhancements
 
 Potential improvements to consider:
 
-- [ ] Add agent-os to daily fast-track (currently only in bi-weekly)
+- [x] ~~Daily nixpkgs updates for claude-code~~ (implemented)
+- [x] ~~Auto-merge for low-risk updates~~ (implemented)
+- [ ] Add agent-os to daily fast-track (currently only in daily full update)
 - [ ] Create security-specific workflow for CVE scanning
 - [ ] Add Slack/Discord notifications for HIGH risk updates
 - [ ] Expand package monitoring to more packages
 - [ ] Add performance metrics (build time tracking)
+- [ ] Optional launchd agent for automatic local rebuilds
 
 ## References
 
