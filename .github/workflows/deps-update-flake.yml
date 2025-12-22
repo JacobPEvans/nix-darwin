@@ -1,13 +1,12 @@
 # Automated flake.lock updates
-# Runs Mon/Thu/Sat at 6 AM UTC to keep nix inputs current
+# Runs daily at 6 AM UTC to keep nix inputs current (especially claude-code)
 # Creates PRs with 'dependencies' label for AI review workflow
+# Low-risk updates auto-merge via review-deps.yml
 name: Update flake.lock
 
 on:
   schedule:
-    - cron: "0 6 * * 1" # Monday 6 AM UTC
-    - cron: "0 6 * * 4" # Thursday 6 AM UTC
-    - cron: "0 6 * * 6" # Saturday 6 AM UTC
+    - cron: "0 6 * * *" # Daily at 6 AM UTC (10-11 PM PT)
   workflow_dispatch: {} # Manual trigger
 
 jobs:

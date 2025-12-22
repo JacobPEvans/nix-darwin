@@ -11,10 +11,8 @@ on:
 jobs:
   review:
     name: AI Dependency Review
-    # TEMPORARILY DISABLED - re-enable when ready
-    if: false
-    # Original condition:
-    # if: contains(github.event.pull_request.labels.*.name, 'dependencies')
+    # Only run on PRs with the 'dependencies' label
+    if: contains(github.event.pull_request.labels.*.name, 'dependencies')
     runs-on: ubuntu-latest
     permissions:
       contents: write
