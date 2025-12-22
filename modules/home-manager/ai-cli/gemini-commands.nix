@@ -19,20 +19,50 @@ let
       filePath = "${commandsDir}/${fileName}";
       fileContent = builtins.readFile filePath;
 
-      # Basic frontmatter/content splitter
-      # Assumes standard Jekyll/Claude style frontmatter:
+      # Robust frontmatter/content splitter
+      # Assumes standard Jekyll/Claude style frontmatter at top of file:
       # ---
       # key: value
       # ---
       # Content...
-      parts = lib.splitString "---" fileContent;
+      lines = lib.splitString "\n" fileContent;
+      lineCount = builtins.length lines;
 
-      # indices: [0] = empty before first ---, [1] = frontmatter, [2+] = content
-      hasFrontmatter = (builtins.length parts) >= 3;
+      # Find the index of the second frontmatter delimiter ("---"), starting at line 1
+      secondDelimIndex =
+        let
+          find =
+            idx:
+            if idx >= lineCount then
+              null
+            else if lib.trim (builtins.elemAt lines idx) == "---" then
+              idx
+            else
+              find (idx + 1);
+        in
+        find 1;
 
-      frontmatterRaw = if hasFrontmatter then builtins.elemAt parts 1 else "";
+      # Valid frontmatter exists only if the file starts with "---" and we find a second delimiter
+      hasFrontmatter =
+        lineCount >= 3 && lib.trim (builtins.elemAt lines 0) == "---" && secondDelimIndex != null;
+
+      frontmatterRaw =
+        if hasFrontmatter then
+          let
+            frontmatterLines = lib.sublist 1 (secondDelimIndex - 1) lines;
+          in
+          lib.concatStringsSep "\n" frontmatterLines
+        else
+          "";
+
       contentRaw =
-        if hasFrontmatter then lib.concatStringsSep "---" (lib.drop 2 parts) else fileContent;
+        if hasFrontmatter then
+          let
+            contentLines = lib.sublist (secondDelimIndex + 1) (lineCount - secondDelimIndex - 1) lines;
+          in
+          lib.concatStringsSep "\n" contentLines
+        else
+          fileContent;
 
       # Extract description from frontmatter
       # Looks for "description: text" line
@@ -48,13 +78,17 @@ let
 
       # Generate Gemini TOML format
       # We use multi-line string for the command content
-      # NOTE: We escape double quotes in description if any (basic)
-      safeDescription = lib.replaceStrings [ "\"" ] [ "\\\"" ] description;
+      # NOTE: We escape backslashes and double quotes in description
+      safeDescription = lib.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] description;
+
+      # Escape triple quotes in content to prevent TOML parsing errors
+      # TOML multi-line strings (""") break if content contains """
+      safeContent = lib.replaceStrings [ "\"\"\"" ] [ "\"\"\\\"" ] (lib.trim contentRaw);
 
       tomlContent = ''
         description = "${safeDescription}"
-        command = """
-        ${lib.trim contentRaw}
+        prompt = """
+        ${safeContent}
         """
       '';
 
@@ -65,6 +99,7 @@ let
       name = ".gemini/commands/${outName}";
       value = {
         text = tomlContent;
+        force = true;
       };
     };
 
@@ -72,9 +107,7 @@ let
   commandFiles =
     if builtins.pathExists commandsDir then
       builtins.attrNames (
-        lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".md" n) (
-          builtins.readDir commandsDir
-        )
+        lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".md" n) (builtins.readDir commandsDir)
       )
     else
       [ ];
