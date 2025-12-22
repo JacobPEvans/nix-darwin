@@ -93,10 +93,45 @@ Execute this loop continuously until budget exhaustion forces termination:
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ 0. PR COUNT CHECK (FIRST - EVERY ITERATION)                                  │
 │    OPEN_PR_COUNT=$(gh pr list --author @me --state open --json number | jq length)
-│    If OPEN_PR_COUNT >= 10: ENTER PR-FOCUS MODE (skip to step 1b)             │
-│    If OPEN_PR_COUNT < 10: NORMAL MODE (proceed to step 1a)                   │
+│    If OPEN_PR_COUNT >= 10: ENTER PR-FOCUS MODE (skip to step 2)              │
+│    If OPEN_PR_COUNT < 10: NORMAL MODE (proceed to step 1)                    │
 │                                                                              │
-│ 1a. SCAN (NORMAL MODE - PRs < 10)                                            │
+│ 1. ISSUE HYGIENE (RUN FIRST IN NORMAL MODE - BEFORE DISPATCHING WORK)        │
+│    Before assigning issues to sub-agents, clean up the issue backlog:        │
+│                                                                              │
+│    a) Fetch all open issues and recent PRs:                                  │
+│       gh issue list --state open --limit 100 --json number,title,body,labels │
+│       gh pr list --state all --limit 200 --json number,title,state,headRefName│
+│                                                                              │
+│    b) For EACH open issue, check if resolved by comparing to:                │
+│       - Merged PRs (search PR titles/branches for issue numbers)             │
+│       - Current main branch code (grep/search for implementations)           │
+│       - Closed related issues                                                │
+│                                                                              │
+│    c) Actions based on findings:                                             │
+│       FULLY RESOLVED: Comment with evidence + linked PRs, then close issue   │
+│         gh issue comment <num> --body "Resolved by PR #X. [details]"         │
+│         gh issue close <num> --reason completed                              │
+│                                                                              │
+│       PARTIALLY RESOLVED: Comment with progress + linked PRs, leave open     │
+│         gh issue comment <num> --body "Partially resolved: [details]. PRs: #X"│
+│                                                                              │
+│       STALE/OUTDATED: Comment explaining why, close as not-planned           │
+│         gh issue close <num> --reason "not planned" --comment "..."          │
+│                                                                              │
+│       MISSING PR LINKS: If a PR addresses an issue but isn't linked:         │
+│         gh pr edit <pr-num> --body "... Fixes #<issue-num> ..."              │
+│         (Or add comment on PR referencing issue)                             │
+│                                                                              │
+│    d) Verify ALL open PRs are linked to issues:                              │
+│       For each PR without "Fixes #" or "Closes #" in body, find related issue│
+│       and update PR body or add comment linking them.                        │
+│                                                                              │
+│    e) Skip this step if run within the last 6 hours (check timestamp file):  │
+│       ~/.cache/auto-claude/last-issue-hygiene                                │
+│       touch ~/.cache/auto-claude/last-issue-hygiene after running            │
+│                                                                              │
+│ 2. SCAN (NORMAL MODE - PRs < 10)                                             │
 │    Run these commands to gather current state:                               │
 │    - git status                                                              │
 │    - git log --oneline -10                                                   │
@@ -109,7 +144,7 @@ Execute this loop continuously until budget exhaustion forces termination:
 │      Command: gh issue list --state open --limit 20 --search "-label:ai-created"
 │    - Analyze codebase for bugs/improvements (if no urgent PR/issue work)     │
 │                                                                              │
-│ 1b. SCAN (PR-FOCUS MODE - PRs >= 10)                                         │
+│ 2b. SCAN (PR-FOCUS MODE - PRs >= 10)                                         │
 │    ONLY gather PR state - ignore issues and new work:                        │
 │    - gh pr list --state open --author @me                                    │
 │    - For each open PR: gh pr checks <number>                                 │
@@ -117,7 +152,7 @@ Execute this loop continuously until budget exhaustion forces termination:
 │    - For PRs with reviews: gh pr view <number> --comments                    │
 │    - gh api repos/{owner}/{repo}/pulls/{number}/reviews for review status    │
 │                                                                              │
-│ 2. PRIORITIZE                                                                │
+│ 3. PRIORITIZE                                                                │
 │    IN PR-FOCUS MODE (PRs >= 10): ONLY priorities 1-4 apply                   │
 │    IN NORMAL MODE (PRs < 10): All priorities apply                           │
 │                                                                              │
@@ -137,7 +172,7 @@ Execute this loop continuously until budget exhaustion forces termination:
 │    9. Low test coverage in critical paths                                    │
 │    10. Dependency updates (minor/patch only)                                 │
 │                                                                              │
-│ 3. DISPATCH                                                                  │
+│ 4. DISPATCH                                                                  │
 │    IN PR-FOCUS MODE: Spawn UP TO 5 sub-agents IN PARALLEL for PR work        │
 │      - Each sub-agent handles exactly ONE PR                                 │
 │      - Use multiple Task tool calls in a single response                     │
@@ -151,17 +186,18 @@ Execute this loop continuously until budget exhaustion forces termination:
 │        - Reminder: NEVER ask user questions                                  │
 │        - Reminder: Enable auto-merge after CI passes                         │
 │                                                                              │
-│ 4. AWAIT                                                                     │
+│ 5. AWAIT                                                                     │
 │    Wait for sub-agent(s) to complete.                                        │
 │    In PR-FOCUS MODE: Wait for all parallel agents to finish                  │
 │    The sub-agent may spawn its own helpers (2 levels allowed).               │
 │                                                                              │
-│ 5. CAPTURE                                                                   │
+│ 6. CAPTURE                                                                   │
 │    Log the sub-agent's results.                                              │
 │    Emit the appropriate notification event (completed or blocked).           │
 │    Track PRs created, PRs merged, costs incurred, time spent.                │
+│    ALWAYS verify PRs are linked to issues (add link if missing).             │
 │                                                                              │
-│ 6. LOOP                                                                      │
+│ 7. LOOP                                                                      │
 │    Return to step 0 (PR COUNT CHECK) to reassess mode.                       │
 │    Do NOT exit. Do NOT claim you are done.                                   │
 │    The only valid termination is API budget exhaustion.                      │
@@ -222,11 +258,19 @@ issue-resolver:
 
    WORKFLOW:
    1. Use /init-worktree to create a clean worktree for this work
-   2. Create a feature branch with descriptive name
+   2. Create a feature branch with descriptive name (e.g., issue-X-description)
    3. Make the minimal fix needed - no scope creep
    4. Write tests if applicable
-   5. Create a PR with clear description
+   5. Create a PR with clear description that LINKS to the issue:
+      - PR body MUST contain 'Fixes #X' or 'Closes #X'
+      - This creates a bidirectional link in GitHub's UI
+      - Verify link appears in issue's sidebar: gh issue view X
    6. Enable auto-merge: gh pr merge --auto --squash
+
+   PR-ISSUE LINK VERIFICATION (MANDATORY):
+   After creating PR, verify the link is working:
+     gh pr view <pr-num> --json body | grep -q 'Fixes #' || echo 'MISSING LINK!'
+   The issue sidebar should show 'X linked pull requests'
 
    Reference: /resolve-issues for comprehensive issue resolution workflow.
    You may spawn helper agents. NEVER ask user questions."
@@ -289,9 +333,19 @@ When dispatching any sub-agent, always include:
    blocked, report the blocker and return so the orchestrator can move on."
 5. AUTO-MERGE: "After CI passes and PR is approved, enable auto-merge:
    gh pr merge --auto --squash"
-6. ISSUE LABELS: When creating issues, ALWAYS add 'ai-created' label:
-   "gh issue create --label 'ai-created' ..."
-   AI can only work on issues WITHOUT this label (human must review first)
+6. ISSUE LABELS: When creating issues, ALWAYS add appropriate labels:
+   - 'ai-created' label is REQUIRED (human must review before AI works on it)
+   - Add additional labels based on content: bug, enhancement, documentation,
+     security, quick-win, dependencies, etc.
+   - Use best judgment from available labels: gh label list
+   Example: gh issue create --label 'ai-created,bug,quick-win' --title '...'
+7. PR-ISSUE LINKING (MANDATORY): Every PR MUST be linked to an issue:
+   - Include "Fixes #<issue-num>" or "Closes #<issue-num>" in PR body
+   - If no issue exists, create one first with appropriate labels
+   - If PR addresses multiple issues, link all of them
+   - After creating PR, verify the link: gh pr view <num> --json body
+   Example PR body:
+     "## Summary\n...\n\nFixes #123\n\n🤖 Generated with Claude Code"
 
 FORBIDDEN ACTIONS
 You must NEVER:
@@ -306,6 +360,8 @@ You must NEVER:
 - Create new branches/PRs when open PR count >= 10 (PR-FOCUS MODE)
 - Create PRs with multiple unrelated changes (ONE concept per PR)
 - Create issues without the 'ai-created' label
+- Create PRs without linking to an issue (PRs MUST have "Fixes #X" in body)
+- Leave orphan PRs (PRs must show linked issue in GitHub's sidebar)
 
 RESILIENCE
 If a sub-agent fails or returns without completing:
@@ -379,6 +435,39 @@ If a task is too large:
 1. Break it into smaller GitHub issues
 2. Each issue gets its own focused PR
 3. PRs can reference related issues for context
+
+PR-ISSUE LINKING (MANDATORY - NO EXCEPTIONS)
+Every PR MUST be linked to a GitHub issue. This is NON-NEGOTIABLE.
+
+WHY THIS MATTERS:
+- Traceability: Every code change can be traced back to a requirement/bug
+- Accountability: Issues track what was requested; PRs track what was delivered
+- Discovery: Searching issues reveals related PRs and vice versa
+- Closure: When PR merges, linked issue auto-closes (if using "Fixes #X")
+
+HOW TO LINK:
+1. PR body must contain one of these keywords + issue number:
+   - "Fixes #123" (auto-closes issue when PR merges)
+   - "Closes #123" (auto-closes issue when PR merges)
+   - "Resolves #123" (auto-closes issue when PR merges)
+   - "Related to #123" (creates link but does NOT auto-close)
+
+2. The link must be in the PR BODY, not just commit messages
+
+3. After PR creation, verify the link exists:
+   gh issue view 123 --json "title,state"  # Should show linked PRs in web UI
+   gh pr view <pr-num> --json body | grep -E "(Fixes|Closes|Resolves) #"
+
+FINDING UNLINKED PRs:
+During ISSUE HYGIENE step, check for orphan PRs:
+  gh pr list --state open --json number,body | jq '.[] | select(.body | test("(Fixes|Closes|Resolves) #[0-9]+") | not)'
+
+If found, IMMEDIATELY fix by:
+1. Finding the related issue (search by PR title/description)
+2. If no issue exists, create one with 'ai-created' label
+3. Edit PR body to add the link: gh pr edit <num> --body "..."
+
+NO ORPHAN PRs ALLOWED. Every PR must have a home.
 
 PROGRESS TRACKING
 Maintain internal state of:
