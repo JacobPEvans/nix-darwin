@@ -18,6 +18,15 @@
   # Host-Specific Home Settings
   # ==========================================================================
   # Settings unique to this machine's user environment
+
+  # Enable monitoring infrastructure (K8s manifests, helper scripts)
+  monitoring = {
+    enable = true;
+    kubernetes.enable = true;
+    otel.enable = true;
+    cribl.enable = true;
+  };
+
   home = {
     # ========================================================================
     # TCC-Sensitive GUI Applications (require proper trampolines)
@@ -32,10 +41,13 @@
     # /Applications/Nix Apps/.
     #
     # Trampolines location: ~/Applications/Home Manager Trampolines/
+    #
+    # NOTE: OrbStack moved to system-level installation via
+    # programs.orbstack.package.enable in default.nix
+    # See hosts/macbook-m4/default.nix for OrbStack configuration
     packages = with pkgs; [
       ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
       zoom-us # Video conferencing - needs camera/mic TCC permissions
-      orbstack # Docker/Linux VMs - needs various system permissions
     ];
 
     # ========================================================================

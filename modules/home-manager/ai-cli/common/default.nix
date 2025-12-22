@@ -5,7 +5,7 @@
 #
 # USAGE:
 #   let
-#     aiCommon = import ./common { inherit lib config; };
+#     aiCommon = import ./common { inherit lib config ai-assistant-instructions; };
 #     geminiAllowedTools = aiCommon.formatters.gemini.formatAllowedTools aiCommon.permissions;
 #   in { ... }
 #
@@ -19,11 +19,16 @@
 # - permissions: Tool-agnostic command definitions
 # - formatters: Tool-specific formatting functions
 
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  ai-assistant-instructions,
+  ...
+}:
 
 {
   # Unified permission definitions
-  permissions = import ./permissions.nix { inherit lib config; };
+  permissions = import ./permissions.nix { inherit lib config ai-assistant-instructions; };
 
   # Tool-specific formatters
   formatters = import ./formatters.nix { inherit lib; };

@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cribl-edge
+  namespace: monitoring
+  labels:
+    app: cribl-edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cribl-edge
+  template:
+    metadata:
+      labels:
+        app: cribl-edge
+    spec:
+      containers:
+        - name: cribl-edge
+          image: cribl/cribl:latest
+          ports:
+            - name: api
+              containerPort: 9420
+              protocol: TCP
+            - name: ui
+              containerPort: 9000
+              protocol: TCP
+          env:
+            # Managed Edge mode - connected to Cribl Cloud
+            - name: CRIBL_DIST_MODE
+              value: "managed-edge"
+            - name: CRIBL_DIST_MASTER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cribl-cloud-config
+                  key: master-url
+            - name: CRIBL_DIST_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cribl-cloud-config
+                  key: auth-token
+            # Fleet group
+            - name: CRIBL_DIST_GROUP
+              value: "default_fleet"
+          volumeMounts:
+            # Mount Claude logs
+            - name: claude-logs
+              mountPath: /var/log/claude
+              readOnly: true
+            # Mount Ollama logs
+            - name: ollama-logs
+              mountPath: /var/log/ollama
+              readOnly: true
+            # Mount terminal logs
+            - name: terminal-logs
+              mountPath: /var/log/terminal
+              readOnly: true
+            # Persistent config/state
+            - name: cribl-data
+              mountPath: /opt/cribl/data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "curl -sf http://127.0.0.1:9420/api/v1/health || exit 1"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "curl -sf http://127.0.0.1:9420/api/v1/health || exit 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+      volumes:
+        # OrbStack mounts macOS paths automatically
+        - name: claude-logs
+          hostPath:
+            path: "@homeDir@/.claude/logs"
+            type: DirectoryOrCreate
+        - name: ollama-logs
+          hostPath:
+            path: "@homeDir@/Library/Logs/Ollama"
+            type: DirectoryOrCreate
+        - name: terminal-logs
+          hostPath:
+            path: "@homeDir@/logs"
+            type: DirectoryOrCreate
+        - name: cribl-data
+          emptyDir: {}

@@ -75,8 +75,22 @@ let
     # agentsmd - folder containing commands/, rules/, workflows/
     "agentsmd".source = "${ai-assistant-instructions}/agentsmd";
   };
-  geminiFiles = import ./ai-cli/gemini.nix { inherit config lib pkgs; };
-  copilotFiles = import ./ai-cli/copilot.nix { inherit config lib pkgs; };
+  geminiFiles = import ./ai-cli/gemini.nix {
+    inherit
+      config
+      lib
+      pkgs
+      ai-assistant-instructions
+      ;
+  };
+  copilotFiles = import ./ai-cli/copilot.nix {
+    inherit
+      config
+      lib
+      pkgs
+      ai-assistant-instructions
+      ;
+  };
 in
 {
   # ==========================================================================

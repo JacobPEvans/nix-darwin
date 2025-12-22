@@ -29,12 +29,17 @@
   config,
   lib,
   pkgs,
+  ai-assistant-instructions,
   ...
 }:
 
 let
-  geminiAllow = import ../permissions/gemini-permissions-allow.nix { inherit config lib; };
-  geminiDeny = import ../permissions/gemini-permissions-deny.nix { inherit config lib; };
+  geminiAllow = import ../permissions/gemini-permissions-allow.nix {
+    inherit config lib ai-assistant-instructions;
+  };
+  geminiDeny = import ../permissions/gemini-permissions-deny.nix {
+    inherit config lib ai-assistant-instructions;
+  };
 
   # Gemini settings object
   settings = {

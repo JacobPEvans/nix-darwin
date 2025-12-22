@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cribl-edge
+  namespace: monitoring
+  labels:
+    app: cribl-edge
+spec:
+  type: ClusterIP
+  selector:
+    app: cribl-edge
+  ports:
+    # OTEL endpoint for receiving traces/logs
+    - name: otel
+      port: 9420
+      targetPort: 9420
+      protocol: TCP
+    # Management UI
+    - name: ui
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
