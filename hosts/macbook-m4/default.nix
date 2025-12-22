@@ -56,6 +56,23 @@ in
     };
   };
 
+  # ==========================================================================
+  # File Extension Mappings
+  # ==========================================================================
+  # Custom file extensions recognized as tar.gz archives
+  # Enables Finder auto-extract and shell autocomplete
+
+  programs.file-extensions = {
+    enable = true;
+    # Default mappings for .spl and .crbl are already configured
+    # Add more custom mappings here if needed:
+    # customMappings = {
+    #   ".spl" = "public.tar-archive";
+    #   ".crbl" = "public.tar-archive";
+    #   ".custom" = "public.tar-archive";
+    # };
+  };
+
   # Machine-specific packages (if any beyond common)
   # environment.systemPackages = with pkgs; [ ];
 }

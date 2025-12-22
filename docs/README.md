@@ -12,6 +12,12 @@ Comprehensive documentation for the Nix configuration repository.
   - GitHub Actions templates
   - Troubleshooting and maintenance
 
+- **[FILE-EXTENSIONS.md](FILE-EXTENSIONS.md)** - Custom file extension mappings for macOS
+  - Configure non-standard archive extensions (e.g., .spl, .crbl)
+  - Enable Finder auto-extract and shell autocomplete
+  - UTI (Uniform Type Identifier) reference
+  - Examples and troubleshooting
+
 ## Related Documentation
 
 Main repository documentation is in the root directory:
