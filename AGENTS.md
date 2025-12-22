@@ -508,6 +508,24 @@ for GitHub Copilot's automated PR reviews via `.github/copilot-instructions.md`.
 - Flakes-only (no nix-channels, no nix-env)
 - Determinate Nix compatibility is required
 
+### Copilot Coding Agent Warning
+
+**NEVER use `@copilot` or `@copilot-*` in PR comments.**
+
+GitHub's mention parser extracts `@copilot` from strings like `@copilot-pull-request-reviewer`,
+triggering the Copilot Coding Agent to create unwanted "fix" PRs.
+
+**Instead of:**
+
+- ❌ "Thank you @copilot-pull-request-reviewer"
+- ❌ "@copilot-pull-request-reviewer's concern about..."
+
+**Use:**
+
+- ✅ "Thank you Copilot reviewer"
+- ✅ "The Copilot review mentioned..."
+- ✅ "Per the automated review..."
+
 ## Workflow
 
 1. Make changes to nix files

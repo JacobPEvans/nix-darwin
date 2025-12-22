@@ -16,11 +16,14 @@
   config,
   lib,
   pkgs,
+  ai-assistant-instructions,
   ...
 }:
 
 let
-  copilotAllow = import ../permissions/copilot-permissions-allow.nix { inherit config lib; };
+  copilotAllow = import ../permissions/copilot-permissions-allow.nix {
+    inherit config lib ai-assistant-instructions;
+  };
 
   # Copilot settings object
   settings = {

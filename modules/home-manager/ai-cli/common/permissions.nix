@@ -4,7 +4,7 @@
 # Each tool uses formatters to convert these to their specific format.
 #
 # STRUCTURE:
-# - allow: Auto-approved commands (imported from allow.nix)
+# - allow: Auto-approved commands (from ai-assistant-instructions)
 # - deny: Permanently blocked, catastrophic operations
 # - directories: Shared directory trust configuration
 # - toolSpecific: Non-shell tool identifiers
@@ -18,71 +18,71 @@
 {
   lib,
   config,
+  ai-assistant-instructions,
   ...
 }:
 
 let
   homeDir = config.home.homeDirectory;
+
+  # Read all JSON files from a directory into an attribute set
+  # Returns {filename = parsed-json-content} for efficient reuse
+  readJsonsFromDir =
+    dir:
+    if builtins.pathExists dir then
+      let
+        files = builtins.readDir dir;
+        jsonFiles = lib.filterAttrs (n: v: v == "regular" && lib.hasSuffix ".json" n) files;
+      in
+      lib.mapAttrs' (
+        name: _:
+        let
+          filePath = "${dir}/${name}";
+          fileContents = builtins.readFile filePath;
+          parsed = builtins.tryEval (builtins.fromJSON fileContents);
+        in
+        if parsed.success then
+          lib.nameValuePair name parsed.value
+        else
+          throw "Invalid JSON in AI permission file: ${filePath}"
+      ) jsonFiles
+    else
+      { };
+
+  # Paths to permission directories in ai-assistant-instructions
+  allowDir = "${ai-assistant-instructions}/agentsmd/permissions/allow";
+  denyDir = "${ai-assistant-instructions}/agentsmd/permissions/deny";
+  askDir = "${ai-assistant-instructions}/agentsmd/permissions/ask";
+  domainsFile = "${ai-assistant-instructions}/agentsmd/permissions/domains/webfetch.json";
+
+  # Read all permission files once to avoid redundant I/O
+  allowJsons = readJsonsFromDir allowDir;
+  denyJsons = readJsonsFromDir denyDir;
+  askJsons = readJsonsFromDir askDir;
+
 in
 {
-  # Auto-approved commands (imported from separate file for size)
-  allow = import ./allow.nix { };
+  # Auto-approved commands from ai-assistant-instructions
+  allow = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) allowJsons);
 
-  # Denied commands (catastrophic, permanently blocked)
-  deny = {
-    fileDestruction = [
-      "rm -rf /"
-      "rm -rf /*"
-      "rm -rf ~"
-      "rm -fr /"
-      "rm -fr /*"
-      "rm --recursive --force /"
-      "rm --recursive --force /*"
-    ];
+  # Denied commands from ai-assistant-instructions
+  deny = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) denyJsons);
 
-    httpWrite = [
-      "curl -X POST"
-      "curl -X PUT"
-      "curl -X DELETE"
-      "curl -X PATCH"
-      "curl --request POST"
-      "curl --request PUT"
-      "curl --request DELETE"
-      "curl --request PATCH"
-      "curl -d"
-      "curl --data"
-    ];
+  # Commands that require explicit user confirmation
+  ask = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) askJsons);
 
-    systemDestruction = [
-      "sudo rm"
-      "sudo dd"
-      "mkfs"
-      "fdisk"
-      "diskutil"
-    ];
+  # WebFetch domains
+  webfetchDomains =
+    if builtins.pathExists domainsFile then
+      (builtins.fromJSON (builtins.readFile domainsFile)).domains
+    else
+      [ ];
 
-    privilegeEscalation = [
-      "sudo su"
-      "sudo -i"
-      "sudo bash"
-      "sudo -s"
-    ];
+  # File patterns to deny (for Claude Read tool)
+  # These come from dangerous.json's "patterns" field
+  denyPatterns = denyJsons."dangerous.json".patterns or [ ];
 
-    reverseShells = [
-      "nc -l"
-      "ncat -l"
-      "socat"
-    ];
-
-    gitDangerous = [
-      "git push --force origin main"
-      "git push --force origin master"
-      "git push -f origin main"
-      "git push -f origin master"
-    ];
-  };
-
-  # Trusted directories
+  # Trusted directories (local config)
   directories = {
     development = [
       "${homeDir}/projects"
@@ -117,12 +117,34 @@ in
     ];
 
     # Claude built-in tools (non-shell)
-    claude.builtin = [
-      "Read"
-      "Glob"
-      "Grep"
-      "WebFetch"
-      "WebSearch"
-    ];
+    # NOTE: Deny rules (denyRead) take precedence over allow rules (builtin)
+    # as enforced by Claude Code at runtime when it evaluates these patterns,
+    # not by this Nix configuration itself. Even though Read(**) allows reading
+    # any file, the denyRead patterns will block sensitive files (.env, SSH keys,
+    # etc.) when Claude Code processes the permission lists.
+    claude = {
+      # Core built-in tools with glob patterns
+      builtin = [
+        "Read(**)"
+        "Glob(**)"
+        "Grep(**)"
+        "WebSearch"
+        "TodoWrite"
+        "TodoRead"
+        "SlashCommand(**)"
+      ];
+
+      # WebFetch with allowed domains (dynamically generated from ai-assistant-instructions)
+      # This will be populated by formatters.nix using webfetchDomains
+
+      # Special read patterns
+      read = [
+        "Read(/nix/store/**)"
+      ];
+
+      # Deny patterns for sensitive files (Claude-specific Read tool)
+      # Populated from ai-assistant-instructions deny/dangerous.json patterns field
+      # This will be transformed by formatters.nix to Read(...) format
+    };
   };
 }

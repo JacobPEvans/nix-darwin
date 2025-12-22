@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: splunk
+  namespace: monitoring
+  labels:
+    app: splunk
+spec:
+  serviceName: splunk
+  replicas: 1
+  selector:
+    matchLabels:
+      app: splunk
+  template:
+    metadata:
+      labels:
+        app: splunk
+    spec:
+      containers:
+        - name: splunk
+          # Force amd64 image for Rosetta emulation on ARM64
+          image: splunk/splunk@sha256:a455c77bc5e6b14395c7dd0a6665b4a93820f2742d6ac87359098cad96791300
+          ports:
+            - name: web
+              containerPort: 8000
+              protocol: TCP
+            - name: hec
+              containerPort: 8088
+              protocol: TCP
+            - name: forwarder
+              containerPort: 9997
+              protocol: TCP
+            - name: s2s
+              containerPort: 9998
+              protocol: TCP
+          env:
+            - name: SPLUNK_START_ARGS
+              value: "--accept-license"
+            - name: SPLUNK_GENERAL_TERMS
+              value: "--accept-sgt-current-at-splunk-com"
+            - name: SPLUNK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: splunk-admin
+                  key: password
+            # Generate HEC token for OTEL
+            - name: SPLUNK_HEC_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: splunk-hec-token
+                  key: token
+                  optional: true
+          volumeMounts:
+            - name: splunk-data
+              mountPath: /opt/splunk/var
+            - name: splunk-etc
+              mountPath: /opt/splunk/etc
+            - name: config
+              mountPath: /tmp/defaults/default.yml
+              subPath: default.yml
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /services/server/health/splunkd
+              port: 8089
+              scheme: HTTPS
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /services/server/health/splunkd
+              port: 8089
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            periodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: splunk-config
+  volumeClaimTemplates:
+    - metadata:
+        name: splunk-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+    - metadata:
+        name: splunk-etc
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

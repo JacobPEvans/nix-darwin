@@ -22,13 +22,11 @@ let
   # All other ai-assistant-instructions content comes from Nix store (flake input)
   autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
 
-  # Read permissions from ai-assistant-instructions
-  # Helper to reduce repetition (DRY)
-  readPermissionsJson = path: builtins.fromJSON (builtins.readFile path);
-
-  claudeAllowJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/allow.json";
-  claudeAskJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/ask.json";
-  claudeDenyJson = readPermissionsJson "${ai-assistant-instructions}/.claude/permissions/deny.json";
+  # Import unified permissions from common module
+  # This reads from ai-assistant-instructions agentsmd/permissions/
+  aiCommon = import ./common { inherit lib config ai-assistant-instructions; };
+  inherit (aiCommon) permissions;
+  inherit (aiCommon) formatters;
 
   # Dynamic command discovery from flake inputs
   # No more hardcoded lists - discovers all .md files automatically
@@ -106,16 +104,18 @@ in
         path = autoClaudeLocalRepoPath;
         schedule.hours = lib.lists.genList (i: i * 2) 12;
         maxBudget = 25.0;
-        # TODO: Configure Slack channel ID for this repo
-        # slackChannel = "C_AI_INSTRUCTIONS";
+        # Slack channel ID removed for security - retrieved from BWS at runtime
+        # Store in BWS as: slack-channel-ai-assistant-instructions
+        # slackChannel = "...";
       };
       # nix config: runs at odd hours (1, 3, 5, ...)
       nix = {
         path = "${config.home.homeDirectory}/.config/nix";
         schedule.hours = lib.lists.genList (i: i * 2 + 1) 12;
         maxBudget = 25.0;
-        # TODO: Configure Slack channel ID for this repo
-        # slackChannel = "C_NIX_CONFIG";
+        # Slack channel ID removed for security - retrieved from BWS at runtime
+        # Store in BWS as: slack-channel-nix
+        # slackChannel = "...";
       };
     };
   };
@@ -149,8 +149,9 @@ in
     };
 
     enabled = enabledPlugins;
-    # Disable local/experimental marketplace (for developing local plugins)
-    # Plugins from official marketplaces can still be installed at runtime
+    # Disable the local/experimental marketplace used for developing local plugins.
+    # With this disabled, plugins from configured/official marketplaces must be
+    # declared in Nix (via flake inputs) rather than installed dynamically at runtime.
     allowRuntimeInstall = false;
   };
 
@@ -206,11 +207,13 @@ in
       BASH_MAX_TIMEOUT_MS = "600000";
     };
 
-    # Permissions from ai-assistant-instructions repo
+    # Permissions from unified ai-assistant-instructions system
+    # Uses common/permissions.nix which reads from agentsmd/permissions/
+    # Formatted by common/formatters.nix to Claude Code format
     permissions = {
-      allow = claudeAllowJson.permissions;
-      deny = claudeDenyJson.permissions;
-      ask = claudeAskJson.permissions;
+      allow = formatters.claude.formatAllowed permissions;
+      deny = formatters.claude.formatDenied permissions;
+      ask = [ ]; # No ask permissions defined yet
     };
 
     # Additional directories accessible to Claude Code without prompts

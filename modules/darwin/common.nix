@@ -10,6 +10,7 @@ in
   imports = [
     ./apps
     ./dock
+    ./file-associations.nix
     ./finder.nix
     ./keyboard.nix
     ./security.nix
@@ -93,11 +94,13 @@ in
       # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
       # See hosts/macbook-m4/home.nix for details
       obsidian # Knowledge base / note-taking (Markdown)
-      # NOTE: OrbStack and Zoom moved to home.packages for better handling of TCC
+      # NOTE: OrbStack managed via programs.orbstack module for system-level
+      # installation. See modules/darwin/apps/orbstack.nix and
+      # hosts/macbook-m4/default.nix for configuration.
+      # NOTE: Zoom moved to home.packages for better handling of TCC
       # (camera/mic/screen) permissions via stable trampolines (wrapper apps with
       # stable paths; see hosts/macbook-m4/home.nix). Apps that frequently need
-      # these permissions (e.g., Zoom for video calls, OrbStack for VM/system
-      # access) benefit most.
+      # these permissions (e.g., Zoom for video calls) benefit most.
       raycast # Productivity launcher (replaces Spotlight)
       swiftbar # Menu bar customization (auto-claude status)
       vscode # Visual Studio Code editor
@@ -152,7 +155,16 @@ in
   nix = {
     enable = false;
     package = lib.mkForce pkgs.nix;
+
+    # DISABLED: nix.gc.automatic requires nix.enable = true, which conflicts with
+    # Determinate Nix (which manages its own daemon). For gc, use manual:
+    #   nix-collect-garbage --delete-older-than 30d
+    # Or consider a launchd plist that runs nix-collect-garbage directly.
+    gc.automatic = false;
   };
+
+  # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
+  environment.etc."nix/conf.d/gc.conf".text = "auto-optimise-store = true";
 
   # Disable documentation to suppress builtins.toFile warnings
   documentation.enable = false;
