@@ -21,27 +21,30 @@ let
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false;
     }))
-    ps.pyyaml
   ]);
 
   # Check if reporting is enabled
   reportingEnabled = cfg.autoClaude.reporting.enable;
 
-  # Note: launchd StartCalendarInterval uses UTC time, not local time
-  # EST is UTC-5, so:
-  # 8am EST = 1pm UTC (hour 13)
-  # 5pm EST = 10pm UTC (hour 22)
-  # Hardcoding for the typical report times to avoid Nix octal parsing issues
-  utcReportTimes = [
+  # Convert EST report times from config to UTC for launchd StartCalendarInterval
+  # NOTE: This assumes EST is always UTC-5 and does NOT account for Daylight Saving Time (EDT).
+  # During EDT (March-November), EST is actually UTC-4, so reports will be 1 hour off.
+  # If you need DST-aware scheduling, consider using fixed UTC times or a more complex conversion.
+  utcReportTimes = map (
+    timeStr:
+    let
+      # Parse time string with regex to extract hour and minute
+      match = builtins.match "0*([0-9]+):0*([0-9]+)" timeStr;
+      hour = lib.toInt (builtins.elemAt match 0);
+      minute = lib.toInt (builtins.elemAt match 1);
+      # Assume EST = UTC-5 (not accounting for EDT which is UTC-4)
+      utcHour = lib.mod (hour + 5) 24;
+    in
     {
-      Hour = 13;
-      Minute = 0;
-    } # 8am EST
-    {
-      Hour = 22;
-      Minute = 0;
-    } # 5pm EST
-  ];
+      Hour = utcHour;
+      Minute = minute;
+    }
+  ) cfg.autoClaude.reporting.scheduledReports.times;
 
 in
 {
@@ -158,7 +161,6 @@ in
           PATH = lib.concatStringsSep ":" [
             "${pythonWithDeps}/bin"
             "${pkgs.coreutils}/bin"
-            "$\{PATH}"
           ];
           HOME = homeDir;
         };
@@ -176,6 +178,7 @@ in
       CLAUDE_ALERT_CONTEXT_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.contextThreshold;
       CLAUDE_ALERT_BUDGET_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.budgetThreshold;
       CLAUDE_ALERT_TOKENS_NO_OUTPUT = builtins.toString cfg.autoClaude.reporting.alerts.tokensNoOutput;
+      CLAUDE_ALERT_CONSECUTIVE_FAILURES = builtins.toString cfg.autoClaude.reporting.alerts.consecutiveFailures;
     };
   };
 }

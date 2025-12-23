@@ -131,7 +131,7 @@ in
         ];
         # Slack channel ID retrieved from BWS at runtime
         # Store in BWS as: slack-channel-auto-claude-reports
-        slackChannel = "C0AXXXXXXXX"; # Replace with actual channel ID or retrieve from BWS
+        slackChannel = ""; # Replace with actual channel ID or retrieve from BWS
       };
 
       # Real-time anomaly detection

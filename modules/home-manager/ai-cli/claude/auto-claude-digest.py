@@ -17,7 +17,7 @@ Usage:
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -46,7 +46,7 @@ def get_slack_token() -> str:
         sys.exit(1)
 
 
-def format_number(n: int) -> str:
+def format_number(n: Optional[int]) -> str:
     """Format number with commas for readability."""
     if n is None:
         return "0"
@@ -86,7 +86,7 @@ def build_report_blocks(
         since_display = "last report"
 
     # Header
-    now_display = datetime.now().strftime("%b %d, %I:%M %p")
+    now_display = datetime.now(timezone.utc).strftime("%b %d, %I:%M %p")
     text = f"Auto-Claude Report - {now_display}"
 
     blocks = [
@@ -137,12 +137,10 @@ def build_report_blocks(
         flagged_runs = []
 
         for run in efficiency[:8]:
-            run_id = run.get("run_id", "unknown")
             repo = run.get("repo", "unknown")
             total = run.get("total_tokens", 0)
             work = run.get("work_units", 0)
             tpu = run.get("tokens_per_unit", total)
-            context_pct = run.get("context_usage_pct", 0)
 
             emoji = get_efficiency_emoji(tpu, avg_tokens_per_unit)
 
@@ -272,7 +270,6 @@ def main():
             since_time = last_report
         else:
             # Default to 12 hours ago if no previous report
-            from datetime import timedelta
             since_time = (datetime.now(timezone.utc) - timedelta(hours=12)).isoformat()
 
     # Get data

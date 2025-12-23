@@ -477,12 +477,25 @@ fi
 # Call monitor script if enabled (checks for context exhaustion, loops, failures, etc.)
 # Monitor will store run data in SQLite database for scheduled reports
 MONITOR_SCRIPT="${SCRIPT_DIR}/auto-claude-monitor.py"
-if [[ -x "$MONITOR_SCRIPT" ]] && [[ "$SLACK_ENABLED" == "true" ]] && command -v python3 &>/dev/null; then
-  python3 "$MONITOR_SCRIPT" \
-    --run-id "$RUN_ID" \
-    --repo "$REPO_NAME" \
-    --log-file "$LOG_FILE" \
-    --channel "$SLACK_CHANNEL" 2>/dev/null || true
+if [[ -x "$MONITOR_SCRIPT" ]] && [[ "${CLAUDE_MONITORING_ENABLED:-0}" == "1" ]] && [[ "$SLACK_ENABLED" == "true" ]]; then
+  if ! command -v python3 >/dev/null; then
+    echo "WARNING: python3 not found. Skipping auto-claude monitor." >&2
+  else
+    # Build arguments for monitor script, using configured thresholds from env vars
+    declare -a monitor_args=(
+      --run-id "$RUN_ID"
+      --repo "$REPO_NAME"
+      --log-file "$LOG_FILE"
+      --channel "$SLACK_CHANNEL"
+    )
+    [[ -n "$CLAUDE_ALERT_CONTEXT_THRESHOLD" ]] && monitor_args+=(--context-threshold "$CLAUDE_ALERT_CONTEXT_THRESHOLD")
+    [[ -n "$CLAUDE_ALERT_BUDGET_THRESHOLD" ]] && monitor_args+=(--budget-threshold "$CLAUDE_ALERT_BUDGET_THRESHOLD")
+    [[ -n "$CLAUDE_ALERT_TOKENS_NO_OUTPUT" ]] && monitor_args+=(--tokens-no-output "$CLAUDE_ALERT_TOKENS_NO_OUTPUT")
+    [[ -n "$CLAUDE_ALERT_CONSECUTIVE_FAILURES" ]] && monitor_args+=(--consecutive-failures "$CLAUDE_ALERT_CONSECUTIVE_FAILURES")
+
+    # Execute the monitor script, redirecting its stderr to our stderr
+    python3 "$MONITOR_SCRIPT" "${monitor_args[@]}" >&2 || echo "WARNING: auto-claude monitor script failed." >&2
+  fi
 fi
 
 # --- UPDATE CONTROL FILE WITH LAST RUN (only on success) ---
