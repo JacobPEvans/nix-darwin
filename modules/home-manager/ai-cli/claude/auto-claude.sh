@@ -475,12 +475,8 @@ if [[ "$SLACK_ENABLED" == "true" ]] && [[ -n "$PARENT_TS" ]]; then
 fi
 
 # --- UPDATE CONTROL FILE WITH LAST RUN (only on success) ---
-if [[ $EXIT_CODE -eq 0 ]] && [[ -f "$CONTROL_FILE" ]]; then
-  LAST_RUN_TS=$(date "+%Y-%m-%dT%H:%M:%S")
-  CTRL_TMP=$(mktemp) || { echo "Warning: could not create temporary file for last_run update." >&2; }
-  if [[ -n "$CTRL_TMP" ]]; then
-    jq ".last_run = \"$LAST_RUN_TS\" | .last_run_repo = \"$REPO_NAME\"" "$CONTROL_FILE" > "$CTRL_TMP" && mv "$CTRL_TMP" "$CONTROL_FILE"
-  fi
+if [[ $EXIT_CODE -eq 0 ]]; then
+  update_last_run "$REPO_NAME"
 fi
 
 echo "" >> "$SUMMARY_LOG"
