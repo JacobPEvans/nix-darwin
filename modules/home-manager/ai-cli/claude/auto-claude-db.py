@@ -20,9 +20,9 @@ Usage:
 
 import argparse
 import json
-import os
 import re
 import sqlite3
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
@@ -368,6 +368,7 @@ def parse_jsonl_log(log_path: Path) -> dict:
             end = datetime.fromisoformat(run_data["ended_at"].replace("Z", "+00:00"))
             run_data["duration_sec"] = int((end - start).total_seconds())
         except (ValueError, TypeError):
+            # If timestamps are malformed, skip duration calculation and keep other stats
             pass
 
     return run_data
@@ -490,5 +491,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())

@@ -53,7 +53,7 @@ def get_slack_token() -> str:
         sys.exit(1)
 
 
-def format_number(n: int) -> str:
+def format_number(n: Optional[int]) -> str:
     """Format number with commas."""
     if n is None:
         return "0"
@@ -129,6 +129,22 @@ class AnomalyChecker:
                     "severity": "low",
                     "message": f"Run exited with code {exit_code}",
                     "value": exit_code,
+                })
+
+        # Check high budget utilization, if a per-run token budget is provided
+        token_budget = run_data.get("token_budget")
+        if token_budget and token_budget > 0:
+            budget_pct = (total_tokens / token_budget) * 100
+            if budget_pct >= self.budget_threshold:
+                anomalies.append({
+                    "type": "high_budget_utilization",
+                    "severity": "high" if budget_pct >= 90 else "medium",
+                    "message": (
+                        f"Used {format_number(total_tokens)} tokens, "
+                        f"{budget_pct:.1f}% of the configured token budget "
+                        f"({format_number(token_budget)} tokens)"
+                    ),
+                    "value": budget_pct,
                 })
 
         # Check for efficiency anomaly (tokens per unit way above average)
@@ -293,6 +309,7 @@ def main():
     parser.add_argument("--context-threshold", type=int, default=DEFAULT_CONTEXT_THRESHOLD)
     parser.add_argument("--budget-threshold", type=int, default=DEFAULT_BUDGET_THRESHOLD)
     parser.add_argument("--tokens-no-output", type=int, default=DEFAULT_TOKENS_NO_OUTPUT)
+    parser.add_argument("--consecutive-failures", type=int, default=DEFAULT_CONSECUTIVE_FAILURES)
 
     args = parser.parse_args()
 
@@ -316,6 +333,7 @@ def main():
         context_threshold=args.context_threshold,
         budget_threshold=args.budget_threshold,
         tokens_no_output=args.tokens_no_output,
+        consecutive_failures=args.consecutive_failures,
     )
 
     anomalies = checker.check_run(run_data)
