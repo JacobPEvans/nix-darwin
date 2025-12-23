@@ -189,7 +189,7 @@ in
       # Model selection is dynamic (via /model command or shell env).
       # To set a default in this config, uncomment below.
       # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
-      CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required
+      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";

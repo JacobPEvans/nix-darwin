@@ -29,7 +29,11 @@ def load_env(path: Path = Path.home() / ".config/bws/.env") -> dict[str, str]:
             if line.startswith("export "):
                 line = line[7:]
             k, _, v = line.partition("=")
-            config[k.strip()] = v.strip().strip("'\"")
+            key = k.strip()
+            value = v.strip().strip("'\"")
+            if not value:
+                raise ValueError(f"Empty value for key '{key}' in {path}")
+            config[key] = value
     return config
 
 
@@ -68,10 +72,14 @@ def bws_get(name_or_id: str) -> str:
         except json.JSONDecodeError as e:
             raise RuntimeError(f"Failed to parse bws secret list output: {e}") from e
 
+        original_name = name_or_id
         for s in secrets:
             if s.get("key") == name_or_id:
                 name_or_id = s["id"]
                 break
+
+        if not _is_uuid(name_or_id):
+            raise ValueError(f"Secret '{original_name}' not found in BWS")
 
     # Fetch secret by ID - value goes straight from JSON to return
     result = subprocess.run(
@@ -106,7 +114,7 @@ def get_secret(key: str) -> str:
 
 
 def get_keychain(service: str) -> str:
-    """Get value directly from keychain (for channel IDs, etc.)."""
+    """Get non-secret values from keychain (Slack channel IDs, etc.) using BWS account."""
     cfg = load_env()
     account = cfg.get("BWS_KEYCHAIN_ACCOUNT")
     if not account:
