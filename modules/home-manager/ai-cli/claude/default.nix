@@ -56,7 +56,7 @@ in
       # API Key Helper script for headless authentication
       # Configuration now comes from ~/.config/bws/.env (not Nix options)
       "${cfg.apiKeyHelper.scriptPath}" = {
-        source = ./get-api-key.sh; # Now Python, uses bws_helper
+        source = ./get-api-key.py; # Python script using bws_helper
         executable = true;
       };
     };

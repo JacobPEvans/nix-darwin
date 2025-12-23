@@ -3,11 +3,11 @@
     "agent-os": {
       "flake": false,
       "locked": {
-        "lastModified": 1761688666,
-        "narHash": "sha256-027+m1nj78zC+6IIP8IdNtnx0ARBrZE9zs6crxfoh3o=",
+        "lastModified": 1765489693,
+        "narHash": "sha256-33PFC8HLgzVRpyTXSOxS09ffIjcr2P96/RKoZzQZ22o=",
         "owner": "JacobPEvans",
         "repo": "agent-os",
-        "rev": "a543311dc0430bc1dffd12feacf087c685670873",
+        "rev": "8b12ec5b3d002988da7171b89b9f60e5dbd88abc",
         "type": "github"
       },
       "original": {
