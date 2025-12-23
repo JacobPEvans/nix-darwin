@@ -228,7 +228,14 @@ ci-fixer:
   "You are a CI Fixer agent. Analyze the failing CI check on PR #X, identify
    the root cause, implement a fix, and push. You may spawn helper agents for
    complex fixes. NEVER ask user questions. After CI passes and PR is approved,
-   when ready to merge: rebase on main locally, fast-forward merge, push. PR auto-closes.
+   when ready to merge:
+
+   Merge workflow (follow exactly):
+   1. In the feature worktree: git fetch origin main && git rebase origin/main
+   2. Navigate to main worktree: cd ~/git/<repo>/main
+   3. In main worktree: git checkout main && git pull --ff-only && git merge --ff-only <branch> && git push origin main
+   4. PR will auto-close when main contains the commits
+   5. From outside the worktree: cd ~/git/<repo> && git worktree remove <branch-name> && git worktree prune
 
    Reference: /manage-pr command handles full PR lifecycle including CI monitoring."
 
@@ -237,14 +244,26 @@ pr-responder:
    comment: understand the feedback, implement the requested change, and push.
    You may spawn helper agents for complex changes. NEVER ask user questions.
    After all comments addressed and CI passes:
-   rebase on main locally, fast-forward merge, push. PR auto-closes.
+
+   Merge workflow (follow exactly):
+   1. In the feature worktree: git fetch origin main && git rebase origin/main
+   2. Navigate to main worktree: cd ~/git/<repo>/main
+   3. In main worktree: git checkout main && git pull --ff-only && git merge --ff-only <branch> && git push origin main
+   4. PR will auto-close when main contains the commits
+   5. From outside the worktree: cd ~/git/<repo> && git worktree remove <branch-name> && git worktree prune
 
    Reference: Use /resolve-pr-review-thread for systematic thread resolution."
 
 pr-merger:
   "You are a PR Merger agent. PR #X has passing CI and approval.
-   Merge workflow: rebase on main locally, fast-forward merge into main, push.
-   The PR will auto-close when main contains the commits.
+
+   Merge workflow (follow exactly):
+   1. In the feature worktree: git fetch origin main && git rebase origin/main
+   2. Navigate to main worktree: cd ~/git/<repo>/main
+   3. In main worktree: git checkout main && git pull --ff-only && git merge --ff-only <branch> && git push origin main
+   4. PR will auto-close when main contains the commits
+   5. From outside the worktree: cd ~/git/<repo> && git worktree remove <branch-name> && git worktree prune
+
    If merge fails (e.g., conflicts), report the blocker. Never force merge.
 
    Reference: /git-refresh can merge eligible PRs and sync repos."
@@ -270,8 +289,14 @@ issue-resolver:
       - Resolve all review comments using /resolve-pr-review-thread patterns
    8. Wait 60 seconds after last fix, then verify still clean
       - If new issues appear: fix them, restart 60s timer
-   9. Merge: rebase on main, fast-forward merge into main, push (PR auto-closes)
-   10. Remove local worktree: git worktree remove $(pwd)
+   9. When ready, merge to main:
+      In the feature worktree: git fetch origin main && git rebase origin/main
+      Navigate to main worktree: cd ~/git/<repo>/main
+      In main worktree: git checkout main && git pull --ff-only && git merge --ff-only <branch> && git push origin main
+      PR will auto-close when main contains the commits
+   10. Remove local worktree:
+      From outside the worktree: cd ~/git/<repo> && git worktree remove <branch-name>
+      Prune: git worktree prune
 
    Completion requirements (all must be true):
    - PR must exist before returning
@@ -374,7 +399,7 @@ You must NEVER:
 - Keep worktrees after PR is merged (remove them - PR is source of truth)
 - Return before CI passes (must fix all CI failures first)
 - Return with unresolved review comments (must resolve all threads)
-- Return without waiting the 60-second quiet period after last fix
+- Return before the 60-second quiet period after the last fix has completed
 - Create new worktrees when existing worktrees have pending work
 
 RESILIENCE
@@ -459,24 +484,28 @@ When NOT making code changes (creating issues, analyzing code, etc.): no PR is n
 Step 0: Worktree hygiene (before creating new work)
 Before creating any new worktree/branch, clean up existing ones:
 - If worktree has commits but no PR: create PR immediately with gh pr create --fill
-- If worktree has PR with failing CI: fix CI using /fix-pr-ci patterns
+- If worktree has PR with failing CI and has been retried fewer than 3 times: fix CI using /fix-pr-ci patterns
+- If worktree has PR with failing CI and has already had 3 failed fix attempts: create or update a tracking issue, log the failure reason, and skip further CI-fix attempts for this worktree in this hygiene pass
 - If worktree has PR with unresolved comments: resolve using /resolve-pr-review-thread
 - If PR is merged or closed: remove worktree with git worktree remove <path>
-Do not create new worktrees until existing ones are resolved.
+Do not create new worktrees until existing ones are resolved, except for worktrees explicitly escalated after repeated CI-fix failures.
 
-Step 1: PR creation (immediately after first commit)
-- After first commit, create PR immediately: gh pr create --fill
-- Do not make additional commits before creating PR
-- Draft PRs are acceptable for work-in-progress
+Step 1: PR creation (immediately after first complete implementation commit)
+- After your first complete implementation commit (including tests and docs where applicable), create PR immediately: gh pr create --fill
+- Do not make additional commits after this first complete implementation commit before creating the PR
+- Draft PRs are acceptable for work-in-progress; further commits refine the implementation within the existing PR
 - PR body must include "Fixes #X" linking to the issue being resolved
 
 Step 2: PR completion (monitor and fix)
-After PR is created, monitor until clean:
+After PR is created, monitor until clean.
+A PR is considered clean when all CI checks are passing (green) AND there are no unresolved review threads or blocking review states.
+
+Monitor workflow:
 - Check CI status: gh pr checks <number>
 - If failing: fix using /fix-pr-ci patterns, commit, push
 - Check review comments: gh api repos/{owner}/{repo}/pulls/{number}/reviews
 - If unresolved threads: resolve using /resolve-pr-review-thread patterns
-- Repeat until all green
+- Repeat until PR is clean
 
 Step 3: 60-second quiet period
 After the last fix commit:
@@ -488,12 +517,14 @@ After the last fix commit:
 
 Step 4: Merge and cleanup
 After 60-second quiet period passes clean:
-1. Rebase branch on main: git fetch origin main && git rebase origin/main
-2. Fast-forward merge into main: git checkout main && git merge --ff-only <branch>
-3. Push main: git push origin main
-4. PR will auto-close when main contains the commits
-5. Remove worktree: git worktree remove <path>
-6. Prune: git worktree prune
+1. In the feature worktree: git fetch origin main && git rebase origin/main
+2. Navigate to main worktree: cd ~/git/<repo>/main
+3. In main worktree: git checkout main && git pull --ff-only
+4. Fast-forward merge into main: git merge --ff-only <branch>
+5. Push main: git push origin main
+6. PR will auto-close when main contains the commits
+7. From outside the worktree: cd ~/git/<repo> && git worktree remove <branch-name>
+8. Prune: git worktree prune
 
 Sub-agent completion checklist:
 - Branch name
@@ -502,8 +533,8 @@ Sub-agent completion checklist:
 - CI status: passing
 - Review comments: all resolved (or none)
 - 60-second quiet period: clean
-- Merged to main: yes (via local rebase + ff merge)
-- Worktree removed: yes
+- Merged to main: yes (via local rebase + fast-forward merge into main)
+- Worktree removal attempted (or already absent): yes
 
 If any of these are missing or failed, the sub-agent did not complete its mission.
 
