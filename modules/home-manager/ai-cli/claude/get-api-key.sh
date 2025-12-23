@@ -11,13 +11,13 @@ Configuration: ~/.config/bws/.env (see bws_helper.py)
 import sys
 from pathlib import Path
 
-# Import bws_helper from ~/.claude/scripts/
-sys.path.insert(0, str(Path.home() / ".claude/scripts"))
+# Import bws_helper from same directory
+sys.path.insert(0, str(Path(__file__).parent))
 import bws_helper
 
 if __name__ == "__main__":
     try:
         print(bws_helper.get_secret("CLAUDE_OAUTH_TOKEN"))
-    except Exception as e:
+    except (FileNotFoundError, ValueError, RuntimeError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
