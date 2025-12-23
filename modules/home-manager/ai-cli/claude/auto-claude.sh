@@ -473,6 +473,18 @@ if [[ "$SLACK_ENABLED" == "true" ]] && [[ -n "$PARENT_TS" ]]; then
     --log-file "$LOG_FILE" 2>/dev/null || true
 fi
 
+# --- MONITORING: CHECK FOR ANOMALIES ---
+# Call monitor script if enabled (checks for context exhaustion, loops, failures, etc.)
+# Monitor will store run data in SQLite database for scheduled reports
+MONITOR_SCRIPT="${SCRIPT_DIR}/auto-claude-monitor.py"
+if [[ -x "$MONITOR_SCRIPT" ]] && [[ "$SLACK_ENABLED" == "true" ]] && command -v python3 &>/dev/null; then
+  python3 "$MONITOR_SCRIPT" \
+    --run-id "$RUN_ID" \
+    --repo "$REPO_NAME" \
+    --log-file "$LOG_FILE" \
+    --channel "$SLACK_CHANNEL" 2>/dev/null || true
+fi
+
 # --- UPDATE CONTROL FILE WITH LAST RUN (only on success) ---
 if [[ $EXIT_CODE -eq 0 ]]; then
   update_last_run "$REPO_NAME"

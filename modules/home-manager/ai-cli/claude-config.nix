@@ -117,6 +117,32 @@ in
         # slackChannel = "...";
       };
     };
+
+    # Reporting: Twice-daily utilization reports and real-time anomaly alerts
+    reporting = {
+      enable = true;
+
+      # Scheduled digest reports (8am and 5pm EST)
+      scheduledReports = {
+        # Times in EST - converted to UTC by Nix module (8am EST = 1pm UTC, 5pm EST = 10pm UTC)
+        times = [
+          "08:00"
+          "17:00"
+        ];
+        # Slack channel ID retrieved from BWS at runtime
+        # Store in BWS as: slack-channel-auto-claude-reports
+        slackChannel = "C0AXXXXXXXX"; # Replace with actual channel ID or retrieve from BWS
+      };
+
+      # Real-time anomaly detection
+      alerts = {
+        enable = true;
+        contextThreshold = 90; # Alert if >90% of 200k token window used
+        budgetThreshold = 50; # Alert if >50% of run budget used
+        tokensNoOutput = 50000; # Flag if >50k tokens with no completed work
+        consecutiveFailures = 2; # Alert after 2 consecutive failures
+      };
+    };
   };
 
   # Menu bar status indicator via SwiftBar

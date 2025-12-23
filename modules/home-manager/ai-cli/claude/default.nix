@@ -35,6 +35,7 @@ in
     ./statusline # New modular statusline (Issue #80)
     ./mcp.nix
     ./auto-claude.nix
+    ./auto-claude-reporting.nix
     ./menubar.nix
   ];
 
