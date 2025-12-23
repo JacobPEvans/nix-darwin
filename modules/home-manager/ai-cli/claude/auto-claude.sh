@@ -138,6 +138,7 @@ check_context_usage() {
   fi
 }
 
+
 # --- ARGUMENT PARSING ---
 if [[ $# -lt 2 ]]; then
   echo "Usage: $0 <target_dir> <max_budget_usd> [log_dir] [slack_channel]" >&2
@@ -148,6 +149,14 @@ TARGET_DIR="$1"
 MAX_BUDGET_USD="$2"
 LOG_DIR="${3:-$HOME/.claude/logs}"
 SLACK_CHANNEL="${4:-}"
+
+# If no Slack channel provided, try to fetch from keychain
+if [[ -z "$SLACK_CHANNEL" ]]; then
+  REPO_NAME=$(basename "$TARGET_DIR")
+  # Convert to uppercase and replace dashes/dots with underscores
+  KEYCHAIN_KEY="SLACK_CHANNEL_ID_${REPO_NAME:u:gs/-/_/:gs/./_/}"
+  SLACK_CHANNEL=$(security find-generic-password -s "$KEYCHAIN_KEY" -w 2>/dev/null || true)
+fi
 
 # --- DEPENDENCY CHECKS ---
 if ! command -v jq &>/dev/null; then
@@ -216,6 +225,7 @@ notify_skipped() {
     '{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo, reason: $reason}' \
     >> "$EVENTS_LOG"
 }
+
 
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
@@ -445,6 +455,9 @@ DURATION_MIN=$((DURATION_SEC / 60))
 # Check context usage for monitoring (optional tracking)
 check_context_usage
 
+# Check context usage for monitoring (optional tracking)
+check_context_usage
+
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
   emit_event "run_completed" \
@@ -483,8 +496,5 @@ if [[ $EXIT_CODE -eq 0 ]] && [[ -f "$CONTROL_FILE" ]]; then
 fi
 
 echo "" >> "$SUMMARY_LOG"
-
-# --- UPDATE CONTROL FILE ---
-update_last_run "$REPO_NAME"
 
 exit "$EXIT_CODE"

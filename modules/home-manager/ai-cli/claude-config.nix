@@ -86,11 +86,10 @@ in
 
   # API Key Helper for headless authentication (cron jobs, CI/CD)
   # Uses Bitwarden Secrets Manager to securely fetch OAuth token
+  # Configuration: ~/.config/bws/.env (see bws-env.example)
   apiKeyHelper = {
     enable = true;
     # scriptPath default: .local/bin/claude-api-key-helper
-    # keychainService default: bws-claude-automation
-    secretId = "55ebeb62-1327-4967-8f08-b3a5015f5b7b";
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
