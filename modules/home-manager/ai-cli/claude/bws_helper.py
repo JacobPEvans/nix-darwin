@@ -6,8 +6,10 @@ Config: ~/.config/bws/.env (not in git)
 Usage: python3 bws_helper.py CLAUDE_OAUTH  # prints secret value
 """
 
+import functools
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -15,8 +17,9 @@ from pathlib import Path
 import keyring
 
 
+@functools.lru_cache(maxsize=1)
 def load_env(path: Path = Path.home() / ".config/bws/.env") -> dict[str, str]:
-    """Load .env file into dict."""
+    """Load .env file into dict (cached)."""
     if not path.exists():
         raise FileNotFoundError(f"Config not found: {path}")
     config = {}
@@ -57,11 +60,13 @@ def bws_get(name_or_id: str) -> str:
             text=True,
             env=env,
         )
-        if result.returncode == 0:
-            for s in json.loads(result.stdout):
-                if s.get("key") == name_or_id:
-                    name_or_id = s["id"]
-                    break
+        if result.returncode != 0:
+            raise RuntimeError(f"Failed to list bws secrets to find ID for '{name_or_id}': {result.stderr}")
+
+        for s in json.loads(result.stdout):
+            if s.get("key") == name_or_id:
+                name_or_id = s["id"]
+                break
 
     # Fetch secret by ID - value goes straight from JSON to return
     result = subprocess.run(
@@ -78,7 +83,6 @@ def bws_get(name_or_id: str) -> str:
 
 def _is_uuid(s: str) -> bool:
     """Check if string looks like a UUID."""
-    import re
     return bool(re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', s, re.I))
 
 

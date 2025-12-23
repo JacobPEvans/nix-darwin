@@ -455,9 +455,6 @@ DURATION_MIN=$((DURATION_SEC / 60))
 # Check context usage for monitoring (optional tracking)
 check_context_usage
 
-# Check context usage for monitoring (optional tracking)
-check_context_usage
-
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
   emit_event "run_completed" \
