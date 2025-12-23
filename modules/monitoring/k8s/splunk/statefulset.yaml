@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: splunk
-          # Force amd64 image for Rosetta emulation on ARM64
+          # SHA256 digest pins to amd64 manifest for Rosetta emulation on ARM64
           image: splunk/splunk@sha256:a455c77bc5e6b14395c7dd0a6665b4a93820f2742d6ac87359098cad96791300
           ports:
             - name: web
@@ -41,15 +41,13 @@ spec:
             - name: SPLUNK_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: splunk-admin
+                  name: splunk-credentials
                   key: password
-            # Generate HEC token for OTEL
             - name: SPLUNK_HEC_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: splunk-hec-token
-                  key: token
-                  optional: true
+                  name: splunk-credentials
+                  key: hec-token
           volumeMounts:
             - name: splunk-data
               mountPath: /opt/splunk/var
@@ -66,20 +64,16 @@ spec:
               memory: "4Gi"
               cpu: "2"
           livenessProbe:
-            httpGet:
-              path: /services/server/health/splunkd
+            tcpSocket:
               port: 8089
-              scheme: HTTPS
-            initialDelaySeconds: 120
+            initialDelaySeconds: 180
             periodSeconds: 30
             failureThreshold: 10
           readinessProbe:
-            httpGet:
-              path: /services/server/health/splunkd
+            tcpSocket:
               port: 8089
-              scheme: HTTPS
-            initialDelaySeconds: 60
-            periodSeconds: 10
+            initialDelaySeconds: 120
+            periodSeconds: 15
       volumes:
         - name: config
           configMap:
