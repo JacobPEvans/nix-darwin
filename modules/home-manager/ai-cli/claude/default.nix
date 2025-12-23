@@ -39,17 +39,8 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
-    # Validate secretId is provided when apiKeyHelper is enabled
-    assertions = [
-      {
-        assertion = !cfg.apiKeyHelper.enable || (cfg.apiKeyHelper.secretId or "") != "";
-        message = ''
-          programs.claude.apiKeyHelper.enable is true but secretId is not set.
-          Please provide the Bitwarden secret ID:
-            programs.claude.apiKeyHelper.secretId = "your-secret-id";
-        '';
-      }
-    ];
+    # Note: apiKeyHelper now reads config from ~/.config/bws/.env
+    # The Python helper (bws_helper.py) will give clear errors if config is missing
 
     # Ensure ~/.claude directory structure exists
     # Individual sub-modules populate these directories
@@ -63,11 +54,9 @@ in
     }
     // lib.optionalAttrs cfg.apiKeyHelper.enable {
       # API Key Helper script for headless authentication
+      # Configuration now comes from ~/.config/bws/.env (not Nix options)
       "${cfg.apiKeyHelper.scriptPath}" = {
-        source = pkgs.replaceVars ./get-api-key.sh {
-          inherit (cfg.apiKeyHelper) keychainService;
-          bwsSecretId = cfg.apiKeyHelper.secretId;
-        };
+        source = ./get-api-key.sh; # Now Python, uses bws_helper
         executable = true;
       };
     };
