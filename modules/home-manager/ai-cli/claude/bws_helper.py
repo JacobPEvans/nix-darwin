@@ -46,10 +46,24 @@ def get_bws_token() -> str:
 
 
 def bws_get(name_or_id: str) -> str:
-    """Fetch secret from BWS by name or ID."""
+    """Fetch secret from BWS by name or ID. Secret value flows directly to return."""
     env = {**os.environ, "BWS_ACCESS_TOKEN": get_bws_token()}
 
-    # The bws CLI can resolve both names and IDs directly
+    # If not a UUID, resolve name to ID via list (metadata only, no secret values)
+    if not _is_uuid(name_or_id):
+        result = subprocess.run(
+            ["bws", "secret", "list", "-o", "json"],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        if result.returncode == 0:
+            for s in json.loads(result.stdout):
+                if s.get("key") == name_or_id:
+                    name_or_id = s["id"]
+                    break
+
+    # Fetch secret by ID - value goes straight from JSON to return
     result = subprocess.run(
         ["bws", "secret", "get", name_or_id, "-o", "json"],
         capture_output=True,
@@ -59,15 +73,13 @@ def bws_get(name_or_id: str) -> str:
     if result.returncode != 0:
         raise RuntimeError(f"bws secret get failed for '{name_or_id}': {result.stderr}")
 
-    try:
-        data = json.loads(result.stdout)
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"Failed to parse 'bws secret get' JSON output: {e}") from e
+    return json.loads(result.stdout)["value"]
 
-    try:
-        return data["value"]
-    except KeyError as e:
-        raise RuntimeError("Missing 'value' field in 'bws secret get' JSON output") from e
+
+def _is_uuid(s: str) -> bool:
+    """Check if string looks like a UUID."""
+    import re
+    return bool(re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', s, re.I))
 
 
 def get_secret(key: str) -> str:
