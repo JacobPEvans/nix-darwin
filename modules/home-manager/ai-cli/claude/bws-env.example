@@ -5,7 +5,7 @@
 #
 # Setup:
 # 1. Create automation keychain: security create-keychain -p "" automation.keychain
-# 2. Add BWS token: security add-generic-password -a <account> -s <service> -w <token> -A automation.keychain
+# 2. Add BWS token: security add-generic-password -a <account> -s <service> -w <token> automation.keychain
 # 3. Unlock on login: security unlock-keychain -p "" automation.keychain
 #
 # Required Variables:
