@@ -3,7 +3,7 @@
 BWS Helper - Fetch secrets from Bitwarden Secrets Manager via macOS Keychain.
 
 Config: ~/.config/bws/.env (not in git)
-Usage: python3 bws_helper.py CLAUDE_OAUTH  # prints secret value
+Usage: python3 bws_helper.py CLAUDE_OAUTH_TOKEN  # prints secret value
 """
 
 import functools
@@ -63,7 +63,12 @@ def bws_get(name_or_id: str) -> str:
         if result.returncode != 0:
             raise RuntimeError(f"Failed to list bws secrets to find ID for '{name_or_id}': {result.stderr}")
 
-        for s in json.loads(result.stdout):
+        try:
+            secrets = json.loads(result.stdout)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Failed to parse bws secret list output: {e}") from e
+
+        for s in secrets:
             if s.get("key") == name_or_id:
                 name_or_id = s["id"]
                 break
@@ -78,7 +83,12 @@ def bws_get(name_or_id: str) -> str:
     if result.returncode != 0:
         raise RuntimeError(f"bws secret get failed for '{name_or_id}': {result.stderr}")
 
-    return json.loads(result.stdout)["value"]
+    try:
+        return json.loads(result.stdout)["value"]
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Failed to parse bws secret get output: {e}") from e
+    except KeyError:
+        raise RuntimeError(f"bws secret get returned JSON without 'value' key for '{name_or_id}'") from None
 
 
 def _is_uuid(s: str) -> bool:

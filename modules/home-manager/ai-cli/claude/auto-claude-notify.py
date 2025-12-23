@@ -14,7 +14,7 @@ Usage:
 
 Secrets:
     All secrets retrieved via bws_helper from ~/.config/bws/.env
-    - Slack bot token: BWS_SECRET_SLACK_BOT in config
+    - Slack bot token: BWS_SECRET_SLACK_BOT_TOKEN in config
     - Slack channels: Retrieved from keychain (SLACK_CHANNEL_<REPO>)
 """
 
