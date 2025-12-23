@@ -11,6 +11,9 @@
 # Required Variables:
 
 # Keychain configuration for BWS access token
+# These define where the BWS access token is stored in macOS Keychain
+# Example: BWS_KEYCHAIN_SERVICE=bws-claude-access-token
+# Example: BWS_KEYCHAIN_ACCOUNT=claude-automation
 BWS_KEYCHAIN_SERVICE=your-keychain-service-name
 BWS_KEYCHAIN_ACCOUNT=your-keychain-account-name
 
@@ -25,6 +28,12 @@ BWS_SECRET_SLACK_BOT_TOKEN=SLACK_BOT_TOKEN
 
 # Slack channel IDs (stored directly in keychain, not BWS)
 # These are less sensitive and stored with the same account name
-# Format: SLACK_CHANNEL_ID_<REPO> in keychain
-# - SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS
-# - SLACK_CHANNEL_ID_NIX
+# Format: SLACK_CHANNEL_ID_<REPO> in keychain (repo name uppercase, dashes/dots → underscores)
+#
+# To add channel IDs to keychain (use same account as BWS_KEYCHAIN_ACCOUNT):
+#   security add-generic-password -a <account> -s SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS -w C0123456789 automation.keychain
+#   security add-generic-password -a <account> -s SLACK_CHANNEL_ID_NIX_CONFIG -w C9876543210 automation.keychain
+#
+# Examples:
+# - SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS → for ai-assistant-instructions repo
+# - SLACK_CHANNEL_ID_NIX_CONFIG → for nix-config repo

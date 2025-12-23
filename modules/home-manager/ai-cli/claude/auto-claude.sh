@@ -164,10 +164,9 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-# --- ENVIRONMENT (early, needed for bws/Slack auth) ---
-# Source shell configs for full environment (API keys, PATH, git credentials)
+# --- ENVIRONMENT (early) ---
+# Source shell configs for full environment (PATH, git credentials)
 # Required because launchd runs in a minimal shell
-# Must happen BEFORE skip notifications so bws has access token
 if [[ -r "$HOME/.zshrc" ]]; then
   if ! source "$HOME/.zshrc" 2>/dev/null; then
     echo "WARNING: Failed to source .zshrc" >&2
