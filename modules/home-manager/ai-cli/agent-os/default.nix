@@ -242,9 +242,6 @@ in
       ''
       + configYaml;
 
-      # Reference documentation
-      "agent-os/CHANGELOG.md".source = "${agent-os}/CHANGELOG.md";
-
       # Profile template for reference (users can customize)
       "agent-os/profiles/default".source = "${agent-os}/profiles/default";
     }

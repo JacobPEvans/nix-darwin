@@ -79,15 +79,6 @@ injected everywhere else via Nix's `config.home.homeDirectory` or similar patter
 
 ## Specific File Suppressions
 
-### PLANNING.md and CHANGELOG.md
-
-**Don't review** (these are working documents, not code):
-
-- Task list formatting
-- Incomplete sentences in notes
-- Personal shorthand
-- Future plans without implementation details
-
 ### flake.lock
 
 **Never review** (auto-generated file):
