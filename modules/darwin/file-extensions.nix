@@ -76,7 +76,7 @@ in
 
       # Create temporary duti configuration file
       DUTI_CONFIG=$(mktemp)
-      trap "rm -f $DUTI_CONFIG" EXIT
+      trap 'rm -f $DUTI_CONFIG' EXIT
 
       # Generate duti configuration for each custom extension
       ${lib.concatStringsSep "\n" (
