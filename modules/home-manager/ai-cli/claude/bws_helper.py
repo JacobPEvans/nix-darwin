@@ -19,7 +19,11 @@ import keyring
 
 @functools.lru_cache(maxsize=1)
 def load_env(path: Path = Path.home() / ".config/bws/.env") -> dict[str, str]:
-    """Load .env file into dict (cached)."""
+    """Load .env file into dict (cached).
+
+    Note: Cache is intentional - config should not change during script execution.
+    Scripts are short-lived (seconds), so stale config is not a concern.
+    """
     if not path.exists():
         raise FileNotFoundError(f"Config not found: {path}")
     config = {}
@@ -30,6 +34,8 @@ def load_env(path: Path = Path.home() / ".config/bws/.env") -> dict[str, str]:
                 line = line[7:]
             k, _, v = line.partition("=")
             key = k.strip()
+            # Strip surrounding quotes - handles both KEY=value and KEY="value"
+            # Values needing leading/trailing quotes should escape them
             value = v.strip().strip("'\"")
             if not value:
                 raise ValueError(f"Empty value for key '{key}' in {path}")
@@ -58,12 +64,16 @@ def bws_get(name_or_id: str) -> str:
 
     # If not a UUID, resolve name to ID via list (metadata only, no secret values)
     if not _is_uuid(name_or_id):
-        result = subprocess.run(
-            ["bws", "secret", "list", "-o", "json"],
-            capture_output=True,
-            text=True,
-            env=env,
-        )
+        try:
+            result = subprocess.run(
+                ["bws", "secret", "list", "-o", "json"],
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+        except FileNotFoundError:
+            raise RuntimeError("bws command not found. Install it from https://bitwarden.com/help/secrets-manager-cli/") from None
+
         if result.returncode != 0:
             raise RuntimeError(f"Failed to list bws secrets to find ID for '{name_or_id}': {result.stderr}")
 
@@ -82,12 +92,16 @@ def bws_get(name_or_id: str) -> str:
             raise ValueError(f"Secret '{original_name}' not found in BWS")
 
     # Fetch secret by ID - value goes straight from JSON to return
-    result = subprocess.run(
-        ["bws", "secret", "get", name_or_id, "-o", "json"],
-        capture_output=True,
-        text=True,
-        env=env,
-    )
+    try:
+        result = subprocess.run(
+            ["bws", "secret", "get", name_or_id, "-o", "json"],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+    except FileNotFoundError:
+        raise RuntimeError("bws command not found. Install it from https://bitwarden.com/help/secrets-manager-cli/") from None
+
     if result.returncode != 0:
         raise RuntimeError(f"bws secret get failed for '{name_or_id}': {result.stderr}")
 
