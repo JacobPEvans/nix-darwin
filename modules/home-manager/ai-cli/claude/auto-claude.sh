@@ -180,17 +180,8 @@ if [[ -r "$HOME/.profile" ]]; then
   fi
 fi
 
-# --- BWS AUTHENTICATION ---
-# Retrieve BWS access token from macOS Keychain for Bitwarden Secrets Manager
-# This is required for Slack notifications (bot token stored in BWS)
-if [[ -z "${BWS_ACCESS_TOKEN:-}" ]]; then
-  BWS_TOKEN=$(security find-generic-password -s "bws-claude-automation" -w 2>/dev/null) || true
-  if [[ -n "$BWS_TOKEN" ]]; then
-    export BWS_ACCESS_TOKEN="$BWS_TOKEN"
-  fi
-fi
-
 # --- EARLY SETUP FOR SLACK NOTIFICATIONS (needed for skip notifications) ---
+# Note: bws_helper.py handles all BWS/Keychain authentication from ~/.config/bws/.env
 SCRIPT_DIR="${HOME}/.claude/scripts"
 NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
 REPO_NAME=$(basename "${TARGET_DIR%/}")
@@ -198,9 +189,9 @@ LOG_DIR="${HOME}/.claude/logs"
 EVENTS_LOG="$LOG_DIR/events.jsonl"
 
 # Check if Python notifier is available for skip notifications
-# Also verify BWS_ACCESS_TOKEN is set (required for Slack API calls)
+# bws_helper.py retrieves tokens from keychain at runtime (no env var needed)
 SLACK_ENABLED=false
-if [[ -n "$SLACK_CHANNEL" ]] && [[ -x "$NOTIFIER" ]] && command -v python3 &>/dev/null && [[ -n "${BWS_ACCESS_TOKEN:-}" ]]; then
+if [[ -n "$SLACK_CHANNEL" ]] && [[ -x "$NOTIFIER" ]] && command -v python3 &>/dev/null; then
   SLACK_ENABLED=true
 fi
 
