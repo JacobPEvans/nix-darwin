@@ -155,18 +155,9 @@ in
   nix = {
     enable = false;
     package = lib.mkForce pkgs.nix;
-
-    # Automatic garbage collection to free disk space
-    # Schedule and retention policy defined in lib/user-config.nix
-    gc = {
-      automatic = true;
-      interval = {
-        Weekday = userConfig.nix.gc.weekday;
-        Hour = userConfig.nix.gc.hour;
-        Minute = userConfig.nix.gc.minute;
-      };
-      options = "--delete-older-than ${userConfig.nix.gc.retention}";
-    };
+    # Note: nix.gc cannot be configured when nix.enable = false
+    # Determinate Nix manages garbage collection via its own mechanisms
+    # For manual GC, use: nix-collect-garbage --delete-older-than 30d
   };
 
   # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
