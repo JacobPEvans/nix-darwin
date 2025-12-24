@@ -218,6 +218,26 @@ in
           executable = true;
         };
 
+        # Deploy Python modules for auto-claude
+        ".claude/scripts/auto_claude_utils.py" = {
+          source = ./auto_claude_utils.py;
+          executable = true;
+        };
+        ".claude/scripts/auto_claude_preflight.py" = {
+          source = ./auto_claude_preflight.py;
+          executable = true;
+        };
+        ".claude/scripts/auto_claude_postrun.py" = {
+          source = ./auto_claude_postrun.py;
+          executable = true;
+        };
+
+        # Deploy Slack notification test script
+        ".claude/scripts/test-slack-notifications.py" = {
+          source = ./test-slack-notifications.py;
+          executable = true;
+        };
+
         # Deploy BWS config template (user copies to .env and fills in values)
         ".config/bws/.env.example" = {
           source = ./bws-env.example;
