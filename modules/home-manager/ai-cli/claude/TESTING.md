@@ -132,24 +132,86 @@ cat /tmp/auto-claude-test/summary.log
 
 ## Slack Notification Tests
 
-If Slack webhook is configured:
+Auto-Claude uses the Python notifier with Slack SDK for rich notifications.
+Channels are stored per-repo in the macOS automation keychain.
 
-### 1. Check Secrets File
+### Slack Prerequisites
+
+1. Slack bot token in Bitwarden Secrets Manager (secret: `SLACK_BOT_TOKEN`)
+2. Per-repo channel IDs in automation keychain:
+   - `SLACK_CHANNEL_ID_NIX`
+   - `SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS`
+3. BWS config at `~/.config/bws/.env`
+
+### 1. Unlock Automation Keychain
+
+The automation keychain must be unlocked for headless operations:
 
 ```bash
-test -r ~/.config/secrets/slack-webhook && echo "Secrets file exists"
+security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
 ```
 
-### 2. Test Startup Notification
+### 2. Verify Channel IDs in Keychain
 
-The script sends `{"text":"Auto-Claude run started"}` on startup.
+Check that channels are retrievable (output suppressed for security):
 
-### 3. Test Completion Notification
+```bash
+security find-generic-password -s "SLACK_CHANNEL_ID_NIX" -a "ai-cli-coder" -w >/dev/null && echo "NIX: FOUND"
+security find-generic-password -s "SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS" -a "ai-cli-coder" -w >/dev/null && echo "AI: FOUND"
+```
 
-On completion, sends either:
+### 3. Run Validation Test Script
 
-- Rich Block Kit message (if structured summary found)
-- Simple text message: `Auto-Claude <status>: <repo> [run: <id>] (exit <code>)`
+```bash
+PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
+  ~/.claude/scripts/test-slack-notifications.py
+```
+
+### 4. Send Test Messages to Each Channel
+
+Test NIX channel:
+
+```bash
+NIX_CHANNEL=$(security find-generic-password -s "SLACK_CHANNEL_ID_NIX" -a "ai-cli-coder" -w)
+PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
+  ~/.claude/scripts/auto-claude-notify.py run_started \
+  --repo "test-nix" --budget "0.01" --run-id "test-$(date +%s)" \
+  --channel "$NIX_CHANNEL" && echo "✓ NIX channel test sent"
+```
+
+Test AI-ASSISTANT-INSTRUCTIONS channel:
+
+```bash
+AI_CHANNEL=$(security find-generic-password -s "SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS" -a "ai-cli-coder" -w)
+PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
+  ~/.claude/scripts/auto-claude-notify.py run_started \
+  --repo "test-ai" --budget "0.01" --run-id "test-$(date +%s)" \
+  --channel "$AI_CHANNEL" && echo "✓ AI channel test sent"
+```
+
+### 5. End-to-End LaunchD Test
+
+This tests the full launchd-initiated flow:
+
+```bash
+# Ensure keychain is unlocked first
+security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
+
+# Kickstart the launchd agent
+launchctl kickstart gui/$(id -u)/com.claude.auto-claude-nix
+
+# Monitor logs
+tail -f ~/.claude/logs/launchd-nix.log
+
+# Check for errors
+tail ~/.claude/logs/launchd-nix.err
+```
+
+**Success indicators:**
+
+- Log shows `slack_enabled: "true"` in run_started event
+- Slack channel receives "Run Started" notification
+- No `ModuleNotFoundError` in error log
 
 ## Troubleshooting
 
@@ -191,3 +253,47 @@ If headless auth fails:
    ```bash
    security find-generic-password -s bws-claude-automation -w
    ```
+
+### Slack Notifications Not Sending
+
+**Symptom**: `ModuleNotFoundError: No module named 'slack_sdk'`
+
+**Cause**: LaunchD uses wrong Python environment
+
+**Fix**: Rebuild to update launchd plist with per-user profile path:
+
+```bash
+darwin-rebuild switch --flake ~/.config/nix
+```
+
+Verify the plist PATH includes per-user profile:
+
+```bash
+grep PATH ~/Library/LaunchAgents/com.claude.auto-claude-nix.plist
+# Should show: /etc/profiles/per-user/<username>/bin at the start
+```
+
+**Symptom**: Keychain access denied (error -25308)
+
+**Cause**: Automation keychain is locked
+
+**Fix**: Unlock the keychain:
+
+```bash
+security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
+```
+
+**Symptom**: Channel not found in keychain
+
+**Cause**: Missing per-repo channel entry
+
+**Fix**: Add the channel to automation keychain:
+
+```bash
+security add-generic-password -a "ai-cli-coder" \
+  -s "SLACK_CHANNEL_ID_<REPO_NAME>" \
+  -w "<channel_id>" \
+  ~/Library/Keychains/automation.keychain-db
+```
+
+Replace `<REPO_NAME>` with uppercase repo name (dashes/dots to underscores).
