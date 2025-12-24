@@ -34,16 +34,19 @@ def calculate_token_usage(log_file: Path) -> int:
         return 0
 
     total = 0
-    for line in log_file.read_text().splitlines():
-        if not line.strip():
-            continue
-        try:
-            data = json.loads(line)
-            if data.get("type") == "message" and data.get("message", {}).get("role") == "assistant":
-                usage = data.get("message", {}).get("usage", {})
-                total += usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
-        except json.JSONDecodeError:
-            continue
+    with log_file.open() as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                data = json.loads(line)
+                if data.get("type") == "message" and data.get("message", {}).get("role") == "assistant":
+                    usage = data.get("message", {}).get("usage", {})
+                    total += usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
+            except json.JSONDecodeError:
+                # Skip malformed JSON lines (partial writes, corruption)
+                continue
     return total
 
 
@@ -103,6 +106,7 @@ def update_control_file(repo: str) -> bool:
         CONTROL_FILE.write_text(json.dumps(control, indent=2))
         return True
     except (json.JSONDecodeError, OSError):
+        # Control file corrupt or inaccessible - non-critical, continue
         return False
 
 
@@ -191,9 +195,11 @@ def main():
                     try:
                         v = int(v)
                     except ValueError:
+                        # Not an int, try float
                         try:
                             v = float(v)
                         except ValueError:
+                            # Not a number, keep as string
                             pass
                     extra[k] = v
 

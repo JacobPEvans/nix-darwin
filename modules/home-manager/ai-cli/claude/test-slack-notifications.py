@@ -22,6 +22,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from auto_claude_utils import (
+    get_keychain_password,
+    get_repo_name,
+    load_bws_env,
+    sanitize_repo_name,
+)
+
 
 class Colors:
     RED = "\033[0;31m"
@@ -47,57 +54,6 @@ class TestResults:
     def warn(self, msg: str):
         print(f"{Colors.YELLOW}⚠ WARN{Colors.NC}: {msg}")
         self.warnings += 1
-
-
-def load_bws_env() -> dict[str, str]:
-    """Load BWS .env file into dict."""
-    env_path = Path.home() / ".config/bws/.env"
-    config = {}
-    if env_path.exists():
-        for line in env_path.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, _, value = line.partition("=")
-                # Strip quotes
-                value = value.strip().strip("'\"")
-                config[key.strip()] = value
-    return config
-
-
-def get_keychain_password(service: str, account: str | None = None) -> str | None:
-    """Get password from macOS keychain."""
-    try:
-        cmd = ["security", "find-generic-password", "-s", service, "-w"]
-        if account:
-            cmd = ["security", "find-generic-password", "-s", service, "-a", account, "-w"]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
-        return None
-
-
-def get_repo_name_from_git(target_dir: str) -> str | None:
-    """Get repo name from git remote URL."""
-    try:
-        result = subprocess.run(
-            ["git", "-C", target_dir, "remote", "get-url", "origin"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        url = result.stdout.strip()
-        # Extract repo name from URL (handles both HTTPS and SSH)
-        name = url.rsplit("/", 1)[-1]
-        if name.endswith(".git"):
-            name = name[:-4]
-        return name
-    except subprocess.CalledProcessError:
-        return None
-
-
-def sanitize_repo_name(name: str) -> str:
-    """Convert repo name to keychain key format (uppercase, no dashes/dots)."""
-    return name.upper().replace("-", "_").replace(".", "_")
 
 
 def main():
@@ -190,8 +146,8 @@ def main():
 
     for test_repo in test_repos:
         if Path(test_repo).exists():
-            # Try git remote first
-            repo_name = get_repo_name_from_git(test_repo) or Path(test_repo).name
+            # Use get_repo_name from utils (handles worktrees properly)
+            repo_name = get_repo_name(test_repo)
             print(f"   Testing: {test_repo}")
             print(f"   Detected repo name: {repo_name}")
 

@@ -24,6 +24,27 @@ def load_bws_env(path: Path | None = None) -> dict[str, str]:
     for line in path.read_text().splitlines():
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
+            # Strip inline comments (but preserve # inside quotes)
+            if "#" in line:
+                # Simple approach: if # appears after =, strip from # onwards
+                # This works for unquoted values and simple cases
+                key_part, _, value_part = line.partition("=")
+                if "#" in value_part:
+                    # Check if # is inside quotes
+                    in_quotes = False
+                    quote_char = None
+                    for i, char in enumerate(value_part):
+                        if char in ("'", '"') and (i == 0 or value_part[i - 1] != "\\"):
+                            if not in_quotes:
+                                in_quotes = True
+                                quote_char = char
+                            elif char == quote_char:
+                                in_quotes = False
+                        elif char == "#" and not in_quotes:
+                            value_part = value_part[:i]
+                            break
+                line = key_part + "=" + value_part
+
             if line.startswith("export "):
                 line = line[7:]
             key, _, value = line.partition("=")
@@ -41,6 +62,7 @@ def get_keychain_password(service: str, account: str | None = None) -> str | Non
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError:
+        # Keychain entry not found - this is expected for optional config
         return None
 
 
@@ -65,6 +87,7 @@ def get_repo_name(target_dir: str) -> str:
             if name:
                 return name
         except subprocess.CalledProcessError:
+            # Git command failed (not a git repo or no remote) - fall back to directory name
             pass
 
     return target_path.name

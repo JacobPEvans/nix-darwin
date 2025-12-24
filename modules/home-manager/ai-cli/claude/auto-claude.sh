@@ -63,7 +63,7 @@ FORCE_FLAG=""
 [[ "${FORCE_RUN:-}" == "1" ]] && FORCE_FLAG="--force"
 
 # Run all preflight checks via Python
-PREFLIGHT_RESULT=$(python3 "${SCRIPT_DIR}/auto_claude_preflight.py" all "$TARGET_DIR" $FORCE_FLAG --json 2>/dev/null) || {
+PREFLIGHT_RESULT=$(python3 "${SCRIPT_DIR}/auto_claude_preflight.py" all "$TARGET_DIR" $FORCE_FLAG --json) || {
   PREFLIGHT_EXIT=$?
   if [[ $PREFLIGHT_EXIT -eq 2 ]]; then
     # Skip requested (paused or skip_count)
@@ -76,7 +76,13 @@ PREFLIGHT_RESULT=$(python3 "${SCRIPT_DIR}/auto_claude_preflight.py" all "$TARGET
     fi
     exit 0
   fi
-  echo "[$RUN_ID] ERROR: Preflight checks failed" >> "$FAILURES_LOG"
+  # Extract failure reason if available
+  PREFLIGHT_REASON=$(echo "$PREFLIGHT_RESULT" | python3 -c "import sys, json; data=sys.stdin.read(); obj=json.loads(data) if data else {}; print(obj.get('reason') or obj.get('error') or obj.get('message') or '')" 2>/dev/null || echo "")
+  if [[ -n "$PREFLIGHT_REASON" ]]; then
+    echo "[$RUN_ID] ERROR: Preflight checks failed (exit=$PREFLIGHT_EXIT, reason=$PREFLIGHT_REASON)" >> "$FAILURES_LOG"
+  else
+    echo "[$RUN_ID] ERROR: Preflight checks failed (exit=$PREFLIGHT_EXIT)" >> "$FAILURES_LOG"
+  fi
   exit 1
 }
 
@@ -124,7 +130,7 @@ fi
 # --- EMIT PREFLIGHT PASSED EVENT ---
 python3 "${SCRIPT_DIR}/auto_claude_postrun.py" emit-event preflight_passed \
   --run-id "$RUN_ID" --repo "$REPO_NAME" \
-  --extra "target_dir=$TARGET_DIR" "budget=$MAX_BUDGET_USD" 2>/dev/null || true
+  --extra "target_dir=$TARGET_DIR" "budget=$MAX_BUDGET_USD" || true
 
 # --- SLACK: RUN STARTED ---
 PARENT_TS=""
@@ -133,7 +139,7 @@ if [[ "$SLACK_ENABLED" == "true" ]]; then
     --repo "$REPO_NAME" \
     --budget "$MAX_BUDGET_USD" \
     --run-id "$RUN_ID" \
-    --channel "$SLACK_CHANNEL" 2>/dev/null) || true
+    --channel "$SLACK_CHANNEL") || true
 fi
 
 # --- EXECUTION ---
@@ -146,7 +152,7 @@ echo "    Budget: \$${MAX_BUDGET_USD}" >> "$SUMMARY_LOG"
 # Emit run_started event
 python3 "${SCRIPT_DIR}/auto_claude_postrun.py" emit-event run_started \
   --run-id "$RUN_ID" --repo "$REPO_NAME" --budget "$MAX_BUDGET_USD" \
-  --extra "slack_enabled=$SLACK_ENABLED" 2>/dev/null || true
+  --extra "slack_enabled=$SLACK_ENABLED" || true
 
 START_TIME=$(date +%s)
 ORCHESTRATOR_PROMPT=$(<"$PROMPT_FILE")
@@ -174,18 +180,18 @@ TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
 # Check context usage via Python
 python3 "${SCRIPT_DIR}/auto_claude_postrun.py" check-context "$LOG_FILE" \
-  --run-id "$RUN_ID" --repo "$REPO_NAME" 2>/dev/null || true
+  --run-id "$RUN_ID" --repo "$REPO_NAME" || true
 
 # Emit run_completed event
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
   python3 "${SCRIPT_DIR}/auto_claude_postrun.py" emit-event run_completed \
-    --run-id "$RUN_ID" --repo "$REPO_NAME" --exit-code 0 --duration "$DURATION_SEC" 2>/dev/null || true
+    --run-id "$RUN_ID" --repo "$REPO_NAME" --exit-code 0 --duration "$DURATION_SEC" || true
 else
   echo "=== [$TIMESTAMP] Failed: $REPO_NAME (exit $EXIT_CODE) ===" >> "$SUMMARY_LOG"
   echo "[$RUN_ID] $REPO_NAME: Exit code $EXIT_CODE" >> "$FAILURES_LOG"
   python3 "${SCRIPT_DIR}/auto_claude_postrun.py" emit-event run_completed \
-    --run-id "$RUN_ID" --repo "$REPO_NAME" --exit-code "$EXIT_CODE" --duration "$DURATION_SEC" 2>/dev/null || true
+    --run-id "$RUN_ID" --repo "$REPO_NAME" --exit-code "$EXIT_CODE" --duration "$DURATION_SEC" || true
 fi
 
 # --- SLACK: RUN COMPLETED ---
@@ -196,7 +202,7 @@ if [[ "$SLACK_ENABLED" == "true" ]] && [[ -n "$PARENT_TS" ]]; then
     --thread-ts "$PARENT_TS" \
     --budget "$MAX_BUDGET_USD" \
     --run-id "$RUN_ID" \
-    --log-file "$LOG_FILE" 2>/dev/null || true
+    --log-file "$LOG_FILE" || true
 fi
 
 # --- MONITORING: CHECK FOR ANOMALIES ---
@@ -212,7 +218,7 @@ fi
 
 # --- UPDATE CONTROL FILE (only on success) ---
 if [[ $EXIT_CODE -eq 0 ]]; then
-  python3 "${SCRIPT_DIR}/auto_claude_postrun.py" update-control "$REPO_NAME" 2>/dev/null || true
+  python3 "${SCRIPT_DIR}/auto_claude_postrun.py" update-control "$REPO_NAME" || true
 fi
 
 echo "" >> "$SUMMARY_LOG"
