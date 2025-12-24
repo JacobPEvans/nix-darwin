@@ -131,7 +131,7 @@ in
         ];
         # Slack channel ID retrieved from BWS at runtime
         # Store in BWS as: slack-channel-auto-claude-reports
-        slackChannel = ""; # Replace with actual channel ID or retrieve from BWS
+        slackChannel = "CHANGE_ME_SLACK_CHANNEL_ID"; # Replace with actual channel ID or retrieve from BWS
       };
 
       # Real-time anomaly detection
@@ -215,7 +215,7 @@ in
       # Model selection is dynamic (via /model command or shell env).
       # To set a default in this config, uncomment below.
       # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
-      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required
+      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required. Left disabled to use orchestrator defaults; uncomment only to force a specific sub-agent model.
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";

@@ -21,6 +21,7 @@ let
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false;
     }))
+    ps.keyring
   ]);
 
   # Check if reporting is enabled
@@ -118,20 +119,33 @@ in
   };
 
   config = lib.mkIf reportingEnabled {
-    # Deploy Python scripts and ensure log directory exists
-    home.file = {
-      "${logDir}/.gitkeep".text = "";
-      "${scriptDir}/auto-claude-db.py" = {
-        executable = true;
-        text = builtins.readFile ./auto-claude-db.py;
+    home = {
+      # Deploy Python scripts and ensure log directory exists
+      # Note: Python environment (pythonWithDeps) is referenced directly in launchd config below
+      file = {
+        "${logDir}/.gitkeep".text = "";
+        "${scriptDir}/auto-claude-db.py" = {
+          executable = true;
+          text = builtins.readFile ./auto-claude-db.py;
+        };
+        "${scriptDir}/auto-claude-digest.py" = {
+          executable = true;
+          text = builtins.readFile ./auto-claude-digest.py;
+        };
+        "${scriptDir}/auto-claude-monitor.py" = {
+          executable = true;
+          text = builtins.readFile ./auto-claude-monitor.py;
+        };
       };
-      "${scriptDir}/auto-claude-digest.py" = {
-        executable = true;
-        text = builtins.readFile ./auto-claude-digest.py;
-      };
-      "${scriptDir}/auto-claude-monitor.py" = {
-        executable = true;
-        text = builtins.readFile ./auto-claude-monitor.py;
+
+      # Reminder to user: alert integration happens in auto-claude.sh
+      # The monitor script is called after each run completes
+      sessionVariables = {
+        CLAUDE_MONITORING_ENABLED = lib.mkIf cfg.autoClaude.reporting.alerts.enable "1";
+        CLAUDE_ALERT_CONTEXT_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.contextThreshold;
+        CLAUDE_ALERT_BUDGET_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.budgetThreshold;
+        CLAUDE_ALERT_TOKENS_NO_OUTPUT = builtins.toString cfg.autoClaude.reporting.alerts.tokensNoOutput;
+        CLAUDE_ALERT_CONSECUTIVE_FAILURES = builtins.toString cfg.autoClaude.reporting.alerts.consecutiveFailures;
       };
     };
 
@@ -169,16 +183,6 @@ in
         ProcessType = "Standard";
         RunAtLoad = false;
       };
-    };
-
-    # Reminder to user: alert integration happens in auto-claude.sh
-    # The monitor script is called after each run completes
-    home.sessionVariables = {
-      CLAUDE_MONITORING_ENABLED = lib.mkIf cfg.autoClaude.reporting.alerts.enable "1";
-      CLAUDE_ALERT_CONTEXT_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.contextThreshold;
-      CLAUDE_ALERT_BUDGET_THRESHOLD = builtins.toString cfg.autoClaude.reporting.alerts.budgetThreshold;
-      CLAUDE_ALERT_TOKENS_NO_OUTPUT = builtins.toString cfg.autoClaude.reporting.alerts.tokensNoOutput;
-      CLAUDE_ALERT_CONSECUTIVE_FAILURES = builtins.toString cfg.autoClaude.reporting.alerts.consecutiveFailures;
     };
   };
 }

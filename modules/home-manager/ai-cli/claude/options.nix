@@ -166,8 +166,20 @@ in
     };
 
     # API Key Helper (for headless authentication)
-    # Configuration comes from ~/.config/bws/.env (not Nix options)
-    # See bws_helper.py for required .env variables
+    #
+    # This feature assumes you have created a ~/.config/bws/.env file
+    # containing the required environment variables for Bitwarden/Claude
+    # API key retrieval. Configuration is not provided via Nix options.
+    #
+    # NOTE: The bws_helper.py script currently performs little or no
+    # validation of this file. If ~/.config/bws/.env is missing or
+    # misconfigured, the helper will fail at runtime with confusing
+    # errors rather than clear setup instructions.
+    #
+    # Before enabling this option, ensure that:
+    #   - ~/.config/bws/.env exists
+    #   - it contains all variables expected by bws_helper.py
+    #   - the file has appropriate permissions (not world-readable)
     apiKeyHelper = {
       enable = mkEnableOption "API key helper for headless Claude authentication";
 

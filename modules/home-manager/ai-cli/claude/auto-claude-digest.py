@@ -37,7 +37,7 @@ def get_slack_token() -> str:
     """Retrieve Slack bot token via bws_helper."""
     try:
         from bws_helper import get_secret
-        return get_secret("SLACK_TOKEN")
+        return get_secret("SLACK_BOT_TOKEN")
     except ImportError:
         print("Error: bws_helper module not found. Ensure it's in the same directory.", file=sys.stderr)
         sys.exit(1)

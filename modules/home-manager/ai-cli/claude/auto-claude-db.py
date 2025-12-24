@@ -363,9 +363,22 @@ def parse_jsonl_log(log_path: Path) -> dict:
 
     # Calculate duration if not set
     if run_data["started_at"] and run_data["ended_at"] and not run_data.get("duration_sec"):
+        def _parse_timestamp(ts: str) -> datetime:
+            """Parse ISO 8601 timestamp, handling 'Z' suffix and naive datetimes as UTC."""
+            if ts is None:
+                raise TypeError("Timestamp is None")
+            # Normalize trailing 'Z' (UTC) without affecting other offsets
+            if ts.endswith("Z"):
+                ts = ts[:-1] + "+00:00"
+            dt = datetime.fromisoformat(ts)
+            # If no timezone info is present, assume UTC for consistency
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+
         try:
-            start = datetime.fromisoformat(run_data["started_at"].replace("Z", "+00:00"))
-            end = datetime.fromisoformat(run_data["ended_at"].replace("Z", "+00:00"))
+            start = _parse_timestamp(run_data["started_at"])
+            end = _parse_timestamp(run_data["ended_at"])
             run_data["duration_sec"] = int((end - start).total_seconds())
         except (ValueError, TypeError):
             # If timestamps are malformed, skip duration calculation and keep other stats
@@ -376,7 +389,7 @@ def parse_jsonl_log(log_path: Path) -> dict:
 
 def extract_run_id_from_filename(filename: str) -> Optional[tuple[str, str]]:
     """Extract repo name and run_id from filename like 'repo_20251222_150007.jsonl'."""
-    match = re.match(r"^(.+?)_(\d{8}_\d{6})\.jsonl$", filename)
+    match = re.match(r"^(.+)_(\d{8}_\d{6})\.jsonl$", filename)
     if match:
         return match.group(1), match.group(2)
     return None

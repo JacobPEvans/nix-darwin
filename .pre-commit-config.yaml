@@ -82,7 +82,7 @@ repos:
       # Validates syntax of all auto-claude shell scripts
       - id: validate-auto-claude-scripts
         name: Validate auto-claude shell scripts
-        entry: bash -c 'find modules/home-manager/ai-cli/claude -name "auto-claude*.sh" -exec zsh -n {} + || exit 1'
+        entry: bash -c 'find modules/home-manager/ai-cli/claude -name "auto-claude*.sh" -exec zsh -n {} \; || exit 1'
         language: system
         files: '^modules/home-manager/ai-cli/claude/auto-claude.*\.sh$'
         types: [file]

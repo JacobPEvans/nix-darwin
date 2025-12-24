@@ -34,9 +34,13 @@ def load_env(path: Path = Path.home() / ".config/bws/.env") -> dict[str, str]:
                 line = line[7:]
             k, _, v = line.partition("=")
             key = k.strip()
-            # Strip surrounding quotes - handles both KEY=value and KEY="value"
-            # Values needing leading/trailing quotes should escape them
-            value = v.strip().strip("'\"")
+            # Strip a single pair of matching surrounding quotes after trimming whitespace
+            # This preserves legitimate leading/trailing quotes that are not delimiters
+            raw = v.strip()
+            if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in ("'", '"'):
+                value = raw[1:-1]
+            else:
+                value = raw
             if not value:
                 raise ValueError(f"Empty value for key '{key}' in {path}")
             config[key] = value
