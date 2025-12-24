@@ -16,12 +16,12 @@ let
   scriptPath = "${homeDir}/.claude/scripts/auto-claude.sh";
   logDir = "${homeDir}/.claude/logs";
 
-  # Python with slack-sdk for notifications
-  # Override slack-sdk to disable tests that fail in CI
-  pythonWithSlack = pkgs.python3.withPackages (ps: [
+  # Python environment for auto-claude scripts
+  pythonEnv = pkgs.python3.withPackages (ps: [
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false; # Disable tests - they fail in CI with connection/signal errors
     }))
+    ps.keyring # macOS Keychain access
     ps.pyyaml
   ]);
 
@@ -186,7 +186,7 @@ in
 
     # Add Python with slack-sdk to path and deploy scripts
     home = {
-      packages = [ pythonWithSlack ];
+      packages = [ pythonEnv ];
 
       file = {
         # Deploy shell script
@@ -210,6 +210,37 @@ in
         ".claude/scripts/auto-claude-notify.py" = {
           source = ./auto-claude-notify.py;
           executable = true;
+        };
+
+        # Deploy BWS helper (shared by notifier and API key helper)
+        ".claude/scripts/bws_helper.py" = {
+          source = ./bws_helper.py;
+          executable = true;
+        };
+
+        # Deploy Python modules for auto-claude
+        ".claude/scripts/auto_claude_utils.py" = {
+          source = ./auto_claude_utils.py;
+          executable = true;
+        };
+        ".claude/scripts/auto_claude_preflight.py" = {
+          source = ./auto_claude_preflight.py;
+          executable = true;
+        };
+        ".claude/scripts/auto_claude_postrun.py" = {
+          source = ./auto_claude_postrun.py;
+          executable = true;
+        };
+
+        # Deploy Slack notification test script
+        ".claude/scripts/test-slack-notifications.py" = {
+          source = ./test-slack-notifications.py;
+          executable = true;
+        };
+
+        # Deploy BWS config template (user copies to .env and fills in values)
+        ".config/bws/.env.example" = {
+          source = ./bws-env.example;
         };
       };
 
@@ -252,7 +283,7 @@ in
           StandardErrorPath = "${logDir}/launchd-${name}.err";
           EnvironmentVariables = {
             HOME = homeDir;
-            PATH = "${pythonWithSlack}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+            PATH = "${pythonEnv}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           };
         };
       }

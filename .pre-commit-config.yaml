@@ -82,7 +82,7 @@ repos:
       # Validates syntax of all auto-claude shell scripts
       - id: validate-auto-claude-scripts
         name: Validate auto-claude shell scripts
-        entry: bash -c 'shopt -s nullglob; rc=0; for f in modules/home-manager/ai-cli/claude/auto-claude*.sh; do zsh -n "$f" || rc=1; done; exit $rc'
+        entry: bash -c 'find modules/home-manager/ai-cli/claude -name "auto-claude*.sh" -exec zsh -n {} \; || exit 1'
         language: system
         files: '^modules/home-manager/ai-cli/claude/auto-claude.*\.sh$'
         types: [file]
@@ -96,4 +96,13 @@ repos:
         language: system
         files: '^modules/home-manager/ai-cli/claude/orchestrator-prompt\.txt$'
         types: [file]
+        pass_filenames: false
+
+      # Flake input updates - run manually to update critical inputs
+      # Use: pre-commit run --hook-stage manual update-flake-inputs
+      - id: update-flake-inputs
+        name: Update flake inputs (nixpkgs, ai-assistant-instructions, agent-os, nix-config-main)
+        entry: nix flake lock --update-input nixpkgs --update-input ai-assistant-instructions --update-input agent-os --update-input nix-config-main
+        language: system
+        stages: [manual]
         pass_filenames: false

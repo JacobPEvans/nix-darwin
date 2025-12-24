@@ -86,11 +86,10 @@ in
 
   # API Key Helper for headless authentication (cron jobs, CI/CD)
   # Uses Bitwarden Secrets Manager to securely fetch OAuth token
+  # Configuration: ~/.config/bws/.env (see bws-env.example)
   apiKeyHelper = {
     enable = true;
     # scriptPath default: .local/bin/claude-api-key-helper
-    # keychainService default: bws-claude-automation
-    secretId = "55ebeb62-1327-4967-8f08-b3a5015f5b7b";
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
@@ -116,6 +115,32 @@ in
         # Slack channel ID removed for security - retrieved from BWS at runtime
         # Store in BWS as: slack-channel-nix
         # slackChannel = "...";
+      };
+    };
+
+    # Reporting: Twice-daily utilization reports and real-time anomaly alerts
+    reporting = {
+      enable = true;
+
+      # Scheduled digest reports (8am and 5pm EST)
+      scheduledReports = {
+        # Times in EST - converted to UTC by Nix module (8am EST = 1pm UTC, 5pm EST = 10pm UTC)
+        times = [
+          "08:00"
+          "17:00"
+        ];
+        # Slack channel ID retrieved from BWS at runtime
+        # Store in BWS as: slack-channel-auto-claude-reports
+        slackChannel = "CHANGE_ME_SLACK_CHANNEL_ID"; # Replace with actual channel ID or retrieve from BWS
+      };
+
+      # Real-time anomaly detection
+      alerts = {
+        enable = true;
+        contextThreshold = 90; # Alert if >90% of 200k token window used
+        budgetThreshold = 50; # Alert if >50% of run budget used
+        tokensNoOutput = 50000; # Flag if >50k tokens with no completed work
+        consecutiveFailures = 2; # Alert after 2 consecutive failures
       };
     };
   };
@@ -190,7 +215,7 @@ in
       # Model selection is dynamic (via /model command or shell env).
       # To set a default in this config, uncomment below.
       # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
-      CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required
+      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required. Left disabled to use orchestrator defaults; uncomment only to force a specific sub-agent model.
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";

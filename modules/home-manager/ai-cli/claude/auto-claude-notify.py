@@ -13,20 +13,24 @@ Usage:
     auto-claude-notify.py run_completed --repo NAME --thread-ts TS --log-file PATH --budget AMOUNT
 
 Secrets:
-    Slack bot token retrieved from Bitwarden Secrets Manager (bws).
-    Set BWS_SLACK_SECRET_ID env var or use default: auto-claude-slack-bot-token
+    All secrets retrieved via bws_helper from ~/.config/bws/.env
+    - Slack bot token: BWS_SECRET_SLACK_BOT_TOKEN in config
+    - Slack channels: Retrieved from keychain (SLACK_CHANNEL_<REPO>)
 """
 
 import argparse
 import json
-import os
-import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+
+# Import bws_helper from same directory
+sys.path.insert(0, str(Path(__file__).parent))
+import bws_helper
 
 # Display limits for Slack messages (prevents overly long messages)
 MAX_DISPLAY_ITEMS = 10
@@ -41,23 +45,11 @@ def escape_slack_markdown(text: str) -> str:
 
 
 def get_slack_token() -> str:
-    """Retrieve Slack bot token from Bitwarden Secrets Manager."""
-    secret_id = os.environ.get("BWS_SLACK_SECRET_ID", "auto-claude-slack-bot-token")
-
+    """Retrieve Slack bot token from Bitwarden Secrets Manager via bws_helper."""
     try:
-        result = subprocess.run(
-            ["bws", "secret", "get", secret_id],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        secret_data = json.loads(result.stdout)
-        return secret_data["value"]
-    except subprocess.CalledProcessError:
-        print(f"Error retrieving secret '{secret_id}' from bws. Please check your Bitwarden setup.", file=sys.stderr)
-        sys.exit(1)
-    except (json.JSONDecodeError, KeyError) as e:
-        print(f"Error parsing bws response: {e}", file=sys.stderr)
+        return bws_helper.get_secret("SLACK_BOT_TOKEN")
+    except (FileNotFoundError, ValueError, RuntimeError) as e:
+        print(f"Error retrieving Slack token: {e}", file=sys.stderr)
         sys.exit(1)
 
 

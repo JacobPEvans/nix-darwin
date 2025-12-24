@@ -19,6 +19,7 @@ let
     name: marketplace:
     lib.nameValuePair ".claude/plugins/marketplaces/${getMarketplaceName name}" {
       source = marketplace.flakeInput;
+      force = true;
     }
   ) nixManagedMarketplaces;
 

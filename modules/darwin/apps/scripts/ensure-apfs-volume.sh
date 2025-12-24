@@ -18,13 +18,15 @@ VOLUME_NAME="${1:?Volume name required}"
 CONTAINER="${2:?APFS container required}"
 
 # Validate volume name: allow only safe characters (letters, digits, dot, underscore, space, hyphen)
-if [[ ! "$VOLUME_NAME" =~ ^[A-Za-z0-9._ -]+$ ]]; then
+NAME_PATTERN="^[A-Za-z0-9._ -]+$"
+if [[ ! "$VOLUME_NAME" =~ $NAME_PATTERN ]]; then
     echo "Error: Volume name contains invalid characters" >&2
     exit 1
 fi
 
 # Validate container: disk identifiers (disk3, disk3s1) or UUIDs
-if [[ ! "$CONTAINER" =~ ^(disk[0-9]+([s][0-9]+)?|[A-Fa-f0-9-]{36})$ ]]; then
+CONTAINER_PATTERN="^(disk[0-9]+([s][0-9]+)?|[A-Fa-f0-9-]{36})$"
+if [[ ! "$CONTAINER" =~ $CONTAINER_PATTERN ]]; then
     echo "Error: Invalid container identifier" >&2
     exit 1
 fi
