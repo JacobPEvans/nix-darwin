@@ -121,11 +121,20 @@ check_context_usage() {
   local total_tokens=$(calculate_token_usage "$LOG_FILE")
   local context_window=200000  # Standard tier
   local usage_pct=$((total_tokens * 100 / context_window))
+  local tokens_remaining=$((context_window - total_tokens))
 
   echo "[$RUN_ID] Total tokens used: $total_tokens / $context_window ($usage_pct%)" >> "$SUMMARY_LOG"
 
+  # Emit context checkpoint event for monitoring
+  emit_event "context_checkpoint" \
+    "tokens_used" "$total_tokens" \
+    "tokens_remaining" "$tokens_remaining" \
+    "usage_pct" "$usage_pct" \
+    "context_window" "$context_window"
+
   if (( usage_pct > 90 )); then
     echo "[$RUN_ID] WARNING: Context usage exceeded 90% - orchestrator should have exited gracefully" >> "$SUMMARY_LOG"
+    emit_event "context_warning" "usage_pct" "$usage_pct" "reason" "exceeded_90_percent"
   fi
 }
 
@@ -146,87 +155,10 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-# --- CONTROL FILE CHECK ---
-CONTROL_FILE="${HOME}/.claude/auto-claude-control.json"
-
-# Convert ISO8601 timestamp to epoch seconds for reliable comparison
-# Supports both macOS (BSD date) and Linux (GNU date)
-iso_to_epoch() {
-  local iso="$1"
-  if date --version >/dev/null 2>&1; then
-    # GNU date (Linux)
-    date -d "$iso" "+%s" 2>/dev/null
-  else
-    # BSD date (macOS)
-    date -j -f "%Y-%m-%dT%H:%M:%S" "${iso%%.*}" "+%s" 2>/dev/null
-  fi
-}
-
-check_control_file() {
-  # Skip checks if FORCE_RUN is set
-  if [[ "${FORCE_RUN:-}" == "1" ]]; then
-    return 0
-  fi
-
-  # Skip if control file doesn't exist
-  if [[ ! -f "$CONTROL_FILE" ]]; then
-    return 0
-  fi
-
-  local now=$(date "+%Y-%m-%dT%H:%M:%S")
-
-  # Check pause_until
-  local pause_until=$(jq -r '.pause_until // empty' "$CONTROL_FILE" 2>/dev/null)
-  if [[ -n "$pause_until" && "$pause_until" != "null" ]]; then
-    local now_epoch=$(iso_to_epoch "$now")
-    local pause_until_epoch=$(iso_to_epoch "$pause_until")
-    if [[ -z "$now_epoch" || -z "$pause_until_epoch" ]]; then
-      echo "Warning: Could not parse pause_until or current time. Skipping pause check." >&2
-    elif [[ "$now_epoch" -lt "$pause_until_epoch" ]]; then
-      echo "Auto-claude paused until $pause_until. Skipping this run." >&2
-      echo "Run 'auto-claude-ctl resume' to resume earlier." >&2
-      exit 0
-    fi
-  fi
-
-  # Check skip_count
-  local skip_count=$(jq -r '.skip_count // 0' "$CONTROL_FILE" 2>/dev/null)
-  if [[ "$skip_count" -gt 0 ]] 2>/dev/null; then
-    local new_count=$((skip_count - 1))
-    local tmp
-    tmp=$(mktemp) || { echo "Error: could not create temporary file for skip_count update." >&2; exit 1; }
-    jq ".skip_count = $new_count" "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
-    echo "Skipping this run ($new_count remaining). Run 'auto-claude-ctl resume' to clear." >&2
-    exit 0
-  fi
-
-  # Clear run_now flag if set (we're about to run)
-  local run_now=$(jq -r '.run_now // false' "$CONTROL_FILE" 2>/dev/null)
-  if [[ "$run_now" == "true" ]]; then
-    local tmp
-    tmp=$(mktemp) || { echo "Error: could not create temporary file for run_now flag clear." >&2; exit 1; }
-    jq '.run_now = false' "$CONTROL_FILE" > "$tmp" && mv "$tmp" "$CONTROL_FILE"
-  fi
-}
-
-# Run control file check
-check_control_file
-
-# --- INPUT VALIDATION ---
-if [[ ! -d "$TARGET_DIR" ]]; then
-  echo "Error: Directory $TARGET_DIR does not exist." >&2
-  exit 1
-fi
-
-# Validate MAX_BUDGET_USD is a positive number
-if ! [[ "$MAX_BUDGET_USD" =~ ^[0-9]+\.?[0-9]*$ ]] || ! awk -v val="$MAX_BUDGET_USD" 'BEGIN { exit !(val > 0) }'; then
-  echo "Error: MAX_BUDGET_USD must be a positive number, got: $MAX_BUDGET_USD" >&2
-  exit 1
-fi
-
-# --- ENVIRONMENT ---
+# --- ENVIRONMENT (early, needed for bws/Slack auth) ---
 # Source shell configs for full environment (API keys, PATH, git credentials)
 # Required because launchd runs in a minimal shell
+# Must happen BEFORE skip notifications so bws has access token
 if [[ -r "$HOME/.zshrc" ]]; then
   if ! source "$HOME/.zshrc" 2>/dev/null; then
     echo "WARNING: Failed to source .zshrc" >&2
@@ -239,17 +171,116 @@ if [[ -r "$HOME/.profile" ]]; then
   fi
 fi
 
+# --- BWS AUTHENTICATION ---
+# Retrieve BWS access token from macOS Keychain for Bitwarden Secrets Manager
+# This is required for Slack notifications (bot token stored in BWS)
+if [[ -z "${BWS_ACCESS_TOKEN:-}" ]]; then
+  BWS_TOKEN=$(security find-generic-password -s "bws-claude-automation" -w 2>/dev/null) || true
+  if [[ -n "$BWS_TOKEN" ]]; then
+    export BWS_ACCESS_TOKEN="$BWS_TOKEN"
+  fi
+fi
+
+# --- EARLY SETUP FOR SLACK NOTIFICATIONS (needed for skip notifications) ---
+SCRIPT_DIR="${HOME}/.claude/scripts"
+NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
+REPO_NAME=$(basename "${TARGET_DIR%/}")
+LOG_DIR="${HOME}/.claude/logs"
+EVENTS_LOG="$LOG_DIR/events.jsonl"
+
+# Check if Python notifier is available for skip notifications
+# Also verify BWS_ACCESS_TOKEN is set (required for Slack API calls)
+SLACK_ENABLED=false
+if [[ -n "$SLACK_CHANNEL" ]] && [[ -x "$NOTIFIER" ]] && command -v python3 &>/dev/null && [[ -n "${BWS_ACCESS_TOKEN:-}" ]]; then
+  SLACK_ENABLED=true
+fi
+
+# Function to send skip notification
+notify_skipped() {
+  local reason="$1"
+  if [[ "$SLACK_ENABLED" == "true" ]]; then
+    python3 "$NOTIFIER" run_skipped \
+      --repo "$REPO_NAME" \
+      --reason "$reason" \
+      --channel "$SLACK_CHANNEL" 2>/dev/null || true
+  fi
+  # Also emit structured event (using jq for proper JSON escaping)
+  local timestamp=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
+  local run_id=$(date "+%Y%m%d_%H%M%S")
+  jq -n \
+    --arg event "run_skipped" \
+    --arg timestamp "$timestamp" \
+    --arg run_id "$run_id" \
+    --arg repo "$REPO_NAME" \
+    --arg reason "$reason" \
+    '{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo, reason: $reason}' \
+    >> "$EVENTS_LOG"
+}
+
+# --- INPUT VALIDATION ---
+if [[ ! -d "$TARGET_DIR" ]]; then
+  echo "Error: Directory $TARGET_DIR does not exist." >&2
+  exit 1
+fi
+
+# Validate MAX_BUDGET_USD is a positive number
+if ! [[ "$MAX_BUDGET_USD" =~ ^[0-9]+\.?[0-9]*$ ]] || ! awk -v val="$MAX_BUDGET_USD" 'BEGIN { exit !(val > 0) }'; then
+  echo "Error: MAX_BUDGET_USD must be a positive number, got: $MAX_BUDGET_USD" >&2
+  exit 1
+fi
 # --- LOGGING SETUP ---
 if ! mkdir -p "$LOG_DIR"; then
   echo "Error: Cannot create log directory $LOG_DIR" >&2
   exit 1
 fi
 RUN_ID=$(date "+%Y%m%d_%H%M%S")
-# Normalize path (remove trailing slashes) before extracting basename
-REPO_NAME=$(basename "${TARGET_DIR%/}")
+# LOG_DIR, REPO_NAME, and EVENTS_LOG already defined in early setup (needed for notify_skipped)
 LOG_FILE="$LOG_DIR/${REPO_NAME}_${RUN_ID}.jsonl"
 SUMMARY_LOG="$LOG_DIR/summary.log"
 FAILURES_LOG="$LOG_DIR/failures.log"
+
+# --- STRUCTURED EVENT LOGGING ---
+# Emit JSON events for monitoring systems (OTEL, Cribl, Splunk)
+emit_event() {
+  local event_type="$1"
+  shift
+
+  # Validate even number of remaining arguments (key-value pairs)
+  if [[ $(($# % 2)) -ne 0 ]]; then
+    echo "ERROR: emit_event requires even number of arguments for key-value pairs" >&2
+    return 1
+  fi
+
+  local timestamp=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
+
+  # Use jq for proper JSON encoding (required by script dependency check)
+  local -a jq_args=(
+    -n
+    --arg event "$event_type"
+    --arg timestamp "$timestamp"
+    --arg run_id "$RUN_ID"
+    --arg repo "$REPO_NAME"
+  )
+
+  local jq_filter='{event: $event, timestamp: $timestamp, run_id: $run_id, repo: $repo}'
+
+  while [[ $# -ge 2 ]]; do
+    local key="$1"
+    local value="$2"
+    if [[ "$value" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+      jq_args+=(--argjson "$key" "$value")
+    else
+      jq_args+=(--arg "$key" "$value")
+    fi
+    jq_filter+=" + {\"$key\": \$$key}"
+    shift 2
+  done
+
+  local event_json
+  event_json=$(jq "${jq_args[@]}" "$jq_filter")
+  echo "$event_json" >> "$EVENTS_LOG"
+  echo "$event_json"
+}
 
 # --- SCRIPT PATHS ---
 SCRIPT_DIR="${HOME}/.claude/scripts"
@@ -329,6 +360,9 @@ pre_flight_git_check() {
 
 pre_flight_git_check
 
+# Emit preflight passed event
+emit_event "preflight_passed" "target_dir" "$TARGET_DIR" "budget" "$MAX_BUDGET_USD"
+
 # Verify claude CLI is available
 if ! command -v claude &>/dev/null; then
   echo "[$RUN_ID] ERROR: Claude CLI not found in PATH" >> "$FAILURES_LOG"
@@ -372,6 +406,10 @@ echo "    Target: $TARGET_DIR" >> "$SUMMARY_LOG"
 echo "    Budget: \$${MAX_BUDGET_USD}" >> "$SUMMARY_LOG"
 [[ -n "$PARENT_TS" ]] && echo "    Slack thread: $PARENT_TS" >> "$SUMMARY_LOG"
 
+# Emit run_started event for monitoring
+emit_event "run_started" "budget" "$MAX_BUDGET_USD" "slack_enabled" "$SLACK_ENABLED"
+START_TIME=$(date +%s)
+
 set +e
 # Use gtimeout (macOS via coreutils) or timeout (Linux), fallback to no timeout
 TIMEOUT_CMD=""
@@ -400,15 +438,28 @@ set -e
 
 # --- POST-RUN PROCESSING ---
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+END_TIME=$(date +%s)
+DURATION_SEC=$((END_TIME - START_TIME))
+DURATION_MIN=$((DURATION_SEC / 60))
 
 # Check context usage for monitoring (optional tracking)
 check_context_usage
 
 if [[ $EXIT_CODE -eq 0 ]]; then
   echo "=== [$TIMESTAMP] Completed: $REPO_NAME (exit 0) ===" >> "$SUMMARY_LOG"
+  emit_event "run_completed" \
+    "exit_code" "0" \
+    "duration_sec" "$DURATION_SEC" \
+    "duration_min" "$DURATION_MIN" \
+    "status" "success"
 else
   echo "=== [$TIMESTAMP] Failed: $REPO_NAME (exit $EXIT_CODE) ===" >> "$SUMMARY_LOG"
   echo "[$RUN_ID] $REPO_NAME: Exit code $EXIT_CODE" >> "$FAILURES_LOG"
+  emit_event "run_completed" \
+    "exit_code" "$EXIT_CODE" \
+    "duration_sec" "$DURATION_SEC" \
+    "duration_min" "$DURATION_MIN" \
+    "status" "failed"
 fi
 
 # --- SLACK: RUN COMPLETED ---

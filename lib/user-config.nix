@@ -97,5 +97,14 @@ in
     # Update this when upgrading to a new NixOS stable release
     # Reference: https://nixos.org/blog/announcements/
     homeManagerStateVersion = "25.05";
+
+    # Automatic garbage collection schedule
+    # Centralized configuration for nix-darwin's gc.interval and gc.options
+    gc = {
+      weekday = 0; # Sunday (0 = Sunday, 1 = Monday, ... 6 = Saturday)
+      hour = 3; # 3 AM
+      minute = 0;
+      retention = "30d"; # Keep generations from last 30 days
+    };
   };
 }

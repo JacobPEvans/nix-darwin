@@ -86,9 +86,7 @@ Detailed structure of the nix-darwin configuration.
 │   └── terraform/                 # Terraform/OpenTofu development
 │
 ├── ARCHITECTURE.md                # This file - detailed structure
-├── CHANGELOG.md                   # Completed work history
 ├── CLAUDE.md                      # AI agent instructions
-├── PLANNING.md                    # Future roadmap
 ├── README.md                      # Project overview
 ├── REFERENCES.md                  # External documentation links
 ├── RUNBOOK.md                     # Operational procedures

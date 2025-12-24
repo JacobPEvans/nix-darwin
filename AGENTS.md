@@ -344,24 +344,12 @@ In rare cases where a security update is urgent:
 
 ## Task Management Workflow
 
-**STRICT PATTERN - Follow without exception:**
+**Simplified Workflow:**
 
 1. **Tasks come from user** - All tasks originate from user requests
-2. **PLANNING.md for active work** - Not started or in-progress tasks ONLY
-3. **CHANGELOG.md for completed work** - ALL completed tasks ONLY
-4. **NO overlap** - A task must NEVER appear in both files
-5. **Clean up regularly** - Reorganize PLANNING.md and clean CHANGELOG.md as needed
-
-**When completing a task:**
-
-1. Remove from PLANNING.md immediately
-2. Add to CHANGELOG.md under appropriate date
-3. Ensure no task exists in both files
-
-**File purposes:**
-
-- `PLANNING.md` = Future roadmap + current work in progress
-- `CHANGELOG.md` = Historical record of completed work
+2. **Calendar Versioning** - This project adheres to [Calendar Versioning](https://calver.org/).
+3. **Changelog** - Keep a record of significant changes. Ideally this should be maintained in `agentsmd/` (or similar central documentation) if possible,
+   or in the git history/PR descriptions.
 
 ## Common Mistakes to Avoid
 
@@ -507,6 +495,24 @@ for GitHub Copilot's automated PR reviews via `.github/copilot-instructions.md`.
 - User is learning Nix - comments are intentionally verbose
 - Flakes-only (no nix-channels, no nix-env)
 - Determinate Nix compatibility is required
+
+### Copilot Coding Agent Warning
+
+**NEVER use `@copilot` or `@copilot-*` in PR comments.**
+
+GitHub's mention parser extracts `@copilot` from strings like `@copilot-pull-request-reviewer`,
+triggering the Copilot Coding Agent to create unwanted "fix" PRs.
+
+**Instead of:**
+
+- ❌ "Thank you @copilot-pull-request-reviewer"
+- ❌ "@copilot-pull-request-reviewer's concern about..."
+
+**Use:**
+
+- ✅ "Thank you Copilot reviewer"
+- ✅ "The Copilot review mentioned..."
+- ✅ "Per the automated review..."
 
 ## Workflow
 

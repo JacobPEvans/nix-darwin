@@ -41,7 +41,6 @@
 <!-- Please confirm the following before submitting -->
 
 - [ ] My commit message follows conventional commits format
-- [ ] I have updated CHANGELOG.md if needed
 - [ ] I have performed a self-review
 
 ## Additional Information

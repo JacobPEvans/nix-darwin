@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: splunk-config
+  namespace: monitoring
+  labels:
+    app: splunk
+data:
+  # Default Splunk configuration
+  default.yml: |
+    splunk:
+      conf:
+        # Create the claude index
+        indexes:
+          directory: /opt/splunk/etc/apps/claude-monitoring/local
+          content:
+            indexes.conf:
+              claude:
+                homePath: $SPLUNK_DB/claude/db
+                coldPath: $SPLUNK_DB/claude/colddb
+                thawedPath: $SPLUNK_DB/claude/thaweddb
+                frozenTimePeriodInSecs: 2592000
+                maxTotalDataSizeMB: 51200
+
+        # Enable HEC
+        inputs:
+          directory: /opt/splunk/etc/apps/claude-monitoring/local
+          content:
+            inputs.conf:
+              http:
+                disabled: 0
+              "http://claude":
+                disabled: 0
+                token: ${SPLUNK_HEC_TOKEN}
+                index: claude
+                sourcetype: _json
+
+        # Create saved searches for Claude monitoring
+        savedsearches:
+          directory: /opt/splunk/etc/apps/claude-monitoring/local
+          content:
+            savedsearches.conf:
+              "Claude - All Events":
+                search: index=claude
+                dispatch.earliest_time: -24h@h
+                dispatch.latest_time: now
+              "Claude - Run Completions":
+                search: index=claude event="run_completed"
+                dispatch.earliest_time: -7d@d
+                dispatch.latest_time: now
+              "Claude - Failed Runs":
+                search: index=claude event="run_completed" status="failed"
+                dispatch.earliest_time: -7d@d
+                dispatch.latest_time: now
+              "Claude - Context Usage":
+                search: index=claude event="context_checkpoint" | timechart avg(usage_pct) by repo
+                dispatch.earliest_time: -7d@d
+                dispatch.latest_time: now

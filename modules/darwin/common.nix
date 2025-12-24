@@ -10,7 +10,7 @@ in
   imports = [
     ./apps
     ./dock
-    ./file-associations.nix
+    ./file-extensions.nix
     ./finder.nix
     ./keyboard.nix
     ./security.nix
@@ -156,13 +156,9 @@ in
   nix = {
     enable = false;
     package = lib.mkForce pkgs.nix;
-
-    # Automatic Garbage Collection
-    # DISABLED: nix.gc.automatic requires nix.enable = true, which conflicts with
-    # Determinate Nix (which manages its own daemon). For gc, use manual:
-    #   nix-collect-garbage --delete-older-than 30d
-    # Or consider a launchd plist that runs nix-collect-garbage directly.
-    gc.automatic = false;
+    # Note: nix.gc cannot be configured when nix.enable = false
+    # Determinate Nix manages garbage collection via its own mechanisms
+    # For manual GC, use: nix-collect-garbage --delete-older-than 30d
   };
 
   # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.

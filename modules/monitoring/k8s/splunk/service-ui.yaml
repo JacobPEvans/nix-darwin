@@ -1,0 +1,23 @@
+# NodePort for local web UI access
+apiVersion: v1
+kind: Service
+metadata:
+  name: splunk-ui
+  namespace: monitoring
+  labels:
+    app: splunk
+spec:
+  type: NodePort
+  selector:
+    app: splunk
+  ports:
+    - name: web
+      port: 8000
+      targetPort: 8000
+      nodePort: 30800
+      protocol: TCP
+    - name: hec
+      port: 8088
+      targetPort: 8088
+      nodePort: 30808
+      protocol: TCP

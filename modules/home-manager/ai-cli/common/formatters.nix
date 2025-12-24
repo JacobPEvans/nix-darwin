@@ -16,33 +16,45 @@ let
   # Handles both lists and nested attrsets
   flattenCommands =
     attrs:
-    lib.flatten (
-      lib.mapAttrsToList (
-        _name: value:
-        if builtins.isList value then
-          value
-        else if builtins.isAttrs value then
-          flattenCommands value
-        else
-          [ ]
-      ) attrs
-    );
+    if builtins.isList attrs then
+      attrs
+    else if builtins.isAttrs attrs then
+      lib.flatten (
+        lib.mapAttrsToList (
+          _name: value:
+          if builtins.isList value then
+            value
+          else if builtins.isAttrs value then
+            flattenCommands value
+          else
+            [ ]
+        ) attrs
+      )
+    else
+      [ ];
 
   # Claude-specific helper: Get all tool-specific permissions (non-shell)
   getClaudeToolPermissions =
     permissions:
     let
       claudePerms = permissions.toolSpecific.claude or { };
+      # WebFetch domains from ai-assistant-instructions
+      webfetchDomains = permissions.webfetchDomains or [ ];
+      webfetchPerms = map (d: "WebFetch(domain:${d})") webfetchDomains;
     in
-    (claudePerms.builtin or [ ]) ++ (claudePerms.webFetch or [ ]) ++ (claudePerms.read or [ ]);
+    (claudePerms.builtin or [ ]) ++ webfetchPerms ++ (claudePerms.read or [ ]);
 
   # Claude-specific helper: Get tool-specific deny permissions
   getClaudeDenyPermissions =
     permissions:
     let
-      claudePerms = permissions.toolSpecific.claude or { };
+      # Deny patterns from ai-assistant-instructions (file patterns for the Read tool)
+      denyPatterns = permissions.denyPatterns or [ ];
+      # Convert patterns to Read(...) format for Claude's deny list.
+      # Note: patterns are used as provided; any tilde (~) expansion must be done upstream.
+      denyReadPatterns = map (p: "Read(${p})") denyPatterns;
     in
-    claudePerms.denyRead or [ ];
+    denyReadPatterns;
 
 in
 {
@@ -71,6 +83,8 @@ in
       (getClaudeToolPermissions permissions) ++ shellPermissions;
 
     # Format all denied commands (shell + tool-specific)
+    # Note: Tool-specific permissions are placed before shell permissions.
+    # This ordering matches formatAllowed and ensures consistent evaluation by Claude Code.
     formatDenied =
       permissions:
       let
