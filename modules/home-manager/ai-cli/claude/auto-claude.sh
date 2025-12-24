@@ -29,6 +29,28 @@ SCRIPT_DIR="${HOME}/.claude/scripts"
 NOTIFIER="${SCRIPT_DIR}/auto-claude-notify.py"
 PROMPT_FILE="${SCRIPT_DIR}/orchestrator-prompt.txt"
 
+# --- KEYCHAIN SECRETS ---
+# Retrieve secrets from macOS automation keychain for headless operation
+# This provides early fallback before Python preflight runs
+AUTOMATION_KEYCHAIN="${HOME}/Library/Keychains/automation.keychain-db"
+
+# Get BWS access token (required for Slack notifier to authenticate with Bitwarden)
+if [[ -z "${BWS_ACCESS_TOKEN:-}" ]] && [[ -f "$AUTOMATION_KEYCHAIN" ]]; then
+  BWS_ACCESS_TOKEN=$(security find-generic-password -s "bws-access-token" -w "$AUTOMATION_KEYCHAIN" 2>/dev/null) || true
+  export BWS_ACCESS_TOKEN
+fi
+
+# Get Slack channel from keychain if not provided as argument
+# Channels are stored as SLACK_CHANNEL_ID_<REPO_NAME> (uppercase, dashes/dots to underscores)
+if [[ -z "$SLACK_CHANNEL" ]] && [[ -f "$AUTOMATION_KEYCHAIN" ]]; then
+  # Normalize repo name: basename, uppercase, replace dashes/dots with underscores
+  # Note: dash must be at end of character set for BSD tr compatibility
+  REPO_BASENAME=$(basename "${TARGET_DIR%/}")
+  REPO_KEY=$(echo "$REPO_BASENAME" | tr '[:lower:]' '[:upper:]' | tr '.-' '__')
+  KEYCHAIN_SERVICE="SLACK_CHANNEL_ID_${REPO_KEY}"
+  SLACK_CHANNEL=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -w "$AUTOMATION_KEYCHAIN" 2>/dev/null) || true
+fi
+
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
   echo "Error: Directory $TARGET_DIR does not exist." >&2
