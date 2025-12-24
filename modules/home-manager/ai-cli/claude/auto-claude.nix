@@ -283,7 +283,9 @@ in
           StandardErrorPath = "${logDir}/launchd-${name}.err";
           EnvironmentVariables = {
             HOME = homeDir;
-            PATH = "${pythonEnv}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+            # Use per-user profile path for Python to ensure slack-sdk is available
+            # The per-user profile is the canonical location for home-manager packages
+            PATH = "/etc/profiles/per-user/${config.home.username}/bin:${pythonEnv}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           };
         };
       }
