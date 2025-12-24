@@ -47,8 +47,9 @@ get_keychain_secret() {
 
 # Get BWS access token (required for Slack notifier to authenticate with Bitwarden)
 if [[ -z "${BWS_ACCESS_TOKEN:-}" ]] && [[ -f "$AUTOMATION_KEYCHAIN" ]]; then
-  if BWS_ACCESS_TOKEN=$(get_keychain_secret "bws-access-token"); then
-    export BWS_ACCESS_TOKEN
+  _token=$(get_keychain_secret "bws-access-token") || true
+  if [[ -n "$_token" ]]; then
+    export BWS_ACCESS_TOKEN="$_token"
   fi
 fi
 
@@ -57,7 +58,7 @@ fi
 if [[ -z "$SLACK_CHANNEL" ]] && [[ -f "$AUTOMATION_KEYCHAIN" ]]; then
   # Normalize repo name: basename, uppercase, replace dashes/dots with underscores
   REPO_BASENAME=$(basename "${TARGET_DIR%/}")
-  REPO_KEY=$(echo "$REPO_BASENAME" | tr '[:lower:]' '[:upper:]' | tr '.-' '_')
+  REPO_KEY=${${(U)REPO_BASENAME}//[-.]/_}
   KEYCHAIN_SERVICE="SLACK_CHANNEL_ID_${REPO_KEY}"
   SLACK_CHANNEL=$(get_keychain_secret "$KEYCHAIN_SERVICE") || true
 fi

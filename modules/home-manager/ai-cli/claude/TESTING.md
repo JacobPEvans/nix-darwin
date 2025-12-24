@@ -169,24 +169,30 @@ PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
 
 ### 4. Send Test Messages to Each Channel
 
-Test NIX channel:
+Define a helper function to avoid repetition:
 
 ```bash
-NIX_CHANNEL=$(security find-generic-password -s "SLACK_CHANNEL_ID_NIX" -a "ai-cli-coder" -w)
-PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
-  ~/.claude/scripts/auto-claude-notify.py run_started \
-  --repo "test-nix" --budget "0.01" --run-id "test-$(date +%s)" \
-  --channel "$NIX_CHANNEL" && echo "✓ NIX channel test sent"
-```
+send_test_notification() {
+  local repo_key="$1"
+  local repo_name="$2"
+  local channel
+  channel=$(security find-generic-password -s "SLACK_CHANNEL_ID_${repo_key}" -a "ai-cli-coder" -w)
+  if [[ -z "$channel" ]]; then
+    echo "Channel for ${repo_key} not found in keychain." >&2
+    return 1
+  fi
 
-Test AI-ASSISTANT-INSTRUCTIONS channel:
+  PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
+    ~/.claude/scripts/auto-claude-notify.py run_started \
+    --repo "$repo_name" --budget "0.01" --run-id "test-$(date +%s)" \
+    --channel "$channel" && echo "✓ ${repo_key} channel test sent"
+}
 
-```bash
-AI_CHANNEL=$(security find-generic-password -s "SLACK_CHANNEL_ID_AI_ASSISTANT_INSTRUCTIONS" -a "ai-cli-coder" -w)
-PYTHONPATH=~/.claude/scripts /etc/profiles/per-user/$USER/bin/python3 \
-  ~/.claude/scripts/auto-claude-notify.py run_started \
-  --repo "test-ai" --budget "0.01" --run-id "test-$(date +%s)" \
-  --channel "$AI_CHANNEL" && echo "✓ AI channel test sent"
+# Test NIX channel
+send_test_notification "NIX" "test-nix"
+
+# Test AI-ASSISTANT-INSTRUCTIONS channel
+send_test_notification "AI_ASSISTANT_INSTRUCTIONS" "test-ai"
 ```
 
 ### 5. End-to-End LaunchD Test

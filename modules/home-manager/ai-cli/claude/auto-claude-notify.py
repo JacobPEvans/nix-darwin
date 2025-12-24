@@ -408,13 +408,13 @@ def blocks_run_skipped(repo: str, reason: str) -> tuple[list, str]:
         {
             "type": "section",
             "fields": [
-                {"type": "mrkdwn", "text": f"*Repository:*\n{escape_markdown(repo)}"},
+                {"type": "mrkdwn", "text": f"*Repository:*\n{escape_slack_markdown(repo)}"},
                 {"type": "mrkdwn", "text": f"*Time:*\n{timestamp}"},
             ],
         },
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": f"*Reason:*\n{escape_markdown(reason)}"},
+            "text": {"type": "mrkdwn", "text": f"*Reason:*\n{escape_slack_markdown(reason)}"},
         },
     ]
     return blocks, f"Auto-Claude run skipped for {repo}: {reason}"
