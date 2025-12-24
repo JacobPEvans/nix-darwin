@@ -87,10 +87,11 @@ SUMMARY_LOG="$LOG_DIR/summary.log"
 FAILURES_LOG="$LOG_DIR/failures.log"
 
 # --- ENVIRONMENT SETUP ---
-# Source shell configs for full environment (PATH, git credentials)
-# Required because launchd runs in a minimal shell
-[[ -r "$HOME/.zshrc" ]] && source "$HOME/.zshrc" 2>/dev/null || true
-[[ -r "$HOME/.profile" ]] && source "$HOME/.profile" 2>/dev/null || true
+# NOTE: We intentionally do NOT source .zshrc or .profile here.
+# LaunchD agents should run in a controlled environment defined by the plist.
+# The launchd plist sets PATH to include /etc/profiles/per-user/<user>/bin
+# which provides home-manager packages (python3 with slack_sdk, etc.)
+# Sourcing interactive shell configs would override PATH and cause issues.
 
 # --- PYTHON PREFLIGHT CHECKS ---
 FORCE_FLAG=""

@@ -203,13 +203,16 @@ def main():
                             pass
                     extra[k] = v
 
+        # If budget was passed via --extra, use it; otherwise use --budget arg
+        # This prevents "multiple values for keyword argument" errors
+        budget = extra.pop("budget", None) or args.budget
         event = emit_run_event(
             args.event_type,
             args.run_id,
             args.repo,
             exit_code=args.exit_code,
             duration_sec=args.duration,
-            budget=args.budget,
+            budget=budget,
             **extra,
         )
         print(json.dumps(event))
