@@ -106,9 +106,10 @@ in
       ## Current Model Assignments (December 2025)
 
       - **Research**: Gemini 3 Pro (1M context, strong reasoning)
-      - **Coding**: Claude Opus 4.5 (SWE-bench leader)
+      - **Coding**: Claude Sonnet 4.5 (fast, capable)
+      - **Architecture**: Claude Opus 4.5 (complex reasoning, planning)
       - **Review**: Multi-model consensus via PAL
-      - **Planning**: Gemini 3 Pro
+      - **Planning**: Claude Opus 4.5 (architectural decisions)
       - **Local Research**: qwen3-next:80b
       - **Local Coding**: qwen3-coder:30b
 
@@ -123,7 +124,8 @@ in
 
       cloud_models:
         research: gemini-3-pro
-        coding: claude-opus-4-5
+        coding: claude-sonnet-4-5
+        architecture: claude-opus-4-5
         fast: claude-sonnet-4-5
         review: consensus  # Uses PAL multi-model consensus
 
@@ -139,10 +141,15 @@ in
           context_window: 1000000
           strengths: ["research", "reasoning", "large documents"]
 
+        claude-sonnet-4-5:
+          release_date: "2025-10-22"
+          context_window: 200000
+          strengths: ["coding", "fast responses", "general tasks"]
+
         claude-opus-4-5:
           release_date: "2025-11-24"
           context_window: 200000
-          strengths: ["coding", "autonomous operation", "complex tasks"]
+          strengths: ["architecture", "complex reasoning", "planning", "autonomous operation"]
 
         qwen3-next:80b:
           release_date: "2025-12-01"
