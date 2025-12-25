@@ -1,103 +1,108 @@
 # Dependency Monitoring System
 
-Multi-tier automated dependency monitoring and update system for nix-darwin configuration.
+Automated dependency monitoring and update system for nix-darwin configuration.
 
 ## Overview
 
-This repository uses a sophisticated **4-tier dependency monitoring strategy** to keep Nix
-flake inputs and packages current while minimizing noise and maximizing safety:
+This repository uses a **unified dependency update strategy** with a single workflow
+handling all flake input updates:
 
-| Tier | What | Schedule | Trigger | Workflow | PR Label |
-|------|------|----------|---------|----------|----------|
-| **Instant** | ai-assistant-instructions | On push to main | repository_dispatch | deps-update-ai-instructions.yml | `ai-instructions` |
-| **Daily** | Anthropic repos (4 inputs) | 6 AM UTC daily | Scheduled | deps-update-anthropic.yml | `anthropic` |
-| **Daily** | All flake inputs (11 total) | 6 AM UTC daily | Scheduled | deps-update-flake.yml | `dependencies` |
-| **Tri-weekly** | Package versions (8 packages) | Mon 7am, Thu 7pm, Sat 7am | Scheduled | deps-monitor-packages.yml | `package-updates` |
+| Trigger | What Updates | When |
+|---------|--------------|------|
+| **Schedule** (Tue/Fri) | ALL flake inputs | Noon UTC |
+| **Schedule** (other days) | AI-focused inputs only | Noon UTC |
+| **repository_dispatch** | ai-assistant-instructions only | Instant (on push) |
+| **workflow_dispatch** | Configurable (manual trigger) | On demand |
 
-## Workflows
-
-### 1. Instant Updates: ai-assistant-instructions
-
-**Workflow**: `.github/workflows/deps-update-ai-instructions.yml`
-
-Immediately syncs permission configurations and AI instructions when the ai-assistant-instructions repository is updated.
-
-**How it works:**
-
-1. Push to `ai-assistant-instructions` main branch triggers repository_dispatch
-2. This repo receives the event and updates the `ai-assistant-instructions` input
-3. Creates PR with `ai-instructions` label
-4. AI review workflow analyzes changes
-5. Low-risk permission updates typically auto-merge
-
-**Setup required:**
-See [Setup Instructions](#setup-cross-repo-webhook) below.
-
-### 2. Daily Fast-Track: Anthropic Repositories
-
-**Workflow**: `.github/workflows/deps-update-anthropic.yml`
-
-Updates fast-moving Anthropic repositories daily to stay current with Claude Code ecosystem.
-
-**Updated inputs:**
-
-- `claude-code-plugins` (anthropics/claude-code)
-- `claude-cookbooks` (anthropics/claude-cookbooks)
-- `claude-plugins-official` (anthropics/claude-plugins-official)
-- `anthropic-skills` (anthropics/skills)
-
-**Schedule**: Daily at 6 AM UTC
-
-**Manual trigger:**
-
-```bash
-gh workflow run deps-update-anthropic.yml
-```
-
-### 3. Daily Full Update: All Inputs
+## Unified Workflow
 
 **Workflow**: `.github/workflows/deps-update-flake.yml`
 
-Comprehensive update of all 11 flake inputs including nixpkgs, darwin, home-manager, and other dependencies.
-Changed from bi-weekly to daily to ensure fast-moving packages like `claude-code` stay current.
+A single workflow handles all flake input updates with verified commit signatures.
 
-**Schedule**: Daily at 6 AM UTC (10-11 PM PT previous day)
+### Update Strategy
 
-**Manual trigger:**
+| Day | Inputs Updated |
+|-----|----------------|
+| Monday, Wednesday, Thursday, Saturday, Sunday | AI-focused inputs (9 total) |
+| Tuesday, Friday | ALL flake inputs |
+| repository_dispatch event | ai-assistant-instructions only (fast sync) |
+| Manual with `update_all: true` | ALL flake inputs |
+
+### AI-Focused Inputs (Daily)
+
+Updated daily at noon UTC:
+
+- `nixpkgs`
+- `ai-assistant-instructions`
+- `claude-code-plugins`
+- `claude-cookbooks`
+- `claude-plugins-official`
+- `anthropic-skills`
+- `claude-powerline`
+- `superpowers-marketplace`
+- `agent-os`
+
+### Full Updates (Tue/Fri)
+
+Includes all AI-focused inputs plus:
+
+- `darwin`
+- `home-manager`
+- All other flake inputs
+
+### Verified Commit Signatures
+
+All commits are signed via GitHub's REST API using `peter-evans/create-pull-request`
+with `sign-commits: true`. This produces verified signatures as `github-actions[bot]`.
+
+**Key benefit**: No additional secrets required - uses built-in `GITHUB_TOKEN`.
+
+### Manual Trigger
 
 ```bash
+# Update based on day of week (AI-focused or all)
 gh workflow run deps-update-flake.yml
+
+# Force update ALL inputs regardless of day
+gh workflow run deps-update-flake.yml -f update_all=true
 ```
 
-### 4. Tri-Weekly Package Monitoring
+## Instant Sync: ai-assistant-instructions
+
+When the `ai-assistant-instructions` repository is updated, a `repository_dispatch`
+event triggers an immediate sync of just that input.
+
+### How It Works
+
+1. Push to `ai-assistant-instructions` main branch triggers repository_dispatch
+2. `deps-update-flake.yml` receives the `ai-instructions-updated` event
+3. Only `ai-assistant-instructions` input is updated (fast sync)
+4. PR created with verified signature
+
+### Setup Required
+
+See [Setup Cross-Repo Webhook](#setup-cross-repo-webhook) below.
+
+## Package Version Monitoring
 
 **Workflow**: `.github/workflows/deps-monitor-packages.yml`
 **Script**: `scripts/workflows/check-package-versions.sh`
 
-Monitors version changes for critical packages and creates a **single digest issue** with findings.
+Monitors version changes for critical packages and creates a **single digest issue**.
 
 **Monitored packages:**
 
 - **Security-critical**: git, gnupg, gh, nodejs
 - **AI Tools**: claude-code, claude-monitor, gemini-cli, ollama
 
-**Schedule**:
-
-- Monday 7 AM UTC (after full flake update)
-- Thursday 7 PM UTC (after full flake update)
-- Saturday 7 AM UTC (mid-week check)
+**Schedule**: Monday 7 AM, Thursday 7 PM, Saturday 7 AM (UTC)
 
 **Behavior**:
 
 - Creates or updates a single issue labeled `package-updates`
 - Auto-closes issue when all packages are current
 - Adds `security` label if security-critical packages need updates
-
-**Manual trigger:**
-
-```bash
-gh workflow run deps-monitor-packages.yml
-```
 
 ## AI-Powered Review
 
@@ -135,25 +140,33 @@ To enable instant updates from ai-assistant-instructions:
 
 ### 3. Add Workflow to ai-assistant-instructions
 
-Copy the template from `docs/ai-instructions-trigger-workflow.yml` to:
+Create `.github/workflows/trigger-nix-update.yml`:
 
-```text
-ai-assistant-instructions/.github/workflows/trigger-nix-update.yml
-```
+```yaml
+name: Trigger nix-config update
 
-Or use this command (from ai-assistant-instructions repo):
+on:
+  push:
+    branches: [main]
 
-```bash
-mkdir -p .github/workflows
-curl -o .github/workflows/trigger-nix-update.yml \
-  https://raw.githubusercontent.com/JacobPEvans/nix-config/main/docs/ai-instructions-trigger-workflow.yml
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger nix-config workflow
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.NIX_CONFIG_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/JacobPEvans/nix/dispatches \
+            -d '{"event_type":"ai-instructions-updated","client_payload":{"ref":"${{ github.ref }}","sha":"${{ github.sha }}"}}'
 ```
 
 ### 4. Test the Webhook
 
 1. Make a test commit to ai-assistant-instructions main branch
 2. Check Actions tab in nix-config for triggered workflow
-3. Verify PR is created with `ai-instructions` label
+3. Verify PR is created with `dependencies` label
 
 ## Monitoring and Maintenance
 
@@ -165,7 +178,6 @@ gh workflow list
 
 # View recent runs
 gh run list --workflow=deps-update-flake.yml
-gh run list --workflow=deps-update-anthropic.yml
 gh run list --workflow=deps-monitor-packages.yml
 ```
 
@@ -176,22 +188,6 @@ Check the issue labeled `package-updates` for current package status:
 ```bash
 gh issue list --label package-updates
 ```
-
-### Adjust Schedules
-
-Edit workflow files to change update frequencies:
-
-```yaml
-# .github/workflows/deps-update-anthropic.yml
-schedule:
-  - cron: "0 6 * * *" # Daily at 6 AM UTC
-```
-
-**Cron syntax:**
-
-- `0 6 * * 1` = Monday 6 AM UTC
-- `0 6 * * *` = Every day 6 AM UTC
-- `0 */6 * * *` = Every 6 hours
 
 ## Troubleshooting
 
@@ -214,41 +210,20 @@ schedule:
 2. Check for permission errors (needs `issues: write`)
 3. Look for existing issues with `package-updates` label
 
-### No PR created despite changes
+### Commits showing as "Unverified"
 
-1. Check if branch already exists: `git branch -r | grep deps/`
-2. Delete stale branch: `git push origin --delete deps/anthropic-daily`
-3. Re-run workflow
+This should not happen with the current setup. If it does:
 
-## Migration from Manual Updates
+1. Verify workflow uses `peter-evans/create-pull-request@v8`
+2. Confirm `sign-commits: true` is set
+3. Check that no custom token is overriding `GITHUB_TOKEN`
 
-If migrating from manual `nix flake update`:
-
-1. ✅ These workflows replace manual updates
-2. ✅ Daily flake updates (changed from bi-weekly for faster claude-code updates)
-3. ✅ Daily Anthropic updates (current tooling)
-4. ✅ Instant ai-instructions sync (immediate permission updates)
-5. ✅ Package version visibility (proactive monitoring)
-6. ✅ Auto-merge for low-risk updates (no manual PR approval needed)
-
-**Daily workflow**: Updates flow overnight (6 AM UTC) → auto-merge → you pull and rebuild when ready.
-
-## Future Enhancements
-
-Potential improvements to consider:
-
-- [x] ~~Daily nixpkgs updates for claude-code~~ (implemented)
-- [x] ~~Auto-merge for low-risk updates~~ (implemented)
-- [ ] Add agent-os to daily fast-track (currently only in daily full update)
-- [ ] Create security-specific workflow for CVE scanning
-- [ ] Add Slack/Discord notifications for HIGH risk updates
-- [ ] Expand package monitoring to more packages
-- [ ] Add performance metrics (build time tracking)
-- [ ] Optional launchd agent for automatic local rebuilds
+The workflow uses GitHub's REST API for commits, which automatically signs
+them as `github-actions[bot]` with verified status.
 
 ## References
 
-- [GitHub Actions Workflows](.github/workflows/)
+- [GitHub Actions Workflows](../.github/workflows/)
 - [Nix Flake Inputs](../flake.nix)
 - [AI Review Workflow](../.github/workflows/review-deps.yml)
 - [Repository Dispatch Documentation](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#repository_dispatch)

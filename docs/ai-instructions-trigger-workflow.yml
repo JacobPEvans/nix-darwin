@@ -17,7 +17,7 @@
 # What this does:
 # - Triggers on every push to main branch in ai-assistant-instructions
 # - Sends repository_dispatch event to nix-config repository
-# - Causes deps-update-ai-instructions.yml to run immediately
+# - Causes deps-update-flake.yml to run immediately (fast sync mode)
 # - Creates PR in nix-config with updated permissions/instructions
 #
 # ============================================================================
