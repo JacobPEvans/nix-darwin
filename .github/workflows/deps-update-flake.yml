@@ -1,10 +1,11 @@
-# Automated flake.lock updates with GPG-signed commits
+# Automated flake.lock updates with verified commits
 #
 # Schedule: Daily at noon UTC
 # - Tue/Fri: Updates ALL flake inputs
-# - Other days: Updates only AI-focused inputs (nixpkgs, claude-*, anthropic-*, etc.)
+# - Other days: Updates only AI-focused inputs
 #
-# Commits are GPG-signed by the GitHub App bot to satisfy branch protection rules.
+# Commits are signed via GitHub REST API (peter-evans/create-pull-request)
+# using GITHUB_TOKEN, producing verified signatures as github-actions[bot].
 name: Update flake.lock
 
 on:
@@ -26,7 +27,6 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      # AI-focused inputs for daily updates (space-separated)
       AI_INPUTS: >-
         nixpkgs
         ai-assistant-instructions
@@ -38,24 +38,14 @@ jobs:
         superpowers-marketplace
         agent-os
     steps:
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.GHA_GHAPP_ID }}
-          private-key: ${{ secrets.GHA_GHAPP_PRIVATE_KEY }}
-
       - name: Determine inputs to update
         id: inputs
         run: |
-          # Day of week: 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun
           DAY=$(date -u +%u)
           if [[ "$DAY" == "2" || "$DAY" == "5" || "$UPDATE_ALL" == "true" ]]; then
-            # Tuesday, Friday, or manual override - update all inputs
             echo "inputs=" >> "$GITHUB_OUTPUT"
             echo "::notice::Updating ALL flake inputs"
           else
-            # Other days - update only AI-focused inputs
             echo "inputs=$AI_INPUTS" >> "$GITHUB_OUTPUT"
             echo "::notice::Updating AI-focused inputs only"
           fi
@@ -63,34 +53,31 @@ jobs:
           UPDATE_ALL: ${{ inputs.update_all }}
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v28
+        run: |
+          if [ -n "${{ steps.inputs.outputs.inputs }}" ]; then
+            nix flake update ${{ steps.inputs.outputs.inputs }}
+          else
+            nix flake update
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
         with:
-          inputs: ${{ steps.inputs.outputs.inputs }}
-          token: ${{ steps.app-token.outputs.token }}
-          pr-labels: dependencies
-          pr-assignees: JacobPEvans
-          pr-reviewers: JacobPEvans
           sign-commits: true
-          gpg-private-key: ${{ secrets.GHA_BOT_GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.GHA_BOT_GPG_PASSPHRASE }}
-          gpg-fingerprint: ${{ secrets.GHA_BOT_GPG_FINGERPRINT }}
-          git-author-name: jacobpevans-github-actions-bot[bot]
-          git-author-email: 251056911+jacobpevans-github-actions-bot[bot]@users.noreply.github.com
-          git-committer-name: jacobpevans-github-actions-bot[bot]
-          git-committer-email: 251056911+jacobpevans-github-actions-bot[bot]@users.noreply.github.com
-          commit-msg: |
+          branch: update_flake_lock_action
+          delete-branch: true
+          commit-message: |
             chore(deps): update flake inputs
 
             Automated update of Nix flake dependencies.
-            Updates are GPG-signed and verified.
-          pr-title: "chore(deps): update flake inputs"
-          pr-body: |
+          title: "chore(deps): update flake inputs"
+          body: |
             Automated Nix flake dependency update.
 
             ## What Changed
@@ -102,4 +89,7 @@ jobs:
             - Full updates (darwin, home-manager) run Tue/Fri
 
             ---
-            *This PR was automatically created by jacobpevans-github-actions-bot.*
+            *This PR was automatically created by github-actions[bot].*
+          labels: dependencies
+          assignees: JacobPEvans
+          reviewers: JacobPEvans
