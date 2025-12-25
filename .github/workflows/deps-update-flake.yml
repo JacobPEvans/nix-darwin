@@ -4,7 +4,7 @@
 # - Tue/Fri: Updates ALL flake inputs
 # - Other days: Updates only AI-focused inputs (nixpkgs, claude-*, anthropic-*, etc.)
 #
-# Commits are GPG-signed to satisfy repository branch protection rules.
+# Commits are GPG-signed by the GitHub App bot to satisfy branch protection rules.
 name: Update flake.lock
 
 on:
@@ -38,6 +38,13 @@ jobs:
         superpowers-marketplace
         agent-os
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GHA_GHAPP_ID }}
+          private-key: ${{ secrets.GHA_GHAPP_PRIVATE_KEY }}
+
       - name: Determine inputs to update
         id: inputs
         run: |
@@ -65,7 +72,7 @@ jobs:
         uses: DeterminateSystems/update-flake-lock@v28
         with:
           inputs: ${{ steps.inputs.outputs.inputs }}
-          token: ${{ secrets.GH_PA_TOKEN_FOR_UPDATES }}
+          token: ${{ steps.app-token.outputs.token }}
           pr-labels: dependencies
           pr-assignees: JacobPEvans
           pr-reviewers: JacobPEvans
@@ -73,3 +80,26 @@ jobs:
           gpg-private-key: ${{ secrets.GHA_BOT_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GHA_BOT_GPG_PASSPHRASE }}
           gpg-fingerprint: ${{ secrets.GHA_BOT_GPG_FINGERPRINT }}
+          git-author-name: jacobpevans-github-actions-bot[bot]
+          git-author-email: 251056911+jacobpevans-github-actions-bot[bot]@users.noreply.github.com
+          git-committer-name: jacobpevans-github-actions-bot[bot]
+          git-committer-email: 251056911+jacobpevans-github-actions-bot[bot]@users.noreply.github.com
+          commit-msg: |
+            chore(deps): update flake inputs
+
+            Automated update of Nix flake dependencies.
+            Updates are GPG-signed and verified.
+          pr-title: "chore(deps): update flake inputs"
+          pr-body: |
+            Automated Nix flake dependency update.
+
+            ## What Changed
+            See the flake.lock diff below for specific version bumps.
+
+            ## Review Notes
+            - CI validates flake structure and build
+            - Low-risk updates (AI tools, plugins) run daily
+            - Full updates (darwin, home-manager) run Tue/Fri
+
+            ---
+            *This PR was automatically created by jacobpevans-github-actions-bot.*

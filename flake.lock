@@ -5,13 +5,13 @@
       "locked": {
         "lastModified": 1765489693,
         "narHash": "sha256-33PFC8HLgzVRpyTXSOxS09ffIjcr2P96/RKoZzQZ22o=",
-        "owner": "JacobPEvans",
+        "owner": "buildermethods",
         "repo": "agent-os",
         "rev": "8b12ec5b3d002988da7171b89b9f60e5dbd88abc",
         "type": "github"
       },
       "original": {
-        "owner": "JacobPEvans",
+        "owner": "buildermethods",
         "repo": "agent-os",
         "type": "github"
       }
