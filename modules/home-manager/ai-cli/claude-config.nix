@@ -93,54 +93,44 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
-  # Alternating schedule: one repo runs every hour
+  # DISABLED - Re-enable by setting enable = true and adding schedule times
   autoClaude = {
-    enable = true;
+    enable = false;
     repositories = {
-      # ai-assistant-instructions: runs at even hours (0, 2, 4, ...)
+      # ai-assistant-instructions: disabled (was running at even hours)
       # Uses local repo (not Nix store) because autoClaude needs writable git
       ai-assistant-instructions = {
+        enabled = false;
         path = autoClaudeLocalRepoPath;
-        schedule.hours = lib.lists.genList (i: i * 2) 12;
-        maxBudget = 25.0;
-        # Slack channel ID removed for security - retrieved from BWS at runtime
-        # Store in BWS as: slack-channel-ai-assistant-instructions
-        # slackChannel = "...";
+        schedule.hours = [ ]; # Empty schedule - no runs
+        maxBudget = 20.0;
       };
-      # nix config: runs at odd hours (1, 3, 5, ...)
+      # nix config: disabled (was running at odd hours)
       nix = {
+        enabled = false;
         path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hours = lib.lists.genList (i: i * 2 + 1) 12;
-        maxBudget = 25.0;
-        # Slack channel ID removed for security - retrieved from BWS at runtime
-        # Store in BWS as: slack-channel-nix
-        # slackChannel = "...";
+        schedule.hours = [ ]; # Empty schedule - no runs
+        maxBudget = 20.0;
       };
     };
 
     # Reporting: Twice-daily utilization reports and real-time anomaly alerts
     reporting = {
-      enable = true;
+      enable = false;
 
-      # Scheduled digest reports (8am and 5pm EST)
+      # Scheduled digest reports (disabled)
       scheduledReports = {
-        # Times in EST - converted to UTC by Nix module (8am EST = 1pm UTC, 5pm EST = 10pm UTC)
-        times = [
-          "08:00"
-          "17:00"
-        ];
-        # Slack channel ID retrieved from BWS at runtime
-        # Store in BWS as: slack-channel-auto-claude-reports
-        slackChannel = "CHANGE_ME_SLACK_CHANNEL_ID"; # Replace with actual channel ID or retrieve from BWS
+        times = [ ]; # Empty - no scheduled reports
+        slackChannel = ""; # Retrieve from BWS when re-enabled
       };
 
       # Real-time anomaly detection
       alerts = {
-        enable = true;
-        contextThreshold = 90; # Alert if >90% of 200k token window used
-        budgetThreshold = 50; # Alert if >50% of run budget used
-        tokensNoOutput = 50000; # Flag if >50k tokens with no completed work
-        consecutiveFailures = 2; # Alert after 2 consecutive failures
+        enable = false;
+        contextThreshold = 90;
+        budgetThreshold = 50;
+        tokensNoOutput = 50000;
+        consecutiveFailures = 2;
       };
     };
   };
