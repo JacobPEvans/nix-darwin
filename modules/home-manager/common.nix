@@ -94,6 +94,14 @@ let
       ai-assistant-instructions
       ;
   };
+  opencodeFiles = import ./ai-cli/opencode.nix {
+    inherit
+      config
+      lib
+      pkgs
+      ai-assistant-instructions
+      ;
+  };
 in
 {
   # ==========================================================================
@@ -107,6 +115,7 @@ in
     # - claude.nix: Claude Code settings + status line script
     # - gemini.nix: Gemini CLI settings
     # - copilot.nix: GitHub Copilot CLI config
+    # - opencode.nix: OpenCode AI agent configuration
     #
     # Permissions: Now read from JSON in ai-assistant-instructions repo
     # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
@@ -117,6 +126,7 @@ in
       // geminiFiles
       // geminiCommands
       // copilotFiles
+      // opencodeFiles
       // agentsMdSymlinks
       // gitHooks
       // gitMergeDrivers;
