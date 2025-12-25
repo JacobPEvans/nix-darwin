@@ -189,10 +189,9 @@ kubectl -n monitoring create secret generic splunk-admin \
 kubectl -n monitoring create secret generic splunk-hec-token \
   --from-literal=token="$(uuidgen)"
 
-# Create Cribl Cloud config secret (get from Cribl Cloud console)
+# Create Cribl Cloud config secret (copy full URL from Cribl Cloud console)
 kubectl -n monitoring create secret generic cribl-cloud-config \
-  --from-literal=master-url='https://YOUR_ORG.cribl.cloud:4200' \
-  --from-literal=auth-token='YOUR_FLEET_TOKEN'
+  --from-literal=master-url='tls://YOUR_AUTH_TOKEN@YOUR_ORG.cribl.cloud?group=YOUR_FLEET'
 ```
 
 **Important**: Store the Splunk password and HEC token securely. You'll need the HEC token for OTEL Collector config.

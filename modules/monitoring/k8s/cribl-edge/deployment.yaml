@@ -29,19 +29,13 @@ spec:
             # Managed Edge mode - connected to Cribl Cloud
             - name: CRIBL_DIST_MODE
               value: "managed-edge"
+            # Full URL format: tls://TOKEN@host:port?group=fleet_name
+            # The secret must contain the complete URL with embedded auth token and group
             - name: CRIBL_DIST_MASTER_URL
               valueFrom:
                 secretKeyRef:
                   name: cribl-cloud-config
                   key: master-url
-            - name: CRIBL_DIST_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: cribl-cloud-config
-                  key: auth-token
-            # Fleet group
-            - name: CRIBL_DIST_GROUP
-              value: "default_fleet"
           volumeMounts:
             # Mount Claude logs
             - name: claude-logs

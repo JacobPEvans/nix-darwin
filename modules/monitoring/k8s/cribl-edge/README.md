@@ -27,16 +27,17 @@ Host paths are mounted read-only for log collection:
 ## Connecting to Cribl Cloud
 
 1. Create a Fleet in Cribl Cloud console
-2. Get the enrollment token
-3. Create the K8s secret:
+2. Copy the full connection URL from the Fleet enrollment page
+3. Create the K8s secret with the **complete URL** (includes auth token and group):
 
    ```bash
    kubectl -n monitoring create secret generic cribl-cloud-config \
-     --from-literal=master-url="https://YOUR_ORG.cribl.cloud:4200" \
-     --from-literal=auth-token="YOUR_FLEET_TOKEN"
+     --from-literal=master-url="tls://YOUR_AUTH_TOKEN@YOUR_ORG.cribl.cloud?group=YOUR_FLEET"
    ```
 
-4. Update deployment: change `CRIBL_DIST_MODE` to `managed-edge`
+   Example format: `tls://otiQTiu...@main-org.cribl.cloud?group=default_fleet`
+
+4. Apply the deployment (already configured for `managed-edge` mode)
 
 ## Troubleshooting
 
