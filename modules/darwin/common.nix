@@ -82,7 +82,7 @@ in
       gemini-cli # Google's Gemini CLI
       opencode # Provider-agnostic AI coding agent
       gh # GitHub CLI
-      opencode # Provider-agnostic AI coding agent (Claude, GPT-4, Gemini, local)
+
       mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
       ollama # LLM runtime (nixpkgs 0.13.2, replaces manual 0.12.10 install)
