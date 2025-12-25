@@ -10,7 +10,7 @@
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
 #
-# NOTE: TCC-sensitive apps (Zoom, OrbStack) use Home Manager trampolines
+# NOTE: TCC-sensitive apps (Zoom, Ghostty) use Home Manager trampolines
 # for persistent macOS permissions across darwin-rebuild.
 
 _:
