@@ -44,9 +44,9 @@ in
       # Development & Tools
       "/Applications/Nix Apps/RapidAPI.app"
       "/Applications/Nix Apps/Visual Studio Code.app"
-      "/System/Applications/Utilities/Terminal.app"
+      "${homeDir}/Applications/Home Manager Trampolines/Ghostty.app"
       "/Applications/Nix Apps/Bitwarden.app"
-      "${homeDir}/Applications/Home Manager Trampolines/OrbStack.app"
+      "/Applications/Nix Apps/OrbStack.app"
 
       # Browsers
       "/Applications/Safari.app"
