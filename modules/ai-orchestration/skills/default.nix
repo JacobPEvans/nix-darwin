@@ -107,9 +107,8 @@ in
 
       - **Research**: Gemini 3 Pro (1M context, strong reasoning)
       - **Coding**: Claude Sonnet 4.5 (fast, capable)
-      - **Architecture**: Claude Opus 4.5 (complex reasoning, planning)
+      - **Architecture**: Claude Opus 4.5 (complex reasoning, planning, and architectural decisions)
       - **Review**: Multi-model consensus via PAL
-      - **Planning**: Claude Opus 4.5 (architectural decisions)
       - **Local Research**: qwen3-next:80b
       - **Local Coding**: qwen3-coder:30b
 
@@ -126,6 +125,7 @@ in
         research: gemini-3-pro
         coding: claude-sonnet-4-5
         architecture: claude-opus-4-5
+        planning: claude-opus-4-5
         fast: claude-sonnet-4-5
         review: consensus  # Uses PAL multi-model consensus
 
