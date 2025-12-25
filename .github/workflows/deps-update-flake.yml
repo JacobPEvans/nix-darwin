@@ -67,7 +67,7 @@ jobs:
           UPDATE_ALL: ${{ inputs.update_all }}
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
