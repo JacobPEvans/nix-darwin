@@ -25,10 +25,7 @@ jobs:
   # Automatic PR review on open/sync
   review:
     name: Claude Code Review
-    if: |
-      github.event_name == 'pull_request' &&
-      !contains(github.event.pull_request.labels.*.name, 'dependencies') &&
-      !contains(github.event.pull_request.labels.*.name, 'skip-claude')
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
