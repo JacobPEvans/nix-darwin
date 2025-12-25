@@ -61,9 +61,8 @@
     # Agent OS - spec-driven development system for AI coding agents
     # Provides standards, workflows, agents, and commands
     # https://buildermethods.com/agent-os
-    # Forked to user's GitHub to mitigate upstream disappearing
     agent-os = {
-      url = "github:JacobPEvans/agent-os";
+      url = "github:buildermethods/agent-os";
       flake = false; # Not a flake, just fetch the repo
     };
 

@@ -52,6 +52,7 @@ with pkgs;
 
   bitwarden-cli # CLI for Bitwarden password manager (bw command)
   bws # Bitwarden Secrets Manager CLI (for machine secrets)
+  doppler # Doppler secrets manager CLI (for CI/CD and team secrets)
 
   # ==========================================================================
   # Cloud Infrastructure (AWS)

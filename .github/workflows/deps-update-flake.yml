@@ -1,13 +1,22 @@
-# Automated flake.lock updates
-# Runs daily at 6 AM UTC to keep nix inputs current (especially claude-code)
-# Creates PRs with 'dependencies' label for AI review workflow
-# Low-risk updates auto-merge via review-deps.yml
+# Automated flake.lock updates with GPG-signed commits
+#
+# Schedule: Daily at noon UTC
+# - Tue/Fri: Updates ALL flake inputs
+# - Other days: Updates only AI-focused inputs (nixpkgs, claude-*, anthropic-*, etc.)
+#
+# Commits are GPG-signed to satisfy repository branch protection rules.
 name: Update flake.lock
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Daily at 6 AM UTC (10-11 PM PT)
-  workflow_dispatch: {} # Manual trigger
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      update_all:
+        description: "Update ALL inputs (not just AI-focused)"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   update:
@@ -16,7 +25,36 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      # AI-focused inputs for daily updates (space-separated)
+      AI_INPUTS: >-
+        nixpkgs
+        ai-assistant-instructions
+        claude-code-plugins
+        claude-cookbooks
+        claude-plugins-official
+        anthropic-skills
+        claude-powerline
+        superpowers-marketplace
+        agent-os
     steps:
+      - name: Determine inputs to update
+        id: inputs
+        run: |
+          # Day of week: 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun
+          DAY=$(date -u +%u)
+          if [[ "$DAY" == "2" || "$DAY" == "5" || "$UPDATE_ALL" == "true" ]]; then
+            # Tuesday, Friday, or manual override - update all inputs
+            echo "inputs=" >> "$GITHUB_OUTPUT"
+            echo "::notice::Updating ALL flake inputs"
+          else
+            # Other days - update only AI-focused inputs
+            echo "inputs=$AI_INPUTS" >> "$GITHUB_OUTPUT"
+            echo "::notice::Updating AI-focused inputs only"
+          fi
+        env:
+          UPDATE_ALL: ${{ inputs.update_all }}
+
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -26,16 +64,12 @@ jobs:
       - name: Update flake.lock
         uses: DeterminateSystems/update-flake-lock@v28
         with:
-          pr-title: "chore(deps): update flake.lock"
+          inputs: ${{ steps.inputs.outputs.inputs }}
+          token: ${{ secrets.GH_PA_TOKEN_FOR_UPDATES }}
           pr-labels: dependencies
-          commit-msg: "chore(deps): update flake.lock"
-          pr-body: |
-            Automated flake.lock update.
-
-            ## Updated inputs
-            This PR updates the following flake inputs to their latest versions.
-
-            ## Review process
-            - CI validates the flake structure and builds
-            - AI review workflow analyzes changes for risk
-            - Low-risk updates may auto-merge; others require human review
+          pr-assignees: JacobPEvans
+          pr-reviewers: JacobPEvans
+          sign-commits: true
+          gpg-private-key: ${{ secrets.GHA_BOT_GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GHA_BOT_GPG_PASSPHRASE }}
+          gpg-fingerprint: ${{ secrets.GHA_BOT_GPG_FINGERPRINT }}
