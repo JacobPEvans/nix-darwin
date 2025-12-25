@@ -94,7 +94,14 @@ let
       ai-assistant-instructions
       ;
   };
-  opencodeFiles = import ./ai-cli/opencode.nix { inherit config lib pkgs; };
+  opencodeFiles = import ./ai-cli/opencode.nix {
+    inherit
+      config
+      lib
+      pkgs
+      ai-assistant-instructions
+      ;
+  };
 in
 {
   # ==========================================================================

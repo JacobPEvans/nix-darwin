@@ -35,7 +35,7 @@ let
 
     # Default model configuration
     model = {
-      default = "claude-sonnet-4-5-20250514";
+      default = "claude-haiku";
     };
 
     # Additional settings can be added here as OpenCode evolves
