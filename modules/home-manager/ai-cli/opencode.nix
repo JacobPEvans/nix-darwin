@@ -12,6 +12,8 @@
 # Configuration format:
 # - opencode.json: Contains theme, model, and other settings
 # - Permissions: Uses unified permission system from common/permissions.nix
+#
+# Reference: https://github.com/opencode-ai/opencode
 
 {
   config,
@@ -33,7 +35,7 @@ let
 
     # Default model configuration
     model = {
-      default = "claude-sonnet-4-5";
+      default = "claude-sonnet-4-5-20250514";
     };
 
     # Additional settings can be added here as OpenCode evolves

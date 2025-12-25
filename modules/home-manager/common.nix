@@ -108,7 +108,7 @@ in
     # - claude.nix: Claude Code settings + status line script
     # - gemini.nix: Gemini CLI settings
     # - copilot.nix: GitHub Copilot CLI config
-    # - opencode.nix: OpenCode AI agent config
+    # - opencode.nix: OpenCode AI agent configuration
     #
     # Permissions: Now read from JSON in ai-assistant-instructions repo
     # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
