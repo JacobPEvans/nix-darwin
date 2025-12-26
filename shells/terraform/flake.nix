@@ -6,26 +6,55 @@
 # NOTE: This shell allows unfree packages (Terraform uses BSL license).
 # OpenTofu is included as a fully open-source alternative.
 #
-# Included tools:
+# ════════════════════════════════════════════════════════════════
+# TERRAFORM/TERRAGRUNT TOOLS
+# ════════════════════════════════════════════════════════════════
 # - terraform: Core IaC tool
 # - terragrunt: Terraform wrapper for DRY configurations
 # - opentofu: Open source Terraform fork
 # - terraform-docs: Auto-generate documentation from modules
 # - tflint: Terraform linter for best practices
-# - checkov: Security scanner for infrastructure code
-# - terrascan: Security scanner by Tenable
-# - tfsec: Security scanner (now part of Trivy)
+#
+# ════════════════════════════════════════════════════════════════
+# SECURITY SCANNERS
+# ════════════════════════════════════════════════════════════════
+# - checkov: Security/compliance scanner (Bridgecrew)
+# - terrascan: Security scanner (Tenable)
+# - tfsec: Security scanner (Aqua)
 # - trivy: Comprehensive vulnerability scanner
 # - infracost: Cloud cost estimation
-# - pre-commit: Git hooks framework
-# - markdownlint-cli2: Markdown linting
+#
+# ════════════════════════════════════════════════════════════════
+# CONFIGURATION MANAGEMENT & TESTING (Ansible/Molecule)
+# ════════════════════════════════════════════════════════════════
+# - ansible: Configuration management and automation
+# - ansible-lint: Ansible playbook linting
+# - molecule: Ansible role testing framework
+# - python3: Runtime for Ansible, Molecule, and pip packages
+#
+# ════════════════════════════════════════════════════════════════
+# CLOUD & STATE MANAGEMENT
+# ════════════════════════════════════════════════════════════════
+# - aws-cli: AWS CLI for S3 backend and credential management
+# - docker: Container runtime for Molecule testing
+#
+# ════════════════════════════════════════════════════════════════
+# GIT & UTILITIES
+# ════════════════════════════════════════════════════════════════
+# - pre-commit: Git hooks framework (also in system packages)
+# - markdownlint-cli2: Markdown linting (also in system packages)
+# - jq: JSON processor
+# - yq: YAML processor
+# - git: Version control
 #
 # Usage:
-#   1. Copy this file to your project
-#   2. Create .envrc with "use flake"
-#   3. Run: direnv allow
+#   1. nix develop (from project root)
+#   2. Or create .envrc with "use flake" and run direnv allow
 #
-# Or manually: nix develop
+# Python packages (from nixpkgs):
+#   - ansible: Core automation tool
+#   - molecule: Testing framework
+#   - docker: Python Docker client (for Molecule)
 
 {
   description = "Terraform/Terragrunt development environment";
@@ -62,53 +91,94 @@
         {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
-              # === CORE IaC TOOLS ===
-              terraform # HashiCorp Terraform
-              terragrunt # Terraform wrapper (DRY configs)
-              opentofu # Open source Terraform fork
+              # ═══════════════════════════════════════════════════════════════
+              # CORE IaC TOOLS
+              # ═══════════════════════════════════════════════════════════════
+              terraform # HashiCorp Terraform (main IaC tool)
+              terragrunt # Terraform wrapper for DRY configurations
+              opentofu # Open-source Terraform fork
 
-              # === DOCUMENTATION ===
-              terraform-docs # Auto-generate docs from modules
-
-              # === LINTING & FORMATTING ===
-              tflint # Terraform linter
-              # TFLint plugins (uncomment as needed for your providers):
+              # ═══════════════════════════════════════════════════════════════
+              # TERRAFORM DOCUMENTATION & LINTING
+              # ═══════════════════════════════════════════════════════════════
+              terraform-docs # Auto-generate module documentation
+              tflint # Terraform linter & best practices checker
+              # Uncomment TFLint plugins as needed:
               # tflint-plugins.tflint-ruleset-aws
               # tflint-plugins.tflint-ruleset-google
 
-              # === SECURITY SCANNERS ===
-              checkov # Security/compliance scanner (Bridgecrew)
-              terrascan # Security scanner (Tenable)
-              tfsec # Security scanner (Aqua)
+              # ═══════════════════════════════════════════════════════════════
+              # SECURITY & COMPLIANCE SCANNING
+              # ═══════════════════════════════════════════════════════════════
+              checkov # Security/compliance scanning (Bridgecrew)
+              terrascan # Infrastructure security scanning (Tenable)
+              tfsec # Terraform security scanning (Aqua)
               trivy # Comprehensive vulnerability scanner
 
-              # === COST ESTIMATION ===
-              infracost # Cloud cost estimates
+              # ═══════════════════════════════════════════════════════════════
+              # COST ESTIMATION
+              # ═══════════════════════════════════════════════════════════════
+              infracost # Cloud cost estimation tool
 
-              # === UTILITIES ===
-              # NOTE: pre-commit and markdownlint-cli2 are in common system packages
-              jq # JSON processor
-              yq # YAML processor
+              # ═══════════════════════════════════════════════════════════════
+              # CONFIGURATION MANAGEMENT (Ansible/Molecule)
+              # ═══════════════════════════════════════════════════════════════
+              ansible # Agentless configuration management
+              ansible-lint # Ansible playbook linting
+              molecule # Ansible role testing framework
+              python3 # Python runtime for Ansible, Molecule, pip packages
+              git # Version control (explicit for compatibility)
+
+              # ═══════════════════════════════════════════════════════════════
+              # CLOUD & CONTAINER TOOLS
+              # ═══════════════════════════════════════════════════════════════
+              awscli2 # AWS CLI for S3 state backend & credential management
+              docker # Container runtime (required for Molecule testing)
+
+              # ═══════════════════════════════════════════════════════════════
+              # UTILITIES & PROCESSORS
+              # ═══════════════════════════════════════════════════════════════
+              jq # JSON processor & formatter
+              yq # YAML processor & formatter
+              # NOTE: pre-commit & markdownlint-cli2 are available in system packages
             ];
 
             shellHook = ''
-              echo "Terraform/Terragrunt development environment ready"
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Terraform/Terragrunt & Ansible Development Environment"
+              echo "═══════════════════════════════════════════════════════════════"
               echo ""
-              echo "Core tools:"
-              echo "  - terraform $(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1)"
-              echo "  - terragrunt $(terragrunt --version 2>/dev/null | head -1)"
-              echo "  - opentofu $(tofu version 2>/dev/null | head -1)"
+              echo "INFRASTRUCTURE AS CODE:"
+              echo "  - terraform: $(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1)"
+              echo "  - terragrunt: $(terragrunt --version 2>/dev/null | cut -d' ' -f2)"
+              echo "  - opentofu: $(tofu version 2>/dev/null | head -1)"
               echo ""
-              echo "Validation & Docs:"
-              echo "  - terraform-docs, tflint"
+              echo "VALIDATION & DOCUMENTATION:"
+              echo "  - terraform-docs (auto-generate module docs)"
+              echo "  - tflint (Terraform linting)"
               echo ""
-              echo "Security scanners:"
+              echo "SECURITY SCANNING:"
               echo "  - checkov, terrascan, tfsec, trivy"
               echo ""
-              echo "Cost estimation:"
-              echo "  - infracost"
+              echo "CONFIGURATION MANAGEMENT:"
+              echo "  - ansible: $(ansible --version 2>/dev/null | head -1)"
+              echo "  - ansible-lint: $(ansible-lint --version 2>/dev/null)"
+              echo "  - molecule: $(molecule --version 2>/dev/null)"
+              echo "  - python: $(python3 --version 2>/dev/null)"
               echo ""
-              echo "Tip: Run 'pre-commit install' to enable git hooks"
+              echo "CLOUD & CONTAINER:"
+              echo "  - aws-cli: $(aws --version 2>/dev/null)"
+              echo "  - docker: $(docker --version 2>/dev/null)"
+              echo ""
+              echo "UTILITIES:"
+              echo "  - jq (JSON), yq (YAML), git (version control)"
+              echo ""
+              echo "GETTING STARTED:"
+              echo "  1. Configure AWS credentials: aws configure"
+              echo "  2. Configure Proxmox API token (environment variable or file)"
+              echo "  3. Initialize Terraform: terragrunt init"
+              echo "  4. Setup pre-commit hooks: pre-commit install"
+              echo ""
             '';
           };
         }
