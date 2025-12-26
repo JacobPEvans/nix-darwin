@@ -184,18 +184,10 @@ in
       trap cleanup INT TERM
 
       # Verify /run is writable (required to update /run/current-system symlink)
-      # Using POSIX-compliant [ ] test for portability
       if [ ! -w /run ]; then
         echo "❌ ERROR: Cannot write to /run directory" >&2
         echo "Check permissions and ensure running as root" >&2
         exit 1
-      fi
-
-      # Check disk space (warn if < 5GB available)
-      AVAILABLE=$(df -g / | tail -1 | awk '{print $4}')
-      if [ "$AVAILABLE" -lt 5 ]; then
-        echo "⚠️  WARNING: Low disk space (''${AVAILABLE}GB available)" >&2
-        echo "Consider running: nix-collect-garbage --delete-older-than 30d" >&2
       fi
     '';
 

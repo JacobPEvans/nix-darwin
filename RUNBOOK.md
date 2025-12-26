@@ -345,39 +345,6 @@ If the system is broken and normal commands fail:
 sudo /nix/var/nix/profiles/system-1-link/activate
 ```
 
-### Activation Failure Recovery
-
-If `darwin-rebuild switch` builds successfully but doesn't activate (binaries show old versions):
-
-1. **Verify the mismatch:**
-
-   ```bash
-   bash scripts/workflows/verify-activation.sh
-   ```
-
-2. **Activate manually:**
-
-   ```bash
-   sudo /nix/var/nix/profiles/system/activate
-   ```
-
-3. **Verify success:**
-
-   ```bash
-   readlink /run/current-system  # Should point to latest generation
-   claude --version              # Should show expected version
-   ```
-
-**Common causes:**
-
-- Interrupted activation (SIGINT, terminal closed, SSH disconnect)
-- Permission issues with `/run` directory
-- Low disk space preventing symlink update
-
-**Prevention:** The system now includes automatic activation verification hooks that will fail loudly if activation doesn't complete successfully.
-
----
-
 ## Dock Configuration
 
 ### Change Dock App Order

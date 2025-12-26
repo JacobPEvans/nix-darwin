@@ -204,41 +204,33 @@ After system updates or profile switches, these packages may vanish because:
 
 **Problem**: `darwin-rebuild switch` completes successfully but running binaries show old versions.
 
-**Symptoms**:
+**Example**: `claude --version` shows 2.0.74 when expected version is 2.0.76.
 
-- `claude --version` shows older version than expected
-- `/run/current-system` points to an older generation than `/nix/var/nix/profiles/system`
-- Build succeeded but activation didn't complete
-
-**Diagnosis**:
-
-```bash
-# Check for activation mismatch
-bash scripts/workflows/verify-activation.sh
-```
-
-**Root Causes**:
-
-- Interrupted activation (SIGINT, terminal closed, SSH disconnect)
-- Permission issues with `/run` directory
-- Low disk space preventing symlink update
+**Root Cause**: The build completed and created a new generation, but the `/run/current-system`
+symlink was never updated to point to it. This is a silent failure - the command exits successfully
+but the activation didn't complete.
 
 **Solution**:
 
 ```bash
-# 1. Activate the latest generation manually
 sudo /nix/var/nix/profiles/system/activate
-
-# 2. Verify success
-readlink /run/current-system  # Should match /nix/var/nix/profiles/system
-claude --version              # Should show expected version
-
-# 3. Check PATH if binaries still show wrong version
-echo $PATH | tr ':' '\n' | head -5
-# Should show /run/current-system/sw/bin before /opt/homebrew/bin
 ```
 
-**Prevention**: The system now includes automatic activation verification hooks that will fail loudly if activation doesn't complete successfully.
+Then verify:
+
+```bash
+claude --version              # Should show expected version
+readlink /run/current-system  # Should point to latest generation in /nix/var/nix/profiles/
+```
+
+**Why This Happens**:
+
+- Interrupted activation (Ctrl+C, terminal closed, SSH disconnect)
+- Permission issues with `/run` directory preventing symlink update
+
+**Prevention**: The system now includes automatic activation verification hooks in
+`modules/darwin/common.nix` that detect and report this error loudly, so you won't silently run
+old binaries.
 
 ---
 
