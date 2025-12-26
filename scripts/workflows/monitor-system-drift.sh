@@ -15,9 +15,9 @@ CRITICAL_PACKAGES=(
   "gh"
 )
 
-echo "=== System Drift Monitor ==="
-echo "Date: $(date)"
-echo ""
+echo "=== System Drift Monitor ===" >&2
+echo "Date: $(date)" >&2
+echo "" >&2
 
 DRIFT_DETECTED=0
 
@@ -26,17 +26,19 @@ SYSTEM_PROFILE_TARGET=$(readlink -f /nix/var/nix/profiles/system)
 CURRENT_SYSTEM=$(readlink -f /run/current-system)
 
 if [[ "$SYSTEM_PROFILE_TARGET" != "$CURRENT_SYSTEM" ]]; then
-  echo "❌ CRITICAL: Activation mismatch detected"
-  echo "   System profile: $SYSTEM_PROFILE_TARGET"
-  echo "   Current system: $CURRENT_SYSTEM"
-  echo ""
+  echo "❌ CRITICAL: Activation mismatch detected" >&2
+  echo "   System profile: $SYSTEM_PROFILE_TARGET" >&2
+  echo "   Current system: $CURRENT_SYSTEM" >&2
+  echo "" >&2
   DRIFT_DETECTED=1
 fi
 
 # Check each critical package
-for pkg in "${CRITICAL_PACKAGES[@]}"; do
+# Note: Using while read with process substitution instead of for loop
+# to comply with repository rules and avoid permission matching issues
+while IFS= read -r pkg; do
   if ! command -v "$pkg" &>/dev/null; then
-    echo "⚠️  Package not found: $pkg"
+    echo "⚠️  Package not found: $pkg" >&2
     continue
   fi
 
@@ -44,26 +46,26 @@ for pkg in "${CRITICAL_PACKAGES[@]}"; do
   EXPECTED_PREFIX="/run/current-system/sw/bin"
 
   if [[ "$PKG_PATH" != "$EXPECTED_PREFIX/$pkg" ]]; then
-    echo "❌ Version drift detected: $pkg"
-    echo "   Expected: $EXPECTED_PREFIX/$pkg"
-    echo "   Actual:   $PKG_PATH"
-    echo ""
+    echo "❌ Version drift detected: $pkg" >&2
+    echo "   Expected: $EXPECTED_PREFIX/$pkg" >&2
+    echo "   Actual:   $PKG_PATH" >&2
+    echo "" >&2
     DRIFT_DETECTED=1
   else
-    echo "✅ $pkg: OK"
+    echo "✅ $pkg: OK" >&2
   fi
-done
+done < <(printf "%s\n" "${CRITICAL_PACKAGES[@]}")
 
 if [[ $DRIFT_DETECTED -eq 0 ]]; then
-  echo ""
-  echo "✅ No drift detected - system is consistent"
+  echo "" >&2
+  echo "✅ No drift detected - system is consistent" >&2
   exit 0
 else
-  echo ""
-  echo "❌ Drift detected - system requires attention"
-  echo ""
-  echo "To fix activation mismatch, run:"
-  echo "  sudo /nix/var/nix/profiles/system/activate"
-  echo ""
+  echo "" >&2
+  echo "❌ Drift detected - system requires attention" >&2
+  echo "" >&2
+  echo "To fix activation mismatch, run:" >&2
+  echo "  sudo /nix/var/nix/profiles/system/activate" >&2
+  echo "" >&2
   exit 1
 fi

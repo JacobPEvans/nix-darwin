@@ -184,7 +184,8 @@ in
       trap cleanup INT TERM
 
       # Verify /run is writable (required to update /run/current-system symlink)
-      if [[ ! -w /run ]]; then
+      # Using POSIX-compliant [ ] test for portability
+      if [ ! -w /run ]; then
         echo "❌ ERROR: Cannot write to /run directory" >&2
         echo "Check permissions and ensure running as root" >&2
         exit 1
@@ -192,7 +193,7 @@ in
 
       # Check disk space (warn if < 5GB available)
       AVAILABLE=$(df -g / | tail -1 | awk '{print $4}')
-      if [[ $AVAILABLE -lt 5 ]]; then
+      if [ "$AVAILABLE" -lt 5 ]; then
         echo "⚠️  WARNING: Low disk space (''${AVAILABLE}GB available)" >&2
         echo "Consider running: nix-collect-garbage --delete-older-than 30d" >&2
       fi
@@ -205,7 +206,8 @@ in
       EXPECTED="$systemConfig"
       ACTUAL="$(readlink -f /run/current-system)"
 
-      if [[ "$EXPECTED" != "$ACTUAL" ]]; then
+      # Using POSIX-compliant [ ] test for portability
+      if [ "$EXPECTED" != "$ACTUAL" ]; then
         echo "❌ ERROR: Activation verification failed" >&2
         echo "Expected: $EXPECTED" >&2
         echo "Actual:   $ACTUAL" >&2
