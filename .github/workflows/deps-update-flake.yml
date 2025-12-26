@@ -1,5 +1,10 @@
 # Automated flake.lock updates with verified commits
 #
+# Uses JacobPEvans-github-actions App for:
+# - Signed & verified commits via GitHub's REST API
+# - Triggering downstream workflows (CI Gate, Review)
+# - Enabling auto-merge for approved updates
+#
 # Triggers:
 # - Daily at noon UTC (schedule)
 # - Instant sync when ai-assistant-instructions pushes (repository_dispatch)
@@ -9,9 +14,6 @@
 # - Tue/Fri or manual with update_all: Updates ALL flake inputs
 # - Other days: Updates only AI-focused inputs
 # - repository_dispatch: Updates only ai-assistant-instructions (fast sync)
-#
-# Commits are signed via GitHub REST API (peter-evans/create-pull-request)
-# using GITHUB_TOKEN, producing verified signatures as github-actions[bot].
 name: Update flake.lock
 
 on:
@@ -46,6 +48,13 @@ jobs:
         superpowers-marketplace
         agent-os
     steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: Determine inputs to update
         id: inputs
         run: |
@@ -68,6 +77,8 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
@@ -83,6 +94,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
+          token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
           branch: update_flake_lock_action
           delete-branch: true
@@ -103,7 +115,7 @@ jobs:
             - Full updates (darwin, home-manager) run Tue/Fri
 
             ---
-            *This PR was automatically created by github-actions[bot].*
+            *Created by JacobPEvans-github-actions*
           labels: dependencies
           assignees: JacobPEvans
           reviewers: JacobPEvans
