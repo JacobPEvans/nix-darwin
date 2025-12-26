@@ -200,6 +200,46 @@ After system updates or profile switches, these packages may vanish because:
 3. Let nix-darwin manage PATH via `/etc/zshenv`
 4. Open new terminal to get updated PATH
 
+### Activation Failure (Binaries Show Old Versions)
+
+**Problem**: `darwin-rebuild switch` completes successfully but running binaries show old versions.
+
+**Symptoms**:
+
+- `claude --version` shows older version than expected
+- `/run/current-system` points to an older generation than `/nix/var/nix/profiles/system`
+- Build succeeded but activation didn't complete
+
+**Diagnosis**:
+
+```bash
+# Check for activation mismatch
+bash scripts/workflows/verify-activation.sh
+```
+
+**Root Causes**:
+
+- Interrupted activation (SIGINT, terminal closed, SSH disconnect)
+- Permission issues with `/run` directory
+- Low disk space preventing symlink update
+
+**Solution**:
+
+```bash
+# 1. Activate the latest generation manually
+sudo /nix/var/nix/profiles/system/activate
+
+# 2. Verify success
+readlink /run/current-system  # Should match /nix/var/nix/profiles/system
+claude --version              # Should show expected version
+
+# 3. Check PATH if binaries still show wrong version
+echo $PATH | tr ':' '\n' | head -5
+# Should show /run/current-system/sw/bin before /opt/homebrew/bin
+```
+
+**Prevention**: The system now includes automatic activation verification hooks that will fail loudly if activation doesn't complete successfully.
+
 ---
 
 ## Application Issues

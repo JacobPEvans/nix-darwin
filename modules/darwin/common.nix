@@ -38,9 +38,6 @@ in
     home = userConfig.user.homeDir;
   };
 
-  # Required for nix-darwin with Determinate Nix
-  system.primaryUser = userConfig.user.name;
-
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
   environment.systemPackages =
@@ -168,6 +165,64 @@ in
   # Disable documentation to suppress builtins.toFile warnings
   documentation.enable = false;
 
-  # macOS system version (required for nix-darwin)
-  system.stateVersion = 5;
+  # ==========================================================================
+  # System Configuration (Activation Scripts & State Version)
+  # ==========================================================================
+  # Activation scripts run during darwin-rebuild to verify system state and prevent
+  # silent activation failures that leave /run/current-system pointing to stale generations
+  system = {
+    # Required for nix-darwin with Determinate Nix
+    primaryUser = userConfig.user.name;
+
+    activationScripts.preActivation.text = ''
+      # Trap signals to prevent leaving system in bad state if interrupted
+      cleanup() {
+        echo "❌ Activation interrupted - system may be in an inconsistent state" >&2
+        echo "Run: sudo darwin-rebuild activate" >&2
+        exit 1
+      }
+      trap cleanup INT TERM
+
+      # Verify /run is writable (required to update /run/current-system symlink)
+      if [[ ! -w /run ]]; then
+        echo "❌ ERROR: Cannot write to /run directory" >&2
+        echo "Check permissions and ensure running as root" >&2
+        exit 1
+      fi
+
+      # Check disk space (warn if < 5GB available)
+      AVAILABLE=$(df -g / | tail -1 | awk '{print $4}')
+      if [[ $AVAILABLE -lt 5 ]]; then
+        echo "⚠️  WARNING: Low disk space (''${AVAILABLE}GB available)" >&2
+        echo "Consider running: nix-collect-garbage --delete-older-than 30d" >&2
+      fi
+    '';
+
+    activationScripts.postActivation.text = ''
+      # Verify /run/current-system points to this generation
+      # This catches silent activation failures where the build succeeds but
+      # the symlink update doesn't happen (permissions, interrupts, etc.)
+      EXPECTED="$systemConfig"
+      ACTUAL="$(readlink -f /run/current-system)"
+
+      if [[ "$EXPECTED" != "$ACTUAL" ]]; then
+        echo "❌ ERROR: Activation verification failed" >&2
+        echo "Expected: $EXPECTED" >&2
+        echo "Actual:   $ACTUAL" >&2
+        echo "" >&2
+        echo "The /run/current-system symlink was not updated." >&2
+        echo "This is a critical error - the system is in an inconsistent state." >&2
+        echo "" >&2
+        echo "To fix this, run:" >&2
+        echo "  sudo /nix/var/nix/profiles/system/activate" >&2
+        echo "" >&2
+        exit 1
+      fi
+
+      echo "✅ Activation verified: /run/current-system updated successfully" >&2
+    '';
+
+    # macOS system version (required for nix-darwin)
+    stateVersion = 5;
+  };
 }
