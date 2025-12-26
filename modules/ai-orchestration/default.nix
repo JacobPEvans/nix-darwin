@@ -47,8 +47,14 @@ in
 
     defaultCodingModel = lib.mkOption {
       type = lib.types.str;
+      default = "claude-sonnet-4-5";
+      description = "Model for coding tasks (use Opus via /model opus for complex architectural work)";
+    };
+
+    defaultArchitectureModel = lib.mkOption {
+      type = lib.types.str;
       default = "claude-opus-4-5";
-      description = "Model for complex coding tasks";
+      description = "Model for complex architectural decisions and advanced reasoning";
     };
 
     defaultFastModel = lib.mkOption {

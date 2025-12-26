@@ -92,15 +92,20 @@ in
             model: gemini/gemini-3-pro
             # API key injected at runtime via wrapper
 
-        # Coding model - currently Claude Opus 4.5 (SWE-bench leader)
+        # Coding model - currently Claude Sonnet 4.5
         - model_name: coding-model
           litellm_params:
-            model: anthropic/claude-opus-4-5-20251101
+            model: anthropic/claude-sonnet-4-5-20251101
 
         # Fast model - currently Claude Sonnet 4.5
         - model_name: fast-model
           litellm_params:
             model: anthropic/claude-sonnet-4-5-20251101
+
+        # Architecture model - Claude Opus 4.5 for complex reasoning
+        - model_name: architecture-model
+          litellm_params:
+            model: anthropic/claude-opus-4-5-20251101
 
         # Local research - Qwen3-next 80B
         - model_name: local-research

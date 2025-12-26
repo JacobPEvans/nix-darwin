@@ -40,12 +40,14 @@ This file contains **AI-specific instructions only** - rules and patterns that A
 ```text
 📊 Session Status
 Model: [current model name]
-Reminder: Switch to Opus (/model opus) for complex architectural decisions,
+Default: Sonnet 4.5 for coding and general tasks
+Advanced: Switch to Opus (/model opus) for complex architectural decisions,
 multi-file refactoring, or tasks requiring deep reasoning.
 ```
 
 **Why**: Model depends on session configuration. User needs visibility to
-consciously choose the appropriate model (Opus for complex tasks).
+consciously choose the appropriate model. Sonnet is the default for most work,
+while Opus is available for complex architectural and planning tasks.
 
 ## Enforced Git Development Workflow
 
