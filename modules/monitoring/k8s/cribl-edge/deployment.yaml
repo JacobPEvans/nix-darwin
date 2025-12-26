@@ -49,9 +49,6 @@ spec:
             - name: terminal-logs
               mountPath: /var/log/terminal
               readOnly: true
-            # Persistent config/state
-            - name: cribl-data
-              mountPath: /opt/cribl/data
           resources:
             requests:
               memory: "512Mi"
@@ -91,5 +88,3 @@ spec:
           hostPath:
             path: "@homeDir@/logs"
             type: DirectoryOrCreate
-        - name: cribl-data
-          emptyDir: {}
