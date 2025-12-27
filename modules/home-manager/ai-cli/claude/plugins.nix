@@ -64,10 +64,10 @@ in
           '') marketplacePaths}
         '';
 
-        # Post-activation script to show diffs and clean up backups
+        # Post-activation script to show diffs for manual review
         reportMarketplaceDiffs = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
           # Show diffs between backed-up directories and new Nix-managed symlinks
-          # Then remove backups to avoid clutter
+          # Backups are kept for manual review and deletion
           ${lib.concatMapStringsSep "\n" (path: ''
             BACKUP="${path}.backup"
             if [ -d "$BACKUP" ]; then
