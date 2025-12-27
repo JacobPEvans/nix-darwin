@@ -16,8 +16,8 @@ Think of it as infrastructure-as-code, but for your laptop. Fully automated with
 ## Quick Start
 
 ```bash
-# Rebuild after config changes
-sudo darwin-rebuild switch --flake ~/.config/nix
+# Rebuild after config changes (use the sa-drs alias)
+sa-drs
 
 # Search for a package
 nix search nixpkgs <name>
@@ -26,7 +26,7 @@ nix search nixpkgs <name>
 sudo darwin-rebuild --rollback
 ```
 
-See [RUNBOOK.md](RUNBOOK.md) for detailed procedures.
+The `sa-drs` alias handles system activation automatically. See [RUNBOOK.md](RUNBOOK.md) for detailed procedures.
 
 ## Directory Structure
 

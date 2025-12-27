@@ -129,7 +129,7 @@ Without this check, authenticated Git operations will fail with authentication e
 1. Stage intended changes explicitly (avoid `git add -A` to prevent staging unintended files)
 2. Commit with descriptive message (pre-commit hooks run automatically on commit)
 3. If pre-commit hooks fail, fix issues and re-commit - **NEVER disable or bypass hooks**
-4. Test the build: `sudo darwin-rebuild switch --flake .` (see [TESTING.md](TESTING.md#basic-local-change-testing))
+4. Test the build: `sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .` (see [TESTING.md](TESTING.md#basic-local-change-testing))
 5. If rebuild fails, fix issues and amend the commit, then re-test
 6. Repeat steps 1-5 for any additional changes (e.g., addressing review feedback)
 7. **Only after ALL commits are complete**: Push to remote (single push)

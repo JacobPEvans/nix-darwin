@@ -118,13 +118,13 @@ All configuration moved to `home/home.nix`:
 ```bash
 cd ~/.config/nix
 nix flake check
-sudo darwin-rebuild switch --flake ~/.config/nix
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake ~/.config/nix
 ```
 
 ### Or use darwin-rebuild directly (after first activation)
 
 ```bash
-sudo darwin-rebuild switch --flake ~/.config/nix
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake ~/.config/nix
 ```
 
 ### Check Current Configuration

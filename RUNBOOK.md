@@ -20,7 +20,8 @@ Step-by-step procedures for common configuration tasks.
 
 ```bash
 # Rebuild after config changes (most common)
-sudo darwin-rebuild switch --flake ~/.config/nix
+# The activation prefix ensures current-system symlink is updated first
+sudo /nix/var/nix/profiles/system/activate && sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake ~/.config/nix
 
 # Search for a package
 nix search nixpkgs <name>
@@ -71,7 +72,7 @@ ll@
 
 | Alias | Command | Purpose |
 |-------|---------|---------|
-| `d-r` | `sudo darwin-rebuild switch --flake .` | Rebuild system configuration |
+| `sa-drs` | `sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .` | Rebuild system configuration |
 | `nf-u` | `nix flake update` | Update flake.lock to latest versions |
 
 ### AWS
@@ -118,7 +119,7 @@ ll@
    cd ~/.config/nix
    git add .
    git commit -m "feat: add <package>"
-   sudo darwin-rebuild switch --flake .
+   sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
    ```
 
 ### Adding a Homebrew Package (Fallback Only)
@@ -178,7 +179,7 @@ git add flake.lock
 git commit -m "chore: update flake inputs"
 
 # 3. Rebuild with new versions
-sudo darwin-rebuild switch --flake .
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
 ```
 
 **Recommended frequency**: Weekly or when you notice outdated packages.
@@ -192,7 +193,7 @@ Homebrew auto-update is disabled for faster rebuilds. To get latest versions:
 brew update
 
 # 2. Rebuild (will upgrade packages based on new index)
-sudo darwin-rebuild switch --flake ~/.config/nix
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake ~/.config/nix
 ```
 
 ### If Something Breaks After Update
@@ -204,7 +205,7 @@ cd ~/.config/nix
 git revert HEAD
 
 # Rebuild with old versions
-sudo darwin-rebuild switch --flake .
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
 ```
 
 ### Secure Flake Update Workflow
@@ -279,7 +280,7 @@ git add flake.lock
 git commit -m "chore: update flake inputs"
 
 # Apply the update
-sudo darwin-rebuild switch --flake .
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
 ```
 
 #### 5. Rollback Procedures
@@ -298,7 +299,7 @@ sudo darwin-rebuild --rollback
 ```bash
 cd ~/.config/nix
 git revert HEAD
-sudo darwin-rebuild switch --flake .
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
 ```
 
 **Switch to specific generation:**
@@ -470,7 +471,7 @@ No rebuild required - dev shells are evaluated on-demand.
 
 ```bash
 # Uses hostname to auto-detect configuration
-sudo darwin-rebuild switch --flake ~/.config/nix
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake ~/.config/nix
 ```
 
 ### Creating a New Host Profile

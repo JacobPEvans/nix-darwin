@@ -119,7 +119,7 @@ gh pr create --title "feat(packages): add <pkg-name>" --body "Adds the <pkg-name
 Once the user approves and merges the PR, they will rebuild:
 
 ```bash
-sudo darwin-rebuild switch --flake .  # macOS
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .  # macOS
 # or
 home-manager switch --flake .  # Linux
 ```
