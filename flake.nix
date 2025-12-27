@@ -129,6 +129,7 @@
           inherit (aiCommon) formatters;
         in
         import ./lib/claude-settings.nix {
+          inherit (nixpkgs) lib; # Required for pure evaluation
           homeDir = "/home/user"; # Placeholder - CI only validates schema structure
           schemaUrl = userConfig.ai.claudeSchemaUrl;
           permissions = {
