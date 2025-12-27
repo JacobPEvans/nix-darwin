@@ -7,9 +7,9 @@
 # IMPORTANT: toClaudeMarketplaceFormat is the SINGLE SOURCE OF TRUTH for
 # marketplace format transformation. All modules (settings.nix, claude-settings.nix)
 # MUST import and use this function to ensure consistency.
-{
-  lib ? import <nixpkgs/lib>,
-}:
+# NOTE: lib MUST be passed in explicitly - no default value.
+# This ensures pure evaluation (CI) works correctly without <nixpkgs> lookup.
+{ lib }:
 
 let
   # ==========================================================================

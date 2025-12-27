@@ -11,8 +11,10 @@
 # NOTE: Uses toClaudeMarketplaceFormat from lib/claude-registry.nix as
 # SINGLE SOURCE OF TRUTH for marketplace format transformation.
 
+# NOTE: lib MUST be passed in explicitly - no default value.
+# This ensures pure evaluation (CI) works correctly without <nixpkgs> lookup.
 {
-  lib ? import <nixpkgs/lib>,
+  lib,
   homeDir,
   schemaUrl,
   permissions, # { allow, deny, ask }
