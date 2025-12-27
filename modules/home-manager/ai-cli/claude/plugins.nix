@@ -2,6 +2,9 @@
 #
 # Symlinks Nix-managed plugin directories from flake inputs.
 # Runtime plugins are unaffected - they live in separate directories.
+#
+# Automatic cleanup: When a marketplace directory exists but should be a symlink,
+# it's automatically removed (with diff reporting). Only one backup is kept.
 { config, lib, ... }:
 
 let
@@ -23,7 +26,77 @@ let
     }
   ) nixManagedMarketplaces;
 
+  # Generate list of marketplace paths that should be symlinks
+  marketplacePaths = lib.mapAttrsToList (
+    name: _: "${config.home.homeDirectory}/.claude/plugins/marketplaces/${getMarketplaceName name}"
+  ) nixManagedMarketplaces;
+
 in
 {
-  config = lib.mkIf cfg.enable { home.file = marketplaceSymlinks; };
+  config = lib.mkIf cfg.enable {
+    home = {
+      file = marketplaceSymlinks;
+
+      activation = {
+        # Activation script to clean up conflicting marketplace directories
+        # MUST run before linkGeneration to prevent "cannot overwrite directory" errors
+        cleanupMarketplaceDirectories = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+          # Clean up marketplace directories that conflict with Nix-managed symlinks
+          # This handles the case where runtime plugin installs created real directories
+          # that now prevent Nix from creating symlinks
+          ${lib.concatMapStringsSep "\n" (path: ''
+            if [ -d "${path}" ] && [ ! -L "${path}" ]; then
+              BACKUP="${path}.backup"
+
+              # Remove old backup if it exists (only keep one)
+              if [ -e "$BACKUP" ]; then
+                rm -rf "$BACKUP"
+              fi
+
+              # Move directory to backup
+              mv "${path}" "$BACKUP"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "Cleaned up marketplace directory: ${path}"
+              echo "  Backup saved to: $BACKUP"
+              echo "  After activation completes, a diff will be shown"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            fi
+          '') marketplacePaths}
+        '';
+
+        # Post-activation script to show diffs for manual review
+        reportMarketplaceDiffs = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          # Show diffs between backed-up directories and new Nix-managed symlinks
+          # Backups are kept for manual review and deletion
+          ${lib.concatMapStringsSep "\n" (path: ''
+            BACKUP="${path}.backup"
+            if [ -d "$BACKUP" ]; then
+              echo ""
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "Marketplace update: ${path}"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+              if [ -L "${path}" ]; then
+                NEW_TARGET=$(readlink "${path}")
+                echo "Old: Real directory (runtime install)"
+                echo "New: Symlink -> $NEW_TARGET (Nix-managed)"
+                echo ""
+                echo "Comparing directories (showing first 20 differences):"
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+                # Show directory structure comparison
+                diff -r "$BACKUP" "${path}" 2>&1 | head -20 || true
+
+                echo ""
+                echo "Full comparison available at: $BACKUP"
+                echo "Review and manually delete backup when satisfied."
+              fi
+
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            fi
+          '') marketplacePaths}
+        '';
+      };
+    };
+  };
 }
