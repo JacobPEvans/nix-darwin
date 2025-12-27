@@ -85,6 +85,7 @@ with pkgs;
     ps.grip # Preview GitHub Markdown files locally
     ps.langchain-ollama # LangChain integration for Ollama
     ps.ollama # Ollama Python library for local LLM interaction
+    ps.pipx # Install and run Python CLI apps in isolated environments
     ps.pygithub # GitHub API v3 Python library
   ]))
 ]
