@@ -93,9 +93,10 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
-  # DISABLED - Re-enable by setting enable = true and adding schedule times
+  # ENABLED - Uses Sonnet model only (--model sonnet enforced in auto-claude.sh)
+  # Resource limits: max 10 PRs, max 50 issues, max 1 analysis per item per run
   autoClaude = {
-    enable = false;
+    enable = true;
     repositories = {
       # ai-assistant-instructions: disabled (was running at even hours)
       # Uses local repo (not Nix store) because autoClaude needs writable git
