@@ -70,7 +70,7 @@ let
     # ========================================================================
     # Official Anthropic Marketplaces
     # ========================================================================
-    "anthropics/claude-code" = {
+    "claude-code" = {
       source = {
         type = "github";
         url = "anthropics/claude-code";
