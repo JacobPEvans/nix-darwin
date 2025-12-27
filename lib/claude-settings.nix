@@ -9,12 +9,31 @@
 # pretty-printed JSON for local deployment.
 
 {
+  lib ? import <nixpkgs/lib>,
   homeDir,
   schemaUrl,
   permissions, # { allow, deny, ask }
   plugins, # { marketplaces, enabledPlugins }
 }:
 
+let
+  # Transform marketplace config to Claude's expected format
+  # Claude expects: { source: { source: "github", repo: "owner/repo" } }
+  # Nix config has: { source: { type: "github", url: "..." } }
+  toClaudeMarketplaceFormat = name: m: {
+    source =
+      if m.source.type == "github" || m.source.type == "git" then
+        {
+          source = "github";
+          repo = name; # "owner/repo" format (the key itself)
+        }
+      else
+        {
+          source = m.source.type;
+          inherit (m.source) url;
+        };
+  };
+in
 {
   # JSON Schema for IDE IntelliSense and validation
   "$schema" = schemaUrl;
@@ -22,8 +41,8 @@
   # Enable extended thinking mode
   alwaysThinkingEnabled = true;
 
-  # Plugin marketplace configuration
-  extraKnownMarketplaces = plugins.marketplaces;
+  # Plugin marketplace configuration - transformed to Claude's expected format
+  extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat plugins.marketplaces;
 
   # Enabled plugins from marketplaces
   inherit (plugins) enabledPlugins;
