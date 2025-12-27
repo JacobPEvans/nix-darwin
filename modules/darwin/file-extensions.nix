@@ -93,8 +93,13 @@ in
         echo "Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)" >&2
 
         # Rebuild Launch Services database to ensure changes take effect
-        /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
-        echo "Launch Services database rebuilt" >&2
+        # Note: lsregister can fail on some systems, so we add error handling to prevent
+        # activation failure. The file mappings still work even if lsregister fails.
+        if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>&1; then
+          echo "Launch Services database rebuilt" >&2
+        else
+          echo "Warning: Failed to rebuild Launch Services database (file mappings still applied)" >&2
+        fi
       else
         echo "Warning: Failed to apply file extension mappings" >&2
       fi
