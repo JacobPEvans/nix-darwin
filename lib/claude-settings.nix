@@ -7,6 +7,9 @@
 #
 # This separation enables pure Nix evaluation for CI while keeping
 # pretty-printed JSON for local deployment.
+#
+# NOTE: Uses toClaudeMarketplaceFormat from lib/claude-registry.nix as
+# SINGLE SOURCE OF TRUTH for marketplace format transformation.
 
 {
   lib ? import <nixpkgs/lib>,
@@ -17,22 +20,9 @@
 }:
 
 let
-  # Transform marketplace config to Claude's expected format
-  # Claude expects: { source: { source: "github", repo: "owner/repo" } }
-  # Nix config has: { source: { type: "github", url: "..." } }
-  toClaudeMarketplaceFormat = name: m: {
-    source =
-      if m.source.type == "github" || m.source.type == "git" then
-        {
-          source = "github";
-          repo = name; # "owner/repo" format (the key itself)
-        }
-      else
-        {
-          source = m.source.type;
-          inherit (m.source) url;
-        };
-  };
+  # Import the single source of truth for marketplace formatting
+  claudeRegistry = import ./claude-registry.nix { inherit lib; };
+  inherit (claudeRegistry) toClaudeMarketplaceFormat;
 in
 {
   # JSON Schema for IDE IntelliSense and validation

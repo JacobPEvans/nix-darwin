@@ -3,11 +3,42 @@
 # Pure Nix functions for generating Claude Code registry structures.
 # Used by both the home-manager module and CI validation.
 # No derivations or impure operations - works cross-platform.
+#
+# IMPORTANT: toClaudeMarketplaceFormat is the SINGLE SOURCE OF TRUTH for
+# marketplace format transformation. All modules (settings.nix, claude-settings.nix)
+# MUST import and use this function to ensure consistency.
 {
   lib ? import <nixpkgs/lib>,
 }:
 
+let
+  # ==========================================================================
+  # SINGLE SOURCE OF TRUTH: Marketplace Format Transformation
+  # ==========================================================================
+  # Claude Code expects: { source: { source: "github", repo: "owner/repo" } }
+  # For non-github sources, use url instead of repo.
+  #
+  # Usage: Import this function in any module that needs to transform marketplaces:
+  #   claudeRegistry = import ../../lib/claude-registry.nix { inherit lib; };
+  #   transformed = claudeRegistry.toClaudeMarketplaceFormat name marketplace;
+  #
+  toClaudeMarketplaceFormat = name: m: {
+    source =
+      if m.source.type == "github" || m.source.type == "git" then
+        {
+          source = "github";
+          repo = name; # "owner/repo" format (the key itself)
+        }
+      else
+        {
+          source = m.source.type;
+          inherit (m.source) url;
+        };
+  };
+in
 {
+  # Export the transformation function for use by other modules
+  inherit toClaudeMarketplaceFormat;
   # Generate the full known_marketplaces.json structure
   # Matches native Claude Code format exactly
   mkKnownMarketplaces =
@@ -23,26 +54,19 @@
       getMarketplaceName = name: lib.last (lib.splitString "/" name);
 
       # Convert marketplace config to native format
+      # Uses toClaudeMarketplaceFormat for consistent source formatting
       toNativeFormat =
         name: m:
         let
           marketplaceName = getMarketplaceName name;
           # Native format uses local paths, not Nix store
           localPath = "${homeDir}/.claude/plugins/marketplaces/${marketplaceName}";
+          # Reuse single source of truth for marketplace format
+          formatted = toClaudeMarketplaceFormat name m;
         in
         lib.nameValuePair marketplaceName {
           # Field order matches native: source, installLocation, lastUpdated
-          source =
-            if m.source.type == "github" || m.source.type == "git" then
-              {
-                source = "github";
-                repo = name; # "owner/repo" format
-              }
-            else
-              {
-                source = m.source.type;
-                inherit (m.source) url;
-              };
+          inherit (formatted) source;
           installLocation = localPath;
           lastUpdated = "2025-12-08T00:00:00.000Z";
         };
@@ -94,22 +118,8 @@
         ask = permissions.ask or [ ];
       };
       inherit additionalDirectories;
-      # Transform marketplace config to Claude's expected format
-      # Claude expects: { source: { source: "github", repo: "owner/repo" } }
-      # For non-github sources, use url instead
-      extraKnownMarketplaces = lib.mapAttrs (name: m: {
-        source =
-          if m.source.type == "github" || m.source.type == "git" then
-            {
-              source = "github";
-              repo = name; # "owner/repo" format (the key itself)
-            }
-          else
-            {
-              source = m.source.type;
-              inherit (m.source) url;
-            };
-      }) marketplaces;
+      # Uses toClaudeMarketplaceFormat (single source of truth)
+      extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat marketplaces;
       inherit enabledPlugins;
       mcpServers = lib.filterAttrs (_: s: !(s.disabled or false)) mcpServers;
     };
