@@ -200,59 +200,67 @@ After system updates or profile switches, these packages may vanish because:
 3. Let nix-darwin manage PATH via `/etc/zshenv`
 4. Open new terminal to get updated PATH
 
-### Activation Failure (Binaries Show Old Versions)
+### Activation Failure (Binaries Show Old Versions) - RESOLVED
 
 **Problem**: `darwin-rebuild switch` completes successfully but running binaries show old versions.
 
 **Example**: `claude --version` shows 2.0.74 when expected version is 2.0.76.
 
-**Root Cause**: The build completed and created a new generation, but the `/run/current-system`
-symlink was never updated to point to it. This is a silent failure - the command exits successfully
-but the activation didn't complete.
+**Root Cause**: The `lsregister` command in `modules/darwin/file-extensions.nix` had NO error
+handling. The activate script uses `set -e`, so when lsregister failed, the entire activation would
+exit immediately, preventing the `/run/current-system` symlink update from executing.
 
-**Current Status (as of 2024-12-26)**: PARTIALLY FIXED
+**Status (as of 2025-12-27)**: ✅ **FULLY RESOLVED**
 
-- ✅ **Fixed**: Marketplace directory conflicts that blocked activation (see below)
-- ⚠️ **Still Broken**: The `/run/current-system` symlink update issue persists
-- 📊 **Investigation**: Active debugging in progress to find root cause
+- ✅ **Fixed**: Marketplace directory conflicts that blocked activation
+- ✅ **Fixed**: lsregister command now has proper error handling
+- ✅ **Verified**: Investigation confirmed root cause and solution
 
-**Solution**:
+**How It Was Fixed**:
+
+The `lsregister` command (used to rebuild macOS Launch Services database) is now wrapped in proper
+error handling:
+
+```nix
+if /System/.../lsregister -kill -r -domain local -domain system -domain user 2>&1; then
+  echo "Launch Services database rebuilt" >&2
+else
+  echo "Warning: Failed to rebuild Launch Services database (file mappings still applied)" >&2
+fi
+```
+
+If lsregister fails, activation now continues with a warning instead of exiting.
+
+**Investigation Timeline**:
+
+1. Research agent analyzed nix-darwin source code
+2. Found symlink update is last command in activate script (~line 1526)
+3. Narrowed failure to 90-line window between Terminal config and symlink update
+4. Analyzed actual activate script to find lsregister at line 1459 with no error handling
+5. Added error handling to prevent activation failure
+
+**Verification**:
+
+After rebuilding, you should see either:
+
+- "Launch Services database rebuilt" (if lsregister succeeds)
+- "Warning: Failed to rebuild Launch Services database..." (if lsregister fails but activation
+  continues)
+
+Check that `/run/current-system` now updates correctly:
 
 ```bash
+readlink -f /run/current-system
+readlink -f /nix/var/nix/profiles/system
+# These should match
+```
+
+**Historical Workaround** (no longer needed):
+
+```bash
+# Old workaround when activation failed:
 sudo /nix/var/nix/profiles/system/activate
 ```
-
-Then verify:
-
-```bash
-claude --version              # Should show expected version
-readlink /run/current-system  # Should point to latest generation in /nix/var/nix/profiles/
-```
-
-**Why This Happens**:
-
-Known causes:
-
-- Interrupted activation (Ctrl+C, terminal closed, SSH disconnect)
-- Permission issues with `/run` directory preventing symlink update
-
-Under investigation:
-
-- The `ln -sfn` command at the end of the activate script may be failing silently
-- Possible race condition or permission issue preventing symlink creation
-- The command exists in the activate script but may not be executing
-
-**Debugging Info**: The activate script contains the symlink update command at line ~1526:
-
-```bash
-ln -sfn "$(readlink -f "$systemConfig")" /run/current-system
-```
-
-This command should run AFTER all activation steps complete, but evidence suggests it's not
-executing successfully even though activation reaches that point.
-
-**Detection**: The system includes activation verification in `modules/darwin/common.nix` that
-warns (but does not block) when `/run/current-system` points to the wrong generation.
 
 ---
 

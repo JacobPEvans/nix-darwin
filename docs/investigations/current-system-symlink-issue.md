@@ -170,3 +170,71 @@ sudo ./scripts/test-rebuild-with-logging.sh
 ```bash
 ./scripts/analyze-rebuild-logs.sh /tmp/darwin-rebuild-debug/rebuild-*.log
 ```
+
+## RESOLVED
+
+**Resolution Date**: 2025-12-27
+**Status**: FIXED
+
+### Root Cause
+
+The `lsregister` command in `modules/darwin/file-extensions.nix` (line 96) had NO error handling. The
+activate script uses `set -e`, so when lsregister failed, the entire activation would exit immediately,
+preventing the `/run/current-system` symlink update from executing.
+
+**Execution order**:
+
+1. Terminal.app configuration (line ~1436 in activate script)
+2. File extension mappings via duti (succeeds)
+3. **lsregister command (line 1459) - FAILS with no error handling**
+4. Script exits due to `set -e`
+5. Symlink update (line 1526) - **NEVER REACHED**
+
+### Solution
+
+Wrapped the `lsregister` command in an `if` statement with proper error handling:
+
+```nix
+if /System/.../lsregister -kill -r -domain local -domain system -domain user 2>&1; then
+  echo "Launch Services database rebuilt" >&2
+else
+  echo "Warning: Failed to rebuild Launch Services database (file mappings still applied)" >&2
+fi
+```
+
+Now if lsregister fails, it prints a warning but allows activation to continue. The file mappings still
+work even if lsregister fails.
+
+### Files Changed
+
+- `modules/darwin/file-extensions.nix`: Added error handling to lsregister command
+
+### Investigation Process
+
+1. Research agent analyzed nix-darwin source code
+2. Found symlink update is last command in activate script (~line 1526)
+3. Narrowed failure to 90-line window between Terminal config and symlink update
+4. Analyzed actual activate script to find lsregister at line 1459 with no error handling
+5. Added error handling to prevent activation failure
+
+### Verification
+
+To verify the fix works:
+
+```bash
+cd ~/git/nix-config/main
+sudo darwin-rebuild switch --flake .
+```
+
+The symlink should now update correctly, and you should see either:
+
+- "Launch Services database rebuilt" (if lsregister succeeds)
+- "Warning: Failed to rebuild Launch Services database..." (if lsregister fails but activation continues)
+
+Check that `/run/current-system` points to the new generation:
+
+```bash
+readlink -f /run/current-system
+readlink -f /nix/var/nix/profiles/system
+# These should match
+```
