@@ -186,7 +186,7 @@ For maximum freshness (takes longer):
 ```bash
 nix-collect-garbage -d
 nix store gc
-sudo darwin-rebuild switch --flake .
+sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .
 ```
 
 ### Step 4: Verify New Derivations
