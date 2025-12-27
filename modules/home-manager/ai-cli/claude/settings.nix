@@ -2,6 +2,9 @@
 #
 # Generates ~/.claude/settings.json with all configuration.
 # Merges plugin marketplaces, permissions, MCP servers, etc.
+#
+# NOTE: Uses toClaudeMarketplaceFormat from lib/claude-registry.nix as
+# SINGLE SOURCE OF TRUTH for marketplace format transformation.
 {
   config,
   lib,
@@ -12,6 +15,10 @@
 let
   cfg = config.programs.claude;
   homeDir = config.home.homeDirectory;
+
+  # Import the single source of truth for marketplace formatting
+  claudeRegistry = import ../../../../lib/claude-registry.nix { inherit lib; };
+  inherit (claudeRegistry) toClaudeMarketplaceFormat;
 
   # Build the env attribute (merge user env vars with apiKeyHelper if enabled)
   envAttrs =
@@ -32,21 +39,8 @@ let
     };
 
     # Plugin configuration
-    # Claude expects: { source: { source: "github", repo: "owner/repo" } }
-    # For non-github sources, use url instead
-    extraKnownMarketplaces = lib.mapAttrs (name: m: {
-      source =
-        if m.source.type == "github" || m.source.type == "git" then
-          {
-            source = "github";
-            repo = name; # The key itself is "owner/repo" format
-          }
-        else
-          {
-            source = m.source.type;
-            inherit (m.source) url;
-          };
-    }) cfg.plugins.marketplaces;
+    # Uses toClaudeMarketplaceFormat (single source of truth from lib/claude-registry.nix)
+    extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat cfg.plugins.marketplaces;
 
     enabledPlugins = cfg.plugins.enabled;
 
