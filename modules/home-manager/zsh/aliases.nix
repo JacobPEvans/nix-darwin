@@ -36,8 +36,9 @@
   # ===========================================================================
   # REQUIRES SUDO: darwin-rebuild modifies system-level configurations
   # This activates both system (nix-darwin) and user (home-manager) configs
-  # Usage: d-r            # Use current directory as flake
-  d-r = "sudo darwin-rebuild switch --flake .";
+  # The activation prefix ensures current-system symlink is updated first
+  # Usage: sa-drs         # system-activate + darwin-rebuild switch
+  sa-drs = "sudo /nix/var/nix/profiles/system/activate && sudo darwin-rebuild switch --flake .";
 
   # NO SUDO: Updates flake.lock to latest nixpkgs (must commit before d-r)
   # Usage: nf-u            # update flake in current directory

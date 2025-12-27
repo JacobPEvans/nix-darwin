@@ -161,13 +161,53 @@ in
         };
         flakeInput = superpowers-marketplace;
       };
+
+      # Community marketplaces (no flake input - runtime fetch only)
+      # These are discoverable via /plugin install but not pinned in Nix
+      "BillChirico/bills-claude-skills" = {
+        source = {
+          type = "github";
+          url = "https://github.com/BillChirico/bills-claude-skills.git";
+        };
+      };
+      "ananddtyagi/cc-marketplace" = {
+        source = {
+          type = "github";
+          url = "https://github.com/ananddtyagi/cc-marketplace.git";
+        };
+      };
+      "claudeforge/marketplace" = {
+        source = {
+          type = "github";
+          url = "https://github.com/claudeforge/marketplace.git";
+        };
+      };
+      "ccplugins/awesome-claude-code-plugins" = {
+        source = {
+          type = "github";
+          url = "https://github.com/ccplugins/awesome-claude-code-plugins.git";
+        };
+      };
+      "ccplugins/marketplace" = {
+        source = {
+          type = "github";
+          url = "https://github.com/ccplugins/marketplace.git";
+        };
+      };
+      "wshobson/agents" = {
+        source = {
+          type = "github";
+          url = "https://github.com/wshobson/agents.git";
+        };
+      };
     };
 
     enabled = enabledPlugins;
-    # Disable the local/experimental marketplace used for developing local plugins.
-    # With this disabled, plugins from configured/official marketplaces must be
-    # declared in Nix (via flake inputs) rather than installed dynamically at runtime.
-    allowRuntimeInstall = false;
+    # Enable runtime plugin installation from community marketplaces.
+    # Nix defines the baseline (official plugins via flake inputs).
+    # Claude can dynamically install additional plugins at runtime.
+    # Runtime state tracked in ~/.claude/plugins/installed_plugins.json (not Nix-managed).
+    allowRuntimeInstall = true;
   };
 
   commands = {
