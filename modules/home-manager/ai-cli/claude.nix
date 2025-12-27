@@ -66,6 +66,7 @@ let
   # Claude Code settings object
   # Generated from lib/claude-settings.nix (shared with CI for cross-platform validation)
   claudeSettings = import ../../../lib/claude-settings.nix {
+    inherit lib;
     homeDir = config.home.homeDirectory;
     schemaUrl = userConfig.ai.claudeSchemaUrl;
     permissions = {
