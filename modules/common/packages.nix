@@ -70,6 +70,13 @@ with pkgs;
   rapidapi # Full-featured HTTP client for testing and describing APIs
 
   # ==========================================================================
+  # Python Tools
+  # ==========================================================================
+  # Fast Python package installer and management tools.
+
+  uv # Extremely fast Python package installer and resolver
+
+  # ==========================================================================
   # Python Environment
   # ==========================================================================
   # Create a unified Python environment with all required packages.
