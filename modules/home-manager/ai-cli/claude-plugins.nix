@@ -44,20 +44,45 @@ let
     ) "Marketplace '${name}.source' must have a 'url' string";
     true;
 
-  # Official Anthropic plugin marketplaces
+  # Plugin marketplaces
   # Plugins are fetched on-demand when enabled
   # Format matches options.nix marketplaceModule: { source: { type, url } }
   marketplaces = {
+    # ========================================================================
+    # Official Anthropic Marketplaces
+    # ========================================================================
     "anthropics/claude-code" = {
       source = {
         type = "git";
         url = "https://github.com/anthropics/claude-code.git";
       };
     };
-    "anthropics/claude-plugins-official" = {
+    "claude-plugins-official" = {
       source = {
-        type = "git";
-        url = "https://github.com/anthropics/claude-plugins-official.git";
+        type = "github";
+        url = "anthropics/claude-plugins-official";
+      };
+    };
+
+    # ========================================================================
+    # Community Marketplaces
+    # ========================================================================
+    "cc-marketplace" = {
+      source = {
+        type = "github";
+        url = "ananddtyagi/cc-marketplace";
+      };
+    };
+    "bills-claude-skills" = {
+      source = {
+        type = "github";
+        url = "BillChirico/bills-claude-skills";
+      };
+    };
+    "superpowers-marketplace" = {
+      source = {
+        type = "github";
+        url = "obra/superpowers-marketplace";
       };
     };
   };
@@ -81,35 +106,75 @@ let
   #   - ralph-wiggum: Autonomous iteration loops
   #
   enabledPlugins = {
+    # ========================================================================
+    # Anthropic Official Plugins (claude-plugins-official marketplace)
+    # ========================================================================
+
     # Git workflow automation
-    "commit-commands@anthropics/claude-code" = true;
+    "commit-commands@claude-plugins-official" = true;
 
     # Code review and quality
-    "code-review@anthropics/claude-code" = true;
-    "pr-review-toolkit@anthropics/claude-code" = true;
+    "code-review@claude-plugins-official" = true;
+    "pr-review-toolkit@claude-plugins-official" = true;
 
     # Feature development
-    "feature-dev@anthropics/claude-code" = true;
+    "feature-dev@claude-plugins-official" = true;
 
     # Security
-    "security-guidance@anthropics/claude-code" = true;
+    "security-guidance@claude-plugins-official" = true;
 
     # Plugin/hook development
-    "plugin-dev@anthropics/claude-code" = true;
-    "hookify@anthropics/claude-code" = true;
+    "plugin-dev@claude-plugins-official" = true;
+    "hookify@claude-plugins-official" = true;
 
     # SDK development (useful for Claude Agent SDK work)
-    "agent-sdk-dev@anthropics/claude-code" = true;
+    "agent-sdk-dev@claude-plugins-official" = true;
 
     # UI/UX design and guidance
-    "frontend-design@anthropics/claude-code" = true;
+    "frontend-design@claude-plugins-official" = true;
 
     # Output styles for enhanced interaction
-    "explanatory-output-style@anthropics/claude-code" = true;
-    "learning-output-style@anthropics/claude-code" = true;
+    "explanatory-output-style@claude-plugins-official" = true;
+    "learning-output-style@claude-plugins-official" = true;
 
-    # Model migration tools
-    "claude-opus-4-5-migration@anthropics/claude-code" = true;
+    # GitHub and IDE integration
+    "github@claude-plugins-official" = true;
+    "typescript-lsp@claude-plugins-official" = true;
+
+    # Code analysis and search
+    "greptile@claude-plugins-official" = true;
+
+    # Communication and integrations
+    "slack@claude-plugins-official" = true;
+
+    # ========================================================================
+    # Community Marketplace Plugins
+    # ========================================================================
+
+    # CC Marketplace plugins
+    "2-commit-fast@cc-marketplace" = true;
+    "analyze-issue@cc-marketplace" = true;
+    "bug-detective@cc-marketplace" = true;
+    "code-review@cc-marketplace" = true;
+    "commit@cc-marketplace" = true;
+    "create-worktrees@cc-marketplace" = true;
+    "devops-automator@cc-marketplace" = true;
+    "double-check@cc-marketplace" = true;
+    "fix-github-issue@cc-marketplace" = true;
+    "fix-pr@cc-marketplace" = true;
+    "infrastructure-maintainer@cc-marketplace" = true;
+    "monitoring-observability-specialist@cc-marketplace" = true;
+    "pr-issue-resolve@cc-marketplace" = true;
+    "python-expert@cc-marketplace" = true;
+    "sugar@cc-marketplace" = true;
+
+    # Bills Claude Skills plugins
+    "git-workspace-init@bills-claude-skills" = true;
+    "github-pr-resolver@bills-claude-skills" = true;
+
+    # Superpowers Marketplace plugins
+    "superpowers@superpowers-marketplace" = true;
+    "double-shot-latte@superpowers-marketplace" = true;
 
     # Experimental: Autonomous iteration loops (commented out by default)
     # "ralph-wiggum@anthropics/claude-code" = true;
