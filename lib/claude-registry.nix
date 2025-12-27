@@ -94,8 +94,21 @@
         ask = permissions.ask or [ ];
       };
       inherit additionalDirectories;
-      extraKnownMarketplaces = lib.mapAttrs (_: m: {
-        source = { inherit (m.source) type url; };
+      # Transform marketplace config to Claude's expected format
+      # Claude expects: { source: { source: "github", repo: "owner/repo" } }
+      # For non-github sources, use url instead
+      extraKnownMarketplaces = lib.mapAttrs (name: m: {
+        source =
+          if m.source.type == "github" || m.source.type == "git" then
+            {
+              source = "github";
+              repo = name; # "owner/repo" format (the key itself)
+            }
+          else
+            {
+              source = m.source.type;
+              inherit (m.source) url;
+            };
       }) marketplaces;
       inherit enabledPlugins;
       mcpServers = lib.filterAttrs (_: s: !(s.disabled or false)) mcpServers;
