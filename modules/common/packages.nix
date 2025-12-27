@@ -73,7 +73,6 @@ with pkgs;
   # Python Tools
   # ==========================================================================
   # Fast Python package installer and management tools.
-
   uv # Extremely fast Python package installer and resolver
 
   # ==========================================================================
