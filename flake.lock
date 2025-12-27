@@ -265,11 +265,11 @@
     "superpowers-marketplace": {
       "flake": false,
       "locked": {
-        "lastModified": 1766561038,
-        "narHash": "sha256-iRQ+nAqIMoL+YNQ/RoJePMY5rmR/6+eSGrln1esKio0=",
+        "lastModified": 1766811441,
+        "narHash": "sha256-4juZafMOd+JnP5z1r3EyDqyL9PGlPnOCA/e3I/5kfNQ=",
         "owner": "obra",
         "repo": "superpowers-marketplace",
-        "rev": "b720af296ca840f291ba6cd424bd1e28dd934b4b",
+        "rev": "d466ee3584579088a4ee9a694f3059fa73c17ff1",
         "type": "github"
       },
       "original": {
