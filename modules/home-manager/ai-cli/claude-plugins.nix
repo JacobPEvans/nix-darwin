@@ -46,15 +46,34 @@ let
 
   # Plugin marketplaces
   # Plugins are fetched on-demand when enabled
-  # Format matches options.nix marketplaceModule: { source: { type, url } }
+  #
+  # IMPORTANT: Marketplace URL Format
+  # ========================================================================
+  # INPUT FORMAT (what we define here):
+  #   type: "github"     (for GitHub repositories)
+  #   url: "owner/repo"  (GitHub org/repo format, NOT full URL)
+  #
+  # OUTPUT FORMAT (after transformation via lib/claude-registry.nix):
+  #   source: "github"
+  #   repo: "marketplace-key"
+  #
+  # WHY THIS WORKS:
+  # - The toClaudeMarketplaceFormat function (lib/claude-registry.nix line 25-37)
+  #   converts both "github" and "git" types to "source: github" in settings.json
+  # - The marketplace key (e.g., "anthropics/claude-code") becomes the repo value
+  # - This ensures Claude Code can locate and fetch the marketplace
+  #
+  # DO NOT USE: Full GitHub URLs (e.g., https://github.com/owner/repo.git)
+  # Those belong in native known_marketplaces.json, not Nix definitions.
+  # ========================================================================
   marketplaces = {
     # ========================================================================
     # Official Anthropic Marketplaces
     # ========================================================================
     "anthropics/claude-code" = {
       source = {
-        type = "git";
-        url = "https://github.com/anthropics/claude-code.git";
+        type = "github";
+        url = "anthropics/claude-code";
       };
     };
     "claude-plugins-official" = {

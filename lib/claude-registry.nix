@@ -15,8 +15,33 @@ let
   # ==========================================================================
   # SINGLE SOURCE OF TRUTH: Marketplace Format Transformation
   # ==========================================================================
-  # Claude Code expects: { source: { source: "github", repo: "owner/repo" } }
-  # For non-github sources, use url instead of repo.
+  # This function converts Nix marketplace definitions into Claude Code format.
+  #
+  # INPUT SPECIFICATION (Nix definition):
+  #   {
+  #     source = {
+  #       type = "github";           # or "git" for full URLs
+  #       url = "owner/repo";        # GitHub short form: owner/repo
+  #                                   # OR full URL: https://github.com/owner/repo.git
+  #     };
+  #   }
+  #
+  # OUTPUT SPECIFICATION (Claude Code settings.json):
+  #   {
+  #     source = {
+  #       source = "github";         # Always "github" for GitHub repos
+  #       repo = "marketplace-key";  # The marketplace identifier
+  #     };
+  #   }
+  #
+  # TRANSFORMATION LOGIC:
+  #   - Both type="github" and type="git" become source="github" in output
+  #   - The marketplace KEY becomes the repo value (e.g., "anthropics/claude-code")
+  #   - Non-GitHub types keep their source type and url unchanged
+  #
+  # DOCUMENTATION LOCATION:
+  #   See modules/home-manager/ai-cli/claude-plugins.nix for detailed format docs
+  #   and examples of correct usage.
   #
   # Usage: Import this function in any module that needs to transform marketplaces:
   #   claudeRegistry = import ../../lib/claude-registry.nix { inherit lib; };
@@ -27,7 +52,7 @@ let
       if m.source.type == "github" || m.source.type == "git" then
         {
           source = "github";
-          repo = name; # "owner/repo" format (the key itself)
+          repo = name; # Marketplace key becomes repo value (e.g., "anthropics/claude-code")
         }
       else
         {
