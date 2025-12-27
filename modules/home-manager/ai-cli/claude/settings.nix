@@ -20,11 +20,12 @@ let
   claudeRegistry = import ../../../../lib/claude-registry.nix { inherit lib; };
   inherit (claudeRegistry) toClaudeMarketplaceFormat;
 
-  # Build the env attribute (merge user env vars with apiKeyHelper if enabled)
+  # Build the env attribute (merge user env vars with API_KEY_HELPER if enabled)
+  # Environment variable names must match POSIX convention: ^[A-Z_][A-Z0-9_]*$
   envAttrs =
     cfg.settings.env
     // lib.optionalAttrs cfg.apiKeyHelper.enable {
-      apiKeyHelper = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
+      API_KEY_HELPER = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
     };
 
   # Build the settings object

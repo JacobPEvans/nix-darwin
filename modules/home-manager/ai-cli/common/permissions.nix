@@ -119,19 +119,21 @@ in
     # Claude built-in tools (non-shell)
     # NOTE: Deny rules (denyRead) take precedence over allow rules (builtin)
     # as enforced by Claude Code at runtime when it evaluates these patterns,
-    # not by this Nix configuration itself. Even though Read(**) allows reading
+    # not by this Nix configuration itself. Even though Read allows reading
     # any file, the denyRead patterns will block sensitive files (.env, SSH keys,
     # etc.) when Claude Code processes the permission lists.
     claude = {
-      # Core built-in tools with glob patterns
+      # Core built-in tools (unconditional approval)
+      # Pattern format per Claude Code schema: Tool names without wildcards
+      # Use bare tool name for unconditional approval: Read, Glob, etc.
+      # Use tool with path for specific patterns: Read(/path/to/file)
       builtin = [
-        "Read(**)"
-        "Glob(**)"
-        "Grep(**)"
+        "Read"
+        "Glob"
+        "Grep"
         "WebSearch"
         "TodoWrite"
-        "TodoRead"
-        "SlashCommand(**)"
+        "SlashCommand"
       ];
 
       # WebFetch with allowed domains (dynamically generated from ai-assistant-instructions)
