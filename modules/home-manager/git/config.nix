@@ -42,7 +42,9 @@
     };
 
     # Pull behavior - rebase keeps history cleaner than merge commits
-    pull.rebase = true;
+    #pull.rebase = true;
+    # Pull behavior - hard error on non-linear history which can then be manually rebased
+    pull.ff = "only";
 
     # Push behavior
     push = {
