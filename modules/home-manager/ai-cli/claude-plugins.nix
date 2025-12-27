@@ -27,7 +27,8 @@
 
 let
   # Validate marketplace entry has correct nested structure
-  # Claude Code schema: { "id": { source: { source: "git", url: "..." } } }
+  # Claude Code schema: { "id": { source: { type: "git", url: "..." } } }
+  # Note: 'type' field matches options.nix marketplaceModule definition
   validateMarketplace =
     name: value:
     assert lib.assertMsg (builtins.isAttrs value)
@@ -36,8 +37,8 @@ let
       value ? source && builtins.isAttrs value.source
     ) "Marketplace '${name}' must have a 'source' attrset";
     assert lib.assertMsg (
-      value.source ? source && builtins.isString value.source.source
-    ) "Marketplace '${name}.source' must have a 'source' string (git, github, npm, etc)";
+      value.source ? type && builtins.isString value.source.type
+    ) "Marketplace '${name}.source' must have a 'type' string (git, github, local)";
     assert lib.assertMsg (
       value.source ? url && builtins.isString value.source.url
     ) "Marketplace '${name}.source' must have a 'url' string";
@@ -45,17 +46,17 @@ let
 
   # Official Anthropic plugin marketplaces
   # Plugins are fetched on-demand when enabled
-  # Format: object with marketplace ID as key, containing nested source object
+  # Format matches options.nix marketplaceModule: { source: { type, url } }
   marketplaces = {
     "anthropics/claude-code" = {
       source = {
-        source = "git";
+        type = "git";
         url = "https://github.com/anthropics/claude-code.git";
       };
     };
     "anthropics/claude-plugins-official" = {
       source = {
-        source = "git";
+        type = "git";
         url = "https://github.com/anthropics/claude-plugins-official.git";
       };
     };
