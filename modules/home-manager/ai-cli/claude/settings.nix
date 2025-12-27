@@ -32,11 +32,20 @@ let
     };
 
     # Plugin configuration
-    extraKnownMarketplaces = lib.mapAttrs (_: m: {
-      source = {
-        source = m.source.type;
-        inherit (m.source) url;
-      };
+    # Claude expects: { source: { source: "github", repo: "owner/repo" } }
+    # For non-github sources, use url instead
+    extraKnownMarketplaces = lib.mapAttrs (name: m: {
+      source =
+        if m.source.type == "github" || m.source.type == "git" then
+          {
+            source = "github";
+            repo = name; # The key itself is "owner/repo" format
+          }
+        else
+          {
+            source = m.source.type;
+            inherit (m.source) url;
+          };
     }) cfg.plugins.marketplaces;
 
     enabledPlugins = cfg.plugins.enabled;
