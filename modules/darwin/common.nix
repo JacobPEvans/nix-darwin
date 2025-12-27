@@ -195,25 +195,25 @@ in
       # Verify /run/current-system points to this generation
       # This catches silent activation failures where the build succeeds but
       # the symlink update doesn't happen (permissions, interrupts, etc.)
+      # NOTE: Does NOT exit on failure (would kill activation). Just warns.
       EXPECTED="$systemConfig"
       ACTUAL="$(readlink -f /run/current-system)"
 
       # Using POSIX-compliant [ ] test for portability
       if [ "$EXPECTED" != "$ACTUAL" ]; then
-        echo "❌ ERROR: Activation verification failed" >&2
+        echo "⚠️  WARNING: Activation verification detected a mismatch" >&2
         echo "Expected: $EXPECTED" >&2
         echo "Actual:   $ACTUAL" >&2
         echo "" >&2
-        echo "The /run/current-system symlink was not updated." >&2
-        echo "This is a critical error - the system is in an inconsistent state." >&2
-        echo "" >&2
-        echo "To fix this, run:" >&2
+        echo "This may indicate the /run/current-system symlink update is pending." >&2
+        echo "If this warning persists after activation completes, run:" >&2
         echo "  sudo /nix/var/nix/profiles/system/activate" >&2
         echo "" >&2
-        exit 1
+        # CRITICAL: Do NOT exit here - it kills the entire activation!
+        # Let activation complete and allow darwin-rebuild to update the symlink
+      else
+        echo "✅ Activation verified: /run/current-system updated successfully" >&2
       fi
-
-      echo "✅ Activation verified: /run/current-system updated successfully" >&2
     '';
 
     # macOS system version (required for nix-darwin)
