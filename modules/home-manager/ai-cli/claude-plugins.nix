@@ -104,6 +104,24 @@ let
         url = "obra/superpowers-marketplace";
       };
     };
+    "lunar-claude" = {
+      source = {
+        type = "github";
+        url = "basher83/lunar-claude";
+      };
+    };
+    "claude-code-plugins-plus" = {
+      source = {
+        type = "github";
+        url = "jeremylongshore/claude-code-plugins-plus";
+      };
+    };
+    "agents" = {
+      source = {
+        type = "github";
+        url = "wshobson/agents";
+      };
+    };
   };
 
   # Plugins to enable from the claude-code marketplace
@@ -194,6 +212,24 @@ let
     # Superpowers Marketplace plugins
     "superpowers@superpowers-marketplace" = true;
     "double-shot-latte@superpowers-marketplace" = true;
+
+    # ========================================================================
+    # Lunar Claude Marketplace Plugins
+    # ========================================================================
+    "proxmox-infrastructure@lunar-claude" = true;
+    "git-workflow@lunar-claude" = true;
+    "ansible-workflows@lunar-claude" = true;
+
+    # ========================================================================
+    # Claude Code Plugins Plus Marketplace
+    # ========================================================================
+    "infrastructure-as-code-generator@claude-code-plugins-plus" = true;
+    "terraform-module-builder@claude-code-plugins-plus" = true;
+
+    # ========================================================================
+    # WSHobson Agents Marketplace
+    # ========================================================================
+    # Add plugins from wshobson/agents as needed
 
     # Experimental: Autonomous iteration loops (commented out by default)
     # "ralph-wiggum@anthropics/claude-code" = true;
