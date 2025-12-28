@@ -171,12 +171,24 @@ in
   # ==========================================================================
   # Activation scripts run during darwin-rebuild to verify system state and prevent
   # silent activation failures that leave /run/current-system pointing to stale generations
+  #
+  # ⚠️  CRITICAL: See docs/ACTIVATION-SCRIPTS-RULES.md for mandatory activation script rules
+  # These rules are enforced to prevent silent partial deployments.
   system = {
     # Required for nix-darwin with Determinate Nix
     primaryUser = userConfig.user.name;
 
     activationScripts = {
       preActivation.text = ''
+        # CRITICAL: Disable 'set -e' to prevent non-zero exit codes from aborting
+        # the entire activation script. See docs/ACTIVATION-SCRIPTS-RULES.md Rule 1.
+        #
+        # Summary: nix-darwin's activate script uses 'set -e'. Commands like
+        # 'launchctl asuser' return non-zero exit codes even on success. Without
+        # 'set +e', the script aborts BEFORE updating /run/current-system, causing
+        # a silent partial deployment (home-manager updates but system stays old).
+        set +e
+
         echo "→ Starting activation (user: $(whoami), uid: $(id -u))"
 
         # Trap signals to prevent leaving system in bad state if interrupted
