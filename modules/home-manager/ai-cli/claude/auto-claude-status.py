@@ -107,6 +107,7 @@ def main():
     # Top-level quick actions (no dropdown)
     ctl = shlex.quote(str(CTL_SCRIPT))
     log_dir = shlex.quote(str(LOG_DIR))
+    print(f"Run Now | bash={ctl} param1='run' terminal=false refresh=true")
     print(f"Resume | bash={ctl} param1='resume' terminal=false refresh=true")
     print(f"Skip next run | bash={ctl} param1='skip' param2='1' terminal=false refresh=true")
 
@@ -142,7 +143,6 @@ def main():
     print("---")
 
     # Bottom actions
-    print(f"Run Now... | bash={ctl} param1='run' terminal=true")
     print("---")
     print(f"Open Logs Folder | bash='open {log_dir}' terminal=false")
     print(f"View Status | bash={ctl} param1='status' terminal=true")
