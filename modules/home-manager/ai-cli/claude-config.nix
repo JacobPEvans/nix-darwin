@@ -50,35 +50,22 @@ let
   # Auto-discovers all .md files in .claude/agents/
   cookbookAgents = discoverCommands "${claude-cookbooks}/.claude/agents";
 
-  # Marketplace shorthands for DRY plugin enablement
-  # NOTE: These must match the KEY format in known_marketplaces.json (not the repo path)
-  # Native Claude installs use "claude-plugins-official" not "anthropics/claude-plugins-official"
-  official = "claude-plugins-official";
-  superpowersMarketplace = "superpowers-marketplace";
+  # Import modular plugin configuration
+  # Plugin configuration moved to claude-plugins.nix and organized by category
+  # See: modules/home-manager/ai-cli/claude/plugins/*.nix
+  claudePlugins = import ./claude-plugins.nix {
+    inherit
+      config
+      lib
+      claude-code-plugins
+      claude-cookbooks
+      claude-plugins-official
+      anthropic-skills
+      ;
+  };
 
-  # Helper to create plugin@marketplace entries
-  mkPlugins = marketplace: plugins: lib.genAttrs (map (p: "${p}@${marketplace}") plugins) (_: true);
-
-  # Plugin enablement - map plugin names to their marketplace
-  # See: https://github.com/anthropics/claude-plugins-official
-  enabledPlugins =
-    mkPlugins official [
-      "commit-commands" # Git workflow
-      "code-review" # Code review
-      "pr-review-toolkit"
-      "feature-dev" # Development workflow
-      "security-guidance" # Security
-      "plugin-dev" # Plugin/hook development
-      "hookify"
-      "agent-sdk-dev" # SDK development
-      "frontend-design" # UI/UX
-      "explanatory-output-style" # Output styles
-      "learning-output-style"
-      # "ralph-wiggum"  # Experimental: autonomous iteration loops
-    ]
-    // mkPlugins superpowersMarketplace [
-      "superpowers"
-    ];
+  # Extract enabled plugins from modular configuration
+  inherit (claudePlugins.pluginConfig) enabledPlugins;
 
 in
 {
@@ -143,65 +130,9 @@ in
   };
 
   plugins = {
-    marketplaces = {
-      # Superset marketplace: 13 Anthropic plugins + 10 LSP servers + 11 MCP integrations
-      # (Replaces anthropics/claude-code which was a subset)
-      "anthropics/claude-plugins-official" = {
-        source = {
-          type = "git";
-          url = "https://github.com/anthropics/claude-plugins-official.git";
-        };
-        flakeInput = claude-plugins-official;
-      };
-      # Superpowers - comprehensive software development workflow system
-      # https://github.com/obra/superpowers-marketplace
-      "obra/superpowers-marketplace" = {
-        source = {
-          type = "git";
-          url = "https://github.com/obra/superpowers-marketplace.git";
-        };
-        flakeInput = superpowers-marketplace;
-      };
-
-      # Community marketplaces (no flake input - runtime fetch only)
-      # These are discoverable via /plugin install but not pinned in Nix
-      "BillChirico/bills-claude-skills" = {
-        source = {
-          type = "github";
-          url = "https://github.com/BillChirico/bills-claude-skills.git";
-        };
-      };
-      "ananddtyagi/cc-marketplace" = {
-        source = {
-          type = "github";
-          url = "https://github.com/ananddtyagi/cc-marketplace.git";
-        };
-      };
-      "claudeforge/marketplace" = {
-        source = {
-          type = "github";
-          url = "https://github.com/claudeforge/marketplace.git";
-        };
-      };
-      "ccplugins/awesome-claude-code-plugins" = {
-        source = {
-          type = "github";
-          url = "https://github.com/ccplugins/awesome-claude-code-plugins.git";
-        };
-      };
-      "ccplugins/marketplace" = {
-        source = {
-          type = "github";
-          url = "https://github.com/ccplugins/marketplace.git";
-        };
-      };
-      "wshobson/agents" = {
-        source = {
-          type = "github";
-          url = "https://github.com/wshobson/agents.git";
-        };
-      };
-    };
+    # Marketplaces from modular configuration
+    # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
+    inherit (claudePlugins.pluginConfig) marketplaces;
 
     enabled = enabledPlugins;
     # Enable runtime plugin installation from community marketplaces.

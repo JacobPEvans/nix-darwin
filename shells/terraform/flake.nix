@@ -1,60 +1,10 @@
 # Terraform/Terragrunt Development Shell
 #
-# Complete infrastructure-as-code environment with all tools found in
-# terraform-proxmox repo plus popular community tools.
+# Complete IaC environment: Terraform, Terragrunt, OpenTofu, Ansible, security scanners,
+# Proxmox tools, and utilities. See TOOLS.md for complete tool listing.
 #
-# NOTE: This shell allows unfree packages (Terraform uses BSL license).
-# OpenTofu is included as a fully open-source alternative.
-#
-# ════════════════════════════════════════════════════════════════
-# TERRAFORM/TERRAGRUNT TOOLS
-# ════════════════════════════════════════════════════════════════
-# - terraform: Core IaC tool
-# - terragrunt: Terraform wrapper for DRY configurations
-# - opentofu: Open source Terraform fork
-# - terraform-docs: Auto-generate documentation from modules
-# - tflint: Terraform linter for best practices
-#
-# ════════════════════════════════════════════════════════════════
-# SECURITY SCANNERS
-# ════════════════════════════════════════════════════════════════
-# - checkov: Security/compliance scanner (Bridgecrew)
-# - terrascan: Security scanner (Tenable)
-# - tfsec: Security scanner (Aqua)
-# - trivy: Comprehensive vulnerability scanner
-# - infracost: Cloud cost estimation
-#
-# ════════════════════════════════════════════════════════════════
-# CONFIGURATION MANAGEMENT & TESTING (Ansible/Molecule)
-# ════════════════════════════════════════════════════════════════
-# - ansible: Configuration management and automation
-# - ansible-lint: Ansible playbook linting
-# - molecule: Ansible role testing framework
-# - python3: Runtime for Ansible, Molecule, and pip packages
-#
-# ════════════════════════════════════════════════════════════════
-# CLOUD & STATE MANAGEMENT
-# ════════════════════════════════════════════════════════════════
-# - aws-cli: AWS CLI for S3 backend and credential management
-# - docker: Container runtime for Molecule testing
-#
-# ════════════════════════════════════════════════════════════════
-# GIT & UTILITIES
-# ════════════════════════════════════════════════════════════════
-# - pre-commit: Git hooks framework (also in system packages)
-# - markdownlint-cli2: Markdown linting (also in system packages)
-# - jq: JSON processor
-# - yq: YAML processor
-# - git: Version control
-#
-# Usage:
-#   1. nix develop (from project root)
-#   2. Or create .envrc with "use flake" and run direnv allow
-#
-# Python packages (from nixpkgs):
-#   - ansible: Core automation tool
-#   - molecule: Testing framework
-#   - docker: Python Docker client (for Molecule)
+# Usage: nix develop (or direnv allow with .envrc)
+# NOTE: Allows unfree packages (Terraform BSL license)
 
 {
   description = "Terraform/Terragrunt development environment";
@@ -136,6 +86,13 @@
               docker # Container runtime (required for Molecule testing)
 
               # ═══════════════════════════════════════════════════════════════
+              # PROXMOX VE TOOLS
+              # ═══════════════════════════════════════════════════════════════
+              proxmox-backup-client # Proxmox Backup Server client utilities
+              # NOTE: pvesh, qm, pct are host-only tools (access via SSH)
+              # Use Python proxmoxer library or Terraform providers for API access
+
+              # ═══════════════════════════════════════════════════════════════
               # UTILITIES & PROCESSORS
               # ═══════════════════════════════════════════════════════════════
               jq # JSON processor & formatter
@@ -144,40 +101,21 @@
             ];
 
             shellHook = ''
-              echo "═══════════════════════════════════════════════════════════════"
-              echo "Terraform/Terragrunt & Ansible Development Environment"
-              echo "═══════════════════════════════════════════════════════════════"
+              cat <<'BANNER'
+              ═══════════════════════════════════════════════════════════════
+              Terraform/Terragrunt & Ansible Development Environment
+              ═══════════════════════════════════════════════════════════════
+              BANNER
+
+              echo "Terraform: $(terraform version | head -1 | cut -d' ' -f2)"
+              echo "Terragrunt: $(terragrunt --version | cut -d' ' -f3)"
+              echo "OpenTofu: $(tofu version | head -1 | cut -d' ' -f2)"
               echo ""
-              echo "INFRASTRUCTURE AS CODE:"
-              echo "  - terraform: $(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1)"
-              echo "  - terragrunt: $(terragrunt --version 2>/dev/null | cut -d' ' -f3)"
-              echo "  - opentofu: $(tofu version 2>/dev/null | head -1)"
+              echo "Tools: terraform-docs, tflint, checkov, terrascan, tfsec, trivy"
+              echo "Config: ansible, molecule, python, aws-cli, docker, proxmox-backup-client"
+              echo "Docs: See TOOLS.md for complete tool listing"
               echo ""
-              echo "VALIDATION & DOCUMENTATION:"
-              echo "  - terraform-docs (auto-generate module docs)"
-              echo "  - tflint (Terraform linting)"
-              echo ""
-              echo "SECURITY SCANNING:"
-              echo "  - checkov, terrascan, tfsec, trivy"
-              echo ""
-              echo "CONFIGURATION MANAGEMENT:"
-              echo "  - ansible: $(ansible --version 2>/dev/null | head -1)"
-              echo "  - ansible-lint: $(ansible-lint --version 2>/dev/null)"
-              echo "  - molecule: $(molecule --version 2>/dev/null)"
-              echo "  - python: $(python3 --version 2>/dev/null)"
-              echo ""
-              echo "CLOUD & CONTAINER:"
-              echo "  - aws-cli: $(aws --version 2>/dev/null)"
-              echo "  - docker: $(docker --version 2>/dev/null)"
-              echo ""
-              echo "UTILITIES:"
-              echo "  - jq (JSON), yq (YAML), git (version control)"
-              echo ""
-              echo "GETTING STARTED:"
-              echo "  1. Configure AWS credentials: aws configure"
-              echo "  2. Configure Proxmox API token (environment variable or file)"
-              echo "  3. Initialize Terraform: terragrunt init"
-              echo "  4. Setup pre-commit hooks: pre-commit install"
+              echo "Quick start: aws configure → terragrunt init → pre-commit install"
               echo ""
             '';
           };
