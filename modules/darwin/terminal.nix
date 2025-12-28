@@ -48,7 +48,7 @@ in
     system.activationScripts.postActivation.text = lib.mkAfter ''
       # Configure Terminal.app default profile window size
       #
-      # NOTE: This activation script follows CRITICAL RULES from modules/darwin/common.nix:
+      # NOTE: This activation script follows CRITICAL RULES from docs/ACTIVATION-SCRIPTS-RULES.md:
       #   * NEVER use 'set -e' - errors must not abort the script
       #   * All errors logged as warnings, not fatal failures
       #   * Must reach /run/current-system symlink update (symlink update is critical)

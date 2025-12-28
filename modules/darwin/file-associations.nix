@@ -43,7 +43,7 @@ let
     # Restart Finder to apply changes immediately
     # (Launch Services database updates may not be visible until restart)
     # NOTE: Uses '|| true' to continue activation even if killall fails.
-    # This follows CRITICAL RULES from modules/darwin/common.nix:
+    # This follows CRITICAL RULES from docs/ACTIVATION-SCRIPTS-RULES.md:
     #   * Never use 'set -e' - errors must not abort the script
     #   * All errors treated as warnings, not fatal failures
     #   * Must reach /run/current-system symlink update (the critical phase)

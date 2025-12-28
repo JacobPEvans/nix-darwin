@@ -40,7 +40,7 @@ preActivation.text = ''
   set +e  # CRITICAL: Disable inherited 'set -e'
   # Now non-zero exits don't abort the script
   some-command-that-returns-2
-  echo "Continued despite exit code 2"
+  echo "Continued despite exit code 2" >&2
 ''
 ```
 
@@ -51,7 +51,10 @@ preActivation.text = ''
 - ❌ `|| exit 1` - Will abort the entire script
 - ❌ `set -e` or `set -o pipefail` - Will abort on errors
 - ❌ Unhandled command failures - Will be caught by inherited `set -e`
-- ❌ `exit 1` statements (except in trap handlers for critical failures)
+- ❌ `exit 1` statements (except in trap handlers or preflight checks for fatal preconditions)
+
+**Note on preflight checks**: Fatal precondition checks (like verifying `/run` is writable) that occur **before** any activation work begins are
+allowed to use `exit 1`. These must check conditions that would make the entire activation impossible, not just individual phase failures.
 
 **Allowed patterns**:
 

@@ -90,7 +90,7 @@ in
 
       # Apply the configuration with duti
       # NOTE: Using 'if ... then ... else ...' instead of '|| exit 1' pattern
-      # because we follow CRITICAL RULES in modules/darwin/common.nix:
+      # because we follow CRITICAL RULES in docs/ACTIVATION-SCRIPTS-RULES.md:
       #   * Never use constructs that exit early (set -e, || exit, etc.)
       #   * Treat all errors as warnings, not fatal failures
       #   * Must reach /run/current-system symlink update (the critical phase)

@@ -13,7 +13,7 @@
 # - Allow non-critical phases to fail without aborting (enforced by 'set +e' in preActivation)
 # - Report comprehensive error information with timestamps
 # - Keep debug output for future diagnostics
-# - Follow CRITICAL RULES in modules/darwin/common.nix:
+# - Follow CRITICAL RULES in docs/ACTIVATION-SCRIPTS-RULES.md:
 #   * NEVER use 'set -e' in activation scripts
 #   * TREAT ALL ERRORS AS WARNINGS, not fatal failures
 #   * Symlink update is the CRITICAL phase - must never abort before it
