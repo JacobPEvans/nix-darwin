@@ -44,7 +44,6 @@ _:
     # ========================================================================
     "code-documentation@agents" = true;
     "documentation-generation@agents" = true;
-    "c4-architecture@agents" = true;
 
     # ========================================================================
     # API Development
@@ -72,14 +71,10 @@ _:
     "python-development@agents" = true;
     "javascript-typescript@agents" = true;
     "systems-programming@agents" = true;
-    "jvm-languages@agents" = true;
-    "web-scripting@agents" = true;
-    "functional-programming@agents" = true;
 
     # ========================================================================
-    # Utilities & Collaboration
+    # Utilities
     # ========================================================================
     "dependency-management@agents" = true;
-    "team-collaboration@agents" = true;
   };
 }

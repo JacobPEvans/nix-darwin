@@ -35,9 +35,6 @@ _:
     # WSHobson Agents - Observability & Monitoring
     # ========================================================================
     "observability-monitoring@agents" = true;
-    "incident-response@agents" = true;
-    "error-diagnostics@agents" = true;
-    "distributed-debugging@agents" = true;
 
     # ========================================================================
     # WSHobson Agents - Security
@@ -50,8 +47,6 @@ _:
     # WSHobson Agents - Database & Performance
     # ========================================================================
     "database-design@agents" = true;
-    "database-migrations@agents" = true;
-    "database-cloud-optimization@agents" = true;
     "application-performance@agents" = true;
   };
 }
