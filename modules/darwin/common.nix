@@ -176,16 +176,7 @@ in
 
     activationScripts = {
       preActivation.text = ''
-        # DEBUG: Enable command tracing for activation debugging
-        set -x
-
-        echo "[DEBUG] ========================================" >&2
-        echo "[DEBUG] preActivation: Starting" >&2
-        echo "[DEBUG] User: $(whoami)" >&2
-        echo "[DEBUG] UID: $(id -u)" >&2
-        echo "[DEBUG] systemConfig: $systemConfig" >&2
-        echo "[DEBUG] Current /run/current-system: $(readlink -f /run/current-system 2>&1 || echo 'FAILED TO READ')" >&2
-        echo "[DEBUG] ========================================" >&2
+        echo "→ Starting activation (user: $(whoami), uid: $(id -u))"
 
         # Trap signals to prevent leaving system in bad state if interrupted
         cleanup() {
@@ -201,71 +192,17 @@ in
           echo "Check permissions and ensure running as root" >&2
           exit 1
         fi
-
-        echo "[DEBUG] preActivation: /run is writable" >&2
-        echo "[DEBUG] preActivation: Completed" >&2
       '';
 
+      # Runs after all activation scripts, just before symlink update
+      # NOTE: Can't verify /run/current-system here - it updates after this script
       postActivation.text = ''
-        # DEBUG: Log that we reached postActivation
-        echo "[DEBUG] postActivation: Starting verification" >&2
-        echo "[DEBUG] systemConfig=$systemConfig" >&2
+        # Get timestamps using ls -lT (macOS format: Mon DD HH:MM:SS YYYY)
+        # shellcheck disable=SC2012
+        TIMESTAMPS=$(ls -ldT "$systemConfig" 2>/dev/null | awk '{print $6, $7, $8, $9}')
 
-        # Verify /run/current-system points to this generation
-        # This catches silent activation failures where the build succeeds but
-        # the symlink update doesn't happen (permissions, interrupts, etc.)
-        # NOTE: Does NOT exit on failure (would kill activation). Just warns.
-        EXPECTED="$systemConfig"
-        ACTUAL="$(readlink -f /run/current-system)"
-
-        echo "[DEBUG] EXPECTED=$EXPECTED" >&2
-        echo "[DEBUG] ACTUAL=$ACTUAL" >&2
-
-        # Using POSIX-compliant [ ] test for portability
-        if [ "$EXPECTED" != "$ACTUAL" ]; then
-          echo "⚠️  WARNING: Activation verification detected a mismatch" >&2
-          echo "Expected: $EXPECTED" >&2
-          echo "Actual:   $ACTUAL" >&2
-          echo "" >&2
-          echo "This may indicate the /run/current-system symlink update is pending." >&2
-          echo "If this warning persists after activation completes, run:" >&2
-          echo "  sudo /nix/var/nix/profiles/system/activate" >&2
-          echo "" >&2
-          # CRITICAL: Do NOT exit here - it kills the entire activation!
-          # Let activation complete and allow darwin-rebuild to update the symlink
-        else
-          echo "✅ Activation verified: /run/current-system updated successfully" >&2
-        fi
-
-        echo "[DEBUG] postActivation: Completed" >&2
-      '';
-
-      # CRITICAL DEBUG: This runs as close to the end as possible
-      # According to research, the symlink update is the LAST command in the activate script
-      # If this runs, we know we got past all other activation scripts
-      finalDebug.text = ''
-        echo "[DEBUG] ========================================" >&2
-        echo "[DEBUG] finalDebug: This is the LAST activation script before symlink update" >&2
-        echo "[DEBUG] systemConfig=$systemConfig" >&2
-        echo "[DEBUG] Current /run/current-system: $(readlink -f /run/current-system)" >&2
-        echo "[DEBUG] Expected after update: $systemConfig" >&2
-        echo "[DEBUG] Current directory: $(pwd)" >&2
-        echo "[DEBUG] Script running as: $(whoami) (UID: $(id -u))" >&2
-        echo "[DEBUG] /run permissions: $(ls -ld /run)" >&2
-        echo "[DEBUG] /run/current-system permissions: $(ls -l /run/current-system)" >&2
-        echo "[DEBUG] Testing if we can create symlink..." >&2
-
-        # Test symlink creation ability
-        TEST_LINK="/tmp/test-symlink-$$"
-        if ln -sfn "$systemConfig" "$TEST_LINK" 2>&1; then
-          echo "[DEBUG] ✅ Can create symlinks (test: $TEST_LINK -> $systemConfig)" >&2
-          rm -f "$TEST_LINK"
-        else
-          echo "[DEBUG] ❌ CANNOT create symlinks! Error: $?" >&2
-        fi
-
-        echo "[DEBUG] About to exit finalDebug - next is the ln -sfn for /run/current-system" >&2
-        echo "[DEBUG] ========================================" >&2
+        echo "✅ Activation complete → $systemConfig"
+        echo "   Timestamp: $TIMESTAMPS"
       '';
     };
 
