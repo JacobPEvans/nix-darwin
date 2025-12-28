@@ -45,7 +45,6 @@ _:
     "security-scanning@agents" = true;
     "security-compliance@agents" = true;
     "backend-api-security@agents" = true;
-    "frontend-mobile-security@agents" = true;
 
     # ========================================================================
     # WSHobson Agents - Database & Performance

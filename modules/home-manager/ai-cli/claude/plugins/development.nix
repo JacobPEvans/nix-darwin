@@ -15,9 +15,7 @@ _:
     # Core Development Workflows
     # ========================================================================
     "backend-development@agents" = true;
-    "frontend-mobile-development@agents" = true;
     "full-stack-orchestration@agents" = true;
-    "multi-platform-apps@agents" = true;
 
     # ========================================================================
     # Git & PR Workflows
@@ -77,26 +75,11 @@ _:
     "jvm-languages@agents" = true;
     "web-scripting@agents" = true;
     "functional-programming@agents" = true;
-    "arm-cortex-microcontrollers@agents" = true;
-
-    # ========================================================================
-    # Specialized Domains
-    # ========================================================================
-    "blockchain-web3@agents" = true;
-    "quantitative-trading@agents" = true;
-    "payment-processing@agents" = true;
-    "game-development@agents" = true;
 
     # ========================================================================
     # Utilities & Collaboration
     # ========================================================================
     "dependency-management@agents" = true;
     "team-collaboration@agents" = true;
-    "accessibility-compliance@agents" = true;
-
-    # ========================================================================
-    # Modernization
-    # ========================================================================
-    "framework-migration@agents" = true;
   };
 }

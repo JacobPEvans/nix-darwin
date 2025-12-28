@@ -6,7 +6,6 @@
 # - community.nix: Community marketplace plugins
 # - infrastructure.nix: Infrastructure, DevOps, and cloud operations
 # - development.nix: Software development and engineering tools
-# - business.nix: Business operations and marketing
 #
 # Each module exports an enabledPlugins attrset that gets merged.
 # The marketplaces module exports a marketplaces attrset.
@@ -20,15 +19,13 @@ let
   communityModule = import ./community.nix { };
   infrastructureModule = import ./infrastructure.nix { };
   developmentModule = import ./development.nix { };
-  businessModule = import ./business.nix { };
 
   # Merge all enabled plugins from category modules
   enabledPlugins =
     officialModule.enabledPlugins
     // communityModule.enabledPlugins
     // infrastructureModule.enabledPlugins
-    // developmentModule.enabledPlugins
-    // businessModule.enabledPlugins;
+    // developmentModule.enabledPlugins;
 in
 {
   # Return the complete plugin configuration
