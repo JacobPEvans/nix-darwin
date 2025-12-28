@@ -75,9 +75,10 @@ Configured via `additionalDirectories` in `modules/home-manager/ai-cli/claude.ni
 
 3. **Invalid permission patterns**: Wildcards must follow strict format
    - Rule: Bash commands must end with `:*` (e.g., `Bash(git status:*)`)
+   - Rule: Built-in tools use bare names for unconditional approval (e.g., `Read`, `Glob`, `Grep`)
    - Rule: Only 0 or 1 wildcards per pattern, none in the middle
-   - Valid: `Bash(git log:*)`, `Read(**)`
-   - Invalid: `Bash(git * status:*)`, `Bash(npm run:*:*)`
+   - Valid: `Bash(git log:*)`, `Read`, `Glob`, `WebFetch(domain:github.com)`
+   - Invalid: `Bash(git * status:*)`, `Bash(npm run:*:*)`, `Read(**)`, `Glob(**)`
 
 **Verification steps**:
 
