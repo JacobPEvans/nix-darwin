@@ -176,6 +176,8 @@ in
 
     activationScripts = {
       preActivation.text = ''
+        echo "→ Starting activation (user: $(whoami), uid: $(id -u))" >&2
+
         # Trap signals to prevent leaving system in bad state if interrupted
         cleanup() {
           echo "❌ Activation interrupted - system may be in an inconsistent state" >&2
@@ -192,14 +194,10 @@ in
         fi
       '';
 
-      # NOTE: Removed postActivation check - it ran too early in the activation flow.
-      # The /run/current-system symlink is updated by darwin-rebuild AFTER all
-      # activation scripts complete, so any check here would always show a mismatch.
-
-      # Final activation marker - runs just before symlink update
-      # The /run/current-system symlink update happens after all activation scripts
-      finalActivation.text = ''
-        echo "✅ Activation complete - system configuration applied successfully" >&2
+      # Runs after all activation scripts, just before symlink update
+      # NOTE: Can't verify /run/current-system here - it updates after this script
+      postActivation.text = ''
+        echo "✅ Activation complete → $systemConfig" >&2
       '';
     };
 
