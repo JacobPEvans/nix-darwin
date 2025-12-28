@@ -45,12 +45,6 @@ let
     # Official Anthropic Marketplaces
     # ========================================================================
     # Keys must be full GitHub paths (owner/repo) for correct transformation
-    "anthropics/claude-code" = {
-      source = {
-        type = "github";
-        url = "anthropics/claude-code";
-      };
-    };
     "anthropics/claude-plugins-official" = {
       source = {
         type = "github";
