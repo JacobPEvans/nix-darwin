@@ -238,6 +238,21 @@ in
           executable = true;
         };
 
+        # Deploy monitoring and reporting modules (always deployed, not gated by reporting.enable)
+        # These are dependencies of auto-claude-monitor.py which runs after each auto-claude run
+        ".claude/scripts/auto-claude-db.py" = {
+          source = ./auto-claude-db.py;
+          executable = true;
+        };
+        ".claude/scripts/auto-claude-monitor.py" = {
+          source = ./auto-claude-monitor.py;
+          executable = true;
+        };
+        ".claude/scripts/auto-claude-digest.py" = {
+          source = ./auto-claude-digest.py;
+          executable = true;
+        };
+
         # Deploy BWS config template (user copies to .env and fills in values)
         ".config/bws/.env.example" = {
           source = ./bws-env.example;

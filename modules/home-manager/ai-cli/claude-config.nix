@@ -80,41 +80,70 @@ in
   };
 
   # Auto-Claude: Scheduled autonomous maintenance
-  # ENABLED - Uses Sonnet model only (--model sonnet enforced in auto-claude.sh)
+  # ENABLED - Uses Haiku model for cost-efficiency (set via ANTHROPIC_MODEL env var)
   # Resource limits: max 10 PRs, max 50 issues, max 1 analysis per item per run
   autoClaude = {
     enable = true;
     repositories = {
-      # ai-assistant-instructions: disabled (was running at even hours)
+      # ai-assistant-instructions: enabled with even-hour schedule
       # Uses local repo (not Nix store) because autoClaude needs writable git
       ai-assistant-instructions = {
-        enabled = false;
+        enabled = true;
         path = autoClaudeLocalRepoPath;
-        schedule.hours = [ ]; # Empty schedule - no runs
+        schedule.hours = [
+          0
+          2
+          4
+          6
+          8
+          10
+          12
+          14
+          16
+          18
+          20
+          22
+        ]; # Every 2 hours
         maxBudget = 20.0;
       };
-      # nix config: disabled (was running at odd hours)
+      # nix config: enabled with odd-hour schedule (staggered to prevent concurrent runs)
       nix = {
-        enabled = false;
+        enabled = true;
         path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hours = [ ]; # Empty schedule - no runs
+        schedule.hours = [
+          1
+          3
+          5
+          7
+          9
+          11
+          13
+          15
+          17
+          19
+          21
+          23
+        ]; # Every 2 hours (offset)
         maxBudget = 20.0;
       };
     };
 
     # Reporting: Twice-daily utilization reports and real-time anomaly alerts
     reporting = {
-      enable = false;
+      enable = true;
 
-      # Scheduled digest reports (disabled)
+      # Scheduled digest reports (8am and 5pm EST)
       scheduledReports = {
-        times = [ ]; # Empty - no scheduled reports
-        slackChannel = ""; # Retrieve from BWS when re-enabled
+        times = [
+          "08:00"
+          "17:00"
+        ]; # 8am and 5pm EST
+        slackChannel = ""; # Retrieve from BWS at runtime
       };
 
       # Real-time anomaly detection
       alerts = {
-        enable = false;
+        enable = true;
         contextThreshold = 90;
         budgetThreshold = 50;
         tokensNoOutput = 50000;
@@ -174,10 +203,10 @@ in
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # Model selection is dynamic (via /model command or shell env).
-      # To set a default in this config, uncomment below.
-      # ANTHROPIC_MODEL = "sonnet";  # Default model for new sessions.
-      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-sonnet-4-5-20250929"; # For sub-agents; full model ID required. Left disabled to use orchestrator defaults; uncomment only to force a specific sub-agent model.
+      # Model selection: Haiku is default for cost-efficiency and speed.
+      # Override with /model command in interactive sessions if needed.
+      ANTHROPIC_MODEL = "haiku"; # Default model for all sessions and auto-claude.
+      CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Force haiku for sub-agents.
       # ANTHROPIC_DEFAULT_OPUS_MODEL = "";
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "";

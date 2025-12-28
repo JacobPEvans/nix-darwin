@@ -199,7 +199,7 @@ command -v gtimeout &>/dev/null && TIMEOUT_CMD="gtimeout 3600"
 command -v timeout &>/dev/null && [[ -z "$TIMEOUT_CMD" ]] && TIMEOUT_CMD="timeout 3600"
 
 $TIMEOUT_CMD claude -p "$ORCHESTRATOR_PROMPT" \
-  --model sonnet \
+  --model haiku \
   --output-format stream-json \
   --verbose \
   --max-budget-usd "$MAX_BUDGET_USD" \

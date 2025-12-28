@@ -120,22 +120,11 @@ in
 
   config = lib.mkIf reportingEnabled {
     home = {
-      # Deploy Python scripts and ensure log directory exists
-      # Note: Python environment (pythonWithDeps) is referenced directly in launchd config below
+      # Note: Python scripts (auto-claude-db.py, auto-claude-digest.py, auto-claude-monitor.py)
+      # are now deployed unconditionally by auto-claude.nix, not here.
+      # This prevents deployment conflicts when reporting is enabled.
       file = {
         "${logDir}/.gitkeep".text = "";
-        "${scriptDir}/auto-claude-db.py" = {
-          executable = true;
-          text = builtins.readFile ./auto-claude-db.py;
-        };
-        "${scriptDir}/auto-claude-digest.py" = {
-          executable = true;
-          text = builtins.readFile ./auto-claude-digest.py;
-        };
-        "${scriptDir}/auto-claude-monitor.py" = {
-          executable = true;
-          text = builtins.readFile ./auto-claude-monitor.py;
-        };
       };
 
       # Reminder to user: alert integration happens in auto-claude.sh
