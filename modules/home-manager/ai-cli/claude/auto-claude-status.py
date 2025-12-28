@@ -100,30 +100,35 @@ def get_recent_logs(limit: int = 5) -> list[tuple[str, str, str]]:
 def main():
     icon, status, color = get_status()
 
-    # Menu bar title
-    print(icon)
-    print("---")
-    print("Auto-Claude Status | size=14")
-    print(f"{status} | color={color}")
+    # Menu bar title (status stays first)
+    print(f"{icon} {status} | color={color}")
     print("---")
 
-    # Control file info
-    if CONTROL_FILE.exists():
-        try:
-            with open(CONTROL_FILE) as f:
-                data = json.load(f)
-            last_run = data.get("last_run", "never")
-            last_repo = data.get("last_run_repo", "unknown")
-            print(f"Last run: {last_run}")
-            print(f"Repo: {last_repo}")
-        except Exception:
-            print("Last run: error | color=red")
-    else:
-        print("Last run: never | color=gray")
+    # Top-level quick actions (no dropdown)
+    ctl = shlex.quote(str(CTL_SCRIPT))
+    log_dir = shlex.quote(str(LOG_DIR))
+    print(f"Resume | bash={ctl} param1='resume' terminal=false refresh=true")
+    print(f"Skip next run | bash={ctl} param1='skip' param2='1' terminal=false refresh=true")
+
+    # Pause submenu with all options
+    print("--Pause for:")
+    for hours in [1, 2, 4, 6, 8, 12]:
+        label = f"{hours} hour" if hours == 1 else f"{hours} hours"
+        print(f"----{label} | bash={ctl} param1='pause' param2='{hours}' terminal=false refresh=true")
+
+    # Calculate hours until midnight for "pause until midnight" option
+    now = datetime.now()
+    midnight = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    hours_until_midnight = max(1, int((midnight - now).total_seconds() / 3600) + 1)
+    print(f"----Until midnight | bash={ctl} param1='pause' param2='{hours_until_midnight}' terminal=false refresh=true")
+
+    # Add 1 day and 2 days options
+    print(f"----1 day | bash={ctl} param1='pause' param2='24' terminal=false refresh=true")
+    print(f"----2 days | bash={ctl} param1='pause' param2='48' terminal=false refresh=true")
 
     print("---")
 
-    # Recent logs
+    # Recent logs section
     print("Recent Logs | size=12")
     logs = get_recent_logs()
     if logs:
@@ -136,24 +141,8 @@ def main():
 
     print("---")
 
-    # Actions - escape paths to prevent potential shell injection
-    ctl = shlex.quote(str(CTL_SCRIPT))
-    log_dir = shlex.quote(str(LOG_DIR))
-    print("Actions | size=12")
-    print(f"  Resume | bash={ctl} param1='resume' terminal=false refresh=true")
-    # Pause duration submenu with multiple options
-    print("--Pause Duration")
-    for hours in [1, 2, 4, 6, 8, 12]:
-        label = f"{hours} hour" if hours == 1 else f"{hours} hours"
-        print(f"----{label} | bash={ctl} param1='pause' param2='{hours}' terminal=false refresh=true")
-    # Calculate hours until midnight for "pause until midnight" option
-    now = datetime.now()
-    midnight = now.replace(hour=23, minute=59, second=59, microsecond=0)
-    hours_until_midnight = max(1, int((midnight - now).total_seconds() / 3600) + 1)
-    print(f"----Until midnight | bash={ctl} param1='pause' param2='{hours_until_midnight}' terminal=false refresh=true")
-    print(f"--Skip next run | bash={ctl} param1='skip' param2='1' terminal=false refresh=true")
-    print("---")
-    print(f"  Run Now... | bash={ctl} param1='run' terminal=true")
+    # Bottom actions
+    print(f"Run Now... | bash={ctl} param1='run' terminal=true")
     print("---")
     print(f"Open Logs Folder | bash='open {log_dir}' terminal=false")
     print(f"View Status | bash={ctl} param1='status' terminal=true")
