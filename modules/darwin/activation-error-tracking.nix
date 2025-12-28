@@ -34,6 +34,7 @@
     track_activation_phase() {
       local phase_name="$1"
       local exit_code="$2"
+      # shellcheck disable=SC2034
       local phase_duration=$(($(date '+%s') - PHASE_START_TIME))
 
       if [ "$exit_code" -ne 0 ]; then
