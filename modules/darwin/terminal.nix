@@ -47,6 +47,12 @@ in
   config = lib.mkIf cfg.enable {
     system.activationScripts.postActivation.text = lib.mkAfter ''
       # Configure Terminal.app default profile window size
+      #
+      # NOTE: This activation script follows CRITICAL RULES from modules/darwin/common.nix:
+      #   * NEVER use 'set -e' - errors must not abort the script
+      #   * All errors logged as warnings, not fatal failures
+      #   * Must reach /run/current-system symlink update (symlink update is critical)
+      # This is why we use 'if ... then ... else echo warning' instead of '|| exit' patterns
       PLIST="${userConfig.user.homeDir}/Library/Preferences/com.apple.Terminal.plist"
       PROFILE="${cfg.profile}"
       COLUMNS=${toString cfg.windowSize.columns}

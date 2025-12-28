@@ -89,12 +89,18 @@ in
       )}
 
       # Apply the configuration with duti
+      # NOTE: Using 'if ... then ... else ...' instead of '|| exit 1' pattern
+      # because we follow CRITICAL RULES in modules/darwin/common.nix:
+      #   * Never use constructs that exit early (set -e, || exit, etc.)
+      #   * Treat all errors as warnings, not fatal failures
+      #   * Must reach /run/current-system symlink update (the critical phase)
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
         echo "Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)" >&2
 
         # Rebuild Launch Services database to ensure changes take effect
         # Note: lsregister can fail on some systems, so we add error handling to prevent
         # activation failure. The file mappings still work even if lsregister fails.
+        # Again using if/then/else to continue activation on failure (not || exit pattern)
         if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>&1; then
           echo "Launch Services database rebuilt" >&2
         else

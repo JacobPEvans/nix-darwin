@@ -42,6 +42,11 @@ let
 
     # Restart Finder to apply changes immediately
     # (Launch Services database updates may not be visible until restart)
+    # NOTE: Uses '|| true' to continue activation even if killall fails.
+    # This follows CRITICAL RULES from modules/darwin/common.nix:
+    #   * Never use 'set -e' - errors must not abort the script
+    #   * All errors treated as warnings, not fatal failures
+    #   * Must reach /run/current-system symlink update (the critical phase)
     /usr/bin/killall Finder 2>/dev/null || true
   '';
 
