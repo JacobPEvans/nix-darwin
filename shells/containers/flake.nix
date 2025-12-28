@@ -85,7 +85,7 @@
                 echo "  3. Deploy with: helm install <release> <chart>"
                 echo "  4. Manage cluster: kubectl apply -f <manifests>"
                 echo ""
-              } >&2
+              }
             '';
           };
         }

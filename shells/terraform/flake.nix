@@ -88,7 +88,7 @@
                 echo "  3. Initialize Terraform: terragrunt init"
                 echo "  4. Setup pre-commit hooks: pre-commit install"
                 echo ""
-              } >&2
+              }
             '';
           };
         }

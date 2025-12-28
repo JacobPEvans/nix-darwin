@@ -74,7 +74,7 @@
                 echo "  2. Build with: packer build <template.hcl>"
                 echo "  3. Test configurations with: molecule test"
                 echo ""
-              } >&2
+              }
             '';
           };
         }
