@@ -21,42 +21,6 @@ in
   ];
 
   # ==========================================================================
-  # Activation System Configuration
-  # ==========================================================================
-  # Enable comprehensive error tracking and debugging for all activation phases
-  # This helps diagnose issues like exit code 2 from launchctl asuser calls
-  system.activationScripts.postActivation.text = lib.mkAfter ''
-    # ====================================================================
-    # Post-Activation Verification & Comprehensive Diagnostics
-    # ====================================================================
-    # Verify that the activation actually succeeded despite any non-zero exit codes
-    # from intermediate commands (e.g., launchctl asuser for home-manager)
-
-    echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..." >&2
-
-    # Check if /run/current-system symlink was updated (proves activation succeeded)
-    if [ -L /run/current-system ]; then
-      CURRENT_SYSTEM=$(readlink /run/current-system)
-      echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded" >&2
-      echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM" >&2
-    else
-      echo "[$(date '+%H:%M:%S')] [ERROR] /run/current-system symlink not found" >&2
-      echo "[$(date '+%H:%M:%S')] [ERROR] Activation may have failed - check logs above" >&2
-    fi
-
-    # Report common non-critical exit codes that shouldn't block activation
-    if [ ''${1:-0} -eq 2 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Note: Intermediate command returned exit code 2 (non-critical)" >&2
-      echo "[$(date '+%H:%M:%S')] [INFO] This can occur from launchctl asuser calls even when activation succeeds" >&2
-      echo "[$(date '+%H:%M:%S')] [INFO] Verify /run/current-system reflects the expected system configuration" >&2
-    fi
-
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-  '';
-
-  # ==========================================================================
   # Nixpkgs Configuration
   # ==========================================================================
   nixpkgs.config.allowUnfree = true;
@@ -240,6 +204,29 @@ in
 
         echo "✅ Activation complete → $systemConfig"
         echo "   Timestamp: $TIMESTAMPS"
+
+        # ====================================================================
+        # Post-Activation Comprehensive Diagnostics
+        # ====================================================================
+        # Verify that the activation actually succeeded and provide clear
+        # diagnostics for debugging exit code issues (especially exit code 2
+        # from launchctl asuser calls during home-manager activation)
+
+        echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..." >&2
+
+        # Check if /run/current-system symlink was updated (proves activation succeeded)
+        if [ -L /run/current-system ]; then
+          CURRENT_SYSTEM=$(readlink /run/current-system)
+          echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded" >&2
+          echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM" >&2
+        else
+          echo "[$(date '+%H:%M:%S')] [ERROR] /run/current-system symlink not found" >&2
+          echo "[$(date '+%H:%M:%S')] [ERROR] Activation may have failed - check logs above" >&2
+        fi
+
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
       '';
     };
 
