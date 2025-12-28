@@ -231,22 +231,6 @@ collections:
 
 ---
 
-## Version Pinning Strategy
-
-**Development Shell (Current):**
-
-- Uses `nixpkgs-unstable` for latest versions
-- Pinned via flake.lock (deterministic)
-- Per-project pinning possible if needed
-
-**System Packages (If Added):**
-
-- Would use same nixpkgs channel as main system
-- Updated via `nix flake update`
-- Requires explicit approval per CLAUDE.md
-
----
-
 ## Optional Enhancements
 
 ### TFLint Plugins (if needed)
@@ -277,35 +261,6 @@ For prettier/markdownlint via Node (instead of CLI):
 nodejs
 pnpm
 ```
-
----
-
-## Migration to System Packages
-
-If you later want these tools always available:
-
-**Step 1:** Copy package list to home-manager
-
-```nix
-# modules/home-manager/packages.nix
-home.packages = with pkgs; [
-  # Copy buildInputs from shells/terraform/flake.nix
-  terraform
-  terragrunt
-  ansible
-  ansible-lint
-  molecule
-  # ... etc
-];
-```
-
-**Step 2:** Rebuild
-
-```bash
-darwin-rebuild switch --flake .
-```
-
-**Step 3:** Keep development shell for per-project isolation
 
 ---
 

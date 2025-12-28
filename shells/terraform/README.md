@@ -53,132 +53,6 @@ direnv allow
 
 ---
 
-## Nix Organization Architecture
-
-This development shell demonstrates **one of three approaches** for organizing
-Nix-based tooling. Understanding these options helps you choose the right
-pattern for your needs.
-
-### Approach 1: Project-Specific Development Shells (CURRENT)
-
-**Location:** `shells/terraform/flake.nix`
-**Use Case:** Tools needed only for specific projects or workflows
-
-**Advantages:**
-
-- ✓ Isolated dependencies per project
-- ✓ Easy to share across projects with `nix develop <path>`
-- ✓ No system bloat - tools only loaded when needed
-- ✓ Per-project version pinning possible
-- ✓ Works great with direnv for automatic activation
-
-**How to use:**
-
-```bash
-# Manual activation
-nix develop <path-to-your-nix-config-repo>/shells/terraform
-
-# Or with direnv (recommended)
-echo "use flake <path-to-your-nix-config-repo>/shells/terraform" > .envrc
-direnv allow
-```
-
-**Example structure:**
-
-```text
-shells/
-├── terraform/flake.nix          # Terraform/Terragrunt/Ansible tools
-├── python/flake.nix             # Python data science stack
-├── js/flake.nix                 # Node.js web development
-└── go/flake.nix                 # Go development
-```
-
----
-
-### Approach 2: System-Wide Packages (Alternative)
-
-**Location:** `modules/darwin/packages.nix` or `modules/home-manager/packages.nix`
-**Use Case:** Tools you need in every shell globally
-
-**When to use:**
-
-- Tools needed in multiple projects
-- Essential CLIs you always want available
-- No version conflicts with system tools
-
-**Example:** Adding to home-manager config
-
-```nix
-home.packages = with pkgs; [
-  terraform
-  terragrunt
-  ansible
-  aws-cli2
-  docker
-];
-```
-
-**Advantages:**
-
-- ✓ Tools always available in any shell
-- ✓ Single declarative system config
-- ✓ Works with nix-darwin rebuilds
-
-**Disadvantages:**
-
-- ✗ Larger system closure (slower rebuilds)
-- ✗ Tools accumulate over time
-- ✗ Global state management complexity
-
----
-
-### Approach 3: Per-Host Module (Alternative)
-
-**Location:** `modules/darwin/` subdirectory or `modules/home-manager/ai-cli/`
-**Use Case:** Tools specific to a particular host/workflow configuration
-
-**Example:** `modules/home-manager/iac-tools/default.nix`
-
-```nix
-{ pkgs, ... }:
-{
-  home.packages = with pkgs; [
-    # IaC tools
-    terraform
-    terragrunt
-    # ... etc
-  ];
-}
-```
-
----
-
-## Recommended Approach
-
-For the terraform-proxmox project:
-
-✓ **Use Approach 1 (Development Shell)** - This is already configured!
-
-**Why:**
-
-1. terraform-proxmox has specific version requirements
-2. Not all system users need Terraform/Ansible tools
-3. Each project can use its own development environment
-4. Keeps system configuration lean
-5. Compatible with direnv for automatic activation
-
----
-
-## Migration Path (If Needed Later)
-
-If you later decide to add these tools globally:
-
-1. **For system-wide use:** Copy package list to `modules/home-manager/packages.nix`
-2. **For host-specific use:** Create new module in `modules/home-manager/`
-3. **Keep development shells** for project-specific pinning and testing
-
----
-
 ## Terraform Providers
 
 The following providers are automatically managed by Terraform:
@@ -289,27 +163,13 @@ molecule test
 
 ---
 
-## Updating Tools
-
-Since this uses `nixpkgs/nixpkgs-unstable`, tools are automatically at latest versions from the nixpkgs channel.
-
-To update to a specific nixpkgs commit:
-
-```bash
-# Edit flake.nix to use a specific revision
-nixpkgs.url = "github:nixos/nixpkgs/5d7c61bb5183a81e8f1bc1fcb38e2d2c87be0e63";
-```
-
-For version-pinning strategy, see the main CLAUDE.md documentation.
-
----
-
 ## File Organization
 
 ```text
 shells/terraform/
 ├── flake.nix              # Nix development environment definition
-└── README.md              # This file
+├── README.md              # This file
+└── DEPENDENCIES.md        # Complete dependency mapping
 
 terraform-proxmox/
 ├── terragrunt.hcl         # Terragrunt configuration
