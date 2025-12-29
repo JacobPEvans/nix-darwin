@@ -118,48 +118,54 @@ def get_last_run_info() -> Optional[dict]:
 
     log_file = logs[0]
     try:
-        # Extract repo name from filename (e.g., "nix_20251228_150002" -> "nix")
-        # Use rsplit to handle repo names with underscores (e.g., "my_repo_20251228" -> "my_repo")
+        # Extract repo name and run_id from filename
+        # Format: "{repo}_{YYYYMMDD}_{HHMMSS}.jsonl"
+        # Use rsplit to handle repo names with underscores (e.g., "my_repo_20251228_150002")
         parts = log_file.stem.rsplit("_", 2)  # Split from right, max 2 splits
-        repo_name = parts[0] if len(parts) >= 3 else log_file.stem
-
-        # Read only last 50 lines for efficiency (avoid loading huge files into memory)
-        with open(log_file, "rb") as f:
-            # Seek to end and read last ~5KB (roughly 50-100 lines)
-            try:
-                f.seek(-5120, 2)  # Seek 5KB from end
-            except OSError:
-                # File smaller than 5KB, read from start
-                f.seek(0)
-            lines = f.read().decode("utf-8", errors="ignore").splitlines()
-
-        # Try to find exit status from the last events
-        exit_status = None
-        for line in reversed(lines[-50:]):  # Check last 50 lines
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                event = json.loads(line)
-                if "exit_code" in event:
-                    exit_status = event["exit_code"]
-                    break
-                if event.get("event_type") == "run_completed":
-                    exit_status = event.get("exit_code", 0)
-                    break
-            except json.JSONDecodeError:
-                continue
+        if len(parts) >= 3:
+            repo_name = parts[0]
+            run_id = f"{parts[1]}_{parts[2]}"  # Reconstruct run_id from date_time
+        else:
+            # Fallback for unexpected format
+            repo_name = log_file.stem
+            run_id = None
 
         # Get file modification time
         mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
         time_str = mtime.strftime("%H:%M")
+
+        # Find exit_code from events.jsonl (where run_completed events are written)
+        exit_status = None
+        events_file = LOG_DIR / "events.jsonl"
+        if run_id and events_file.exists():
+            with open(events_file, "rb") as f:
+                # Read last ~10KB to find recent run_completed events
+                try:
+                    f.seek(-10240, 2)  # Seek 10KB from end
+                except OSError:
+                    # File smaller than 10KB, read from start
+                    f.seek(0)
+                lines = f.read().decode("utf-8", errors="ignore").splitlines()
+
+            # Search for run_completed event matching this run_id
+            for line in reversed(lines):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    event = json.loads(line)
+                    if event.get("event") == "run_completed" and event.get("run_id") == run_id:
+                        exit_status = event.get("exit_code")
+                        break
+                except json.JSONDecodeError:
+                    continue
 
         return {
             "repo": repo_name,
             "time": time_str,
             "exit_status": exit_status
         }
-    except Exception:
+    except (IOError, IndexError):
         return None
 
 
