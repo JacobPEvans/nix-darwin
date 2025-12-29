@@ -97,16 +97,114 @@ def get_recent_logs(limit: int = 5) -> list[tuple[str, str, str]]:
     return result
 
 
+def get_last_run_info() -> Optional[dict]:
+    """Extract last run info from most recent log file."""
+    if not LOG_DIR.exists():
+        return None
+
+    # Find most recent .jsonl log file (exclude events.jsonl and any summary files)
+    logs = sorted(
+        [
+            l for l in LOG_DIR.glob("*.jsonl")
+            if l.name not in ["events.jsonl", "summary.log"]
+            and not l.name.startswith("summary")
+        ],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True
+    )
+
+    if not logs:
+        return None
+
+    log_file = logs[0]
+    try:
+        # Extract repo name and run_id from filename
+        # Format: "{repo}_{YYYYMMDD}_{HHMMSS}.jsonl"
+        # Use rsplit to handle repo names with underscores (e.g., "my_repo_20251228_150002")
+        parts = log_file.stem.rsplit("_", 2)  # Split from right, max 2 splits
+        if len(parts) >= 3:
+            repo_name = parts[0]
+            run_id = f"{parts[1]}_{parts[2]}"  # Reconstruct run_id from date_time
+        else:
+            # Fallback for unexpected format
+            repo_name = log_file.stem
+            run_id = None
+
+        # Get file modification time
+        mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
+        time_str = mtime.strftime("%H:%M")
+
+        # Find exit_code from events.jsonl (where run_completed events are written)
+        exit_status = None
+        events_file = LOG_DIR / "events.jsonl"
+        if run_id and events_file.exists():
+            with open(events_file, "rb") as f:
+                # Read last ~10KB to find recent run_completed events
+                try:
+                    f.seek(-10240, 2)  # Seek 10KB from end
+                except OSError:
+                    # File smaller than 10KB, read from start
+                    f.seek(0)
+                lines = f.read().decode("utf-8", errors="ignore").splitlines()
+
+            # Search for run_completed event matching this run_id
+            for line in reversed(lines):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    event = json.loads(line)
+                    if event.get("event") == "run_completed" and event.get("run_id") == run_id:
+                        exit_status = event.get("exit_code")
+                        break
+                except json.JSONDecodeError:
+                    continue
+
+        return {
+            "repo": repo_name,
+            "time": time_str,
+            "exit_status": exit_status
+        }
+    except (IOError, IndexError):
+        return None
+
+
 def main():
     icon, status, color = get_status()
-
-    # Menu bar title (status stays first)
-    print(f"{icon} {status} | color={color}")
-    print("---")
-
-    # Top-level quick actions (no dropdown)
     ctl = shlex.quote(str(CTL_SCRIPT))
     log_dir = shlex.quote(str(LOG_DIR))
+
+    # Menu bar: show icon only (no status text)
+    print(f"{icon} | color={color}")
+    print("---")
+
+    # Auto-Claude Status section
+    print(f"Auto-Claude Status: {status} | color={color} disabled=true")
+    print("---")
+
+    # Last run info section
+    last_run = get_last_run_info()
+    if last_run:
+        # Handle None exit_status (unknown) vs 0 (success) vs non-zero (failure)
+        exit_status = last_run["exit_status"]
+        if exit_status is None:
+            status_icon = "?"
+            status_text = "unknown"
+        elif exit_status == 0:
+            status_icon = "✓"
+            status_text = f"exit {exit_status}"
+        else:
+            status_icon = "✗"
+            status_text = f"exit {exit_status}"
+
+        print(f"Last run: {last_run['time']} | disabled=true")
+        print(f"  Repo: {last_run['repo']} | disabled=true")
+        print(f"  Status: {status_icon} ({status_text}) | disabled=true")
+    else:
+        print("Last run: No runs yet | disabled=true")
+    print("---")
+
+    # Control actions
     print(f"Run Now | bash={ctl} param1='run' terminal=false refresh=true")
     print(f"Resume | bash={ctl} param1='resume' terminal=false refresh=true")
     print(f"Skip next run | bash={ctl} param1='skip' param2='1' terminal=false refresh=true")
@@ -134,16 +232,15 @@ def main():
     logs = get_recent_logs()
     if logs:
         for name, size, path in logs:
-            # Properly escape path for shell safety
+            # Properly escape path for shell safety - use 'open' to open with default app
             escaped_path = shlex.quote(path)
-            print(f"  {name} ({size}) | bash='open -R {escaped_path}' terminal=false")
+            print(f"  {name} ({size}) | bash='open {escaped_path}' terminal=false")
     else:
         print("  No logs found | color=gray")
 
     print("---")
 
     # Bottom actions
-    print("---")
     print(f"Open Logs Folder | bash='open {log_dir}' terminal=false")
     print(f"View Status | bash={ctl} param1='status' terminal=true")
     print("---")
