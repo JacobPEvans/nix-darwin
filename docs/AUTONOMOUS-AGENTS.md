@@ -17,7 +17,7 @@ monitor GitHub, and handle issues/PRs automatically with minimal interaction.
 
 OpenHands is an open-source AI agent that runs in headless mode via GitHub Actions.
 
-### How It Works
+### OpenHands Workflow
 
 1. You create a GitHub issue describing a task
 2. You add the `ai:openhands` label to the issue
@@ -31,9 +31,11 @@ OpenHands is an open-source AI agent that runs in headless mode via GitHub Actio
 The workflow is defined in `.github/workflows/ai-openhands.yml`.
 
 **Required Secrets:**
+
 - `ANTHROPIC_API_KEY` - Your Anthropic API key
 
 **Trigger:**
+
 - Add the `ai:openhands` label to any issue
 
 ### Usage Example
@@ -77,7 +79,7 @@ docker run --rm \
 
 Ellipsis is an AI-powered code review assistant (YC W24).
 
-### Features
+### Ellipsis Features
 
 - **Automatic PR Review**: Reviews every commit on every PR
 - **Bug Detection**: Flags logical mistakes, style violations, anti-patterns
@@ -85,7 +87,7 @@ Ellipsis is an AI-powered code review assistant (YC W24).
 - **Style Guide Enforcement**: Write rules in natural language
 - **20+ Languages**: Python, JavaScript, Java, TypeScript, Go, etc.
 
-### How It Works
+### Ellipsis Workflow
 
 1. Install the Ellipsis GitHub App (2-click install)
 2. Ellipsis automatically reviews all PRs
@@ -137,7 +139,7 @@ review:
 
 **Built into GitHub** - Works with Copilot subscription.
 
-### Features
+### Copilot Features
 
 - Assigns issues to AI agent
 - Works in GitHub Actions environment
@@ -223,16 +225,19 @@ spec:
 ## Security Considerations
 
 ### OpenHands
+
 - Runs in isolated Docker containers
 - API keys stored in GitHub Secrets
 - Limited to repository permissions
 
 ### Ellipsis
+
 - SOC II Type I certified
 - Does not persist source code
 - Runs in private AWS VPC
 
 ### Copilot Agent
+
 - GitHub-native security model
 - Uses existing repository permissions
 - Audit logs available
@@ -242,11 +247,13 @@ spec:
 ### OpenHands Issues
 
 **Workflow not triggering:**
+
 - Check that `ai:openhands` label exists
 - Verify `ANTHROPIC_API_KEY` secret is set
 - Check Actions are enabled for the repository
 
 **Agent fails to complete:**
+
 - Review workflow logs
 - Increase timeout if needed
 - Check API rate limits
@@ -254,6 +261,7 @@ spec:
 ### Ellipsis Issues
 
 **Not reviewing PRs:**
+
 - Verify GitHub App is installed
 - Check repository access permissions
 - Review Ellipsis dashboard for errors

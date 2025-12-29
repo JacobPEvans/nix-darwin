@@ -28,8 +28,6 @@
 }:
 
 let
-  homeDir = config.home.homeDirectory;
-
   # Crush settings object
   # Full configuration reference: https://github.com/charmbracelet/crush
   # Configuration priority: .crush.json > crush.json > ~/.config/crush/crush.json
