@@ -20,7 +20,7 @@ OpenHands is an open-source AI agent that runs in headless mode via GitHub Actio
 ### How It Works
 
 1. You create a GitHub issue describing a task
-2. You add the `openhands` label to the issue
+2. You add the `ai:openhands` label to the issue
 3. OpenHands spins up a Docker container
 4. It reads the issue, analyzes the codebase
 5. Implements changes and creates a PR
@@ -34,7 +34,7 @@ The workflow is defined in `.github/workflows/ai-openhands.yml`.
 - `ANTHROPIC_API_KEY` - Your Anthropic API key
 
 **Trigger:**
-- Add the `openhands` label to any issue
+- Add the `ai:openhands` label to any issue
 
 ### Usage Example
 
@@ -50,7 +50,7 @@ Add a dark mode toggle to the application settings.
 - [ ] Apply theme without refresh
 ```
 
-Then add the `openhands` label → OpenHands creates a PR.
+Then add the `ai:openhands` label → OpenHands creates a PR.
 
 ### Self-Hosting (OrbStack/Proxmox)
 
@@ -242,7 +242,7 @@ spec:
 ### OpenHands Issues
 
 **Workflow not triggering:**
-- Check that `openhands` label exists
+- Check that `ai:openhands` label exists
 - Verify `ANTHROPIC_API_KEY` secret is set
 - Check Actions are enabled for the repository
 
