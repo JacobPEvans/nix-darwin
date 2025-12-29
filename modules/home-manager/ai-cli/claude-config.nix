@@ -100,13 +100,6 @@ in
         schedule.hours = lib.lists.genList (i: i * 3 + 1) 8; # Every 3 hours, offset (1, 4, 7, 10, 13, 16, 19, 22)
         maxBudget = 20.0;
       };
-      # terraform-proxmox: enabled with staggered schedule (offset 2 to prevent concurrent runs)
-      terraform-proxmox = {
-        enabled = true;
-        path = "${config.home.homeDirectory}/.config/terraform-proxmox";
-        schedule.hours = lib.lists.genList (i: i * 3 + 2) 8; # Every 3 hours, offset (2, 5, 8, 11, 14, 17, 20, 23)
-        maxBudget = 20.0;
-      };
     };
 
     # Reporting: Twice-daily utilization reports and real-time anomaly alerts
