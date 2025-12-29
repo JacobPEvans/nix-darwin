@@ -102,9 +102,13 @@ def get_last_run_info() -> Optional[dict]:
     if not LOG_DIR.exists():
         return None
 
-    # Find most recent .jsonl log file (not summary.log or events.jsonl)
+    # Find most recent .jsonl log file (exclude events.jsonl and any summary files)
     logs = sorted(
-        [l for l in LOG_DIR.glob("*.jsonl") if l.name not in ["events.jsonl", "summary.log"]],
+        [
+            l for l in LOG_DIR.glob("*.jsonl")
+            if l.name not in ["events.jsonl", "summary.log"]
+            and not l.name.startswith("summary")
+        ],
         key=lambda p: p.stat().st_mtime,
         reverse=True
     )
@@ -114,16 +118,27 @@ def get_last_run_info() -> Optional[dict]:
 
     log_file = logs[0]
     try:
-        # Parse the last few lines to get repo name and exit status
-        with open(log_file) as f:
-            lines = f.readlines()
-
         # Extract repo name from filename (e.g., "nix_20251228_150002" -> "nix")
-        repo_name = log_file.stem.split("_")[0]
+        # Use rsplit to handle repo names with underscores (e.g., "my_repo_20251228" -> "my_repo")
+        parts = log_file.stem.rsplit("_", 2)  # Split from right, max 2 splits
+        repo_name = parts[0] if len(parts) >= 3 else log_file.stem
 
-        # Try to find exit status from the last event
+        # Read only last 50 lines for efficiency (avoid loading huge files into memory)
+        with open(log_file, "rb") as f:
+            # Seek to end and read last ~5KB (roughly 50-100 lines)
+            try:
+                f.seek(-5120, 2)  # Seek 5KB from end
+            except OSError:
+                # File smaller than 5KB, read from start
+                f.seek(0)
+            lines = f.read().decode("utf-8", errors="ignore").splitlines()
+
+        # Try to find exit status from the last events
         exit_status = None
-        for line in reversed(lines[-10:]):  # Check last 10 lines
+        for line in reversed(lines[-50:]):  # Check last 50 lines
+            line = line.strip()
+            if not line:
+                continue
             try:
                 event = json.loads(line)
                 if "exit_code" in event:
@@ -164,10 +179,21 @@ def main():
     # Last run info section
     last_run = get_last_run_info()
     if last_run:
-        status_icon = "✓" if last_run["exit_status"] == 0 else "✗"
+        # Handle None exit_status (unknown) vs 0 (success) vs non-zero (failure)
+        exit_status = last_run["exit_status"]
+        if exit_status is None:
+            status_icon = "?"
+            status_text = "unknown"
+        elif exit_status == 0:
+            status_icon = "✓"
+            status_text = f"exit {exit_status}"
+        else:
+            status_icon = "✗"
+            status_text = f"exit {exit_status}"
+
         print(f"Last run: {last_run['time']} | disabled=true")
         print(f"  Repo: {last_run['repo']} | disabled=true")
-        print(f"  Status: {status_icon} (exit {last_run['exit_status']}) | disabled=true")
+        print(f"  Status: {status_icon} ({status_text}) | disabled=true")
     else:
         print("Last run: No runs yet | disabled=true")
     print("---")
