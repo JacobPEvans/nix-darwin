@@ -74,7 +74,8 @@ def get_repo_name(target_dir: str) -> str:
     if git_dir.exists():
         try:
             result = subprocess.run(
-                ["git", "-C", target_dir, "remote", "get-url", "origin"],
+                ["git", "remote", "get-url", "origin"],
+                cwd=target_dir,
                 capture_output=True,
                 text=True,
                 check=True,

@@ -130,7 +130,8 @@ def check_git_status(target_dir: str) -> dict:
     try:
         # Get current branch
         branch_result = subprocess.run(
-            ["git", "-C", target_dir, "rev-parse", "--abbrev-ref", "HEAD"],
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=target_dir,
             capture_output=True,
             text=True,
             check=True,
@@ -145,7 +146,8 @@ def check_git_status(target_dir: str) -> dict:
 
         # Check for uncommitted changes
         status_result = subprocess.run(
-            ["git", "-C", target_dir, "status", "--porcelain"],
+            ["git", "status", "--porcelain"],
+            cwd=target_dir,
             capture_output=True,
             text=True,
             check=True,
@@ -158,21 +160,24 @@ def check_git_status(target_dir: str) -> dict:
 
         # Fetch latest
         subprocess.run(
-            ["git", "-C", target_dir, "fetch", "origin", result["branch"], "--quiet"],
+            ["git", "fetch", "origin", result["branch"], "--quiet"],
+            cwd=target_dir,
             capture_output=True,
             check=False,
         )
 
         # Check divergence
         local_sha = subprocess.run(
-            ["git", "-C", target_dir, "rev-parse", "HEAD"],
+            ["git", "rev-parse", "HEAD"],
+            cwd=target_dir,
             capture_output=True,
             text=True,
             check=True,
         ).stdout.strip()
 
         remote_sha_result = subprocess.run(
-            ["git", "-C", target_dir, "rev-parse", f"origin/{result['branch']}"],
+            ["git", "rev-parse", f"origin/{result['branch']}"],
+            cwd=target_dir,
             capture_output=True,
             text=True,
             check=False,
@@ -181,7 +186,8 @@ def check_git_status(target_dir: str) -> dict:
 
         if remote_sha and local_sha != remote_sha:
             base_result = subprocess.run(
-                ["git", "-C", target_dir, "merge-base", "HEAD", f"origin/{result['branch']}"],
+                ["git", "merge-base", "HEAD", f"origin/{result['branch']}"],
+                cwd=target_dir,
                 capture_output=True,
                 text=True,
                 check=False,
@@ -255,7 +261,8 @@ def check_stale_instance(target_dir: str) -> dict:
             if not has_recent_activity:
                 try:
                     git_result = subprocess.run(
-                        ["git", "-C", target_dir, "log", "--since=1 hour ago", "--oneline"],
+                        ["git", "log", "--since=1 hour ago", "--oneline"],
+                        cwd=target_dir,
                         capture_output=True, text=True, check=False,
                     )
                     if git_result.stdout.strip():
