@@ -20,7 +20,9 @@ Exit codes:
 """
 
 import argparse
+import glob
 import json
+import os
 import subprocess
 import sys
 import time
@@ -203,10 +205,97 @@ def check_git_status(target_dir: str) -> dict:
     return result
 
 
+def check_stale_instance(target_dir: str) -> dict:
+    """Check for stale auto-claude instances and kill them if inactive."""
+    import glob
+    import time
+
+    repo_name = get_repo_name(target_dir)
+    result = {"ok": True, "killed": False, "message": "No stale instance found"}
+
+    try:
+        # Find auto-claude processes for this repo
+        ps_result = subprocess.run(
+            ["pgrep", "-f", f"auto-claude.sh.*{target_dir}"],
+            capture_output=True, text=True,
+        )
+
+        if ps_result.returncode != 0:
+            # No running instance found
+            return result
+
+        pids = ps_result.stdout.strip().split("\n")
+        current_pid = str(subprocess.run(["pgrep", "-P", "1", "auto-claude.sh"], capture_output=True, text=True).stdout.strip()) or "0"
+
+        for pid in pids:
+            if not pid or pid == current_pid:
+                continue
+
+            # Check if process is actually doing something
+            has_recent_activity = False
+
+            # Check recent log files (modified in last 4 hours = 14400 seconds)
+            now = time.time()
+            log_patterns = [
+                f"{Path.home()}/.claude/logs/nix_*.jsonl",
+                f"{Path.home()}/.claude/logs/launchd-*.log",
+            ]
+
+            for pattern in log_patterns:
+                for log_file in glob.glob(pattern):
+                    try:
+                        mtime = os.path.getmtime(log_file)
+                        if (now - mtime) < 14400:  # 4 hours
+                            has_recent_activity = True
+                            break
+                    except OSError:
+                        pass
+
+            # Check recent git activity in target_dir
+            if not has_recent_activity:
+                try:
+                    git_result = subprocess.run(
+                        ["git", "-C", target_dir, "log", "--since=4 hours ago", "--oneline"],
+                        capture_output=True, text=True, check=False,
+                    )
+                    if git_result.stdout.strip():
+                        has_recent_activity = True
+                except Exception:
+                    pass
+
+            # Check recent GitHub activity (PRs, issues, commits)
+            if not has_recent_activity:
+                try:
+                    # Check for recent PR activity
+                    pr_result = subprocess.run(
+                        ["gh", "pr", "list", "--state", "all", "--limit", "5"],
+                        cwd=target_dir, capture_output=True, text=True, check=False,
+                    )
+                    if pr_result.stdout.strip():
+                        has_recent_activity = True
+                except Exception:
+                    pass
+
+            if not has_recent_activity:
+                # Kill the stale process
+                try:
+                    subprocess.run(["kill", pid], check=True)
+                    result["killed"] = True
+                    result["message"] = f"Killed stale auto-claude process (PID {pid}) with no recent activity"
+                except subprocess.CalledProcessError:
+                    pass
+
+        return result
+
+    except Exception as e:
+        # Don't fail on stale check errors
+        return {"ok": True, "killed": False, "message": f"Could not check stale instances: {str(e)}"}
+
+
 def check_issue_limits(target_dir: str, force_run: bool = False) -> dict:
-    """Block if >= 50 ai-created issues exist."""
+    """Check issue limits. At limit, skip issue creation but continue other work."""
     if force_run:
-        return {"ok": True, "count": 0, "message": "Bypassed (force)"}
+        return {"ok": True, "count": 0, "skip_issue_creation": False, "message": "Bypassed (force)"}
 
     try:
         result = subprocess.run(
@@ -215,11 +304,17 @@ def check_issue_limits(target_dir: str, force_run: bool = False) -> dict:
         )
         count = len(json.loads(result.stdout))
         if count >= 50:
-            return {"ok": False, "count": count, "message": f"Blocked: {count} ai-created issues (limit: 50)"}
-        return {"ok": True, "count": count, "message": f"OK: {count} ai-created issues"}
+            # Still return ok=True to allow auto-claude to continue, but signal to skip issues
+            return {
+                "ok": True,
+                "count": count,
+                "skip_issue_creation": True,
+                "message": f"Issue limit reached ({count}/50). Skipping issue creation."
+            }
+        return {"ok": True, "count": count, "skip_issue_creation": False, "message": f"OK: {count} ai-created issues"}
     except Exception:
         # Don't block on gh errors - repo might not have issues
-        return {"ok": True, "count": -1, "message": "Warning: gh check failed"}
+        return {"ok": True, "count": -1, "skip_issue_creation": False, "message": "Warning: gh check failed"}
 
 
 def main():
@@ -262,6 +357,7 @@ def main():
 
     elif args.command == "all":
         results = {
+            "stale": check_stale_instance(args.target_dir),
             "control": check_control_file(force_run=args.force),
             "channel": resolve_slack_channel(args.target_dir),
             "git": check_git_status(args.target_dir),
@@ -275,12 +371,10 @@ def main():
         elif not results["git"]["ok"]:
             results["status"] = "error"
             results["reason"] = results["git"]["message"]
-        elif not results["issues"]["ok"]:
-            results["status"] = "error"
-            results["reason"] = results["issues"]["message"]
         else:
             results["status"] = "ok"
             results["reason"] = None
+            # Note: issues check always returns ok=True, may set skip_issue_creation flag
 
         if args.json:
             print(json.dumps(results))

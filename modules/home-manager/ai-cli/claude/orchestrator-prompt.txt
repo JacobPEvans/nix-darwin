@@ -82,11 +82,20 @@ These limits are NON-NEGOTIABLE. Check them before any action.
    Check: gh pr list --author @me --state open --json number | jq length
    If >= 10: Do NOT create new PRs. Focus on resolving existing ones.
 
-2. MAX 50 AI-CREATED ISSUES (HARD ENFORCED)
-   The preflight check BLOCKS execution if >= 50 ai-created issues exist.
-   Do NOT create issues if approaching this limit.
+2. MAX 50 AI-CREATED ISSUES (SOFT LIMIT - SKIP ISSUE CREATION)
+   When >= 50 ai-created issues exist, preflight returns skip_issue_creation: true
+   IMPORTANT: You will STILL CONTINUE ALL OTHER WORK. Only skip the issue creation steps.
 
-   Issue titles MUST use conventional commit format: feat|fix|docs|chore|ci|refactor|test|perf
+   How to detect: Check if any step mentions "skip_issue_creation: true" or if you see the message
+   "Issue limit reached (N/50). Skipping issue creation."
+
+   When skipping issue creation:
+   - Do NOT attempt to create new issues
+   - DO continue with all other tasks (PR fixes, CI checking, etc.)
+   - Log that issue creation was skipped
+   - Complete all other work normally
+
+   Issue titles (when creating) MUST use conventional commit format: feat|fix|docs|chore|ci|refactor|test|perf
 
 3. MAX 1 AUTO-CLAUDE COMMENT PER ISSUE/PR PER RUN
    Before commenting on any issue or PR, check if auto-claude has already commented:
