@@ -159,12 +159,16 @@ pushd "$TARGET_DIR" >/dev/null || {
   echo "[$RUN_ID] ERROR: Cannot cd to $TARGET_DIR" >> "$FAILURES_LOG"
   exit 1
 }
-git fetch origin 2>/dev/null || {
+# Determine default branch dynamically
+DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's@^origin/@@')
+[[ -z "$DEFAULT_BRANCH" ]] && DEFAULT_BRANCH="main"
+
+git fetch origin 2>&1 | tee -a "$FAILURES_LOG" || {
   popd >/dev/null
   echo "[$RUN_ID] ERROR: git fetch failed" >> "$FAILURES_LOG"
   exit 1
 }
-git pull --ff-only origin main 2>/dev/null || {
+git pull --ff-only origin "$DEFAULT_BRANCH" 2>&1 | tee -a "$FAILURES_LOG" || {
   popd >/dev/null
   echo "[$RUN_ID] ERROR: Fast-forward pull failed in main worktree" >> "$FAILURES_LOG"
   exit 1
@@ -324,20 +328,19 @@ fi
 if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "$WORKTREE_DIR" ]]; then
   if [[ $EXIT_CODE -eq 0 ]]; then
     echo "[$RUN_ID] INFO: Cleaning up worktree (success)" >> "$SUMMARY_LOG"
-    # Return to original directory before cleanup
-    cd "$ORIGINAL_TARGET_DIR" 2>/dev/null || cd "$HOME"
 
-    # Remove worktree and branch
-    pushd "$ORIGINAL_TARGET_DIR" >/dev/null || {
-      echo "[$RUN_ID] WARNING: Cannot cd to $ORIGINAL_TARGET_DIR for cleanup" >> "$SUMMARY_LOG"
-    }
-    git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || {
-      echo "[$RUN_ID] WARNING: Failed to remove worktree $WORKTREE_DIR" >> "$SUMMARY_LOG"
-    }
-    git branch -D "$BRANCH_NAME" 2>/dev/null || {
-      echo "[$RUN_ID] WARNING: Failed to delete branch $BRANCH_NAME" >> "$SUMMARY_LOG"
-    }
-    popd >/dev/null || true
+    # Remove worktree and branch - only proceed if we can cd to the correct directory
+    if pushd "$ORIGINAL_TARGET_DIR" >/dev/null 2>&1; then
+      git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || {
+        echo "[$RUN_ID] WARNING: Failed to remove worktree $WORKTREE_DIR" >> "$SUMMARY_LOG"
+      }
+      git branch -D "$BRANCH_NAME" 2>/dev/null || {
+        echo "[$RUN_ID] WARNING: Failed to delete branch $BRANCH_NAME" >> "$SUMMARY_LOG"
+      }
+      popd >/dev/null || true
+    else
+      echo "[$RUN_ID] WARNING: Cannot cd to $ORIGINAL_TARGET_DIR for cleanup, worktree preserved at $WORKTREE_DIR" >> "$SUMMARY_LOG"
+    fi
   else
     echo "[$RUN_ID] INFO: Preserving worktree for inspection (failed run): $WORKTREE_DIR" >> "$SUMMARY_LOG"
     echo "    To clean up manually: cd \"$ORIGINAL_TARGET_DIR\" && git worktree remove \"$WORKTREE_DIR\" --force" >> "$SUMMARY_LOG"
