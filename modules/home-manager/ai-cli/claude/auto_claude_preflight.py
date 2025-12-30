@@ -231,13 +231,15 @@ def check_stale_instance(target_dir: str) -> dict:
             return result
 
         pids = ps_result.stdout.strip().split("\n")
-        current_pid = str(subprocess.run(["pgrep", "-P", "1", "auto-claude.sh"], capture_output=True, text=True).stdout.strip()) or "0"
+        current_pid = str(os.getppid())
 
         for pid in pids:
             if not pid or pid == current_pid:
                 continue
 
             # Check if process is actually doing something
+            # "Recent" = last 1 hour. If no activity in last hour, process is considered idle.
+            # Auto-claude runs every 4 hours, so a process idle for 4+ hours should be killed.
             has_recent_activity = False
 
             # Check recent log files (modified in last 1 hour = 3600 seconds)
@@ -295,8 +297,8 @@ def check_stale_instance(target_dir: str) -> dict:
         return result
 
     except Exception as e:
-        # Don't fail on stale check errors
-        return {"ok": True, "killed": False, "message": f"Could not check stale instances: {str(e)}"}
+        # Don't fail on stale check errors, but log the specific exception for debugging
+        return {"ok": True, "killed": False, "message": f"Warning: Stale instance check failed with an error: {e}"}
 
 
 def check_issue_limits(target_dir: str, force_run: bool = False) -> dict:
@@ -319,9 +321,9 @@ def check_issue_limits(target_dir: str, force_run: bool = False) -> dict:
                 "message": f"Issue limit reached ({count}/50). Skipping issue creation."
             }
         return {"ok": True, "count": count, "skip_issue_creation": False, "message": f"OK: {count} ai-created issues"}
-    except Exception:
-        # Don't block on gh errors - repo might not have issues
-        return {"ok": True, "count": -1, "skip_issue_creation": False, "message": "Warning: gh check failed"}
+    except Exception as e:
+        # Don't block on gh errors, but log the exception for debugging
+        return {"ok": True, "count": -1, "skip_issue_creation": False, "message": f"Warning: gh issue check failed: {e}"}
 
 
 def main():
