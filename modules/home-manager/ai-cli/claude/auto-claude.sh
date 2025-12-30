@@ -130,19 +130,83 @@ fi
 DETECTED_REPO=$(echo "$PREFLIGHT_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('channel',{}).get('repo_name',''))" 2>/dev/null || true)
 [[ -n "$DETECTED_REPO" ]] && REPO_NAME="$DETECTED_REPO"
 
-# Check if git needs pull
-NEEDS_PULL=$(echo "$PREFLIGHT_RESULT" | python3 -c "import sys,json; print('yes' if json.load(sys.stdin).get('git',{}).get('needs_pull') else 'no')" 2>/dev/null || echo "no")
-if [[ "$NEEDS_PULL" == "yes" ]]; then
-  echo "[$RUN_ID] INFO: Pulling latest from origin..." >> "$SUMMARY_LOG"
-  git -C "$TARGET_DIR" pull --ff-only 2>/dev/null || {
-    echo "[$RUN_ID] ERROR: Fast-forward pull failed" >> "$FAILURES_LOG"
-    exit 1
-  }
+# --- WORKTREE SETUP ---
+# Determine repository structure and set up isolated worktree for this run
+if [[ ! -e "$TARGET_DIR/.git" ]]; then
+  echo "[$RUN_ID] ERROR: $TARGET_DIR is not a git repository" >> "$FAILURES_LOG"
+  exit 1
 fi
+
+# Determine the bare repo location
+pushd "$TARGET_DIR" >/dev/null || {
+  echo "[$RUN_ID] ERROR: Cannot access $TARGET_DIR" >> "$FAILURES_LOG"
+  exit 1
+}
+BARE_REPO=$(git rev-parse --git-common-dir 2>/dev/null || echo "")
+popd >/dev/null
+
+if [[ -n "$BARE_REPO" ]] && [[ "$BARE_REPO" != ".git" ]]; then
+  # This is a worktree - find the parent (bare repo)
+  BARE_REPO=$(dirname "$BARE_REPO")
+else
+  # This is a regular repo - use its parent for worktree creation
+  BARE_REPO=$(dirname "$TARGET_DIR")
+fi
+
+# Sync main worktree with origin
+echo "[$RUN_ID] INFO: Syncing main worktree..." >> "$SUMMARY_LOG"
+pushd "$TARGET_DIR" >/dev/null || {
+  echo "[$RUN_ID] ERROR: Cannot cd to $TARGET_DIR" >> "$FAILURES_LOG"
+  exit 1
+}
+git fetch origin 2>/dev/null || {
+  popd >/dev/null
+  echo "[$RUN_ID] ERROR: git fetch failed" >> "$FAILURES_LOG"
+  exit 1
+}
+git pull --ff-only origin main 2>/dev/null || {
+  popd >/dev/null
+  echo "[$RUN_ID] ERROR: Fast-forward pull failed in main worktree" >> "$FAILURES_LOG"
+  exit 1
+}
+popd >/dev/null
+
+# Create worktree for this run
+TIMESTAMP=$(date "+%Y-%m-%d-%H%M")
+WORKTREE_NAME="auto-claude-${TIMESTAMP}"
+WORKTREE_DIR="${BARE_REPO}/worktrees/${WORKTREE_NAME}"
+BRANCH_NAME="${WORKTREE_NAME}"
+
+# Ensure worktrees directory exists
+mkdir -p "${BARE_REPO}/worktrees" || {
+  echo "[$RUN_ID] ERROR: Cannot create worktrees directory" >> "$FAILURES_LOG"
+  exit 1
+}
+
+# Create worktree branching from origin/main
+echo "[$RUN_ID] INFO: Creating worktree at $WORKTREE_DIR" >> "$SUMMARY_LOG"
+ORIGINAL_TARGET_DIR="$TARGET_DIR"
+pushd "$ORIGINAL_TARGET_DIR" >/dev/null || {
+  echo "[$RUN_ID] ERROR: Cannot cd to $ORIGINAL_TARGET_DIR" >> "$FAILURES_LOG"
+  exit 1
+}
+git worktree add "$WORKTREE_DIR" -b "$BRANCH_NAME" origin/main 2>/dev/null || {
+  popd >/dev/null
+  echo "[$RUN_ID] ERROR: git worktree add failed" >> "$FAILURES_LOG"
+  exit 1
+}
+popd >/dev/null
+
+# Update TARGET_DIR to point to the new worktree
+TARGET_DIR="$WORKTREE_DIR"
 
 # --- PRE-FLIGHT DEPENDENCY CHECKS ---
 cd "$TARGET_DIR" || {
-  echo "[$RUN_ID] ERROR: Cannot cd to $TARGET_DIR" >> "$FAILURES_LOG"
+  echo "[$RUN_ID] ERROR: Cannot cd to worktree $TARGET_DIR" >> "$FAILURES_LOG"
+  # Clean up worktree on cd failure
+  if [[ -n "$WORKTREE_DIR" ]]; then
+    pushd "$ORIGINAL_TARGET_DIR" >/dev/null && git worktree remove "$WORKTREE_DIR" --force 2>/dev/null && popd >/dev/null || true
+  fi
   exit 1
 }
 
@@ -254,6 +318,30 @@ fi
 # --- UPDATE CONTROL FILE (only on success) ---
 if [[ $EXIT_CODE -eq 0 ]]; then
   python3 "${SCRIPT_DIR}/auto_claude_postrun.py" update-control "$REPO_NAME" || true
+fi
+
+# --- WORKTREE CLEANUP ---
+if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "$WORKTREE_DIR" ]]; then
+  if [[ $EXIT_CODE -eq 0 ]]; then
+    echo "[$RUN_ID] INFO: Cleaning up worktree (success)" >> "$SUMMARY_LOG"
+    # Return to original directory before cleanup
+    cd "$ORIGINAL_TARGET_DIR" 2>/dev/null || cd "$HOME"
+
+    # Remove worktree and branch
+    pushd "$ORIGINAL_TARGET_DIR" >/dev/null || {
+      echo "[$RUN_ID] WARNING: Cannot cd to $ORIGINAL_TARGET_DIR for cleanup" >> "$SUMMARY_LOG"
+    }
+    git worktree remove "$WORKTREE_DIR" --force 2>/dev/null || {
+      echo "[$RUN_ID] WARNING: Failed to remove worktree $WORKTREE_DIR" >> "$SUMMARY_LOG"
+    }
+    git branch -D "$BRANCH_NAME" 2>/dev/null || {
+      echo "[$RUN_ID] WARNING: Failed to delete branch $BRANCH_NAME" >> "$SUMMARY_LOG"
+    }
+    popd >/dev/null || true
+  else
+    echo "[$RUN_ID] INFO: Preserving worktree for inspection (failed run): $WORKTREE_DIR" >> "$SUMMARY_LOG"
+    echo "    To clean up manually: cd \"$ORIGINAL_TARGET_DIR\" && git worktree remove \"$WORKTREE_DIR\" --force" >> "$SUMMARY_LOG"
+  fi
 fi
 
 echo "" >> "$SUMMARY_LOG"
