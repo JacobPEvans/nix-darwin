@@ -85,19 +85,29 @@ in
   autoClaude = {
     enable = true;
     repositories = {
-      # ai-assistant-instructions: enabled with even-hour schedule
+      # ai-assistant-instructions: every 4 hours starting at midnight
       # Uses local repo (not Nix store) because autoClaude needs writable git
+      # Schedule: 0, 4, 8, 12, 16, 20 (6 times/day)
       ai-assistant-instructions = {
         enabled = true;
         path = autoClaudeLocalRepoPath;
-        schedule.hours = lib.lists.genList (i: i * 3) 8; # Every 3 hours (0, 3, 6, 9, 12, 15, 18, 21)
+        schedule.hours = lib.lists.genList (i: i * 4) 6;
         maxBudget = 20.0;
       };
-      # nix config: enabled with staggered schedule (offset 1, 4, 7, ... to prevent concurrent runs)
+      # nix config: every 4 hours starting at 1am (offset +1 to prevent concurrent runs)
+      # Schedule: 1, 5, 9, 13, 17, 21 (6 times/day)
       nix = {
         enabled = true;
         path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hours = lib.lists.genList (i: i * 3 + 1) 8; # Every 3 hours, offset (1, 4, 7, 10, 13, 16, 19, 22)
+        schedule.hours = lib.lists.genList (i: i * 4 + 1) 6;
+        maxBudget = 20.0;
+      };
+      # terraform-proxmox: every 4 hours starting at 2am (offset +2 to prevent concurrent runs)
+      # Schedule: 2, 6, 10, 14, 18, 22 (6 times/day)
+      terraform-proxmox = {
+        enabled = true;
+        path = "${config.home.homeDirectory}/git/terraform-proxmox/main";
+        schedule.hours = lib.lists.genList (i: i * 4 + 2) 6;
         maxBudget = 20.0;
       };
     };
