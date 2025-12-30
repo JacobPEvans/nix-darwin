@@ -234,7 +234,7 @@ def check_stale_instance(target_dir: str) -> dict:
             # Check if process is actually doing something
             has_recent_activity = False
 
-            # Check recent log files (modified in last 4 hours = 14400 seconds)
+            # Check recent log files (modified in last 1 hour = 3600 seconds)
             now = time.time()
             log_patterns = [
                 f"{Path.home()}/.claude/logs/nix_*.jsonl",
@@ -245,17 +245,17 @@ def check_stale_instance(target_dir: str) -> dict:
                 for log_file in glob.glob(pattern):
                     try:
                         mtime = os.path.getmtime(log_file)
-                        if (now - mtime) < 14400:  # 4 hours
+                        if (now - mtime) < 3600:  # 1 hour
                             has_recent_activity = True
                             break
                     except OSError:
                         pass
 
-            # Check recent git activity in target_dir
+            # Check recent git activity in target_dir (last 1 hour)
             if not has_recent_activity:
                 try:
                     git_result = subprocess.run(
-                        ["git", "-C", target_dir, "log", "--since=4 hours ago", "--oneline"],
+                        ["git", "-C", target_dir, "log", "--since=1 hour ago", "--oneline"],
                         capture_output=True, text=True, check=False,
                     )
                     if git_result.stdout.strip():
