@@ -134,14 +134,27 @@ in
 
             maxBudget = lib.mkOption {
               type = lib.types.float;
-              default = 20.0;
+              default = 50.0;
               description = ''
-                Maximum cost per run in USD.
+                Maximum cost per run in USD. Uses Haiku model exclusively.
 
-                NOTE: This default was increased from $2.0 to $20.0 to allow more
-                substantial maintenance work per run. Adjust based on your usage
-                and cost tolerance. With the default once-daily schedule, this
-                means up to $20/day per repository.
+                IMPORTANT: This default is set to $50.0 and uses Claude Haiku exclusively.
+                Auto-claude enforces Haiku-only operation via environment variables,
+                settings.json, and explicit --model haiku flag for defense-in-depth.
+
+                With the default once-daily schedule, this means up to $50/day per repository.
+                Haiku provides cost-effective operation while maintaining quality output.
+              '';
+            };
+
+            model = lib.mkOption {
+              type = lib.types.str;
+              default = "haiku";
+              description = ''
+                Claude model to use for auto-claude runs.
+
+                Strongly recommended: "haiku" - cost-effective, excellent for autonomous tasks
+                Alternatives: "sonnet", "opus" (significantly higher cost)
               '';
             };
 
@@ -298,6 +311,8 @@ in
           StandardErrorPath = "${logDir}/launchd-${name}.err";
           EnvironmentVariables = {
             HOME = homeDir;
+            # Claude model selection (defense-in-depth: env var + settings.json + --model flag)
+            CLAUDE_MODEL = repoCfg.model;
             # Use per-user profile path and pythonEnv for proper package resolution
             # pythonEnv contains slack-sdk and other required packages
             PATH = "${pythonEnv}/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";

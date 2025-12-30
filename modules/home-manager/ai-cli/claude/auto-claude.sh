@@ -266,7 +266,12 @@ TIMEOUT_CMD=""
 command -v gtimeout &>/dev/null && TIMEOUT_CMD="gtimeout 3600"
 command -v timeout &>/dev/null && [[ -z "$TIMEOUT_CMD" ]] && TIMEOUT_CMD="timeout 3600"
 
+# Determine model from environment variable (set by launchd via nix config)
+# Defaults to haiku if not set, with explicit --model flag for defense-in-depth
+CLAUDE_MODEL_TO_USE="${CLAUDE_MODEL:-haiku}"
+
 $TIMEOUT_CMD claude -p "$ORCHESTRATOR_PROMPT" \
+  --model "$CLAUDE_MODEL_TO_USE" \
   --output-format stream-json \
   --verbose \
   --max-budget-usd "$MAX_BUDGET_USD" \
