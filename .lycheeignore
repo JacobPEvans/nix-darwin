@@ -15,3 +15,6 @@ https://determinate.systems/.*
 # Documentation with access restrictions
 https://nix-darwin.github.io/.*
 https://raw.githubusercontent.com/nix-darwin/.*
+
+# Local file references that won't exist in CI
+file://.*
