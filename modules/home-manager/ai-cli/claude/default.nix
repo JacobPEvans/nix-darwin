@@ -84,7 +84,7 @@ in
       # User must edit ~/.wakatime.cfg and replace waka_YOUR-API-KEY-HERE with real key
       # See: https://wakatime.com/settings/account
       wakatimeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-                WAKATIME_CFG="$HOME/.wakatime.cfg"
+                WAKATIME_CFG="${config.home.homeDirectory}/.wakatime.cfg"
 
                 if [ ! -f "$WAKATIME_CFG" ]; then
                   $DRY_RUN_CMD cat > "$WAKATIME_CFG" <<'EOF'
