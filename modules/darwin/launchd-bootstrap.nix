@@ -1,6 +1,6 @@
 # Ensure nix-darwin LaunchDaemons are bootstrapped into launchd
 #
-# WORKAROUND for upstream issue: https://github.com/LnL7/nix-darwin/issues/1255
+# WORKAROUND for upstream issue: https://github.com/nix-darwin/nix-darwin/issues/1255
 #
 # Problem: nix-darwin uses deprecated `launchctl load` commands which don't
 # reliably persist across reboots on modern macOS (Ventura/Sonoma). After

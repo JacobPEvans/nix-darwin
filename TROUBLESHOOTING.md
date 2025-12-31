@@ -155,8 +155,12 @@ exec zsh
 **Permanent Fix**: The `modules/darwin/launchd-bootstrap.nix` module ensures services are
 bootstrapped during every activation.
 
-**Full Documentation**: See [docs/NIX-BOOT-FAILURE.md](docs/NIX-BOOT-FAILURE.md) for complete
-diagnosis steps, error messages, and prevention strategies.
+**Full Documentation**: See [docs/boot-failure/](docs/boot-failure/) for:
+
+- **[Quick Recovery](docs/boot-failure/README.md)** - Step-by-step recovery commands
+- **[Root Cause](docs/boot-failure/root-cause.md)** - Why this happens
+- **[Permanent Fix](docs/boot-failure/permanent-fix.md)** - Prevention implementation
+- **[Diagnostics](docs/boot-failure/diagnostics.md)** - Advanced diagnostic commands
 
 ---
 
