@@ -28,9 +28,9 @@
 
 {
   system.activationScripts.postActivation.text = lib.mkAfter ''
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon Bootstrap Check" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+    echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
+    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon Bootstrap Check"
+    echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
 
     bootstrap_count=0
     already_loaded=0
@@ -42,28 +42,28 @@
 
         # Check if service is already loaded into launchd
         if ! /bin/launchctl print system/"$label" >/dev/null 2>&1; then
-          echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapping $label..." >&2
+          echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapping $label..."
           if /bin/launchctl bootstrap system "$plist" 2>/dev/null; then
             ((bootstrap_count++))
-            echo "[$(date '+%H:%M:%S')] [INFO] ✓ Successfully bootstrapped $label" >&2
+            echo "[$(date '+%H:%M:%S')] [INFO] ✓ Successfully bootstrapped $label"
           else
             echo "[$(date '+%H:%M:%S')] [WARN] Failed to bootstrap $label (may already be partially loaded)" >&2
           fi
         else
           ((already_loaded++))
-          echo "[$(date '+%H:%M:%S')] [DEBUG] $label already loaded" >&2
+          echo "[$(date '+%H:%M:%S')] [DEBUG] $label already loaded"
         fi
       fi
     done
 
     if [ $bootstrap_count -gt 0 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapped $bootstrap_count service(s)" >&2
+      echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapped $bootstrap_count service(s)"
     fi
     if [ $already_loaded -gt 0 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] $already_loaded service(s) already loaded" >&2
+      echo "[$(date '+%H:%M:%S')] [INFO] $already_loaded service(s) already loaded"
     fi
 
-    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon bootstrap complete" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon bootstrap complete"
+    echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
   '';
 }

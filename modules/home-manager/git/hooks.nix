@@ -23,7 +23,7 @@ let
     # Layer 2 (AI deny list) and Layer 3 (GitHub branch protection) provide enforcement
     if ! command -v pre-commit &> /dev/null; then
       echo "Warning: .pre-commit-config.yaml exists but pre-commit is not installed" >&2
-      echo "Add pre-commit to your Nix configuration and rebuild" >&2
+      echo "Add pre-commit to your Nix configuration and rebuild"
       exit 0
     fi
 

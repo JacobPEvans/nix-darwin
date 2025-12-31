@@ -249,21 +249,21 @@ in
         # diagnostics for debugging exit code issues (especially exit code 2
         # from launchctl asuser calls during home-manager activation)
 
-        echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..." >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..."
 
         # Check if /run/current-system symlink was updated (proves activation succeeded)
         if [ -L /run/current-system ]; then
           CURRENT_SYSTEM=$(readlink /run/current-system)
-          echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded" >&2
-          echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM" >&2
+          echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded"
+          echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM"
         else
           echo "[$(date '+%H:%M:%S')] [ERROR] /run/current-system symlink not found" >&2
           echo "[$(date '+%H:%M:%S')] [ERROR] Activation may have failed - check logs above" >&2
         fi
 
-        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-        echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed" >&2
-        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
+        echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed"
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
       '';
     };
 

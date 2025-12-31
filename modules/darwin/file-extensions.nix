@@ -72,7 +72,7 @@ in
 
     # Configure file associations using duti during system activation
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      echo "Configuring custom file extension mappings..." >&2
+      echo "Configuring custom file extension mappings..."
 
       # Create temporary duti configuration file
       DUTI_CONFIG=$(mktemp)
@@ -95,14 +95,14 @@ in
       #   * Treat all errors as warnings, not fatal failures
       #   * Must reach /run/current-system symlink update (the critical phase)
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
-        echo "Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)" >&2
+        echo "Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)"
 
         # Rebuild Launch Services database to ensure changes take effect
         # Note: lsregister can fail on some systems, so we add error handling to prevent
         # activation failure. The file mappings still work even if lsregister fails.
         # Again using if/then/else to continue activation on failure (not || exit pattern)
         if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>&1; then
-          echo "Launch Services database rebuilt" >&2
+          echo "Launch Services database rebuilt"
         else
           echo "Warning: Failed to rebuild Launch Services database (file mappings still applied)" >&2
         fi
@@ -111,18 +111,18 @@ in
       fi
 
       # Display configured mappings
-      echo "Configured mappings:" >&2
+      echo "Configured mappings:"
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (ext: uti: ''
-          echo "  ${ext} → ${uti}" >&2
+          echo "  ${ext} → ${uti}"
         '') cfg.customMappings
       )}
     '';
 
     # Inform user about activation
     system.activationScripts.preActivation.text = lib.mkBefore ''
-      echo "Note: Custom file extension mappings will be configured during activation" >&2
-      echo "Extensions: ${lib.concatStringsSep ", " (lib.attrNames cfg.customMappings)}" >&2
+      echo "Note: Custom file extension mappings will be configured during activation"
+      echo "Extensions: ${lib.concatStringsSep ", " (lib.attrNames cfg.customMappings)}"
     '';
   };
 }
