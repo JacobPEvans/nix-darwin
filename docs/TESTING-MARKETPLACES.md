@@ -8,7 +8,7 @@ For AI Agents: Complete testing procedures for Claude Code marketplace configura
 
 ```bash
 # After Claude clones the marketplace to ~/.claude/plugins/marketplaces/
-jq -r '.name' ~/.claude/plugins/marketplaces/*/. claude-plugin/marketplace.json
+jq -r '.name' ~/.claude/plugins/marketplaces/*/.claude-plugin/marketplace.json
 ```
 
 ### Method 2: From GitHub (Before Cloning)
@@ -157,7 +157,7 @@ NOT:
 
 **Fix:** Change `@skills` to `@anthropic-agent-skills` (the actual manifest name).
 
-Check: `jq '.name' ~/.claude/plugins/marketplaces/*/. claude-plugin/marketplace.json`
+Check: `jq '.name' ~/.claude/plugins/marketplaces/*/.claude-plugin/marketplace.json`
 
 ### Error: Plugin not found "backend-dev@agents"
 
