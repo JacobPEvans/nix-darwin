@@ -2,6 +2,12 @@
 #
 # Hooks run automatically via core.hooksPath (set in common.nix)
 # Run manually: pre-commit run --all-files
+#
+# PARALLELIZATION:
+# - Pre-commit runs hooks in parallel by default (one thread per hook)
+# - All hooks in this config run automatically on every commit (no manual stages)
+# - Early issue detection outweighs any slowdown from network/IO operations
+# - AI agents should not be relied upon to remember manual hook stages
 
 repos:
   # Standard pre-commit hooks
@@ -77,6 +83,17 @@ repos:
         files: \.(md|nix)$
         types: [file]
         pass_filenames: false
+
+      # Lychee link checker - validates links in markdown and HTML
+      # Runs automatically on every commit (not manual-stage)
+      # Lychee is fast with async validation and caching, minimal slowdown impact
+      - id: lychee
+        name: Lychee link checker
+        entry: lychee
+        language: system
+        files: \.(md|html)$
+        types: [file]
+        pass_filenames: true
 
       # Auto-Claude shell script validation
       # Validates syntax of all auto-claude shell scripts

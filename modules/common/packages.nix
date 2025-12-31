@@ -30,6 +30,7 @@ with pkgs;
   shfmt # Shell script formatter
 
   # Documentation
+  lychee # Link checker for markdown and HTML (validates URLs in docs)
   markdownlint-cli2 # Markdown linter (README, docs exist everywhere)
 
   # CI/CD

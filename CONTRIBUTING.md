@@ -6,17 +6,28 @@ Thanks for considering contributing. It's just me here, so any help is genuinely
 
 1. Fork it
 2. Create your feature branch (`git checkout -b feature/cool-thing`)
-3. Commit your changes (`git commit -m 'Add some cool thing'`)
+3. Commit your changes (GPG-signed - see below)
 4. Push to the branch (`git push origin feature/cool-thing`)
 5. Open a Pull Request
 
 That's it. I'm not picky.
 
+## Organization-Wide Standards
+
+For standards that apply across all JacobPEvans projects, see the
+[Organization Contributing Guide](https://github.com/JacobPEvans/.github/blob/main/docs/CONTRIBUTING.md),
+which covers:
+
+- **Commit Signing** – All commits must be GPG-signed. The org guide has setup instructions.
+- **PR Standards** – Use conventional commit format (`type(scope): description`) and apply type/priority/size labels.
+- **Issue Linking** – Connect related issues with "Closes #123" or "Related to #123" in PR descriptions.
+- **General Acceptance Criteria** – Improvements to documentation, bug fixes, and code maintainability are welcome.
+
 ## Reporting Issues
 
 Found a bug? Something unclear? Open an issue. Describe what you expected, what happened instead, and any relevant context.
 
-## Pull Requests
+## Repository-Specific Guidelines
 
 ### Before You Start
 
@@ -25,48 +36,87 @@ Found a bug? Something unclear? Open an issue. Describe what you expected, what 
 
 ### Code Style
 
-This repo has markdown linting via `markdownlint-cli2`. Run it locally:
+**Markdown:** Linted by `markdownlint-cli2` (runs automatically during pre-commit).
 
-```bash
-markdownlint-cli2 "**/*.md"
-```
+**Nix Code:** Follow existing patterns. Comments are encouraged - this config is meant to be
+educational. Comments help contributors understand the `nix-darwin` ecosystem.
 
-For Nix code, follow existing patterns. Comments are encouraged - this config is meant to be educational.
+See [docs/PRECOMMIT.md](docs/PRECOMMIT.md) for all automated checks that run on commit.
 
-### Commit Messages
+### What Might Not Get Accepted
 
-Use conventional commits if you remember:
-
-- `feat:` for new features
-- `fix:` for bug fixes
-- `docs:` for documentation changes
-- `refactor:` for code changes that don't add features or fix bugs
-
-But honestly, as long as your commit message explains what you did, we're good.
-
-## What Gets Accepted
-
-Pretty much anything that:
-
-- Improves the documentation
-- Adds useful Nix modules or patterns
-- Fixes bugs or typos
-- Makes the codebase more maintainable
-
-## What Might Not Get Accepted
-
-- Breaking changes without discussion
 - Removing comments (they're there for learning)
 - Changes that make the config significantly more complex without clear benefit
 
 ## Development Setup
 
-1. Clone the repo
-2. Make changes
-3. Test with `nix flake check`
-4. Commit and push
+### Prerequisites
 
-That's the whole setup. Nix handles the rest.
+This repository requires:
+
+1. **Nix** (latest, via Determinate installer recommended)
+2. **Git** (for committing and pushing)
+3. **macOS** (nix-darwin is macOS-specific)
+
+### Initial Setup
+
+```bash
+# 1. Clone the repo
+git clone <repo-url>
+cd nix-config
+
+# 2. Install pre-commit hooks (automatic on rebuild)
+pre-commit install
+
+# 3. Make changes to Nix files
+# Edit files in modules/, hosts/, etc.
+
+# 4. Test your changes locally
+nix flake check
+
+# 5. Commit (hooks run automatically)
+git add .
+git commit -m "Your change description"
+
+# 6. Push to GitHub
+git push origin your-branch
+```
+
+### Running Pre-commit Hooks
+
+Before pushing, ensure all checks pass:
+
+```bash
+# Run all automatic checks
+pre-commit run --all-files
+
+# Run content quality checks (slower, manual stage)
+pre-commit run --hook-stage manual
+
+# Both passed? Safe to push
+git push
+```
+
+For detailed pre-commit documentation, see [docs/PRECOMMIT.md](docs/PRECOMMIT.md), which explains:
+
+- What each tool group does
+- How to run hooks manually
+- How to troubleshoot common issues
+- Tool reference and documentation
+
+### Rebuilding System Configuration
+
+After your changes are committed:
+
+```bash
+# Rebuild system with your changes
+sudo darwin-rebuild switch --flake ~/.config/nix
+
+# Rollback if something breaks
+sudo darwin-rebuild rollback
+```
+
+See [RUNBOOK.md](RUNBOOK.md) for more operational procedures.
 
 ## Questions?
 
