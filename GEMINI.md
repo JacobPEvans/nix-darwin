@@ -181,7 +181,7 @@ home.sessionVariables = {
 This is a **personal nix-darwin configuration** for learning Nix:
 
 - **Verbose comments are intentional** - User is learning, explanations are valuable
-- **Personal paths are correct** - `/Users/jevans/` is not a placeholder
+- **Personal paths should use placeholders** - Replace `/Users/<username>/` with actual username or use `~`
 - **Multiple examples are pedagogical** - Showing alternatives is educational, not redundant
 - **Flakes-only is a hard requirement** - Never suggest nix-env or channels
 
