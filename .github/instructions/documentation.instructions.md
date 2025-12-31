@@ -176,9 +176,10 @@ Line 67: Consider adding more examples here.
 
 This is a **personal nix-darwin configuration repository**:
 
-- Paths like `/Users/jevans/` are correct (not placeholders)
+- Use placeholder paths like `/Users/<username>/` or `~` (not literal usernames for privacy)
+- Avoid hardcoding specific usernames or hostnames (use `$USER` or environment variables)
 - Verbose explanations are intentional (user is learning)
 - Multiple examples showing alternatives are pedagogical (not redundant)
 - Comments in code examples explaining internals are valuable (not noise)
 
-Don't suggest making docs more "generic" or "portable" - this is personal config.
+This ensures the repo is portable and usable by other contributors without exposing PII.
