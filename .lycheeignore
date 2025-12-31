@@ -1,0 +1,20 @@
+# Lychee Ignore Patterns
+# https://github.com/lycheeverse/lychee
+
+# GitHub workflow badges - API access restrictions
+https://github.com/JacobPEvans/nix/actions/workflows/.*.badge.svg
+
+# Localhost URLs - expected to fail in CI
+http://localhost.*
+http://127.0.0.1.*
+
+# External sites with known issues or rate limiting
+https://modelcontextprotocol.org/
+https://determinate.systems/.*
+
+# Documentation with access restrictions
+https://nix-darwin.github.io/.*
+https://raw.githubusercontent.com/nix-darwin/.*
+
+# Local file references that won't exist in CI
+file:///Users/jevans/.*
