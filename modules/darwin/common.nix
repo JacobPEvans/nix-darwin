@@ -24,6 +24,7 @@ in
     ./finder.nix
     ./keyboard.nix
     ./launchd-bootstrap.nix
+    ./auto-recovery.nix
     ./security.nix
     ./terminal.nix
     ./trackpad.nix
