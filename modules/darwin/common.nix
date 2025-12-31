@@ -23,6 +23,7 @@ in
     ./file-extensions.nix
     ./finder.nix
     ./keyboard.nix
+    ./launchd-bootstrap.nix
     ./security.nix
     ./terminal.nix
     ./trackpad.nix

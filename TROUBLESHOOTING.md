@@ -6,6 +6,7 @@ Common issues and solutions for this nix-darwin configuration.
 
 - [Sudo Requirements](#sudo-requirements)
 - [Quick Fixes](#quick-fixes)
+- [Boot Failures](#boot-failures)
 - [Why Packages "Disappear"](#why-packages-disappear)
 - [Package Management Issues](#package-management-issues)
 - [Application Issues](#application-issues)
@@ -120,6 +121,42 @@ nix search nixpkgs <partial-name>
 1. Commit your changes to git (flakes require this)
 2. Rebuild (see [RUNBOOK.md](RUNBOOK.md#everyday-commands))
 3. Open a new terminal
+
+---
+
+## Boot Failures
+
+### System Broken After Restart (Empty PATH, Commands Not Found)
+
+**Problem**: After restarting your Mac, the Nix environment is completely broken:
+
+- `echo $PATH` shows nothing or only `/usr/bin:/bin`
+- `darwin-rebuild: command not found`
+- `/run/current-system` doesn't exist
+- Shell completions and oh-my-zsh not working
+
+**Root Cause**: nix-darwin's LaunchDaemons (`org.nixos.activate-system`) weren't loaded at boot,
+so the activation script never ran.
+
+**Quick Fix**:
+
+```bash
+# Bootstrap the missing services
+sudo launchctl bootstrap system /Library/LaunchDaemons/org.nixos.darwin-store.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/org.nixos.activate-system.plist
+
+# Run activation
+sudo /nix/var/nix/profiles/system/activate
+
+# Start new shell
+exec zsh
+```
+
+**Permanent Fix**: The `modules/darwin/launchd-bootstrap.nix` module ensures services are
+bootstrapped during every activation.
+
+**Full Documentation**: See [docs/NIX-BOOT-FAILURE.md](docs/NIX-BOOT-FAILURE.md) for complete
+diagnosis steps, error messages, and prevention strategies.
 
 ---
 
@@ -532,3 +569,7 @@ Error: Access token is not in a valid format: Doesn't contain a decryption key
 
 - [README.md](README.md) - Quick reference and commands
 - [SETUP.md](SETUP.md) - Initial setup and configuration decisions
+- [RUNBOOK.md](RUNBOOK.md) - Common commands and procedures
+- [docs/NIX-BOOT-FAILURE.md](docs/NIX-BOOT-FAILURE.md) - Boot failure recovery guide
+- [docs/ACTIVATION-SCRIPTS-RULES.md](docs/ACTIVATION-SCRIPTS-RULES.md) - Rules for writing activation scripts
+- [docs/ACTIVATION-EXIT-CODES.md](docs/ACTIVATION-EXIT-CODES.md) - Understanding activation exit codes
