@@ -11,19 +11,23 @@
 #
 # OUTPUT FORMAT (after transformation via lib/claude-registry.nix):
 #   source: "github"
-#   repo: "marketplace-key"
+#   repo: <value from source.url>  # The actual GitHub path for fetching
 #
 # MARKETPLACE DISPLAY NAMES:
-# - Marketplace key in this file: "owner/repo" format (e.g., "wakatime/claude-code-wakatime")
-# - Display name in Claude Code: repo name only (e.g., "claude-code-wakatime")
-#   This is extracted by getMarketplaceName = lib.last (lib.splitString "/" name)
-# - Plugin references use: "plugin-name@display-name" (e.g., "claude-code-wakatime@claude-code-wakatime")
-#   NOT "plugin-name@owner" - this is a common mistake!
+# - Standard: Key = "owner/repo", display name = repo (extracted by getMarketplaceName)
+# - Special: Some marketplaces use org-name as display (e.g., WakaTime uses "wakatime")
+# - Plugin references: "plugin-name@display-name" (e.g., "claude-code-wakatime@wakatime")
+#
+# SPECIAL CASES (key differs from owner/repo pattern):
+# - WakaTime: Key = "wakatime", URL = "wakatime/claude-code-wakatime"
+#   Official: claude plugin i claude-code-wakatime@wakatime
+# - When in doubt, check the official plugin install command
 #
 # WHY THIS WORKS:
 # - The toClaudeMarketplaceFormat function (lib/claude-registry.nix)
 #   converts both "github" and "git" types to "source: github"
-# - The marketplace key becomes the repo value in settings.json
+# - The source.url becomes the repo value in settings.json (for fetching)
+# - The KEY becomes the display name (for plugin references)
 # - This ensures Claude Code can locate and fetch the marketplace
 # ========================================================================
 
@@ -106,7 +110,10 @@ let
     # ========================================================================
     # Time Tracking & Monitoring Marketplaces
     # ========================================================================
-    "wakatime/claude-code-wakatime" = {
+    # SPECIAL CASE: WakaTime uses org-name as marketplace ID
+    # Official install: claude plugin i claude-code-wakatime@wakatime
+    # Key is "wakatime" (display name), URL is full GitHub path for fetching
+    "wakatime" = {
       source = {
         type = "github";
         url = "wakatime/claude-code-wakatime";

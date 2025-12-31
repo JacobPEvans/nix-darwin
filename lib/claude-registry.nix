@@ -36,7 +36,8 @@ let
   #
   # TRANSFORMATION LOGIC:
   #   - Both type="github" and type="git" become source="github" in output
-  #   - The marketplace KEY becomes the repo value (e.g., "anthropics/claude-code")
+  #   - The URL field becomes the repo value (the actual GitHub path for fetching)
+  #   - The KEY can differ from URL for display purposes (e.g., "wakatime" vs "wakatime/claude-code-wakatime")
   #   - Non-GitHub types keep their source type and url unchanged
   #
   # DOCUMENTATION LOCATION:
@@ -47,12 +48,12 @@ let
   #   claudeRegistry = import ../../lib/claude-registry.nix { inherit lib; };
   #   transformed = claudeRegistry.toClaudeMarketplaceFormat name marketplace;
   #
-  toClaudeMarketplaceFormat = name: m: {
+  toClaudeMarketplaceFormat = _name: m: {
     source =
       if m.source.type == "github" || m.source.type == "git" then
         {
           source = "github";
-          repo = name; # Marketplace key becomes repo value (e.g., "anthropics/claude-code")
+          repo = m.source.url; # Use URL for GitHub path (allows key to differ for display)
         }
       else
         {

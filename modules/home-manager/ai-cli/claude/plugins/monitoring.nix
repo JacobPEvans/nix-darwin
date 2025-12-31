@@ -7,10 +7,10 @@ _:
 {
   enabledPlugins = {
     # ========================================================================
-    # WakaTime
+    # WakaTime - Time Tracking
     # ========================================================================
-    # Plugin: claude-code-wakatime from marketplace: wakatime/claude-code-wakatime
-    # Marketplace display name (extracted): claude-code-wakatime
-    "claude-code-wakatime@claude-code-wakatime" = true;
+    # Official install: claude plugin i claude-code-wakatime@wakatime
+    # Plugin: claude-code-wakatime | Marketplace: wakatime (org name, not repo name)
+    "claude-code-wakatime@wakatime" = true;
   };
 }
