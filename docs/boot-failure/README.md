@@ -107,7 +107,7 @@ sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 sudo /nix/var/nix/profiles/system/activate
 ```
 
-### Error: "homebrew installed required"
+### Error: "Homebrew installation required"
 
 ```text
 error: Using the homebrew module requires homebrew installed
