@@ -270,7 +270,7 @@ sudo /nix/var/nix/profiles/system/activate
 
 ```text
 cmp: /nix/store/.../superpowers-marketplace: Is a directory
-ln: /Users/jevans/.claude/plugins/marketplaces/superpowers-marketplace: cannot overwrite directory
+ln: ~/.claude/plugins/marketplaces/superpowers-marketplace: cannot overwrite directory
 ```
 
 **Root Cause**: Runtime plugin installs (via `/plugin install`) create real directories at

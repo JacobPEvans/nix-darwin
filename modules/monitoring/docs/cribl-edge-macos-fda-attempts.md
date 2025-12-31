@@ -5,7 +5,7 @@
 
 ## Problem
 
-Cribl Edge runs as the `cribl` user (non-root) but needs Full Disk Access (FDA) to read files in protected directories like `/Users/jevans/.claude/logs/`.
+Cribl Edge runs as the `cribl` user (non-root) but needs Full Disk Access (FDA) to read files in protected directories like `~/.claude/logs/`.
 
 macOS FDA only accepts application bundles (.app), not raw binaries. The Cribl Edge installer creates `/opt/cribl/bin/cribl` as a raw binary.
 

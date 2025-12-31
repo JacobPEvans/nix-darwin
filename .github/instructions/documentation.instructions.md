@@ -43,9 +43,9 @@ applyTo:
    - Link style (MD034)
 
 2. **Personal Configuration Details**
-   - Paths like `/Users/jevans/...` - This is a personal config repo
-   - Specific usernames or hostnames - Intentional for this use case
-   - Personal preferences documented as such
+   - Use placeholder paths like `/Users/<username>/...` or `~` instead of literal usernames
+   - Avoid hardcoding specific usernames or hostnames (use `$USER` or placeholders)
+   - Personal preferences documented as configuration examples
 
 3. **Verbose Documentation**
    - Long explanations for learning purposes

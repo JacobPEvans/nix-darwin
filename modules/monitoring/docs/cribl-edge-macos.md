@@ -89,8 +89,8 @@ sudo launchctl load /Library/LaunchDaemons/io.cribl.plist
 ### Verify FDA is Working
 
 ```bash
-# Check if Cribl can read protected files
-sudo -u cribl cat /Users/jevans/.claude/logs/mcp.jsonl | head -1
+# Check if Cribl can read protected files (replace $USER with your username)
+sudo -u cribl cat /Users/$USER/.claude/logs/mcp.jsonl | head -1
 ```
 
 If FDA is working, this will output JSON. If not, you'll get "Operation not permitted".
