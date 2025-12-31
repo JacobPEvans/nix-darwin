@@ -1,0 +1,51 @@
+# Lychee Link Checker Configuration
+# https://github.com/lycheeverse/lychee
+
+# Retry configuration for transient network errors
+max_retries = 3
+retry_wait_time = 1
+
+# Timeout for link checking (in seconds)
+timeout = 30
+
+# Accept status codes that shouldn't fail
+accept = [
+  429,  # Too Many Requests (rate limiting)
+  503,  # Service Unavailable (temporary)
+  500,  # Internal Server Error
+]
+
+# Exclude patterns for URLs that commonly cause false positives
+exclude_paths = [
+  # Localhost URLs (expected to fail in CI)
+  "localhost",
+  "127.0.0.1",
+
+  # Local file references (expected to fail in CI)
+  "file:///",
+]
+
+# URLs to skip checking entirely
+exclude = [
+  # GitHub workflow status badges (API access restrictions)
+  "https://github.com/JacobPEvans/nix/actions/workflows/.*\\.badge\\.svg",
+
+  # Local services that aren't running in CI
+  "http://localhost.*",
+  "http://127\\.0\\.0\\.1.*",
+
+  # Known network-dependent sites that may timeout
+  "https://modelcontextprotocol\\.org/",
+  "https://determinate\\.systems/.*",
+
+  # Documentation with auth requirements or access restrictions
+  "https://nix-darwin\\.github\\.io/.*",
+  "https://raw\\.githubusercontent\\.com/nix-darwin/.*",
+]
+
+# Whether to skip HTTPS certificate verification
+insecure = false
+
+# Custom headers for requests (useful for GitHub token to avoid rate limiting)
+# Set GITHUB_TOKEN environment variable for better GitHub API access
+# headers = []
