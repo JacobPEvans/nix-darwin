@@ -28,6 +28,7 @@ with pkgs;
   # Shell
   shellcheck # Shell script static analysis (POSIX, bash)
   shfmt # Shell script formatter
+  bats # Bash Automated Testing System for shell script testing
 
   # Documentation
   lychee # Link checker for markdown and HTML (validates URLs in docs)

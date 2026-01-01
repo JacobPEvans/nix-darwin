@@ -124,3 +124,51 @@ Open an issue. I'll respond when I can. Or ping me on the Nix Slack if you're fe
 ---
 
 *Thanks for reading this far. Most people don't. You're a legend.* 🦸
+
+### Shell Script Testing
+
+Shell scripts in this repository are tested using **BATS** (Bash Automated Testing System).
+
+#### Running Tests
+
+```bash
+# Run all shell script tests
+./tests/run-shell-tests.sh
+
+# Run a specific test file
+bats tests/shell/test_auto_claude_args.bats
+
+# Run tests matching a pattern
+bats tests/shell/test_*.bats
+```
+
+#### Writing New Tests
+
+Test files are stored in `tests/shell/` with the `.bats` extension. Each test file should focus on testing a single shell script or related functionality.
+
+Basic BATS test structure:
+
+```bats
+#!/usr/bin/env bats
+# Descriptive comment about what these tests cover
+
+@test "descriptive test name" {
+  run command_to_test arg1 arg2
+  [ "$status" -eq 0 ]              # Assert exit code
+  [[ "$output" =~ "expected text" ]] # Assert output contains text
+}
+
+@test "another test" {
+  [ 1 -eq 1 ]  # Simple assertion
+}
+```
+
+**Key BATS features:**
+
+- `run` - Execute a command and capture output/exit code
+- `$status` - Exit code from last `run` command
+- `$output` - Captured stdout from last `run` command
+- `[ ... ]` - Bash test assertions
+- `[[ ... ]]` - Bash conditional expressions (pattern matching with `=~`)
+
+For complete BATS documentation, see [bats-core documentation](https://bats-core.readthedocs.io/).
