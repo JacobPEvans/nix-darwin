@@ -420,11 +420,181 @@ def blocks_run_skipped(repo: str, reason: str) -> tuple[list, str]:
     return blocks, f"Auto-Claude run skipped for {repo}: {reason}"
 
 
+def blocks_session_summary(
+    findings: list[str],
+    recommendations: list[str],
+    mode: str,
+    stats: Optional[dict] = None,
+) -> tuple[list, str]:
+    """Block Kit for session summary - goes to Slack thread, NOT GitHub.
+
+    This is for meta-information about auto-claude runs that should NOT
+    be created as GitHub issues. Examples:
+    - "Orchestrator Session Summary"
+    - "Consolidated findings from analysis"
+    - Mode transition notifications
+    """
+    text = "Session Summary"
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": "📋 Session Summary", "emoji": True},
+        },
+    ]
+
+    # Add mode info if provided
+    if mode:
+        mode_emoji = {
+            "NORMAL": "🟢",
+            "CONSOLIDATION": "🟡",
+            "PR_CREATION": "🟠",
+            "PR_FOCUS": "🔴",
+            "PAUSED": "⛔",
+        }.get(mode, "⚪")
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Mode:* {mode_emoji} {escape_slack_markdown(mode)}"},
+        })
+
+    # Add stats if provided
+    if stats:
+        stat_fields = []
+        if "total_issues" in stats:
+            stat_fields.append({"type": "mrkdwn", "text": f"*Issues:* {stats['total_issues']}"})
+        if "ai_created" in stats:
+            stat_fields.append({"type": "mrkdwn", "text": f"*AI-Created:* {stats['ai_created']}"})
+        if "pr_count" in stats:
+            stat_fields.append({"type": "mrkdwn", "text": f"*Open PRs:* {stats['pr_count']}"})
+        if "ratio" in stats:
+            stat_fields.append({"type": "mrkdwn", "text": f"*Ratio:* {stats['ratio']}:1"})
+        if stat_fields:
+            blocks.append({"type": "section", "fields": stat_fields})
+
+    # Add findings
+    if findings:
+        findings_text = "\n".join(f"• {escape_slack_markdown(f)}" for f in findings[:MAX_DISPLAY_ITEMS])
+        if len(findings) > MAX_DISPLAY_ITEMS:
+            findings_text += f"\n_...and {len(findings) - MAX_DISPLAY_ITEMS} more_"
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Findings:*\n{findings_text}"},
+        })
+
+    # Add recommendations
+    if recommendations:
+        rec_text = "\n".join(f"• {escape_slack_markdown(r)}" for r in recommendations[:MAX_DISPLAY_ITEMS])
+        if len(recommendations) > MAX_DISPLAY_ITEMS:
+            rec_text += f"\n_...and {len(recommendations) - MAX_DISPLAY_ITEMS} more_"
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Recommendations:*\n{rec_text}"},
+        })
+
+    blocks.append({"type": "divider"})
+    blocks.append({
+        "type": "context",
+        "elements": [{"type": "mrkdwn", "text": "_This summary is for Slack only - not a GitHub issue._"}],
+    })
+
+    return blocks, text
+
+
+def blocks_cross_issue_update(
+    issues: list[str],
+    prs: list[str],
+    action: str,
+    details: Optional[str] = None,
+) -> tuple[list, str]:
+    """Block Kit for cross-issue/PR updates - goes to Slack thread, NOT GitHub.
+
+    Use this for updates that span multiple issues or PRs. Examples:
+    - "Linked issues #1, #2, #3 as related"
+    - "Closed 5 issues resolved by merged PRs"
+    - "Consolidated 3 duplicate issues into #45"
+    """
+    text = f"Cross-Issue Update: {action}"
+
+    action_emoji = {
+        "linked": "🔗",
+        "closed": "✅",
+        "consolidated": "📦",
+        "deduplicated": "🔄",
+        "labeled": "🏷️",
+    }.get(action.lower(), "📝")
+
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"{action_emoji} *{escape_slack_markdown(action)}*"},
+        },
+    ]
+
+    # Add issues if provided
+    if issues:
+        issues_text = ", ".join(f"#{escape_slack_markdown(str(i))}" for i in issues[:MAX_DISPLAY_ITEMS])
+        if len(issues) > MAX_DISPLAY_ITEMS:
+            issues_text += f" _...and {len(issues) - MAX_DISPLAY_ITEMS} more_"
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Issues:* {issues_text}"},
+        })
+
+    # Add PRs if provided
+    if prs:
+        prs_text = ", ".join(f"#{escape_slack_markdown(str(p))}" for p in prs[:MAX_DISPLAY_ITEMS])
+        if len(prs) > MAX_DISPLAY_ITEMS:
+            prs_text += f" _...and {len(prs) - MAX_DISPLAY_ITEMS} more_"
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*PRs:* {prs_text}"},
+        })
+
+    # Add details if provided
+    if details:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"_{escape_slack_markdown(details)}_"},
+        })
+
+    return blocks, text
+
+
 def cmd_run_skipped(args):
     """Handle run_skipped event."""
     token = get_slack_token()
     blocks, text = blocks_run_skipped(args.repo, args.reason)
     result = post_message(token, args.channel, blocks, text)
+    return 0 if result else 1
+
+
+def cmd_session_summary(args):
+    """Handle session_summary event - posts to Slack thread, NOT GitHub."""
+    token = get_slack_token()
+    findings = [f.strip() for f in args.findings.split("|")] if args.findings else []
+    recommendations = [r.strip() for r in args.recommendations.split("|")] if args.recommendations else []
+    stats = {}
+    if args.total_issues is not None:
+        stats["total_issues"] = args.total_issues
+    if args.ai_created is not None:
+        stats["ai_created"] = args.ai_created
+    if args.pr_count is not None:
+        stats["pr_count"] = args.pr_count
+    if args.ratio is not None:
+        stats["ratio"] = args.ratio
+
+    blocks, text = blocks_session_summary(findings, recommendations, args.mode, stats if stats else None)
+    result = post_message(token, args.channel, blocks, text, thread_ts=args.thread_ts)
+    return 0 if result else 1
+
+
+def cmd_cross_issue_update(args):
+    """Handle cross_issue_update event - posts to Slack thread, NOT GitHub."""
+    token = get_slack_token()
+    issues = args.issues.split(",") if args.issues else []
+    prs = args.prs.split(",") if args.prs else []
+    blocks, text = blocks_cross_issue_update(issues, prs, args.action, args.details)
+    result = post_message(token, args.channel, blocks, text, thread_ts=args.thread_ts)
     return 0 if result else 1
 
 
@@ -485,6 +655,31 @@ def main():
     p_skipped.add_argument("--reason", required=True, help="Skip reason")
     p_skipped.add_argument("--channel", required=True, help="Slack channel ID")
     p_skipped.set_defaults(func=cmd_run_skipped)
+
+    # session_summary - goes to Slack thread, NOT GitHub
+    p_summary = subparsers.add_parser("session_summary", help="Post session summary to Slack (not GitHub)")
+    p_summary.add_argument("--repo", required=True)
+    p_summary.add_argument("--channel", required=True)
+    p_summary.add_argument("--thread-ts", required=True)
+    p_summary.add_argument("--mode", required=True, help="Current mode (NORMAL, CONSOLIDATION, etc.)")
+    p_summary.add_argument("--findings", help="Pipe-separated list of findings")
+    p_summary.add_argument("--recommendations", help="Pipe-separated list of recommendations")
+    p_summary.add_argument("--total-issues", type=int, help="Total open issues")
+    p_summary.add_argument("--ai-created", type=int, help="AI-created issues count")
+    p_summary.add_argument("--pr-count", type=int, help="Open PR count")
+    p_summary.add_argument("--ratio", type=float, help="Issue:PR ratio")
+    p_summary.set_defaults(func=cmd_session_summary)
+
+    # cross_issue_update - goes to Slack thread, NOT GitHub
+    p_cross = subparsers.add_parser("cross_issue_update", help="Post cross-issue update to Slack (not GitHub)")
+    p_cross.add_argument("--repo", required=True)
+    p_cross.add_argument("--channel", required=True)
+    p_cross.add_argument("--thread-ts", required=True)
+    p_cross.add_argument("--action", required=True, help="Action taken (linked, closed, consolidated, etc.)")
+    p_cross.add_argument("--issues", help="Comma-separated issue numbers")
+    p_cross.add_argument("--prs", help="Comma-separated PR numbers")
+    p_cross.add_argument("--details", help="Additional details")
+    p_cross.set_defaults(func=cmd_cross_issue_update)
 
     args = parser.parse_args()
     return args.func(args)
