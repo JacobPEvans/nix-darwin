@@ -62,7 +62,7 @@ in
       if [ ! -f "$PLIST" ]; then
         # Terminal.app hasn't been launched yet - create minimal plist
         plutil -create xml1 "$PLIST"
-        echo "Created Terminal.app plist file" >&2
+        echo "Created Terminal.app plist file"
       fi
 
       # Ensure the profile dictionary exists
@@ -96,7 +96,7 @@ in
 
       # Report success or failure
       if [ $colSuccess -eq 1 ] && [ $rowSuccess -eq 1 ]; then
-        echo "Terminal.app profile '$PROFILE' configured for ''${COLUMNS}x''${ROWS}" >&2
+        echo "Terminal.app profile '$PROFILE' configured for ''${COLUMNS}x''${ROWS}"
       else
         echo "Warning: Terminal.app profile '$PROFILE' configuration incomplete" >&2
       fi

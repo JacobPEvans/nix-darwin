@@ -67,8 +67,8 @@ with pkgs;
   # HTTP & API Tools
   # ==========================================================================
   # Tools for testing and working with HTTP APIs and web services.
-
-  rapidapi # Full-featured HTTP client for testing and describing APIs
+  # NOTE: RapidAPI (GUI) moved to home.packages for macOS with copyApps.
+  # See hosts/macbook-m4/home.nix
 
   # ==========================================================================
   # Python Tools

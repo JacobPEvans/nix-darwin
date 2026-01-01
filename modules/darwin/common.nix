@@ -22,7 +22,11 @@ in
     ./dock
     ./file-extensions.nix
     ./finder.nix
+    ./homebrew.nix
     ./keyboard.nix
+    ./launchd-bootstrap.nix
+    ./boot-activation.nix # Creates /run/current-system at boot
+    ./auto-recovery.nix
     ./security.nix
     ./terminal.nix
     ./trackpad.nix
@@ -120,44 +124,20 @@ in
       # NOTE: OrbStack managed via programs.orbstack module for system-level
       # installation. See modules/darwin/apps/orbstack.nix and
       # hosts/macbook-m4/default.nix for configuration.
-      # NOTE: Zoom moved to home.packages for better handling of TCC
-      # (camera/mic/screen) permissions via stable trampolines (wrapper apps with
-      # stable paths; see hosts/macbook-m4/home.nix). Apps that frequently need
-      # these permissions (e.g., Zoom for video calls) benefit most.
+      # NOTE: Zoom in home.packages with copyApps enabled for stable TCC paths.
+      # See hosts/macbook-m4/home.nix for TCC-sensitive app configuration.
       raycast # Productivity launcher (replaces Spotlight)
       swiftbar # Menu bar customization (auto-claude status)
-      vscode # Visual Studio Code editor
+      # NOTE: VS Code managed via programs.vscode in home-manager for declarative
+      # settings. With copyApps enabled, the user-level app has stable TCC paths.
+      # See modules/home-manager/common.nix for VS Code configuration.
     ]);
 
-  # Homebrew as FALLBACK ONLY for packages not in nixpkgs or severely outdated
-  # Prefer nixpkgs for everything - only use homebrew when absolutely necessary
-  homebrew = {
-    enable = true;
-    onActivation = {
-      autoUpdate = false; # Don't download 45MB index on every rebuild (fast)
-      cleanup = "none"; # Don't remove manually installed packages
-      upgrade = true; # Upgrade packages based on cached index
-      # To get new versions: run `brew update` then `darwin-rebuild switch`
-    };
-    taps = [
-      # "homebrew/cask"   # Example: additional taps
-    ];
-    brews = [
-      # CLI tools (only if not available in nixpkgs)
-      "ccusage" # Claude Code usage analyzer (not in nixpkgs)
-    ];
-    casks = [
-      # GUI applications (only if not available in nixpkgs)
-    ];
-
-    # Mac App Store apps (requires signed into App Store)
-    # Find app IDs: mas search <name> or https://github.com/mas-cli/mas
-    # Format: "App Name" = app_id;
-    masApps = {
-      # "Xcode" = 497799835;
-      # "1Password" = 1333542190;
-    };
-  };
+  # ==========================================================================
+  # Homebrew Configuration
+  # ==========================================================================
+  # Homebrew config extracted to ./homebrew.nix
+  # See that file for casks, brews, and masApps configuration
 
   # ==========================================================================
   # Programs Configuration
@@ -247,21 +227,21 @@ in
         # diagnostics for debugging exit code issues (especially exit code 2
         # from launchctl asuser calls during home-manager activation)
 
-        echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..." >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] Post-activation verification starting..."
 
         # Check if /run/current-system symlink was updated (proves activation succeeded)
         if [ -L /run/current-system ]; then
           CURRENT_SYSTEM=$(readlink /run/current-system)
-          echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded" >&2
-          echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM" >&2
+          echo "[$(date '+%H:%M:%S')] [INFO] ✓ System activation succeeded"
+          echo "[$(date '+%H:%M:%S')] [INFO] Current system: $CURRENT_SYSTEM"
         else
           echo "[$(date '+%H:%M:%S')] [ERROR] /run/current-system symlink not found" >&2
           echo "[$(date '+%H:%M:%S')] [ERROR] Activation may have failed - check logs above" >&2
         fi
 
-        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-        echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed" >&2
-        echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
+        echo "[$(date '+%H:%M:%S')] [INFO] darwin-rebuild completed"
+        echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
       '';
     };
 

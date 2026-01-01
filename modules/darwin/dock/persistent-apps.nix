@@ -6,12 +6,13 @@
 # App locations:
 #   - System apps: /System/Applications/
 #   - Nix system packages: /Applications/Nix Apps/
-#   - Home Manager trampolines: ~/Applications/Home Manager Trampolines/
+#   - Home Manager apps (copyApps): ~/Applications/Home Manager Apps/
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
 #
-# NOTE: TCC-sensitive apps (Zoom, Ghostty) use Home Manager trampolines
-# for persistent macOS permissions across darwin-rebuild.
+# NOTE: TCC-sensitive apps (Zoom, Ghostty, VS Code) now use copyApps (migrated
+# from mac-app-util trampolines) for stable paths that persist macOS TCC
+# permissions across darwin-rebuild.
 
 _:
 
@@ -33,8 +34,9 @@ in
 
       # Communication
       "/System/Applications/Messages.app"
+      "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
       "/Applications/Slack.app"
-      "${homeDir}/Applications/Home Manager Trampolines/zoom.us.app"
+      "${homeDir}/Applications/Home Manager Apps/zoom.us.app"
       "/Applications/Webex.app"
 
       # Knowledge & Notes
@@ -42,9 +44,10 @@ in
       # Note: Additional note-taking apps may be installed locally
 
       # Development & Tools
-      "/Applications/Nix Apps/RapidAPI.app"
-      "/Applications/Nix Apps/Visual Studio Code.app"
-      "${homeDir}/Applications/Home Manager Trampolines/Ghostty.app"
+      "${homeDir}/Applications/Home Manager Apps/RapidAPI.app"
+      "${homeDir}/Applications/Home Manager Apps/Postman.app"
+      "${homeDir}/Applications/Home Manager Apps/Visual Studio Code.app"
+      "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
       "/Applications/Nix Apps/Bitwarden.app"
       "/Applications/Nix Apps/OrbStack.app"
 
@@ -52,17 +55,26 @@ in
       "/Applications/Safari.app"
       "/Applications/Brave Browser.app"
 
-      # AI Tools
-      "${homeDir}/Applications/Gemini.app"
-      # Ollama runs headless via LaunchAgent, no dock icon needed
+      # NOTE: AI Tools (Gemini, Antigravity, Claude, ChatGPT, Cursor) are in
+      # the AI Tools folder on the right side of the Dock (persistent-others).
+      # Ollama runs headless via LaunchAgent, no dock icon needed.
     ];
 
     # ========================================================================
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
-    # Explicitly empty - prefer show-recents for temporary apps rather than
-    # persisting folders/apps not managed by Nix. Add apps to persistent-apps
-    # above when they should be permanent.
-    persistent-others = [ ];
+    # AI Tools folder contains symlinks to all AI desktop apps.
+    # Click to expand as a fan/grid showing: Gemini, Antigravity, Claude,
+    # ChatGPT, and Cursor.
+    persistent-others = [
+      {
+        folder = {
+          path = "${homeDir}/Applications/AI Tools";
+          displayas = "folder"; # Show as folder icon
+          showas = "grid"; # Expand as grid when clicked
+          arrangement = "name"; # Sort alphabetically
+        };
+      }
+    ];
   };
 }

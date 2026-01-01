@@ -15,9 +15,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # mac-app-util: Create stable app trampolines to preserve macOS permissions
-    # Without this, TCC permissions (camera, microphone, screen recording) are
-    # revoked on every rebuild because Nix store paths change.
+    # mac-app-util: Create app trampolines for /Applications/Nix Apps/ (system-level)
+    # Used ONLY at darwin level for environment.systemPackages apps.
+    # Home-manager apps use copyApps instead (see hosts/macbook-m4/home.nix).
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       # Consolidate all input overrides in a single attrset
@@ -182,8 +182,9 @@
         modules = [
           ./hosts/macbook-m4/default.nix
 
-          # mac-app-util: Creates stable trampolines for GUI apps
-          # Preserves TCC permissions (camera, mic, screen) across rebuilds
+          # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
+          # NOTE: These trampolines still point to /nix/store paths, so TCC isn't fully stable.
+          # For TCC-sensitive apps (camera, mic), use home.packages + copyApps instead.
           mac-app-util.darwinModules.default
 
           home-manager.darwinModules.home-manager
@@ -192,15 +193,18 @@
               inherit extraSpecialArgs;
               users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
-              # mac-app-util: Also needed for home.packages if any GUI apps there
               # Agent OS: Proper home-manager module for spec-driven AI development
               # Claude: Unified configuration for Claude Code ecosystem
               # Monitoring: K8s-based observability stack (OTEL, Cribl, Splunk)
               # Note: nix-config-symlink module intentionally removed.
               # It conflicted with ~/.config/nix being a git worktree.
               # See PLANNING-monitoring.md for details.
+              #
+              # NOTE: mac-app-util home-manager module REMOVED - using copyApps instead.
+              # copyApps copies apps to ~/Applications/Home Manager Apps/ with stable paths,
+              # making mac-app-util trampolines redundant for TCC permission persistence.
+              # The darwin-level mac-app-util module is still used for /Applications/Nix Apps/.
               sharedModules = [
-                mac-app-util.homeManagerModules.default
                 ./modules/home-manager/ai-cli/agent-os
                 ./modules/home-manager/ai-cli/claude
                 ./modules/monitoring

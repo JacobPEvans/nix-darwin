@@ -32,9 +32,9 @@
 #    In hosts/<host>/home.nix:
 #      home.packages = [ pkgs.orbstack ];  # Install per-user
 #
-#    Pros: mac-app-util provides stable trampolines for TCC permissions
+#    Pros: With copyApps, provides stable paths for TCC permissions
 #    Cons: Requires per-user configuration for each user
-#    App location: ~/Applications/Home Manager Trampolines/OrbStack.app
+#    App location: ~/Applications/Home Manager Apps/OrbStack.app
 #
 # The data volume symlink is managed by home-manager in hosts/<host>/home.nix
 # using mkOutOfStoreSymlink (see Ollama pattern for example):
