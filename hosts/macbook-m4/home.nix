@@ -6,6 +6,24 @@
 { config, pkgs, ... }:
 
 {
+  # ==========================================================================
+  # macOS Application Management (copyApps for TCC stability)
+  # ==========================================================================
+  # Use copyApps instead of linkApps to create REAL copies of apps at stable
+  # paths in ~/Applications/Home Manager Apps/. This allows macOS TCC
+  # (Transparency, Consent, Control) permissions to persist across rebuilds.
+  #
+  # With linkApps (default), apps symlink to /nix/store paths which change on
+  # every rebuild, invalidating TCC permissions (camera, mic, screen recording).
+  #
+  # Trade-off: Uses more disk space (~100MB per app) but TCC permissions persist.
+  #
+  # See: https://github.com/nix-community/home-manager/issues/8336
+  targets.darwin = {
+    copyApps.enable = true;
+    linkApps.enable = false;
+  };
+
   imports = [
     # Common home-manager configuration
     ../../modules/home-manager/common.nix
@@ -36,33 +54,62 @@
 
   home = {
     # ========================================================================
-    # TCC-Sensitive GUI Applications (require proper trampolines)
+    # TCC-Sensitive GUI Applications (using copyApps for stable paths)
     # ========================================================================
     # These apps need macOS TCC (Transparency Consent Control) permissions
     # for camera, microphone, screen recording, etc.
     #
-    # IMPORTANT: Apps in home.packages get REAL trampolines via mac-app-util
-    # that persist TCC permissions across darwin-rebuild. Apps in system
-    # packages (environment.systemPackages) do NOT get stable trampolines
-    # that persist TCC permissions; instead they get hard copies in
-    # /Applications/Nix Apps/.
+    # With targets.darwin.copyApps enabled (see above), apps in home.packages
+    # are COPIED to ~/Applications/Home Manager Apps/ with STABLE paths that
+    # persist TCC permissions across darwin-rebuild.
     #
-    # Trampolines location: ~/Applications/Home Manager Trampolines/
+    # This is better than mac-app-util trampolines because:
+    # - Binary paths are stable (not /nix/store which changes on rebuild)
+    # - TCC permissions granted to the app persist
+    # - No wrapper scripts - actual app copies
     #
-    # NOTE: OrbStack moved to system-level installation via
-    # programs.orbstack.package.enable in default.nix
-    # See hosts/macbook-m4/default.nix for OrbStack configuration
+    # Trade-off: Uses more disk space (~100MB per app) but TCC works correctly.
+    #
+    # NOTE: OrbStack managed via programs.orbstack module at system-level.
+    # See hosts/macbook-m4/default.nix for OrbStack configuration.
     packages = with pkgs; [
+      # Terminal & Development
       ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
+      postman # API development environment
+      rapidapi # Full-featured HTTP client for testing and describing APIs
+
+      # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
+      antigravity # Google's AI-powered IDE (Gemini 3)
+      code-cursor # Cursor AI IDE (VS Code fork)
+      chatgpt # OpenAI ChatGPT desktop app
+
+      # Communication
       zoom-us # Video conferencing - needs camera/mic TCC permissions
     ];
 
     # ========================================================================
-    # Host-specific symlinks for external volumes
+    # AI Tools Dock Folder
     # ========================================================================
+    # Creates ~/Applications/AI Tools/ folder with symlinks to all AI apps.
+    # This folder is added to the Dock's right side (persistent-others) as a
+    # clickable stack that expands to show all AI tools in one place.
+    #
+    # Host-specific symlinks for external volumes are also defined here.
     # NOTE: These symlinks point to data on external volumes.
     # Nix does NOT manage the volume contents - only creates symlinks.
     file = {
+      # AI Tools folder symlinks
+      "Applications/AI Tools/Gemini.app".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Gemini.app";
+      "Applications/AI Tools/Antigravity.app".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/Antigravity.app";
+      "Applications/AI Tools/Claude.app".source =
+        config.lib.file.mkOutOfStoreSymlink "/Applications/Claude.app";
+      "Applications/AI Tools/ChatGPT.app".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/ChatGPT.app";
+      "Applications/AI Tools/Cursor.app".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/Cursor.app";
+
       # Ollama models symlink managed by modules/home-manager/ollama.nix
 
       # OrbStack data on dedicated APFS volume
