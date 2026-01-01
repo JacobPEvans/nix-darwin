@@ -19,11 +19,14 @@ These TWO notifications come from TWO different scripts that both try to modify 
    echo "setting up /Applications/Nix Apps..." >&2
    ```
 
-2. **home-manager trampolines** (line ~1481 in activate script):
+2. **darwin-level (system) trampolines** (line ~1481 in activate script):
 
    ```bash
    mac-app-util sync-trampolines "/Applications/Nix Apps" "/Applications/Nix Trampolines"
    ```
+
+   **Note**: This repository removed `mac-app-util` from home-manager (switched to `copyApps`
+   for user-level apps). Only system-level packages still use trampolines.
 
 The activation script includes an App Management permission check that **requires a graphical
 session (Aqua)** to succeed:
@@ -179,12 +182,18 @@ After rebuild:  /nix/store/def456-ghostty-1.2.4/...  ← NEW path, needs permiss
 2. Add the Nix Apps directory to Full Disk Access (security implications)
 3. Use `tccutil` to grant permissions programmatically (complex)
 
-**Not Yet Solved:**
+**Status After `copyApps` Migration (Home-Manager Apps):**
 
-This remains an ongoing UX issue with Nix + macOS App Management. The trampoline pattern
-was designed to provide stable paths, but macOS still tracks the actual binary being executed.
+This repository now uses Home Manager's `copyApps` feature instead of trampolines for
+user-managed applications (see `hosts/macbook-m4/home.nix`). `copyApps` creates real `.app`
+bundles at stable paths under `~/Applications`, so macOS TCC grants App Management permission
+to a fixed location rather than a changing Nix store path.
+
+**Result**: The repeated permission prompts and associated boot-time activation failures
+described above are **resolved for home-manager–managed apps** in this configuration.
+System-level packages still use trampolines and may experience this issue.
 
 Related upstream issues:
 
 - [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255) - LaunchDaemon bootstrap
-- [home-manager#5189](https://github.com/nix-community/home-manager/issues/5189) - Trampoline apps
+- [home-manager#5189](https://github.com/nix-community/home-manager/issues/5189) - Trampoline apps (partially addressed by copyApps)
