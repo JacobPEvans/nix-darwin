@@ -99,6 +99,8 @@
     # Nix does NOT manage the volume contents - only creates symlinks.
     file = {
       # AI Tools folder symlinks
+      # Gemini.app is installed separately (e.g., from App Store) into ~/Applications,
+      # not managed by home.packages; this symlink adds it to the AI Tools folder.
       "Applications/AI Tools/Gemini.app".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Gemini.app";
       "Applications/AI Tools/Antigravity.app".source =
