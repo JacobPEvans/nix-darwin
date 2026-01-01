@@ -80,17 +80,18 @@
     # CLAUDE.md linter - validates AI context files
     # Source: https://github.com/felixgeelhaar/cclint
     # NPM: @felixgeelhaar/cclint
-    # Uses bunx wrapper (TODO: migrate to buildBunPackage for offline support)
+    # SECURITY: Uses bunx wrapper with pinned version; not yet packaged in nixpkgs.
+    # TODO: Migrate to buildBunPackage for offline/reproducible builds.
     (writeShellScriptBin "cclint" ''
-      exec ${bun}/bin/bunx --bun @felixgeelhaar/cclint "$@"
+      exec ${bun}/bin/bunx --bun @felixgeelhaar/cclint@0.12.1 "$@"
     '')
 
     # Claude Code usage analyzer
     # Source: https://github.com/ryoppippi/ccusage
     # NPM: ccusage
-    # Uses bunx wrapper (bun is faster than npx)
+    # SECURITY: Uses bunx wrapper with pinned version; not yet packaged in nixpkgs.
     (writeShellScriptBin "ccusage" ''
-      exec ${bun}/bin/bunx --bun ccusage@latest "$@"
+      exec ${bun}/bin/bunx --bun ccusage@0.6.2 "$@"
     '')
 
     # ==========================================================================
