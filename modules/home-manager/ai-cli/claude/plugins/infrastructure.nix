@@ -1,9 +1,18 @@
 # Infrastructure & DevOps Plugins
 #
-# Infrastructure automation, cloud operations, and DevOps tools from:
-# - lunar-claude: Proxmox, Ansible, Git workflows
-# - claude-code-plugins-plus: IaC generation, Terraform
-# - wshobson/agents: Cloud, Kubernetes, CI/CD, observability
+# CRITICAL: Marketplace Names
+# ============================================================================
+# Plugins from multiple marketplaces - marketplace names match manifest values:
+#
+# 1. wshobson/agents → "@claude-code-workflows"
+#    Example: "cloud-infrastructure@claude-code-workflows"
+#    NOT "@agents" ✗
+#
+# 2. basher83/lunar-claude → "@lunar-claude"
+# 3. jeremylongshore/claude-code-plugins-plus → "@claude-code-plugins-plus"
+#
+# See docs/TESTING-MARKETPLACES.md for verification
+# ============================================================================
 
 _:
 
@@ -25,28 +34,28 @@ _:
     # ========================================================================
     # WSHobson Agents - Cloud & Infrastructure
     # ========================================================================
-    "cloud-infrastructure@agents" = true;
-    "kubernetes-operations@agents" = true;
-    "cicd-automation@agents" = true;
-    "deployment-strategies@agents" = true;
-    "deployment-validation@agents" = true;
+    "cloud-infrastructure@claude-code-workflows" = true;
+    "kubernetes-operations@claude-code-workflows" = true;
+    "cicd-automation@claude-code-workflows" = true;
+    "deployment-strategies@claude-code-workflows" = true;
+    "deployment-validation@claude-code-workflows" = true;
 
     # ========================================================================
     # WSHobson Agents - Observability & Monitoring
     # ========================================================================
-    "observability-monitoring@agents" = true;
+    "observability-monitoring@claude-code-workflows" = true;
 
     # ========================================================================
     # WSHobson Agents - Security
     # ========================================================================
-    "security-scanning@agents" = true;
-    "security-compliance@agents" = true;
-    "backend-api-security@agents" = true;
+    "security-scanning@claude-code-workflows" = true;
+    "security-compliance@claude-code-workflows" = true;
+    "backend-api-security@claude-code-workflows" = true;
 
     # ========================================================================
     # WSHobson Agents - Database & Performance
     # ========================================================================
-    "database-design@agents" = true;
-    "application-performance@agents" = true;
+    "database-design@claude-code-workflows" = true;
+    "application-performance@claude-code-workflows" = true;
   };
 }

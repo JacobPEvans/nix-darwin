@@ -17,7 +17,7 @@ let
   homeDir = config.home.homeDirectory;
 
   # Import the single source of truth for marketplace formatting
-  claudeRegistry = import ../../../../lib/claude-registry.nix { inherit lib; };
+  claudeRegistry = import ../../../../lib/claude-registry.nix { inherit lib; }; # lastUpdated not needed here
   inherit (claudeRegistry) toClaudeMarketplaceFormat;
 
   # Build the env attribute (merge user env vars with API_KEY_HELPER if enabled)

@@ -63,23 +63,9 @@ in
     };
 
     # Activation scripts for directory and config setup
+    # NOTE: "local" marketplace setup removed - Claude Code doesn't use it by default.
+    # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
     home.activation = {
-      # Claude setup - create local marketplace directory with marketplace.json
-      claudeSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        # Create local marketplace directory for hybrid mode
-        ${lib.optionalString cfg.plugins.allowRuntimeInstall ''
-                    MARKETPLACE_DIR="${config.home.homeDirectory}/.claude/plugins/marketplaces/local"
-                    mkdir -p "$MARKETPLACE_DIR/.claude-plugin"
-
-                    # Create marketplace.json if it doesn't exist
-                    if [ ! -f "$MARKETPLACE_DIR/.claude-plugin/marketplace.json" ]; then
-                      $DRY_RUN_CMD cat > "$MARKETPLACE_DIR/.claude-plugin/marketplace.json" <<'EOF'
-          {"id":"local","plugins":[]}
-          EOF
-                    fi
-        ''}
-      '';
-
       # WakaTime config file - created once with placeholder API key
       # User must edit ~/.wakatime.cfg and replace waka_YOUR-API-KEY-HERE with real key
       # See: https://wakatime.com/settings/account
