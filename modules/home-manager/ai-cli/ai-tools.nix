@@ -43,23 +43,25 @@
 # ============================================================================
 #
 # Claude Code Ecosystem:
-#   cclint: Using bunx wrapper (TODO: migrate to buildBunPackage)
-#   ccusage: Using bunx wrapper (TODO: migrate to buildBunPackage)
+#   cclint: Using bunx wrapper (pinned @0.12.1, TODO: migrate to buildBunPackage)
+#   ccusage: Using bunx wrapper (pinned @0.6.2, TODO: migrate to buildBunPackage)
 #
 # Google Gemini:
-#   gemini: Using bunx wrapper (nixpkgs 0.22.5 has stale npm cache)
+#   gemini: Using bunx wrapper (nixpkgs 0.22.5 has stale npm cache:
+#           "ENOTCACHED - request to registry.npmjs.org/string-width failed")
 #
 # GitHub Copilot:
-#   github-copilot-cli: Using bunx wrapper (nixpkgs 0.0.373 has broken package-lock.json)
+#   gh-copilot: Using bunx wrapper (nixpkgs 0.0.373 has broken package-lock.json:
+#               "Missing: @github/copilot-darwin-arm64@ from lock file")
 #
 # OpenAI:
-#   chatgpt: Using bunx wrapper (not available in nixpkgs)
+#   chatgpt: Using bunx wrapper (pinned @3.3.0, not available in nixpkgs)
 #
 # Block Goose:
-#   goose: Using bunx wrapper (nixpkgs depends on broken python3.13-twisted)
+#   goose: Using bunx wrapper (pinned @0.9.4, nixpkgs depends on broken python3.13-twisted)
 #
 # Charmbracelet:
-#   crush: Using bunx wrapper (nixpkgs depends on broken python3.13-twisted)
+#   crush: Using bunx wrapper (pinned @0.1.1, nixpkgs depends on broken python3.13-twisted)
 #
 # Aider:
 #   aider: Via pipx (Python package, not available in nixpkgs)
@@ -72,6 +74,10 @@
 {
   # AI-specific development tools
   # Install via: home.packages = [ ... ] ++ (import ./ai-cli/ai-tools.nix { inherit pkgs; }).packages;
+  #
+  # NOTE: Only claude-code and claude-monitor come from nixpkgs (via darwin/common.nix).
+  # Other packages below are provided as bunx wrappers due to nixpkgs build issues.
+  # See CURRENT STATUS section at the top of this file for details.
   packages = with pkgs; [
     # ==========================================================================
     # Claude Code Ecosystem
@@ -97,11 +103,10 @@
     # ==========================================================================
     # Google Gemini CLI
     # ==========================================================================
-    # Nixpkgs version 0.22.5 has stale npm dependency cache
-    # npm ci fails: "ENOTCACHED - request to registry.npmjs.org/string-width failed"
-    # Using bunx wrapper until nixpkgs updates to fixed version
     # Source: https://github.com/google-gemini/gemini-cli
-    # NPM: @google/gemini-cli
+    # NPM: @google/generative-ai-cli
+    # SECURITY: Uses bunx wrapper (latest tag); nixpkgs 0.22.5 has stale npm cache
+    # TODO: Pin version and migrate to buildBunPackage once nixpkgs is fixed
     (writeShellScriptBin "gemini" ''
       exec ${bun}/bin/bunx --bun @google/generative-ai-cli@latest "$@"
     '')
@@ -109,46 +114,42 @@
     # ==========================================================================
     # GitHub Copilot CLI
     # ==========================================================================
-    # Nixpkgs version 0.0.373 has broken package-lock.json
-    # npm ci fails: "Missing: @github/copilot-darwin-arm64@ from lock file"
-    # Using bunx wrapper until nixpkgs updates to fixed version
     # Source: https://github.com/github/gh-copilot
     # NPM: @githubnext/github-copilot-cli
-    (writeShellScriptBin "github-copilot-cli" ''
-      exec ${bun}/bin/bunx --bun @githubnext/github-copilot-cli "$@"
+    # SECURITY: Uses bunx wrapper (unversioned); nixpkgs 0.0.373 has broken package-lock
+    # TODO: Pin version and migrate to buildBunPackage once nixpkgs is fixed
+    (writeShellScriptBin "gh-copilot" ''
+      exec ${bun}/bin/bunx --bun @githubnext/github-copilot-cli@latest "$@"
     '')
 
     # ==========================================================================
     # OpenAI ChatGPT CLI
     # ==========================================================================
-    # Not available in nixpkgs - using bunx wrapper
     # Source: https://github.com/manno/chatgpt-cli
     # NPM: chatgpt-cli
+    # SECURITY: Uses bunx wrapper with pinned version; not available in nixpkgs
     (writeShellScriptBin "chatgpt" ''
-      exec ${bun}/bin/bunx --bun chatgpt-cli "$@"
+      exec ${bun}/bin/bunx --bun chatgpt-cli@3.3.0 "$@"
     '')
 
     # ==========================================================================
     # Block Goose CLI
     # ==========================================================================
-    # Nixpkgs version depends on python3.13-twisted with test failures
-    # (IPv6 TCP tests timeout after 120s)
-    # Using bunx wrapper until upstream twisted package is fixed
     # Source: https://github.com/block/goose
     # NPM: goose-ai
+    # SECURITY: Uses bunx wrapper with pinned version; nixpkgs depends on broken twisted
     (writeShellScriptBin "goose" ''
-      exec ${bun}/bin/bunx --bun goose-ai "$@"
+      exec ${bun}/bin/bunx --bun goose-ai@0.9.4 "$@"
     '')
 
     # ==========================================================================
     # Charmbracelet Crush (successor to OpenCode)
     # ==========================================================================
-    # Nixpkgs version depends on python3.13-twisted with test failures
-    # Using bunx wrapper until upstream twisted package is fixed
     # Source: https://github.com/charmbracelet/crush
     # NPM: @charmbracelet/crush
+    # SECURITY: Uses bunx wrapper with pinned version; nixpkgs depends on broken twisted
     (writeShellScriptBin "crush" ''
-      exec ${bun}/bin/bunx --bun @charmbracelet/crush "$@"
+      exec ${bun}/bin/bunx --bun @charmbracelet/crush@0.1.1 "$@"
     '')
 
     # ==========================================================================
