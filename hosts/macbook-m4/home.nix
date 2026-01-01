@@ -72,20 +72,24 @@
     #
     # NOTE: OrbStack managed via programs.orbstack module at system-level.
     # See hosts/macbook-m4/default.nix for OrbStack configuration.
-    packages = with pkgs; [
-      # Terminal & Development
-      ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
-      postman # API development environment
-      rapidapi # Full-featured HTTP client for testing and describing APIs
+    packages =
+      (with pkgs; [
+        # Terminal & Development
+        ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
+        postman # API development environment
+        rapidapi # Full-featured HTTP client for testing and describing APIs
 
-      # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
-      antigravity # Google's AI-powered IDE (Gemini 3)
-      code-cursor # Cursor AI IDE (VS Code fork)
-      chatgpt # OpenAI ChatGPT desktop app
+        # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
+        antigravity # Google's AI-powered IDE (Gemini 3)
+        code-cursor # Cursor AI IDE (VS Code fork)
+        chatgpt # OpenAI ChatGPT desktop app
 
-      # Communication
-      zoom-us # Video conferencing - needs camera/mic TCC permissions
-    ];
+        # Communication
+        zoom-us # Video conferencing - needs camera/mic TCC permissions
+      ])
+      # AI Development Tools (linters, formatters, analyzers)
+      # See modules/home-manager/ai-cli/ai-tools.nix for package definitions
+      ++ (import ../../modules/home-manager/ai-cli/ai-tools.nix { inherit pkgs; }).packages;
 
     # ========================================================================
     # AI Tools Dock Folder

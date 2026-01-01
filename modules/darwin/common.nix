@@ -37,7 +37,6 @@ in
   # See overlays/ directory for individual overlay files
   nixpkgs.overlays = [
     (import ../../overlays/python-packages.nix)
-    (import ../../overlays/npm-packages.nix)
   ];
 
   # ==========================================================================

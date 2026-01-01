@@ -34,10 +34,6 @@ with pkgs;
   lychee # Link checker for markdown and HTML (validates URLs in docs)
   markdownlint-cli2 # Markdown linter (README, docs exist everywhere)
 
-  # AI Context Files
-  cclint # CLAUDE.md linter - validates AI context files (npm overlay)
-  ccusage # Claude Code usage analyzer (npm overlay)
-
   # CI/CD
   actionlint # GitHub Actions workflow linter
 
