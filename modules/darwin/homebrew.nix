@@ -19,7 +19,7 @@ _:
     ];
     brews = [
       # CLI tools (only if not available in nixpkgs)
-      # ccusage moved to nix (npm overlay) - see overlays/npm-packages.nix
+      # ccusage moved to nix - see modules/home-manager/ai-cli/ai-tools.nix
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)

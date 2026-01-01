@@ -57,7 +57,7 @@
     # CLAUDE.md linter - validates AI context files
     # Source: https://github.com/felixgeelhaar/cclint
     # NPM: @felixgeelhaar/cclint
-    # Uses npx wrapper (TODO: migrate to buildBunPackage for offline support)
+    # Uses bunx wrapper (TODO: migrate to buildBunPackage for offline support)
     (writeShellScriptBin "cclint" ''
       exec ${bun}/bin/bunx --bun @felixgeelhaar/cclint "$@"
     '')
