@@ -98,10 +98,23 @@ in
     # ========================================================================
     ++ [
       llmAgentsPkgs.claude-code # Anthropic's agentic coding CLI
-      llmAgentsPkgs.crush # Charmbracelet's AI coding agent (successor to OpenCode)
-      llmAgentsPkgs.gemini-cli # Google's Gemini CLI
-      llmAgentsPkgs.copilot-cli # GitHub Copilot CLI
-      llmAgentsPkgs.goose-cli # Block's open-source AI agent
+
+      # DISABLED: gemini-cli 0.22.5 has stale npm dependency cache
+      # npm ci fails: "ENOTCACHED - request to registry.npmjs.org/string-width failed"
+      # llm-agents.nix needs to regenerate npmDepsHash - re-enable after fix
+      # llmAgentsPkgs.gemini-cli # Google's Gemini CLI
+
+      # DISABLED: copilot-cli 0.0.373 has broken package-lock.json
+      # npm ci fails: "Missing: @github/copilot-darwin-arm64@ from lock file"
+      # Upstream issue in numtide/llm-agents.nix - re-enable after fix
+      # llmAgentsPkgs.copilot-cli # GitHub Copilot CLI
+
+      # DISABLED: The following packages depend on python3.13-twisted, which has
+      # test failures in nixpkgs (IPv6 TCP tests timeout after 120s).
+      # Re-enable when the upstream twisted package is fixed.
+      # llmAgentsPkgs.crush # Charmbracelet's AI coding agent (successor to OpenCode)
+      # llmAgentsPkgs.goose-cli # Block's open-source AI agent
+
       # llmAgentsPkgs.codex # OpenAI Codex agent (enable if needed)
       # llmAgentsPkgs.qwen-code # Alibaba's Qwen3-Coder (enable if needed)
     ]
