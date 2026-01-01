@@ -574,6 +574,6 @@ Error: Access token is not in a valid format: Doesn't contain a decryption key
 - [README.md](README.md) - Quick reference and commands
 - [SETUP.md](SETUP.md) - Initial setup and configuration decisions
 - [RUNBOOK.md](RUNBOOK.md) - Common commands and procedures
-- [docs/NIX-BOOT-FAILURE.md](docs/NIX-BOOT-FAILURE.md) - Boot failure recovery guide
+- [docs/boot-failure/README.md](docs/boot-failure/README.md) - Boot failure recovery guide
 - [docs/ACTIVATION-SCRIPTS-RULES.md](docs/ACTIVATION-SCRIPTS-RULES.md) - Rules for writing activation scripts
 - [docs/ACTIVATION-EXIT-CODES.md](docs/ACTIVATION-EXIT-CODES.md) - Understanding activation exit codes

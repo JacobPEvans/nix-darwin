@@ -25,7 +25,7 @@ in
     ./homebrew.nix
     ./keyboard.nix
     ./launchd-bootstrap.nix
-    ./boot-activation.nix # Minimal symlink creation at boot
+    ./boot-activation.nix # Creates /run/current-system at boot
     ./auto-recovery.nix
     ./security.nix
     ./terminal.nix

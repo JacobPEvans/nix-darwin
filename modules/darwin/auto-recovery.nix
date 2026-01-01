@@ -55,11 +55,31 @@
         echo "╚══════════════════════════════════════════════════════════════════╝"
         echo ""
 
-        # Define nix-recover helper function for this session
-        function nix-recover() {
+        # Define nix-recover helper function for this session (idiomatic zsh syntax)
+        nix-recover() {
           echo "→ Bootstrapping nix-darwin LaunchDaemons..."
-          sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.darwin-store.plist 2>/dev/null && echo "  ✓ darwin-store bootstrapped"
-          sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.activate-system.plist 2>/dev/null && echo "  ✓ activate-system bootstrapped"
+
+          # darwin-store bootstrap with explicit feedback
+          if [[ -f /Library/LaunchDaemons/org.nixos.darwin-store.plist ]]; then
+            if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.darwin-store.plist 2>/dev/null; then
+              echo "  ✓ darwin-store bootstrapped"
+            else
+              echo "  ⚠ darwin-store already loaded or bootstrap failed"
+            fi
+          else
+            echo "  ⚠ darwin-store plist not found, skipping"
+          fi
+
+          # activate-system bootstrap with explicit feedback
+          if [[ -f /Library/LaunchDaemons/org.nixos.activate-system.plist ]]; then
+            if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.activate-system.plist 2>/dev/null; then
+              echo "  ✓ activate-system bootstrapped"
+            else
+              echo "  ⚠ activate-system already loaded or bootstrap failed"
+            fi
+          else
+            echo "  ⚠ activate-system plist not found, skipping"
+          fi
 
           echo "→ Running system activation..."
           if sudo /nix/var/nix/profiles/system/activate; then

@@ -17,7 +17,7 @@
 #
 # Once nix-darwin fixes #1255 upstream, this module can be removed.
 #
-# See: docs/boot-failure/ for full documentation
+# See: docs/boot-failure/ (from repository root) for full documentation
 
 {
   config,

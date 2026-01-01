@@ -41,8 +41,14 @@ let
       ELAPSED=$((ELAPSED + 1))
     done
 
+    # Explicit timeout check - ensures we exit with error if timeout was reached
+    if [ $ELAPSED -ge $TIMEOUT ]; then
+      log "ERROR: Timeout waiting for /nix/store after ''${TIMEOUT}s"
+      exit 1
+    fi
+
     if [ ! -d /nix/store ]; then
-      log "ERROR: /nix/store not available after $TIMEOUT seconds"
+      log "ERROR: /nix/store not available after $ELAPSED seconds"
       exit 1
     fi
 
@@ -62,8 +68,28 @@ let
       exit 1
     fi
 
-    SYSTEM_CONFIG=$(cat "$SYSTEM_CONFIG_FILE")
+    SYSTEM_CONFIG=$(cat "$SYSTEM_CONFIG_FILE" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     log "INFO: System config: $SYSTEM_CONFIG"
+
+    # Validate system config path before creating symlink
+    if [ -z "$SYSTEM_CONFIG" ]; then
+      log "ERROR: System config path is empty after reading $SYSTEM_CONFIG_FILE"
+      exit 1
+    fi
+
+    case "$SYSTEM_CONFIG" in
+      /nix/store/*)
+        ;;
+      *)
+        log "ERROR: System config path does not start with /nix/store/: $SYSTEM_CONFIG"
+        exit 1
+        ;;
+    esac
+
+    if [ ! -e "$SYSTEM_CONFIG" ]; then
+      log "ERROR: System config target does not exist: $SYSTEM_CONFIG"
+      exit 1
+    fi
 
     # Create the critical /run/current-system symlink
     if ln -sfn "$SYSTEM_CONFIG" /run/current-system 2>> "$LOG_FILE"; then
@@ -96,7 +122,8 @@ in
   # This runs BEFORE the full activate-system and just creates the symlink
   launchd.daemons.nix-boot-activation = {
     serviceConfig = {
-      Label = "org.nixos.boot-activation";
+      # More descriptive name - this service ONLY creates the symlink, not full activation
+      Label = "org.nixos.symlink-boot";
 
       # CRITICAL: Use /bin/wait4path to wait for /nix/store BEFORE running script
       # This prevents the "No such file or directory" error when /nix/store
@@ -111,7 +138,8 @@ in
       # Run at load (boot time)
       RunAtLoad = true;
 
-      # Only run once per boot
+      # Only run once per boot - no retry logic to prevent potential infinite loops
+      # If this fails, the user will be prompted via auto-recovery.nix at shell init
       LaunchOnlyOnce = true;
 
       # Run as root
@@ -122,11 +150,10 @@ in
       StandardOutPath = "/var/log/nix-boot-activation.log";
       StandardErrorPath = "/var/log/nix-boot-activation.log";
 
-      # Retry on failure
-      StartInterval = 30;
-      KeepAlive = {
-        SuccessfulExit = false;
-      };
+      # NOTE: Removed KeepAlive and StartInterval which created contradictory behavior
+      # with LaunchOnlyOnce. The original configuration would retry infinitely every 30s
+      # even on successful completion. If boot activation fails, auto-recovery.nix handles
+      # user notification and manual recovery via nix-recover.
     };
   };
 }

@@ -52,7 +52,7 @@ launchctl print system/org.nixos.activate-system | grep "last exit code"
 
 ### Issue 2: Race Condition with /nix/store Mount
 
-**Discovered**: 2025-12-31 during boot testing
+**Issue identified**: 2025-12-31 during boot testing
 
 LaunchDaemons that reference Nix store paths can fail if they start before `/nix` is mounted:
 

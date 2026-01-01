@@ -10,8 +10,9 @@
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
 #
-# NOTE: TCC-sensitive apps (Zoom, Ghostty, VS Code) use copyApps for stable
-# paths that persist macOS TCC permissions across darwin-rebuild.
+# NOTE: TCC-sensitive apps (Zoom, Ghostty, VS Code) now use copyApps (migrated
+# from mac-app-util trampolines) for stable paths that persist macOS TCC
+# permissions across darwin-rebuild.
 
 _:
 
