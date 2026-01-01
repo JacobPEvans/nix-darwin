@@ -4,12 +4,15 @@ This document describes the multi-layered solution for nix-darwin boot activatio
 
 ## Understanding the Problem
 
-Boot failures happen due to **two separate issues** (see [root-cause.md](root-cause.md)):
+Boot failures happen due to **three separate issues** (see [root-cause.md](root-cause.md)):
 
 1. **Primary Issue**: nix-darwin's activation script requires a graphical session (Aqua) for App
    Management permission checks. At boot time, there's no GUI yet, so activation fails.
 
-2. **Secondary Issue**: LaunchDaemons may not persist across reboots due to nix-darwin using
+2. **Race Condition**: Scripts in `/nix/store` can't be executed before Determinate Nix mounts
+   the volume. LaunchDaemons need to wait for `/nix/store` using `/bin/wait4path`.
+
+3. **Tertiary Issue**: LaunchDaemons may not persist across reboots due to nix-darwin using
    deprecated `launchctl load` instead of `launchctl bootstrap`.
 
 ## Solution Architecture
@@ -17,7 +20,11 @@ Boot failures happen due to **two separate issues** (see [root-cause.md](root-ca
 ```text
 Boot Time (System Context)
     │
+    ├──→ systems.determinate.nix-store (Determinate Nix)
+    │    ✅ Mounts /nix volume
+    │
     ├──→ org.nixos.boot-activation (NEW - LaunchDaemon)
+    │    ⏳ Waits for /nix/store via /bin/wait4path
     │    ✅ Creates /run/current-system symlink ONLY
     │    No permission checks, just the critical symlink
     │    Enables boot-time services (Ollama, OrbStack, etc.)
@@ -48,7 +55,14 @@ services need.
 launchd.daemons.nix-boot-activation = {
   serviceConfig = {
     Label = "org.nixos.boot-activation";
-    ProgramArguments = [ "/bin/bash" "${bootActivationScript}" ];
+
+    # CRITICAL: Use wait4path to wait for /nix/store before executing
+    # This prevents "No such file or directory" errors at early boot
+    ProgramArguments = [
+      "/bin/sh" "-c"
+      "/bin/wait4path /nix/store && exec /bin/bash ${bootActivationScript}"
+    ];
+
     RunAtLoad = true;
     LaunchOnlyOnce = true;
     UserName = "root";
@@ -189,20 +203,30 @@ After implementing, verify:
 
 ## How It Works Together
 
-1. **At boot**: `org.nixos.activate-system` runs but fails (no GUI)
-2. **At login**: `org.nixos.activation-recovery` runs in user session
-3. **Recovery agent checks**: Is `/run/current-system` missing?
-4. **If missing**: Runs `sudo /nix/var/nix/profiles/system/activate`
-5. **Activation succeeds**: GUI session available, App Management check passes
-6. **User notified**: macOS notification confirms recovery
+1. **At boot (early)**: Determinate Nix mounts `/nix` volume
+2. **At boot (after mount)**: `org.nixos.boot-activation` waits for `/nix/store`, then creates symlink
+3. **At boot (parallel)**: `org.nixos.activate-system` runs but may fail (no GUI) - doesn't matter,
+   boot-activation already created the symlink
+4. **Boot services start**: Ollama, OrbStack, etc. can now find their binaries
+5. **At login (fallback)**: `org.nixos.activation-recovery` checks if full activation is needed
+6. **If needed**: Runs `sudo /nix/var/nix/profiles/system/activate` with GUI context
+7. **User notified**: macOS notification confirms recovery (if it ran)
 
 ## Logs
 
-Recovery logs are stored at:
+**Boot-time activation**:
 
-- Main log: `~/.local/log/nix-activation-recovery.log`
-- stdout: `/tmp/nix-activation-recovery-stdout.log`
-- stderr: `/tmp/nix-activation-recovery-stderr.log`
+- `/var/log/nix-boot-activation.log` - Boot activation log (persists across reboots)
+
+**Login-time recovery**:
+
+- `~/.local/log/nix-activation-recovery.log` - Recovery agent log
+- `/tmp/nix-activation-recovery-stdout.log` - stdout
+- `/tmp/nix-activation-recovery-stderr.log` - stderr
+
+**Determinate Nix**:
+
+- `/var/log/determinate-nix-init.log` - Volume mount and daemon startup
 
 ## Upstream Issues
 

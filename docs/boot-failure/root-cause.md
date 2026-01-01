@@ -32,14 +32,49 @@ launchctl print system/org.nixos.activate-system | grep "last exit code"
 # If this shows "last exit code = 1", the script ran but failed
 ```
 
-### Issue 2: LaunchDaemon Bootstrap (Secondary Cause)
+### Issue 2: Race Condition with /nix/store Mount
+
+**Discovered**: 2025-12-31 during boot testing
+
+LaunchDaemons that reference Nix store paths can fail if they start before `/nix` is mounted:
+
+```text
+/bin/bash: /nix/store/xxx-script: No such file or directory
+```
+
+**The Problem:**
+
+1. launchd starts all `RunAtLoad` services early in boot
+2. Some services reference scripts in `/nix/store` (e.g., `ProgramArguments = ["/bin/bash", "/nix/store/..."]`)
+3. If Determinate Nix hasn't mounted `/nix` yet, bash can't find the script
+4. Service fails immediately with "No such file or directory"
+
+**The Fix:**
+
+Use `/bin/wait4path /nix/store &&` before executing scripts in the Nix store:
+
+```xml
+<key>ProgramArguments</key>
+<array>
+  <string>/bin/sh</string>
+  <string>-c</string>
+  <string>/bin/wait4path /nix/store &amp;&amp; exec /bin/bash /nix/store/xxx-script</string>
+</array>
+```
+
+**Diagnostic:**
+
+Check `/var/log/nix-boot-activation.log` for timestamps. If there are no log entries for
+the current boot, the script likely failed before even starting (race condition).
+
+### Issue 3: LaunchDaemon Bootstrap (Tertiary Cause)
 
 **Upstream Issue**: [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255)
 
 On modern macOS (Ventura+), LaunchDaemons need explicit bootstrap via `launchctl bootstrap`.
 nix-darwin uses deprecated `launchctl load` which doesn't persist reliably.
 
-This is a **secondary issue** - even if the LaunchDaemon IS loaded, Issue 1 causes it to fail.
+This is a **tertiary issue** - even if the LaunchDaemon IS loaded, Issues 1 and 2 may cause it to fail.
 
 ## Service Architecture
 
@@ -95,3 +130,43 @@ nix-darwin's activation:
 - Requires App Management permission for `/Applications/Nix Apps/`
 - This permission check requires a graphical session
 - At boot time, no graphical session exists yet
+
+## Issue 4: Trampoline App Permissions (User Experience)
+
+**Observed**: 2025-12-31 during manual activation
+
+Even after fixing the boot issues, trampoline apps (like Ghostty) have permission problems:
+
+**The Problem:**
+
+1. The dock shows trampoline apps with generic script icons
+2. Launching a trampoline spawns a NEW dock icon with the correct icon
+3. The new icon points to the actual Nix store path: `/nix/store/xxx-ghostty-bin-1.2.3/Applications/`
+4. macOS prompts for App Management permission for the **Nix store path**, not the trampoline
+5. On next rebuild, the Nix store path changes, and permission must be granted AGAIN
+
+**Why This Happens:**
+
+macOS TCC (Transparency, Consent, Control) grants permissions to **specific binary paths**.
+Nix store paths are content-addressed and change whenever the package is rebuilt.
+
+```text
+Before rebuild: /nix/store/abc123-ghostty-1.2.3/...  ← Permission granted
+After rebuild:  /nix/store/def456-ghostty-1.2.4/...  ← NEW path, needs permission again
+```
+
+**Current Workarounds:**
+
+1. Grant permission each time (tedious but works)
+2. Add the Nix Apps directory to Full Disk Access (security implications)
+3. Use `tccutil` to grant permissions programmatically (complex)
+
+**Not Yet Solved:**
+
+This remains an ongoing UX issue with Nix + macOS App Management. The trampoline pattern
+was designed to provide stable paths, but macOS still tracks the actual binary being executed.
+
+Related upstream issues:
+
+- [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255) - LaunchDaemon bootstrap
+- [home-manager#5189](https://github.com/nix-community/home-manager/issues/5189) - Trampoline apps

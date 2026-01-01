@@ -97,9 +97,15 @@ in
   launchd.daemons.nix-boot-activation = {
     serviceConfig = {
       Label = "org.nixos.boot-activation";
+
+      # CRITICAL: Use /bin/wait4path to wait for /nix/store BEFORE running script
+      # This prevents the "No such file or directory" error when /nix/store
+      # isn't mounted yet at early boot time.
+      # Same pattern as org.nixos.activate-system.plist
       ProgramArguments = [
-        "/bin/bash"
-        "${bootActivationScript}"
+        "/bin/sh"
+        "-c"
+        "/bin/wait4path /nix/store && exec /bin/bash ${bootActivationScript}"
       ];
 
       # Run at load (boot time)
