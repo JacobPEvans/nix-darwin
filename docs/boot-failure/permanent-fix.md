@@ -23,7 +23,7 @@ Boot Time (System Context)
     ├──→ systems.determinate.nix-store (Determinate Nix)
     │    ✅ Mounts /nix volume
     │
-    ├──→ org.nixos.boot-activation (NEW - LaunchDaemon)
+    ├──→ org.nixos.symlink-boot (NEW - LaunchDaemon)
     │    ⏳ Waits for /nix/store via /bin/wait4path
     │    ✅ Creates /run/current-system symlink ONLY
     │    No permission checks, just the critical symlink
@@ -31,7 +31,7 @@ Boot Time (System Context)
     │
     └──→ org.nixos.activate-system (original - LaunchDaemon)
          ❌ May fail: App Management requires GUI
-         But boot-activation already created the symlink!
+         But symlink-boot already created the symlink!
 
 Login Time (User Context)
     │
@@ -51,10 +51,11 @@ services need.
 **File**: `modules/darwin/boot-activation.nix`
 
 ```nix
-# Creates a LaunchDaemon that runs at boot with retry logic
+# Creates a LaunchDaemon that runs exactly once at boot
 launchd.daemons.nix-boot-activation = {
   serviceConfig = {
-    Label = "org.nixos.boot-activation";
+    # Descriptive name - ONLY creates symlink, not full activation
+    Label = "org.nixos.symlink-boot";
 
     # CRITICAL: Use wait4path to wait for /nix/store before executing
     # This prevents "No such file or directory" errors at early boot
@@ -64,12 +65,8 @@ launchd.daemons.nix-boot-activation = {
     ];
 
     RunAtLoad = true;
-    LaunchOnlyOnce = true;
+    LaunchOnlyOnce = true;  # Runs once, no retry (auto-recovery handles failures)
     UserName = "root";
-
-    # Retry on failure
-    StartInterval = 30;
-    KeepAlive = { SuccessfulExit = false; };
   };
 };
 ```
@@ -204,9 +201,9 @@ After implementing, verify:
 ## How It Works Together
 
 1. **At boot (early)**: Determinate Nix mounts `/nix` volume
-2. **At boot (after mount)**: `org.nixos.boot-activation` waits for `/nix/store`, then creates symlink
+2. **At boot (after mount)**: `org.nixos.symlink-boot` waits for `/nix/store`, then creates symlink
 3. **At boot (parallel)**: `org.nixos.activate-system` runs but may fail (no GUI) - doesn't matter,
-   boot-activation already created the symlink
+   symlink-boot already created the symlink
 4. **Boot services start**: Ollama, OrbStack, etc. can now find their binaries
 5. **At login (fallback)**: `org.nixos.activation-recovery` checks if full activation is needed
 6. **If needed**: Runs `sudo /nix/var/nix/profiles/system/activate` with GUI context

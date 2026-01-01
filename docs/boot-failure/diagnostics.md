@@ -44,8 +44,8 @@ ls -la /run/current-system 2>&1
 launchctl list | grep -E "(nix|darwin)"
 # Should show org.nixos.activate-system with exit code
 
-# Check if boot-activation service ran
-launchctl print system/org.nixos.boot-activation 2>&1 | head -10
+# Check if boot-activation service ran (label: org.nixos.symlink-boot)
+launchctl print system/org.nixos.symlink-boot 2>&1 | head -10
 # "Could not find service" = LaunchOnlyOnce completed, check log instead
 
 # Check activate-system exit code
@@ -54,7 +54,7 @@ launchctl print system/org.nixos.activate-system 2>&1 | grep "last exit code"
 
 # Check if plists exist
 ls -la /Library/LaunchDaemons/org.nixos.*.plist
-# Should show activate-system.plist, boot-activation.plist, darwin-store.plist
+# Should show activate-system.plist, symlink-boot.plist, darwin-store.plist
 
 # Check if plists are valid
 plutil -lint /Library/LaunchDaemons/org.nixos.activate-system.plist
