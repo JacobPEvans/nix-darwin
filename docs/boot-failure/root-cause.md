@@ -2,12 +2,53 @@
 
 ## Why Boot Failures Happen
 
-On macOS with Determinate Nix + nix-darwin, there are two sets of launchd services:
+There are **two separate issues** that can cause boot failures with Determinate Nix + nix-darwin:
+
+### Issue 1: App Management Permission Check (Primary Cause)
+
+**This is the main reason activation fails at boot.**
+
+The nix-darwin activation script (`activate-system-start`) includes an App Management
+permission check that **requires a graphical session (Aqua)** to succeed:
+
+```bash
+# From activate-system-start
+if [[ "$(launchctl managername)" != Aqua ]]; then
+    # Fails with exit code 1 - "permission denied over SSH"
+fi
+```
+
+**At boot time:**
+
+1. `org.nixos.activate-system` LaunchDaemon runs (confirmed by `launchctl print` showing `runs = 1`)
+2. No graphical session exists yet - `launchctl managername` returns something other than "Aqua"
+3. The App Management check fails → activation exits with code 1
+4. `/run/current-system` symlink is never created
+
+**Diagnostic command:**
+
+```bash
+launchctl print system/org.nixos.activate-system | grep "last exit code"
+# If this shows "last exit code = 1", the script ran but failed
+```
+
+### Issue 2: LaunchDaemon Bootstrap (Secondary Cause)
+
+**Upstream Issue**: [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255)
+
+On modern macOS (Ventura+), LaunchDaemons need explicit bootstrap via `launchctl bootstrap`.
+nix-darwin uses deprecated `launchctl load` which doesn't persist reliably.
+
+This is a **secondary issue** - even if the LaunchDaemon IS loaded, Issue 1 causes it to fail.
+
+## Service Architecture
 
 | Service Owner | Services | Boot Behavior |
 |---------------|----------|---------------|
-| **Determinate Nix** | `systems.determinate.nix-daemon`, `systems.determinate.nix-store` | **Works** - bootstrapped during Determinate Nix installation |
-| **nix-darwin** | `org.nixos.activate-system`, `org.nixos.darwin-store` | **May fail** - requires explicit bootstrap |
+| **Determinate Nix** | `systems.determinate.nix-store` | ✅ Works - mounts `/nix` volume |
+| **Determinate Nix** | `systems.determinate.nix-daemon` | ✅ Works - socket activation |
+| **nix-darwin** | `org.nixos.darwin-store` | ⚠️ May need bootstrap |
+| **nix-darwin** | `org.nixos.activate-system` | ❌ Runs but FAILS (exit code 1) |
 
 The `org.nixos.activate-system` service is responsible for:
 
@@ -16,43 +57,41 @@ The `org.nixos.activate-system` service is responsible for:
 3. Setting up `/etc/static/*` symlinks
 4. Configuring shell environment variables
 
-If this service doesn't run at boot, your entire Nix environment appears broken.
-
-## Why nix-darwin Services Don't Auto-Load
-
-**Upstream Issue**: [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255)
-
-On modern macOS (Ventura+), LaunchDaemons in `/Library/LaunchDaemons/` need to be explicitly
-**bootstrapped** into launchd using `launchctl bootstrap system <plist>`. Simply placing a
-plist file in the directory is not enough.
-
-nix-darwin uses the deprecated `launchctl load` command, which doesn't persist reliably.
-
-Determinate Nix's installer runs this bootstrap step. nix-darwin's activation may skip it
-if:
-
-1. The services were already registered (but got unloaded somehow)
-2. Activation was interrupted before the launchctl step
-3. macOS's launchd cache got corrupted
-
 ## The Chain of Failure
 
 ```text
 Boot
-  └─→ /nix/store mounted (Determinate Nix - works)
-  └─→ org.nixos.activate-system should run (nix-darwin - FAILS)
-        └─→ /run/current-system symlink NOT created
-              └─→ Shell config can't find NIX_PROFILES
-                    └─→ PATH is empty
-                          └─→ All Nix commands "not found"
+  └─→ /nix volume mounted (Determinate Nix - works)
+  └─→ org.nixos.activate-system runs (nix-darwin)
+        └─→ App Management check: "launchctl managername" != "Aqua"
+              └─→ Script exits with code 1 (no GUI session at boot)
+                    └─→ /run/current-system symlink NOT created
+                          └─→ Shell config can't find NIX_PROFILES
+                                └─→ PATH is empty
+                                      └─→ All Nix commands "not found"
 ```
+
+## Why Manual Recovery Works
+
+When you run `sudo /nix/var/nix/profiles/system/activate` from a terminal:
+
+1. You're in a graphical session - `launchctl managername` returns "Aqua"
+2. The App Management check passes
+3. Activation completes successfully
+4. `/run/current-system` is created
+
+This is why the environment "fixes itself" after manual activation but breaks again on reboot.
 
 ## Why Determinate Nix Works But nix-darwin Fails
 
-Determinate Nix's installation process explicitly bootstraps its services using modern
-`launchctl bootstrap` commands. These services use socket activation and are properly
-registered with launchd.
+Determinate Nix services:
 
-nix-darwin assumes that writing a plist to `/Library/LaunchDaemons/` is sufficient, but
-this assumption doesn't hold on modern macOS. The deprecated `launchctl load` command
-may appear to work initially but doesn't create persistent registrations.
+- Use socket activation (no permission checks needed)
+- Are bootstrapped during installation
+- Don't require GUI access
+
+nix-darwin's activation:
+
+- Requires App Management permission for `/Applications/Nix Apps/`
+- This permission check requires a graphical session
+- At boot time, no graphical session exists yet

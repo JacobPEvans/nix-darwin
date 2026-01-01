@@ -12,6 +12,9 @@
 
     # Ollama configuration (models on /Volumes/Ollama)
     ../../modules/home-manager/ollama.nix
+
+    # Activation recovery after login (fixes boot failures)
+    ../../modules/home-manager/nix-activation-recovery.nix
   ];
 
   # ==========================================================================
@@ -26,6 +29,10 @@
     otel.enable = true;
     cribl.enable = true;
   };
+
+  # Enable activation recovery after login (fixes boot failures)
+  # See docs/boot-failure/root-cause.md for why this is needed
+  programs.nix-activation-recovery.enable = true;
 
   home = {
     # ========================================================================

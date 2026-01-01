@@ -1,66 +1,152 @@
 # Permanent Fix
 
-To prevent boot failures from recurring, add explicit LaunchDaemon bootstrap logic to your
-nix-darwin configuration.
+This document describes the multi-layered solution for nix-darwin boot activation failures.
+
+## Understanding the Problem
+
+Boot failures happen due to **two separate issues** (see [root-cause.md](root-cause.md)):
+
+1. **Primary Issue**: nix-darwin's activation script requires a graphical session (Aqua) for App
+   Management permission checks. At boot time, there's no GUI yet, so activation fails.
+
+2. **Secondary Issue**: LaunchDaemons may not persist across reboots due to nix-darwin using
+   deprecated `launchctl load` instead of `launchctl bootstrap`.
+
+## Solution Architecture
+
+```text
+Boot Time (System Context)
+    │
+    ├──→ org.nixos.boot-activation (NEW - LaunchDaemon)
+    │    ✅ Creates /run/current-system symlink ONLY
+    │    No permission checks, just the critical symlink
+    │    Enables boot-time services (Ollama, OrbStack, etc.)
+    │
+    └──→ org.nixos.activate-system (original - LaunchDaemon)
+         ❌ May fail: App Management requires GUI
+         But boot-activation already created the symlink!
+
+Login Time (User Context)
+    │
+    └──→ org.nixos.activation-recovery (LaunchAgent)
+         Runs full activation if anything is still broken
+         Has GUI (Aqua) so all permission checks pass
+```
 
 ## Implementation
 
-### Create modules/darwin/launchd-bootstrap.nix
+### Part 1: Boot Activation (Critical - Creates Symlink at Boot)
+
+This LaunchDaemon runs at boot and creates ONLY the `/run/current-system` symlink.
+No permission checks, no App Management - just the critical symlink that boot-time
+services need.
+
+**File**: `modules/darwin/boot-activation.nix`
+
+```nix
+# Creates a LaunchDaemon that runs at boot with retry logic
+launchd.daemons.nix-boot-activation = {
+  serviceConfig = {
+    Label = "org.nixos.boot-activation";
+    ProgramArguments = [ "/bin/bash" "${bootActivationScript}" ];
+    RunAtLoad = true;
+    LaunchOnlyOnce = true;
+    UserName = "root";
+
+    # Retry on failure
+    StartInterval = 30;
+    KeepAlive = { SuccessfulExit = false; };
+  };
+};
+```
+
+**What it does**:
+
+1. Waits for `/nix/store` to be available (up to 60 seconds)
+2. Reads `/nix/var/nix/profiles/system/systemConfig`
+3. Creates `/run/current-system` symlink
+4. Updates GC root
+5. Logs to `/var/log/nix-boot-activation.log`
+
+**Why this works**: This runs independently of nix-darwin's activate-system and has no
+App Management permission checks. Boot-time services can start as soon as this completes.
+
+### Part 2: Login Activation Recovery (Fallback)
+
+This LaunchAgent runs after user login and runs full activation if needed.
+
+**File**: `modules/home-manager/nix-activation-recovery.nix`
+
+```nix
+# See the actual file for full implementation
+{
+  options.programs.nix-activation-recovery = {
+    enable = lib.mkEnableOption "automatic nix-darwin activation recovery after login";
+  };
+
+  config = lib.mkIf cfg.enable {
+    launchd.agents.nix-activation-recovery = {
+      enable = true;
+      config = {
+        Label = "org.nixos.activation-recovery";
+        ProgramArguments = [ "${activationRecoveryScript}" ];
+        RunAtLoad = true;
+        KeepAlive = false;
+        ThrottleInterval = 5;
+      };
+    };
+  };
+}
+```
+
+**Enable in your host configuration** (e.g., `hosts/macbook-m4/home.nix`):
 
 ```nix
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+  imports = [
+    # ... other imports ...
+    ../../modules/home-manager/nix-activation-recovery.nix
+  ];
 
+  programs.nix-activation-recovery.enable = true;
+}
+```
+
+**Requires**: Passwordless sudo for activation (already configured in `modules/darwin/security.nix`):
+
+```nix
+environment.etc."sudoers.d/darwin-rebuild".text = ''
+  ${username} ALL=(ALL) NOPASSWD: /nix/var/nix/profiles/system/activate
+'';
+```
+
+### Part 3: LaunchDaemon Bootstrap (Ensures Persistence)
+
+This ensures LaunchDaemons are properly registered during each activation.
+
+**File**: `modules/darwin/launchd-bootstrap.nix`
+
+```nix
+# Workaround for nix-darwin#1255
+# Ensures LaunchDaemons are bootstrapped using modern launchctl commands
 {
   system.activationScripts.postActivation.text = lib.mkAfter ''
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon Bootstrap Check" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
+    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon Bootstrap Check"
 
-    bootstrap_count=0
-    already_loaded=0
-
-    for plist in /Library/LaunchDaemons/org.nixos.*.plist /Library/LaunchDaemons/com.nix-darwin.*.plist; do
+    for plist in /Library/LaunchDaemons/org.nixos.*.plist; do
       if [ -f "$plist" ]; then
-        # Extract label from plist, fallback to filename
-        label=$(/usr/bin/plutil -extract Label raw "$plist" 2>/dev/null || basename "$plist" .plist)
-
-        # Check if service is already loaded into launchd
+        label=$(/usr/bin/plutil -extract Label raw "$plist" 2>/dev/null)
         if ! /bin/launchctl print system/"$label" >/dev/null 2>&1; then
-          echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapping $label..." >&2
-          if /bin/launchctl bootstrap system "$plist" 2>/dev/null; then
-            ((bootstrap_count++))
-            echo "[$(date '+%H:%M:%S')] [INFO] ✓ Successfully bootstrapped $label" >&2
-          else
-            echo "[$(date '+%H:%M:%S')] [WARN] Failed to bootstrap $label (may already be partially loaded)" >&2
-          fi
-        else
-          ((already_loaded++))
-          echo "[$(date '+%H:%M:%S')] [DEBUG] $label already loaded" >&2
+          echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapping $label..."
+          /bin/launchctl bootstrap system "$plist" 2>/dev/null || true
         fi
       fi
     done
-
-    if [ $bootstrap_count -gt 0 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Bootstrapped $bootstrap_count service(s)" >&2
-    fi
-    if [ $already_loaded -gt 0 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] $already_loaded service(s) already loaded" >&2
-    fi
-
-    echo "[$(date '+%H:%M:%S')] [INFO] LaunchDaemon bootstrap complete" >&2
-    echo "[$(date '+%H:%M:%S')] [INFO] ============================================" >&2
   '';
 }
 ```
 
-### Import in Your Host Configuration
-
-In `hosts/<hostname>/default.nix`:
+**Import in darwin configuration** (e.g., `hosts/macbook-m4/default.nix`):
 
 ```nix
 {
@@ -71,67 +157,54 @@ In `hosts/<hostname>/default.nix`:
 }
 ```
 
-### Rebuild
+### Part 4: Shell-Level Detection (User Feedback)
+
+This provides immediate visual feedback when boot fails.
+
+**File**: `modules/darwin/auto-recovery.nix`
+
+Adds a check to zsh initialization that displays a prominent warning if `/run/current-system`
+is missing, along with a `nix-recover` helper function.
+
+## Rebuild
+
+After making these changes:
 
 ```bash
-cd ~/.config/nix  # or your nix-config path
-git add modules/darwin/launchd-bootstrap.nix
-git commit -m "fix: ensure LaunchDaemons are bootstrapped during activation"
+cd ~/git/nix-config/<worktree>
+git add modules/
+git commit -m "fix: multi-layered boot failure recovery"
 sudo darwin-rebuild switch --flake .
 ```
 
-## Prevention Checklist
+## Verification Checklist
 
-After implementing the fix, verify these to prevent recurrence:
+After implementing, verify:
 
-- [ ] **LaunchDaemons are loaded**: `launchctl list | grep org.nixos` shows services
-- [ ] **Activation script includes bootstrap**: Check your config imports `launchd-bootstrap.nix`
-- [ ] **/run/current-system exists**: `ls -la /run/current-system` shows symlink
-- [ ] **PATH is correct**: First entries include `/run/current-system/sw/bin`
-- [ ] **Test a reboot**: Restart and verify everything works
+- [ ] **LaunchAgent installed**: `launchctl list | grep activation-recovery`
+- [ ] **LaunchDaemons loaded**: `launchctl list | grep org.nixos`
+- [ ] **Sudo rule in place**: `sudo -l | grep activate`
+- [ ] **Shell detection works**: Manually remove symlink and open new terminal
+- [ ] **Test a reboot**: Full restart and confirm environment works
 
-## Post-Reboot Verification Script
+## How It Works Together
 
-Save this as `~/.local/bin/verify-nix-boot`:
+1. **At boot**: `org.nixos.activate-system` runs but fails (no GUI)
+2. **At login**: `org.nixos.activation-recovery` runs in user session
+3. **Recovery agent checks**: Is `/run/current-system` missing?
+4. **If missing**: Runs `sudo /nix/var/nix/profiles/system/activate`
+5. **Activation succeeds**: GUI session available, App Management check passes
+6. **User notified**: macOS notification confirms recovery
 
-```bash
-#!/bin/bash
-# Verify nix-darwin boot was successful
+## Logs
 
-echo "=== Nix Boot Verification ==="
+Recovery logs are stored at:
 
-# Check 1: /run/current-system
-if [ -L /run/current-system ]; then
-  echo "✅ /run/current-system exists"
-else
-  echo "❌ /run/current-system MISSING - run recovery steps"
-  exit 1
-fi
+- Main log: `~/.local/log/nix-activation-recovery.log`
+- stdout: `/tmp/nix-activation-recovery-stdout.log`
+- stderr: `/tmp/nix-activation-recovery-stderr.log`
 
-# Check 2: LaunchDaemons loaded
-if launchctl list | grep -q "org.nixos.activate-system"; then
-  echo "✅ org.nixos.activate-system loaded"
-else
-  echo "❌ org.nixos.activate-system NOT loaded"
-  exit 1
-fi
+## Upstream Issues
 
-# Check 3: darwin-rebuild available
-if command -v darwin-rebuild &> /dev/null; then
-  echo "✅ darwin-rebuild in PATH"
-else
-  echo "❌ darwin-rebuild NOT in PATH"
-  exit 1
-fi
-
-# Check 4: PATH includes nix paths
-if echo "$PATH" | grep -q "/run/current-system/sw/bin"; then
-  echo "✅ PATH includes /run/current-system/sw/bin"
-else
-  echo "❌ PATH missing /run/current-system/sw/bin"
-  exit 1
-fi
-
-echo ""
-echo "All checks passed! Nix environment is healthy."
-```
+- [nix-darwin#1255](https://github.com/nix-darwin/nix-darwin/issues/1255) - LaunchDaemon persistence
+- App Management permission check requiring Aqua session (no upstream issue filed yet)

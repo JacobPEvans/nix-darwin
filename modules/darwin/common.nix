@@ -24,6 +24,7 @@ in
     ./finder.nix
     ./keyboard.nix
     ./launchd-bootstrap.nix
+    ./boot-activation.nix # Minimal symlink creation at boot
     ./auto-recovery.nix
     ./security.nix
     ./terminal.nix
