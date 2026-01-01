@@ -2,28 +2,46 @@
 
 ## Why Boot Failures Happen
 
-There are **two separate issues** that can cause boot failures with Determinate Nix + nix-darwin:
+There are **multiple issues** that can cause boot failures with Determinate Nix + nix-darwin:
 
 ### Issue 1: App Management Permission Check (Primary Cause)
 
 **This is the main reason activation fails at boot.**
 
-The nix-darwin activation script (`activate-system-start`) includes an App Management
-permission check that **requires a graphical session (Aqua)** to succeed:
+**Symptom**: TWO macOS notifications appear at login:
+> "bash" was prevented from modifying apps on your Mac
+
+These TWO notifications come from TWO different scripts that both try to modify `/Applications/Nix Apps/`:
+
+1. **nix-darwin activation** (line ~301 in activate script):
+
+   ```bash
+   echo "setting up /Applications/Nix Apps..." >&2
+   ```
+
+2. **home-manager trampolines** (line ~1481 in activate script):
+
+   ```bash
+   mac-app-util sync-trampolines "/Applications/Nix Apps" "/Applications/Nix Trampolines"
+   ```
+
+The activation script includes an App Management permission check that **requires a graphical
+session (Aqua)** to succeed:
 
 ```bash
-# From activate-system-start
+# From activate script (line 167)
 if [[ "$(launchctl managername)" != Aqua ]]; then
-    # Fails with exit code 1 - "permission denied over SSH"
+    # Fails with exit code 1 - "permission denied"
 fi
 ```
 
 **At boot time:**
 
-1. `org.nixos.activate-system` LaunchDaemon runs (confirmed by `launchctl print` showing `runs = 1`)
-2. No graphical session exists yet - `launchctl managername` returns something other than "Aqua"
+1. `org.nixos.activate-system` LaunchDaemon runs
+2. No graphical session exists yet - `launchctl managername` != "Aqua"
 3. The App Management check fails → activation exits with code 1
 4. `/run/current-system` symlink is never created
+5. User sees TWO "bash prevented" notifications at login (queued from boot)
 
 **Diagnostic command:**
 
