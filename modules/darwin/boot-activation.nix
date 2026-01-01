@@ -24,6 +24,9 @@ let
   # No permission checks, no App Management, just the critical symlink
   bootActivationScript = pkgs.writeShellScript "nix-boot-activation" ''
     #!/bin/bash
+    # NOTE: Not using 'set -e' to allow graceful error handling and logging.
+    # LaunchDaemon scripts should log failures rather than exit abruptly,
+    # enabling better diagnostics via /var/log/nix-boot-activation.log.
 
     LOG_FILE="/var/log/nix-boot-activation.log"
 
