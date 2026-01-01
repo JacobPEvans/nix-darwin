@@ -2,6 +2,37 @@
 
 Advanced diagnostic commands for investigating boot failures and system state.
 
+## Quick Health Check
+
+```bash
+# One-liner to check if boot succeeded
+ls -la /run/current-system && echo "✅ Boot succeeded" || echo "❌ Boot failed"
+```
+
+## Log Files to Check
+
+| Log File | What It Shows |
+|----------|---------------|
+| `/var/log/nix-boot-activation.log` | Boot-time symlink creation (our fix) |
+| `/var/log/determinate-nix-init.log` | Volume mount and Nix daemon startup |
+| `~/.local/log/nix-activation-recovery.log` | Login-time recovery attempts |
+| `/tmp/nix-activation-recovery-*.log` | Recovery stdout/stderr |
+
+```bash
+# Check boot activation log (most important)
+tail -20 /var/log/nix-boot-activation.log
+
+# Check if boot-activation ran for current boot
+sysctl kern.boottime  # Get boot time
+cat /var/log/nix-boot-activation.log | grep "$(date '+%Y-%m-%d')"
+
+# Check Determinate Nix log
+tail -20 /var/log/determinate-nix-init.log
+
+# Check recovery log
+cat ~/.local/log/nix-activation-recovery.log 2>/dev/null | tail -10
+```
+
 ## Check What's Broken
 
 ```bash
@@ -13,9 +44,17 @@ ls -la /run/current-system 2>&1
 launchctl list | grep -E "(nix|darwin)"
 # Should show org.nixos.activate-system with exit code
 
+# Check if boot-activation service ran
+launchctl print system/org.nixos.boot-activation 2>&1 | head -10
+# "Could not find service" = LaunchOnlyOnce completed, check log instead
+
+# Check activate-system exit code
+launchctl print system/org.nixos.activate-system 2>&1 | grep "last exit code"
+# "last exit code = 1" = App Management permission failed
+
 # Check if plists exist
 ls -la /Library/LaunchDaemons/org.nixos.*.plist
-# Should show activate-system.plist and darwin-store.plist
+# Should show activate-system.plist, boot-activation.plist, darwin-store.plist
 
 # Check if plists are valid
 plutil -lint /Library/LaunchDaemons/org.nixos.activate-system.plist
