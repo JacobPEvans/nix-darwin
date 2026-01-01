@@ -68,7 +68,7 @@ let
       exit 1
     fi
 
-    SYSTEM_CONFIG=$(cat "$SYSTEM_CONFIG_FILE" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    SYSTEM_CONFIG=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$SYSTEM_CONFIG_FILE")
     log "INFO: System config: $SYSTEM_CONFIG"
 
     # Validate system config path before creating symlink

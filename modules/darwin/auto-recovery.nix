@@ -81,6 +81,17 @@
             echo "  ⚠ activate-system plist not found, skipping"
           fi
 
+          # symlink-boot bootstrap with explicit feedback (creates /run/current-system)
+          if [[ -f /Library/LaunchDaemons/org.nixos.symlink-boot.plist ]]; then
+            if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.symlink-boot.plist 2>/dev/null; then
+              echo "  ✓ symlink-boot bootstrapped"
+            else
+              echo "  ⚠ symlink-boot already loaded or bootstrap failed"
+            fi
+          else
+            echo "  ⚠ symlink-boot plist not found, skipping"
+          fi
+
           echo "→ Running system activation..."
           if sudo /nix/var/nix/profiles/system/activate; then
             echo ""
