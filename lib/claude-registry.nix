@@ -1,15 +1,28 @@
-# Claude Registry Pure Functions
+# Claude Registry Functions
 #
-# Pure Nix functions for generating Claude Code registry structures.
-# Used by both the home-manager module and CI validation.
-# No derivations or impure operations - works cross-platform.
+# Generates known_marketplaces.json structure that Claude Code expects.
 #
-# IMPORTANT: toClaudeMarketplaceFormat is the SINGLE SOURCE OF TRUTH for
-# marketplace format transformation. All modules (settings.nix, claude-settings.nix)
-# MUST import and use this function to ensure consistency.
-# NOTE: lib MUST be passed in explicitly - no default value.
-# This ensures pure evaluation (CI) works correctly without <nixpkgs> lookup.
-{ lib }:
+# CRITICAL FIELDS (must match Claude's expectations exactly):
+# ============================================================================
+# 1. Marketplace Keys: MUST match the `name` field from the marketplace's
+#    .claude-plugin/marketplace.json file (NOT the GitHub repo path)
+#    Example: anthropics/skills → manifest name is "anthropic-agent-skills"
+#
+# 2. source.source: Always "github" for GitHub repos (lowercase)
+# 3. source.repo: GitHub path "owner/repo" format
+# 4. installLocation: Full absolute path to cache directory
+# 5. lastUpdated: ISO 8601 timestamp with milliseconds
+#
+# How to find manifest names: See docs/TESTING-MARKETPLACES.md
+# ============================================================================
+#
+# Parameters:
+#   lib: nixpkgs lib (required)
+#   lastUpdated: ISO 8601 timestamp (default: epoch, caller should provide current time)
+{
+  lib,
+  lastUpdated ? "1970-01-01T00:00:00.000Z",
+}:
 
 let
   # ==========================================================================
@@ -94,21 +107,12 @@ in
           # Field order matches native: source, installLocation, lastUpdated
           inherit (formatted) source;
           installLocation = localPath;
-          lastUpdated = "2025-12-08T00:00:00.000Z";
+          inherit lastUpdated;
         };
     in
-    lib.listToAttrs (lib.mapAttrsToList toNativeFormat marketplaces)
-    // lib.optionalAttrs allowRuntimeInstall {
-      "local" = {
-        source = {
-          source = "directory";
-          path = "~/.claude/plugins/local";
-        };
-        installLocation = "${homeDir}/.claude/plugins/marketplaces/local";
-        lastUpdated = "2025-12-08T00:00:00.000Z";
-        managedBy = "runtime";
-      };
-    };
+    # NOTE: "local" marketplace removed - Claude Code doesn't create one by default.
+    # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
+    lib.listToAttrs (lib.mapAttrsToList toNativeFormat marketplaces);
 
   # Generate installed_plugins.json structure
   mkInstalledPlugins =

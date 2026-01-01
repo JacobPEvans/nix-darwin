@@ -1,8 +1,16 @@
 # Claude Code Plugin Registry
 #
-# Generates known_marketplaces.json and installed_plugins.json.
-# Supports hybrid mode: Nix-managed + runtime plugins coexist.
-# Uses pure functions from lib/claude-registry.nix for DRY.
+# Generates known_marketplaces.json for Claude Code.
+#
+# CRITICAL: lastUpdated Field
+# ============================================================================
+# Generated at build time using printf's %T format (requires bash 4.2+)
+# Format: ISO 8601 with milliseconds (YYYY-MM-DDTHH:MM:SS.000Z)
+# Example: "2025-12-31T16:44:10.000Z"
+#
+# This is cosmetic metadata - Claude updates it at runtime anyway, but we
+# generate a valid timestamp to avoid magic dates like "1970-01-01".
+# ============================================================================
 {
   config,
   lib,
@@ -14,7 +22,14 @@ let
   cfg = config.programs.claude;
 
   # Import pure registry functions from lib
-  claudeRegistryLib = import ../../../../lib/claude-registry.nix { inherit lib; };
+  # Pass current timestamp for lastUpdated field (generated at build time)
+  claudeRegistryLib = import ../../../../lib/claude-registry.nix {
+    inherit lib;
+    # Generate ISO 8601 timestamp at build time via bash printf
+    lastUpdated = builtins.readFile (
+      pkgs.runCommand "timestamp" { } ''printf '%(%Y-%m-%dT%H:%M:%S.000Z)T' -1 > $out''
+    );
+  };
 
   # Build the full registry using lib function
   knownMarketplaces = claudeRegistryLib.mkKnownMarketplaces {

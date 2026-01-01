@@ -1,12 +1,32 @@
 # Official Anthropic Plugins
 #
-# Plugins from the claude-plugins-official marketplace
-# These provide core Claude Code functionality
+# CRITICAL: Plugin Reference Format
+# ============================================================================
+# Format: "plugin-name@marketplace-name"
+#
+# The marketplace-name MUST match the key in marketplaces.nix, which MUST
+# match the `name` field from the marketplace's .claude-plugin/marketplace.json
+#
+# Examples:
+#   - "commit-commands@claude-plugins-official" ✓ CORRECT
+#   - "example-skills@anthropic-agent-skills" ✓ CORRECT
+#   - "example-skills@skills" ✗ WRONG (marketplace is anthropic-agent-skills, not skills)
+#   - "backend-dev@agents" ✗ WRONG (marketplace is claude-code-workflows, not agents)
+#
+# How to verify: See docs/TESTING-MARKETPLACES.md
+# ============================================================================
 
 _:
 
 {
   enabledPlugins = {
+    # ========================================================================
+    # Skills (from anthropics/skills repo, marketplace name: anthropic-agent-skills)
+    # ========================================================================
+    # Example skills including skill-creator for building custom skills
+    "example-skills@anthropic-agent-skills" = true;
+    # Document processing: xlsx, docx, pptx, pdf
+    "document-skills@anthropic-agent-skills" = true;
     # ========================================================================
     # Git Workflow
     # ========================================================================

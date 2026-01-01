@@ -1,7 +1,23 @@
 # Claude Code Plugin Marketplaces
 #
-# Defines available plugin marketplaces for Claude Code.
-# Plugins are fetched on-demand when enabled.
+# CRITICAL: Marketplace Keys MUST Match Manifest Names
+# ============================================================================
+# Each key MUST match the `name` field in the repo's .claude-plugin/marketplace.json
+#
+# Example:
+#   GitHub repo: anthropics/skills
+#   manifest name: "anthropic-agent-skills" (from marketplace.json)
+#   Nix key: "anthropic-agent-skills" ← MUST MATCH manifest name
+#   Plugin reference: "example-skills@anthropic-agent-skills"
+#
+# DO NOT use arbitrary keys like "skills" or GitHub paths like "anthropics/skills"
+#
+# Required fields per marketplace:
+#   - source.type: "github" (lowercase, always)
+#   - source.url: "owner/repo" format (GitHub path)
+#
+# How to find manifest names: See docs/TESTING-MARKETPLACES.md
+# ============================================================================
 #
 # IMPORTANT: Marketplace URL Format and Plugin References
 # ========================================================================
@@ -51,68 +67,69 @@ let
     ) "Marketplace '${name}.source' must have a 'url' string";
     true;
 
+  # ============================================================================
+  # Marketplace Definitions
+  # ============================================================================
+  # IMPORTANT: Keys MUST match the `name` field in each repo's marketplace.json
+  # This ensures plugin references like "plugin@marketplace" work correctly.
+  # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
+  # ============================================================================
   marketplaces = {
-    # ========================================================================
-    # Official Anthropic Marketplaces
-    # ========================================================================
-    # Keys must be full GitHub paths (owner/repo) for correct transformation
-    "anthropics/claude-plugins-official" = {
+    # --- Official Anthropic ---
+    "claude-plugins-official" = {
       source = {
         type = "github";
         url = "anthropics/claude-plugins-official";
       };
     };
+    "anthropic-agent-skills" = {
+      source = {
+        type = "github";
+        url = "anthropics/skills";
+      };
+    };
 
-    # ========================================================================
-    # Community Marketplaces
-    # ========================================================================
-    "ananddtyagi/cc-marketplace" = {
+    # --- Community ---
+    "cc-marketplace" = {
       source = {
         type = "github";
         url = "ananddtyagi/cc-marketplace";
       };
     };
-    "BillChirico/bills-claude-skills" = {
+    "bills-claude-skills" = {
       source = {
         type = "github";
         url = "BillChirico/bills-claude-skills";
       };
     };
-    "obra/superpowers-marketplace" = {
+    "superpowers-marketplace" = {
       source = {
         type = "github";
         url = "obra/superpowers-marketplace";
       };
     };
 
-    # ========================================================================
-    # Infrastructure & DevOps Marketplaces
-    # ========================================================================
-    "basher83/lunar-claude" = {
+    # --- Infrastructure & DevOps ---
+    "lunar-claude" = {
       source = {
         type = "github";
         url = "basher83/lunar-claude";
       };
     };
-    "jeremylongshore/claude-code-plugins-plus" = {
+    "claude-code-plugins-plus" = {
       source = {
         type = "github";
         url = "jeremylongshore/claude-code-plugins-plus";
       };
     };
-    "wshobson/agents" = {
+    "claude-code-workflows" = {
       source = {
         type = "github";
         url = "wshobson/agents";
       };
     };
 
-    # ========================================================================
-    # Time Tracking & Monitoring Marketplaces
-    # ========================================================================
-    # SPECIAL CASE: WakaTime uses org-name as marketplace ID
-    # Official install: claude plugin i claude-code-wakatime@wakatime
-    # Key is "wakatime" (display name), URL is full GitHub path for fetching
+    # --- Time Tracking ---
     "wakatime" = {
       source = {
         type = "github";
