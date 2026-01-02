@@ -516,6 +516,114 @@ triggering the Copilot Coding Agent to create unwanted "fix" PRs.
 - ✅ "The Copilot review mentioned..."
 - ✅ "Per the automated review..."
 
+## Code Comments Best Practices
+
+Comments should explain **why**, not **what**. Self-documenting code reduces token usage while improving clarity.
+
+### Comments to Keep
+
+**File/module headers** - Explain scope, limitations, and architectural decisions:
+
+```nix
+# Energy & Sleep Configuration via pmset
+# Manages display sleep, system sleep (separate AC/battery), disk sleep
+# Reference: https://ss64.com/mac/pmset.html
+```
+
+**Non-obvious patterns** - Explain why unconventional approaches were used:
+
+```nix
+# CRITICAL: No 'set -e' - errors must not abort activation script
+# See docs/ACTIVATION-SCRIPTS-RULES.md Rule 1
+```
+
+**Numeric code mappings** - Explain what numbers mean:
+
+```nix
+# Sidebar icon size: 1 = small, 2 = medium, 3 = large
+NSTableViewDefaultSizeMode = 1;
+```
+
+**Preconditions and setup** - Explain what must happen first:
+
+```nix
+# Cloud Sync: Requires manual authentication via Raycast UI
+# After fresh install: Settings > Account > Sign In
+```
+
+**Relationship between settings** - Explain why multiple settings work together:
+
+```nix
+# Menu bar spacing: Spacing = gap between icons, Padding = space around selection
+# Padding should typically be 2x spacing for visual balance
+NSStatusItemSpacing = 4;
+NSStatusItemSelectionPadding = 8;
+```
+
+### Comments to Remove/Minimize
+
+**Obvious variable name restatement**:
+
+```nix
+# ❌ BAD - Variable name says it all
+# Auto-capitalization
+NSAutomaticCapitalizationEnabled = false;
+
+# ✅ GOOD - Just the code
+NSAutomaticCapitalizationEnabled = false;
+```
+
+**Default value explanations**:
+
+```nix
+# ❌ BAD - Value is right there
+raycastPreferredWindowMode = "compact";  # Default: "default"
+
+# ✅ GOOD - Just the code
+raycastPreferredWindowMode = "compact";
+```
+
+**Decorative separators** (replace with section headers):
+
+```nix
+# ❌ BAD - Wastes tokens
+# ==========================================================================
+# Nixpkgs Configuration
+# ==========================================================================
+
+# ✅ GOOD - Clear, concise
+# --- Nixpkgs Configuration ---
+```
+
+**Echo statement descriptions** (the echo IS the documentation):
+
+```bash
+# ❌ BAD - Comment duplicates what echo shows
+echo "Configuring energy settings..."
+# Output the current settings for verification
+sudo pmset -g
+
+# ✅ GOOD - Echo message documents itself
+echo "Configuring energy settings..."
+sudo pmset -g
+```
+
+### Comment Formatting Rules
+
+- Section markers: `# --- Section Name ---` (single line, replaces 3-line decorative separators)
+- Section headers in code should separate distinct logical blocks, not arbitrary groupings
+- Preserve readability: Comments should be easy to scan and understand
+- Never add comments just to fill whitespace or "explain" what code obviously does
+
+### Impact
+
+Following these practices:
+
+- Reduces token usage by 15-25% while keeping all valuable context
+- Makes code self-documenting and maintainable
+- Focuses reader attention on genuinely important information
+- Discourages comment rot (outdated comments become fewer)
+
 ## Workflow
 
 1. Make changes to nix files

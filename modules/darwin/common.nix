@@ -14,6 +14,7 @@ in
   imports = [
     ./apps
     ./dock
+    ./energy.nix
     ./file-extensions.nix
     ./finder.nix
     ./homebrew.nix
@@ -28,20 +29,13 @@ in
     ./activation-error-tracking.nix
   ];
 
-  # ==========================================================================
-  # Nixpkgs Configuration
-  # ==========================================================================
+  # --- Nixpkgs Configuration ---
   nixpkgs.config.allowUnfree = true;
-
-  # Overlays for package overrides (e.g., updating outdated packages)
-  # See overlays/ directory for individual overlay files
   nixpkgs.overlays = [
     (import ../../overlays/python-packages.nix)
   ];
 
-  # ==========================================================================
-  # User Configuration
-  # ==========================================================================
+  # --- User Configuration ---
   users.users.${userConfig.user.name} = {
     inherit (userConfig.user) name;
     home = userConfig.user.homeDir;
@@ -80,18 +74,11 @@ in
       tree # Directory tree visualization
       yq # YAML parsing (like jq but for YAML/XML/TOML)
 
-      # ========================================================================
-      # Development tools
-      # ========================================================================
+      # --- Development tools ---
       gh # GitHub CLI
 
-      # ========================================================================
-      # AI Coding Agents (sourced from nixpkgs)
-      # All packages are available in nixpkgs, but some are temporarily disabled
-      # due to build issues (see inline comments). The llm-agents.nix flake has
-      # been removed to simplify dependencies, but can be re-introduced as a
-      # fallback for packages that are broken or severely outdated in nixpkgs.
-      # ========================================================================
+      # --- AI Coding Agents (from nixpkgs) ---
+      # Some disabled due to build issues; can re-enable when nixpkgs fixes them
       claude-code # Anthropic's agentic coding CLI
       claude-monitor # Real-time Claude Code usage monitor
 
@@ -112,16 +99,11 @@ in
       # goose-cli # Block's open-source AI agent
     ])
     ++ (with pkgs; [
-
-      mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
+      mas # Mac App Store CLI
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
-      ollama # LLM runtime (nixpkgs 0.13.2, replaces manual 0.12.10 install)
-      # Models stored on dedicated APFS volume /Volumes/Ollama/models
-      # See hosts/macbook-m4/home.nix for symlink configuration
+      ollama # LLM runtime (models on /Volumes/Ollama/models)
 
-      # ========================================================================
-      # GUI applications
-      # ========================================================================
+      # --- GUI applications ---
       bitwarden-desktop # Password manager desktop app
       # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
       # See hosts/macbook-m4/home.nix for details
@@ -133,29 +115,20 @@ in
       # See hosts/macbook-m4/home.nix for TCC-sensitive app configuration.
       raycast # Productivity launcher (replaces Spotlight)
       swiftbar # Menu bar customization (auto-claude status)
-      # NOTE: VS Code managed via programs.vscode in home-manager for declarative
-      # settings. With copyApps enabled, the user-level app has stable TCC paths.
-      # See modules/home-manager/common.nix for VS Code configuration.
+      # NOTE: VS Code managed via programs.vscode in home-manager (with copyApps)
     ]);
 
-  # ==========================================================================
-  # Homebrew Configuration
-  # ==========================================================================
-  # Homebrew config extracted to ./homebrew.nix
-  # See that file for casks, brews, and masApps configuration
+  # --- Homebrew Configuration ---
+  # See ./homebrew.nix for casks, brews, and masApps
 
-  # ==========================================================================
-  # Programs Configuration
-  # ==========================================================================
+  # --- Programs Configuration ---
   programs = {
     zsh.enable = true;
-    raycast.enable = true; # Declarative Raycast preferences
-    terminal.enable = true; # Terminal.app window size (180x80 for Basic profile)
+    raycast.enable = true;
+    terminal.enable = true;
   };
 
-  # ==========================================================================
-  # Nix Configuration (Determinate Nix compatibility)
-  # ==========================================================================
+  # --- Nix Configuration (Determinate Nix compatibility) ---
   # Disable nix-darwin's Nix management - Determinate Nix manages daemon and nix itself
   # Workaround: home-manager's darwin module accesses nix.package even when enable=false
   # Using mkForce bypasses the throw in nix-darwin's managedDefault
@@ -171,17 +144,11 @@ in
   # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
   environment.etc."nix/conf.d/gc.conf".text = "auto-optimise-store = true";
 
-  # Disable documentation to suppress builtins.toFile warnings
   documentation.enable = false;
 
-  # ==========================================================================
-  # System Configuration (Activation Scripts & State Version)
-  # ==========================================================================
-  # Activation scripts run during darwin-rebuild to verify system state and prevent
-  # silent activation failures that leave /run/current-system pointing to stale generations
-  #
-  # ⚠️  CRITICAL: See docs/ACTIVATION-SCRIPTS-RULES.md for mandatory activation script rules
-  # These rules are enforced to prevent silent partial deployments.
+  # --- System Configuration (Activation Scripts) ---
+  # Activation scripts verify system state and prevent silent failures
+  # ⚠️ CRITICAL: See docs/ACTIVATION-SCRIPTS-RULES.md for mandatory rules
   system = {
     # Required for nix-darwin with Determinate Nix
     primaryUser = userConfig.user.name;

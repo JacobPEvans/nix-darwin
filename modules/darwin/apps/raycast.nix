@@ -40,8 +40,8 @@ in
         raycastShouldFollowSystemAppearance = true;
 
         # Window mode: "default" or "compact"
-        # Default: "default"
-        raycastPreferredWindowMode = "default";
+        # Compact mode shows minimal UI, maximizing screen real estate
+        raycastPreferredWindowMode = "compact";
 
         # ========================================================================
         # Menu Bar

@@ -3,141 +3,120 @@
 # NSGlobalDomain settings for appearance, text, and behavior.
 # Reference: https://nix-darwin.github.io/nix-darwin/manual/options.html
 
-_: {
+{ lib, config, ... }:
+{
   system.defaults = {
-    # ==========================================================================
-    # NSGlobalDomain Settings
-    # ==========================================================================
+    # --- NSGlobalDomain Settings ---
     NSGlobalDomain = {
-      # Appearance
-      # Dark mode: null = light, "Dark" = dark
       AppleInterfaceStyle = "Dark";
-
-      # Auto-switch between light/dark based on time
       AppleInterfaceStyleSwitchesAutomatically = false;
-
-      # Scrollbar visibility: "WhenScrolling", "Automatic", "Always"
       AppleShowScrollBars = "Automatic";
 
       # Text & Typing
-      # Auto-capitalization
       NSAutomaticCapitalizationEnabled = false;
-
-      # Smart dashes (-- to em dash)
       NSAutomaticDashSubstitutionEnabled = false;
-
-      # Double-space to period
       NSAutomaticPeriodSubstitutionEnabled = false;
-
-      # Smart quotes ("curly" instead of "straight")
       NSAutomaticQuoteSubstitutionEnabled = false;
-
-      # Auto spell correction
       NSAutomaticSpellingCorrectionEnabled = false;
-
-      # Inline predictive text
       NSAutomaticInlinePredictionEnabled = true;
 
       # Windows & Dialogs
-      # Expand save panel by default
       NSNavPanelExpandedStateForSaveMode = true;
       NSNavPanelExpandedStateForSaveMode2 = true;
-
-      # Expand print panel by default
       PMPrintingExpandedStateForPrint = true;
       PMPrintingExpandedStateForPrint2 = true;
-
-      # Save to disk (not iCloud) by default
       NSDocumentSaveNewDocumentsToCloud = false;
 
       # Animations
-      # Window opening/closing animations
       NSAutomaticWindowAnimationsEnabled = true;
-
-      # Smooth scrolling
       NSScrollAnimationEnabled = true;
-
-      # Animated focus ring
       NSUseAnimatedFocusRing = true;
 
-      # Finder Sidebar
-      # Sidebar icon size: 1 = small, 2 = medium, 3 = large
+      # Finder Sidebar - Icon size: 1=small, 2=medium, 3=large
       NSTableViewDefaultSizeMode = 1;
+
+      # Language & Region - Imperial system
+      AppleTemperatureUnit = "Fahrenheit";
+      AppleMeasurementUnits = "Inches";
+      AppleMetricUnits = 0;
+      AppleICUForce24HourTime = true;
+
+      # Menu bar spacing: Spacing=gap, Padding=selection area (keep 2x ratio)
+      NSStatusItemSpacing = 4;
+      NSStatusItemSelectionPadding = 8;
     };
 
-    # ==========================================================================
-    # Menu Bar Clock
-    # ==========================================================================
+    # --- Menu Bar Clock ---
     menuExtraClock = {
-      # Show date in menu bar
       ShowDate = 1; # 0 = When space allows, 1 = Always, 2 = Never
-
-      # Show day of week
       ShowDayOfWeek = true;
-
-      # Show seconds
-      ShowSeconds = false;
-
-      # 24-hour time (also set via AppleICUForce24HourTime)
-      Show24Hour = false;
-
-      # Analog vs digital: true = analog
-      IsAnalog = false;
+      ShowSeconds = true;
+      Show24Hour = true; # Also set via AppleICUForce24HourTime
+      IsAnalog = false; # false = digital, true = analog
     };
 
-    # ==========================================================================
-    # Login Window
-    # ==========================================================================
+    # --- Login Window ---
     loginwindow = {
-      # Disable guest account
       GuestEnabled = false;
-
-      # Show full name instead of username
       SHOWFULLNAME = false;
     };
 
-    # ==========================================================================
-    # Screensaver & Lock
-    # ==========================================================================
+    # --- Screensaver & Lock ---
     screensaver = {
-      # Require password when waking from screensaver
       askForPassword = true;
-
-      # Grace period before password required (seconds)
-      # 0 = immediately
-      askForPasswordDelay = 0;
+      askForPasswordDelay = 0; # 0 = immediately
     };
 
-    # ==========================================================================
-    # Screenshots
-    # ==========================================================================
+    # --- Screenshots ---
     screencapture = {
-      # Save location: null = ~/Desktop (default)
       # location = "/Users/${userConfig.user.name}/Screenshots";
-
-      # Image format: png, jpg, gif, pdf, tiff
-      type = "png";
-
-      # Disable drop shadow on window screenshots
+      type = "png"; # png, jpg, gif, pdf, tiff
       disable-shadow = true;
-
-      # Include date in filename
       include-date = true;
     };
 
-    # ==========================================================================
-    # Control Center (Menu Bar)
-    # ==========================================================================
+    # --- Control Center (Menu Bar) ---
     controlcenter = {
-      # Show battery percentage
       BatteryShowPercentage = true;
-
-      # Menu bar items visibility (true = show, false = hide)
       Bluetooth = true;
       Sound = true;
       Display = true;
       FocusModes = true;
       NowPlaying = true;
     };
+
+    # --- Custom User Preferences ---
+    # Settings not exposed as first-class nix-darwin options
+    CustomUserPreferences = {
+      "com.apple.menuextra.clock" = {
+        DateFormat = "yyyy-MM-dd HH:mm:ss"; # ISO 8601 format
+        FlashDateSeparators = false; # Don't blink separators
+      };
+    };
   };
+
+  # --- Activation Scripts - Menu Bar Spacing ---
+  # Must use -currentHost flag; requires logout/login to fully apply
+  system.activationScripts.postActivation.text = lib.mkAfter ''
+    echo "Applying menu bar spacing settings (compact mode)..." >&2
+    spacing_applied=0
+
+    if defaults -currentHost write -globalDomain NSStatusItemSpacing -int 4; then
+      echo "Menu bar icon spacing set to 4 (compact)" >&2
+      spacing_applied=1
+    else
+      echo "Warning: Failed to set NSStatusItemSpacing to 4 - check defaults permissions" >&2
+    fi
+
+    if defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8; then
+      echo "Menu bar icon padding set to 8 (compact)" >&2
+      spacing_applied=$((spacing_applied + 1))
+    else
+      echo "Warning: Failed to set NSStatusItemSelectionPadding to 8 - check defaults permissions" >&2
+    fi
+
+    if [ $spacing_applied -gt 0 ]; then
+      echo "Note: Menu bar spacing changes require logout/login to fully take effect" >&2
+    fi
+  '';
 }

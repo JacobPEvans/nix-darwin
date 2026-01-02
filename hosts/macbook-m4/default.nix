@@ -64,15 +64,18 @@ in
 
   programs.file-extensions = {
     enable = true;
-    # Default mappings for .spl and .crbl are already configured
-    # Add more custom mappings here if needed:
-    # customMappings = {
-    #   ".spl" = "public.tar-archive";
-    #   ".crbl" = "public.tar-archive";
-    #   ".custom" = "public.tar-archive";
-    # };
   };
 
-  # Machine-specific packages (if any beyond common)
-  # environment.systemPackages = with pkgs; [ ];
+  # --- Energy & Sleep Configuration ---
+  system.energy = {
+    enable = true;
+    displaysleep = 30; # Display sleeps after 30 minutes
+    sleep = {
+      ac = 0; # Never sleep when plugged in (AC power)
+      battery = 60; # Sleep after 1 hour on battery
+    };
+    disksleep = 0; # Never spin down (good for SSDs)
+    wakeOnMagicPacket = true;
+    autoRestartOnPowerLoss = true;
+  };
 }
