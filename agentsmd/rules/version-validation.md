@@ -76,7 +76,7 @@ If package MUST be pinned to old version (broken nixpkgs, compatibility):
 ```nix
 # GOOD: Researched latest version before suggesting
 # npm view @charmbracelet/crush version → 0.30.0 (released 2025-12-01)
-# Age: 32 days (within acceptable range)
+# Age (as of 2026-01-02): 32 days (within acceptable range)
 (writeShellScriptBin "crush" ''
   exec ${bun}/bin/bunx --bun @charmbracelet/crush@0.30.0 "$@"
 '')

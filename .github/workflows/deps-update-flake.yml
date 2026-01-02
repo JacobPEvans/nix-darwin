@@ -109,9 +109,11 @@ jobs:
 
       - name: Update flake.lock
         if: steps.check-renovate.outputs.skip == 'false'
+        env:
+          FLAKE_INPUTS: ${{ steps.inputs.outputs.inputs }}
         run: |
-          if [ -n "${{ steps.inputs.outputs.inputs }}" ]; then
-            nix flake update ${{ steps.inputs.outputs.inputs }}
+          if [ -n "$FLAKE_INPUTS" ]; then
+            nix flake update $FLAKE_INPUTS
           else
             nix flake update
           fi

@@ -21,7 +21,8 @@ fi
 
 # Extract package names (without @version)
 # Match: bunx --bun PACKAGE@version or bunx --bun @scope/PACKAGE@version
-packages=$(grep -oE 'bunx --bun (@[^/]+/)?[^@]+@' "$AI_TOOLS_FILE" | sed 's/bunx --bun //; s/@$//' || true)
+# Uses explicit character classes and handles whitespace variations
+packages=$(grep -oE 'bunx --bun[[:space:]]+(@[a-z0-9._-]+/[a-z0-9._-]+|[a-z0-9._-]+)@' "$AI_TOOLS_FILE" | sed -E 's/^bunx --bun[[:space:]]+//; s/@$//' || true)
 
 if [[ -z "$packages" ]]; then
   echo "No npm packages found to validate"

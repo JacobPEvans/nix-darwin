@@ -72,6 +72,14 @@ get_exclusion_reason() {
 while IFS= read -r package; do
   [[ -z "$package" ]] && continue
 
+  # Validate package name contains only safe characters
+  if ! [[ "$package" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+    echo "✗ INVALID: '$package' (brew) contains unsafe characters"
+    violations+="  - $package (brew) - invalid characters\n"
+    ((failed++))
+    continue
+  fi
+
   # Check if excluded
   if is_excluded "$package"; then
     reason=$(get_exclusion_reason "$package")
@@ -92,6 +100,14 @@ done <<< "$brews"
 # Check casks
 while IFS= read -r package; do
   [[ -z "$package" ]] && continue
+
+  # Validate package name contains only safe characters
+  if ! [[ "$package" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+    echo "✗ INVALID: '$package' (cask) contains unsafe characters"
+    violations+="  - $package (cask) - invalid characters\n"
+    ((failed++))
+    continue
+  fi
 
   # Check if excluded
   if is_excluded "$package"; then

@@ -19,7 +19,8 @@ fi
 
 # Extract package names from bunx wrappers (without @version, preserving @scope)
 # Match: bunx --bun PACKAGE@version or bunx --bun @scope/PACKAGE@version
-packages=$(grep -oE 'bunx --bun (@[^/]+/)?[^@]+@' "$AI_TOOLS_FILE" | sed 's/bunx --bun //; s/@$//' || true)
+# Uses [:alnum:]_- for scope and [^[:space:]@] for package name to handle edge cases
+packages=$(grep -oE 'bunx --bun (@[[:alnum:]_-]+/[^[:space:]@]+|[^[:space:]@]+)@[0-9A-Za-z._-]+' "$AI_TOOLS_FILE" | sed 's/^bunx --bun //; s/@[0-9A-Za-z._-]\+$//' || true)
 
 if [[ -z "$packages" ]]; then
   echo "No npm packages to validate against homebrew"
@@ -31,8 +32,8 @@ failed=0
 violations=""
 
 while IFS= read -r package; do
-  # Check if package exists in homebrew
-  if brew search "$package" 2>/dev/null | grep -qE "^${package}$"; then
+  # Check if package exists in homebrew (using -Fx for exact fixed-string match)
+  if brew search "$package" 2>/dev/null | grep -qFx -- "$package"; then
     echo "✗ VIOLATION: '$package' is available in homebrew - use homebrew instead of bunx"
     violations+="  - $package\n"
     ((failed++))

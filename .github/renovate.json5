@@ -34,7 +34,8 @@
       "matchStrings": [
         // Pattern: bunx --bun @scope/package@version OR bunx --bun package@version
         // Handles both scoped (@scope/package) and unscoped packages
-        "bunx\\s+(?:--bun\\s+)?(?<depName>@?(?:[a-zA-Z0-9_.-]+/)?[a-zA-Z0-9_.-]+)@(?<currentValue>[0-9.]+)"
+        // Version supports full semver: 1.2.3, 1.2.3-beta.1, 1.2.3+build.1, etc.
+        "bunx\\s+(?:--bun\\s+)?(?<depName>@?(?:[a-zA-Z0-9_.-]+/)?[a-zA-Z0-9_.-]+)@(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+(?:-[a-zA-Z0-9.-]+)?(?:\\+[a-zA-Z0-9.-]+)?)"
       ],
       "datasourceTemplate": "npm",
       "versioningTemplate": "npm"
@@ -90,12 +91,16 @@
     },
 
     // SPECIAL: Node.js LTS tracking (no latest/current versions)
+    // NOTE: Currently inactive - Node.js is managed via nixpkgs flake input (not npm/github-releases)
+    // This rule would only apply if we tracked Node.js directly from npm registry or GitHub releases
+    // To enforce Node.js LTS versions, update nixpkgs to a version that includes the desired LTS
     {
-      "description": "Node.js - track LTS versions only",
+      "description": "Node.js - track LTS versions only (inactive - see comment above)",
       "matchDatasources": ["github-releases", "npm"],
       "matchPackageNames": ["nodejs", "node"],
       "allowedVersions": "20.x || 22.x", // LTS versions only; update this when new LTS releases (24.x becomes LTS Oct 2026)
-      "automerge": false // Always review Node.js updates
+      "automerge": false, // Always review Node.js updates
+      "enabled": false // Disabled: Node.js managed via nixpkgs flake, not direct npm/github-releases
     },
 
     // Auto-merge strategy: patch + minor only
