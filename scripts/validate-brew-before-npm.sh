@@ -40,8 +40,9 @@ while IFS= read -r package; do
     brew_name="$package"
   fi
 
-  # Check if package exists in homebrew (using -Fx for exact fixed-string match)
-  if brew search "$brew_name" 2>/dev/null | grep -qFx -- "$brew_name"; then
+  # Check if package exists in homebrew using word boundary matching
+  # brew search returns substring matches, so we use grep -w to match the package name as a complete word
+  if brew search "$brew_name" 2>/dev/null | grep -qwF -- "$brew_name"; then
     echo "✗ VIOLATION: '$package' is available in homebrew - use homebrew instead of bunx"
     violations+="  - $package\n"
     ((failed++))
