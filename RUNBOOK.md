@@ -314,6 +314,233 @@ sudo /nix/var/nix/profiles/system-<N>-link/activate
 **Note**: This workflow adds safety checks before updates. For development systems or low-risk updates,
 the standard "update and rebuild" workflow in [Updating Packages](#updating-packages) is sufficient.
 
+### Handling Renovate PRs
+
+**Renovate Bot** automatically creates PRs for dependency updates. This section covers how to review and merge them.
+
+#### Renovate Update Schedule
+
+Renovate creates PRs on a schedule based on package criticality:
+
+| Package Group | Schedule | Auto-merge |
+|---------------|----------|------------|
+| Critical Infrastructure (nixpkgs, darwin, home-manager) | Mon/Thu 3am | No |
+| AI Tools (claude-code-plugins, agent-os, etc.) | Sun/Wed/Fri 10pm | Yes (patch/minor) |
+| npm Packages (cclint, chatgpt-cli, crush) | Monday | Yes (patch/minor) |
+
+**Auto-merge policy:**
+
+- **Patch** (1.2.3 → 1.2.4) and **Minor** (1.2.3 → 1.3.0): Auto-merge after CI passes
+- **Major** (1.2.3 → 2.0.0): Manual review required
+
+#### Check for Renovate PRs
+
+```bash
+# List all Renovate PRs
+gh pr list --search "author:app/renovate"
+
+# View Dependency Dashboard (shows pending updates)
+gh issue list --search "Dependency Dashboard in:title"
+```
+
+#### Review a Renovate PR
+
+1. **Check the PR details**:
+
+   ```bash
+   gh pr view <pr-number>
+   ```
+
+   Review:
+   - Package names and version changes
+   - Release notes and changelog links
+   - Whether it's a patch, minor, or major update
+
+2. **Check CI status**:
+
+   ```bash
+   gh pr checks <pr-number>
+   ```
+
+   Wait for all checks to pass:
+   - `nix flake check` (syntax validation)
+   - Package staleness check
+   - AI review (risk assessment)
+
+3. **Review AI risk assessment**:
+
+   - Look for comment from `claude-code` bot
+   - Check risk level: LOW, MEDIUM, or HIGH
+   - LOW risk: Safe to auto-merge
+   - MEDIUM/HIGH risk: Review changes carefully
+
+4. **Test locally (optional for major updates)**:
+
+   ```bash
+   # Checkout the Renovate PR branch
+   gh pr checkout <pr-number>
+
+   # Build without switching
+   sudo darwin-rebuild build --flake .
+
+   # If build succeeds, test switch
+   sudo darwin-rebuild switch --flake .
+
+   # Verify everything works, then merge the PR
+   ```
+
+#### Merge a Renovate PR
+
+**Auto-merge (patch/minor updates):**
+
+Renovate will auto-merge after CI passes. No action needed.
+
+**Manual merge (major updates or high risk):**
+
+```bash
+# Option 1: Merge via gh CLI
+gh pr review <pr-number> --approve
+gh pr merge <pr-number> --squash
+
+# Option 2: Merge via GitHub UI
+# Go to PR page, click "Squash and merge"
+```
+
+**After merge:**
+
+```bash
+# Pull the merged changes
+cd ~/.config/nix
+git checkout main
+git pull
+
+# Rebuild with updated packages
+sudo darwin-rebuild switch --flake .
+```
+
+#### Handling Failed Renovate Updates
+
+**If CI checks fail:**
+
+1. View the failure:
+
+   ```bash
+   gh pr checks <pr-number> --watch
+   ```
+
+2. Common failures:
+   - **Package staleness**: Renovate tried to update one package but others are still stale
+     - Resolution: Wait for Renovate to update all packages, or manually update: `nix flake update`
+   - **Build failure**: Package has breaking changes
+     - Resolution: Check PR comments for migration guide, fix configuration
+   - **Conflict**: PR is out of date with main
+     - Resolution: Renovate will auto-rebase, or close/reopen PR
+
+3. If update is problematic:
+
+   ```bash
+   # Close the PR (Renovate will retry later)
+   gh pr close <pr-number>
+
+   # Or pin the package version in renovate.json5
+   # (see "Pinning Package Versions" below)
+   ```
+
+#### Pinning Package Versions
+
+If a package update causes issues, temporarily pin the version:
+
+1. **Edit** `.github/renovate.json5`:
+
+   ```json5
+   {
+     "packageRules": [
+       {
+         "matchPackageNames": ["problematic-package"],
+         "enabled": false,  // Disable updates entirely
+         // OR
+         "allowedVersions": "<2.0.0"  // Pin below major version
+       }
+     ]
+   }
+   ```
+
+2. **Document the pin** with a comment and GitHub issue:
+
+   ```json5
+   // PINNED: 2026-01-02 - v2.0.0 has breaking changes
+   // TODO: Unpin when migration is complete (see #123)
+   ```
+
+3. **Commit and push**:
+
+   ```bash
+   git add .github/renovate.json5
+   git commit -m "chore(deps): pin <package> due to breaking changes"
+   git push
+   ```
+
+4. **Create issue** to track unpinning work:
+
+   ```bash
+   gh issue create --title "Unpin <package> after migration" \
+     --body "Temporarily pinned in renovate.json5 due to breaking changes"
+   ```
+
+#### Dependency Dashboard
+
+Renovate maintains a **Dependency Dashboard** issue that shows:
+
+- Pending updates (waiting for schedule)
+- Rate-limited updates (max 3 concurrent PRs)
+- Conflicted PRs (need rebase)
+- Manually approved updates
+
+**View the dashboard:**
+
+```bash
+gh issue list --search "Dependency Dashboard in:title"
+```
+
+**Manually trigger an update:**
+
+1. Go to Dependency Dashboard issue
+2. Check the box next to the package you want to update
+3. Renovate will create a PR within minutes
+
+#### Troubleshooting Renovate
+
+**Renovate not creating PRs:**
+
+1. Check if Renovate App is installed:
+
+   ```bash
+   gh api repos/JacobPEvans/nix/collaborators | jq '.[] | select(.login == "renovate[bot]")'
+   ```
+
+2. Check Dependency Dashboard for errors or rate limits
+
+3. Validate configuration:
+
+   ```bash
+   npx --yes renovate-config-validator
+   ```
+
+**Renovate PRs auto-closing:**
+
+1. Check CI logs for failures
+2. Verify `automerge` settings in `.github/renovate.json5`
+3. Check for branch protection rules
+
+**Too many Renovate PRs:**
+
+Renovate has a 3 concurrent PR limit. Merge some PRs to allow new ones.
+
+**Custom workflow conflicts with Renovate:**
+
+The custom workflow (`.github/workflows/deps-update-flake.yml`) automatically skips
+if a Renovate PR exists. No manual intervention needed.
+
 ---
 
 ## Rollback & Recovery

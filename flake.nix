@@ -5,6 +5,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
+    # Consolidated systems input for darwin-only configuration
+    # All transitive dependencies should follow this to avoid duplicate systems entries
+    systems.url = "github:nix-systems/default-darwin";
+
     darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,11 +26,13 @@
       url = "github:hraban/mac-app-util";
       # Consolidate all input overrides in a single attrset
       # - nixpkgs: use our root nixpkgs
+      # - systems: use our consolidated darwin-only systems
       # - treefmt-nix: transitive dependency, prevent duplicate nixpkgs in flake.lock
       # - cl-nix-lite: WORKAROUND for gitlab.common-lisp.net Anubis anti-bot protection
       #   See: https://github.com/hraban/mac-app-util/issues/39
       inputs = {
         nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
         treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
         cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
       };
@@ -96,7 +102,11 @@
     # https://github.com/numtide/llm-agents.nix
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        # Consolidate systems to avoid duplicate systems entries in flake.lock
+        blueprint.inputs.systems.follows = "systems";
+      };
     };
 
   };

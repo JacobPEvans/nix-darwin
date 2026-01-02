@@ -46,7 +46,7 @@
 #   cclint: @felixgeelhaar/cclint@0.12.1 (TODO: migrate to buildBunPackage)
 #   gh-copilot: @githubnext/github-copilot-cli@latest (nixpkgs broken)
 #   chatgpt: chatgpt-cli@3.3.0 (not in nixpkgs)
-#   crush: @charmbracelet/crush@0.1.1 (nixpkgs broken dependency)
+#   crush: @charmbracelet/crush@0.30.0 (nixpkgs broken dependency - updated 2026-01-02)
 #
 # Nixpkgs packages in this file:
 #   gemini-cli: 0.22.5
@@ -114,8 +114,9 @@
     # Source: https://github.com/charmbracelet/crush
     # NPM: @charmbracelet/crush
     # SECURITY: Uses bunx wrapper with pinned version; nixpkgs depends on broken twisted
+    # Updated: 2026-01-02 - v0.1.1 → v0.30.0 (was 29+ versions behind)
     (writeShellScriptBin "crush" ''
-      exec ${bun}/bin/bunx --bun @charmbracelet/crush@0.1.1 "$@"
+      exec ${bun}/bin/bunx --bun @charmbracelet/crush@0.30.0 "$@"
     '')
 
     # ==========================================================================

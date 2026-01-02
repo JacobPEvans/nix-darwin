@@ -147,6 +147,17 @@ repos:
         types: [file]
         pass_filenames: false
 
+      # Package freshness validation
+      # HARD FAIL if packages are too old (prevents security issues)
+      # Critical packages: <30 days, All packages: <90 days
+      - id: validate-package-freshness
+        name: Validate package freshness (staleness check)
+        entry: scripts/validate-package-freshness.sh
+        language: system
+        files: '^flake\.lock$'
+        types: [file]
+        pass_filenames: false
+
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs

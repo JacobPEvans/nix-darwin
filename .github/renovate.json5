@@ -1,0 +1,159 @@
+// Renovate Bot Configuration
+// Automated dependency updates for Nix flakes and npm packages
+//
+// Documentation: https://docs.renovatebot.com/configuration-options/
+// Schema: https://docs.renovatebot.com/config-presets/
+
+{
+  // Base configuration presets
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":enablePreCommit"
+  ],
+
+  // Repository settings
+  "timezone": "America/New_York",
+  "labels": ["dependencies", "renovate"],
+  "assignees": ["@JacobPEvans"],
+  "reviewers": ["@JacobPEvans"],
+
+  // Nix flake support (native manager)
+  "nix": {
+    "enabled": true
+  },
+
+  // Custom regex managers for bunx wrappers in .nix files
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Detect bunx wrapper versions in ai-tools.nix",
+      "fileMatch": ["^modules/home-manager/ai-cli/ai-tools\\.nix$"],
+      "matchStrings": [
+        // Pattern: bunx --bun @package@version OR bunx --bun package@version
+        "bunx\\s+(?:--bun\\s+)?@?(?<depName>[a-zA-Z0-9/_@-]+)@(?<currentValue>[0-9.]+)"
+      ],
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    }
+  ],
+
+  // Package grouping and scheduling strategy
+  "packageRules": [
+    // GROUP 1: Critical infrastructure (Mon/Thu before 3am)
+    {
+      "description": "Critical system inputs - twice weekly updates",
+      "matchDatasources": ["github-tags", "github-releases"],
+      "matchPackageNames": [
+        "nixpkgs",
+        "darwin",
+        "home-manager",
+        "ai-assistant-instructions"
+      ],
+      "groupName": "critical-infrastructure",
+      "schedule": ["before 3am on Monday", "before 3am on Thursday"],
+      "automerge": false, // Always require human review for critical
+      "minimumReleaseAge": "1 day" // Wait 1 day for bug reports
+    },
+
+    // GROUP 2: AI tools (Sun/Wed/Fri after 10pm)
+    {
+      "description": "AI-focused flake inputs - frequent updates",
+      "matchPackagePatterns": [
+        "claude-code",
+        "agent-os",
+        "claude-plugins-official",
+        "llm-agents",
+        "anthropic-skills"
+      ],
+      "groupName": "ai-tools",
+      "schedule": ["after 10pm on Sunday", "after 10pm on Wednesday", "after 10pm on Friday"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "platformAutomerge": true
+    },
+
+    // GROUP 3: npm packages (bunx wrappers) - Weekly Monday updates
+    {
+      "description": "Bunx wrapper npm packages - weekly updates",
+      "matchDatasources": ["npm"],
+      "matchFileNames": ["modules/home-manager/ai-cli/ai-tools.nix"],
+      "groupName": "npm-wrappers",
+      "schedule": ["after 10pm on Monday"],
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days" // Let npm packages stabilize
+    },
+
+    // SPECIAL: Node.js LTS tracking (no latest/current versions)
+    {
+      "description": "Node.js - track LTS versions only",
+      "matchDatasources": ["github-releases", "npm"],
+      "matchPackageNames": ["nodejs", "node"],
+      "allowedVersions": "20.x || 22.x", // LTS versions only
+      "automerge": false // Always review Node.js updates
+    },
+
+    // Auto-merge strategy: patch + minor only
+    {
+      "description": "Auto-merge patch updates (0.0.X)",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Auto-merge minor updates (0.X.0)",
+      "matchUpdateTypes": ["minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Never auto-merge major updates (X.0.0) - require human review",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ],
+
+  // Commit message formatting
+  "commitMessagePrefix": "chore(deps): ",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{{depName}}}",
+  "commitMessageExtra": "to {{{newVersion}}}",
+  "commitBody": "Co-Authored-By: Renovate Bot <bot@renovateapp.com>",
+
+  // PR configuration
+  "prConcurrentLimit": 3, // Max 3 PRs open at once
+  "prCreation": "immediate", // Create PR as soon as update detected
+  "prHourlyLimit": 2, // Max 2 new PRs per hour (prevent spam)
+
+  // Branch naming
+  "branchPrefix": "renovate/",
+  "branchConcurrentLimit": 5,
+
+  // Dependency dashboard (GitHub issue)
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency Dashboard (Renovate)",
+  "dependencyDashboardHeader": "This issue tracks pending dependency updates managed by Renovate Bot.",
+  "dependencyDashboardFooter": "For manual updates, use: `nix flake update` or trigger the deps-update-flake.yml workflow.",
+
+  // Post-update commands (run after updates)
+  "postUpdateOptions": [
+    "gomodTidy",
+    "npmDedupe"
+  ],
+
+  // Ignore patterns
+  "ignoreDeps": [
+    // Add packages to ignore here (e.g., broken packages, intentional pins)
+    // Example: "superpowers-marketplace" // Archived, pinned intentionally
+  ],
+
+  // Platform-specific settings
+  "platformAutomerge": true, // Use GitHub's auto-merge feature when enabled
+  "platformCommit": true // Use GitHub API for commits (enables signing)
+}
