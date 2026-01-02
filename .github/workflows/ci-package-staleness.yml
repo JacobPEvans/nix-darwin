@@ -83,6 +83,7 @@ jobs:
             ### Resolution Options
 
             1. **Update packages** (recommended):
+
             \`\`\`bash
             nix flake update
             git add flake.lock
@@ -90,14 +91,17 @@ jobs:
             \`\`\`
 
             2. **Update specific package**:
+
             \`\`\`bash
             nix flake lock --update-input <package-name>
             \`\`\`
 
             3. **Exempt package** (intentional pin):
+
             Add to EXEMPT_PACKAGES array in scripts/validate-package-freshness.sh
 
             4. **Emergency bypass** (use sparingly):
+
             Add skip-version-check label to this PR
 
             *This check enforces package freshness to prevent security vulnerabilities and outdated dependencies.*`;

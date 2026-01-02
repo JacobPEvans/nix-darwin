@@ -88,7 +88,8 @@ while IFS= read -r package; do
   fi
 
   # Search nixpkgs (suppress warnings to stderr, check if any results)
-  if nix search nixpkgs "^${package}$" 2>/dev/null | grep -q "legacyPackages"; then
+  # Note: package is validated to contain only [a-zA-Z0-9._-] characters above, preventing injection
+  if nix search nixpkgs "^${package}\$" 2>/dev/null | grep -q "legacyPackages"; then
     echo "✗ VIOLATION: '$package' (brew) is available in nixpkgs - use nixpkgs instead"
     violations+="  - $package (brew)\n"
     ((failed++))
@@ -117,7 +118,8 @@ while IFS= read -r package; do
   fi
 
   # Search nixpkgs (suppress warnings to stderr, check if any results)
-  if nix search nixpkgs "^${package}$" 2>/dev/null | grep -q "legacyPackages"; then
+  # Note: package is validated to contain only [a-zA-Z0-9._-] characters above, preventing injection
+  if nix search nixpkgs "^${package}\$" 2>/dev/null | grep -q "legacyPackages"; then
     echo "✗ VIOLATION: '$package' (cask) is available in nixpkgs - use nixpkgs instead"
     violations+="  - $package (cask)\n"
     ((failed++))

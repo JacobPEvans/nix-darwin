@@ -98,7 +98,7 @@
       "description": "Node.js - track LTS versions only (inactive - see comment above)",
       "matchDatasources": ["github-releases", "npm"],
       "matchPackageNames": ["nodejs", "node"],
-      "allowedVersions": "20.x || 22.x", // LTS versions only; update this when new LTS releases (24.x becomes LTS Oct 2026)
+      "allowedVersions": "20.x || 22.x", // LTS versions only; update when 24.x becomes LTS in Oct 2026
       "automerge": false, // Always review Node.js updates
       "enabled": false // Disabled: Node.js managed via nixpkgs flake, not direct npm/github-releases
     },
