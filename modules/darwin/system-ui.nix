@@ -41,9 +41,8 @@
       AppleMetricUnits = 0;
       AppleICUForce24HourTime = true;
 
-      # Menu bar spacing: Spacing=gap, Padding=selection area (keep 2x ratio)
-      NSStatusItemSpacing = 4;
-      NSStatusItemSelectionPadding = 8;
+      # Note: NSStatusItemSpacing and NSStatusItemSelectionPadding are set via
+      # activation script (requires -currentHost flag to work properly)
     };
 
     # --- Menu Bar Clock ---
@@ -98,25 +97,30 @@
   # --- Activation Scripts - Menu Bar Spacing ---
   # Must use -currentHost flag; requires logout/login to fully apply
   system.activationScripts.postActivation.text = lib.mkAfter ''
-    echo "Applying menu bar spacing settings (compact mode)..." >&2
+    # NOTE: Follows CRITICAL RULES from docs/ACTIVATION-SCRIPTS-RULES.md:
+    #   * NEVER use 'set -e' - errors must not abort activation
+    #   * All errors logged as warnings, not fatal
+    #   * Must reach /run/current-system symlink update
+
+    echo "Applying menu bar spacing settings (compact mode)..."
     spacing_applied=0
 
     if defaults -currentHost write -globalDomain NSStatusItemSpacing -int 4; then
-      echo "Menu bar icon spacing set to 4 (compact)" >&2
+      echo "Menu bar icon spacing set to 4 (compact)"
       spacing_applied=1
     else
       echo "Warning: Failed to set NSStatusItemSpacing to 4 - check defaults permissions" >&2
     fi
 
     if defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8; then
-      echo "Menu bar icon padding set to 8 (compact)" >&2
+      echo "Menu bar icon padding set to 8 (compact)"
       spacing_applied=$((spacing_applied + 1))
     else
       echo "Warning: Failed to set NSStatusItemSelectionPadding to 8 - check defaults permissions" >&2
     fi
 
     if [ $spacing_applied -gt 0 ]; then
-      echo "Note: Menu bar spacing changes require logout/login to fully take effect" >&2
+      echo "Note: Menu bar spacing changes require logout/login to fully take effect"
     fi
   '';
 }

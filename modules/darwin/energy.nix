@@ -79,7 +79,7 @@ in
       #   * All errors logged as warnings, not fatal
       #   * Must reach /run/current-system symlink update
 
-      echo "Configuring energy and sleep settings..." >&2
+      echo "Configuring energy and sleep settings..."
       failures=0
 
       # Settings that apply to all power sources
@@ -88,7 +88,7 @@ in
         disksleep ${toString cfg.disksleep} \
         womp ${if cfg.wakeOnMagicPacket then "1" else "0"} \
         autorestart ${if cfg.autoRestartOnPowerLoss then "1" else "0"}; then
-        echo "Common energy settings applied" >&2
+        echo "Common energy settings applied"
       else
         echo "Warning: Failed to apply common energy settings (attempted: display ${toString cfg.displaysleep}m, disk ${toString cfg.disksleep}m)" >&2
         failures=$((failures + 1))
@@ -96,7 +96,7 @@ in
 
       # AC power (plugged in) settings
       if sudo pmset -c sleep ${toString cfg.sleep.ac}; then
-        echo "AC power settings applied (sleep: ${toString cfg.sleep.ac} min)" >&2
+        echo "AC power settings applied (sleep: ${toString cfg.sleep.ac} min)"
       else
         echo "Warning: Failed to apply AC power settings (attempted: ${toString cfg.sleep.ac} min)" >&2
         failures=$((failures + 1))
@@ -104,7 +104,7 @@ in
 
       # Battery settings
       if sudo pmset -b sleep ${toString cfg.sleep.battery}; then
-        echo "Battery settings applied (sleep: ${toString cfg.sleep.battery} min)" >&2
+        echo "Battery settings applied (sleep: ${toString cfg.sleep.battery} min)"
       else
         echo "Warning: Failed to apply battery settings (attempted: ${toString cfg.sleep.battery} min)" >&2
         failures=$((failures + 1))
@@ -112,7 +112,7 @@ in
 
       # Display current settings only if at least one phase succeeded
       if [ $failures -lt 3 ]; then
-        echo "Current pmset configuration:" >&2
+        echo "Current pmset configuration:"
         sudo pmset -g || echo "Warning: Could not display pmset settings" >&2
       fi
     '';
