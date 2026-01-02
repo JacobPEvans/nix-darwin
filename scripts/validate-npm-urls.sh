@@ -6,7 +6,7 @@ set -euo pipefail
 
 # Check if curl is available
 if ! command -v curl &> /dev/null; then
-  echo "ERROR: curl is required but not installed"
+  echo "ERROR: curl is required but not found. Install via nixpkgs (e.g., add 'curl' to packages.nix)."
   exit 1
 fi
 
@@ -22,7 +22,7 @@ fi
 # Extract package names (without @version)
 # Match: bunx --bun PACKAGE@version or bunx --bun @scope/PACKAGE@version
 # Uses explicit character classes and handles whitespace variations
-packages=$(grep -oE 'bunx --bun[[:space:]]+(@[a-z0-9._-]+/[a-z0-9._-]+|[a-z0-9._-]+)@' "$AI_TOOLS_FILE" | sed -E 's/^bunx --bun[[:space:]]+//; s/@$//' || true)
+packages=$(grep -oE 'bunx --bun[[:space:]]+(@[A-Za-z0-9._-]+/[A-Za-z0-9._-]+|[A-Za-z0-9._-]+)@' "$AI_TOOLS_FILE" | sed -E 's/^bunx --bun[[:space:]]+//; s/@$//' || true)
 
 if [[ -z "$packages" ]]; then
   echo "No npm packages found to validate"

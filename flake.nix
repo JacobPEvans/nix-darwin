@@ -11,12 +11,18 @@
 
     darwin = {
       url = "github:nix-darwin/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
     };
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
     };
 
     # mac-app-util: Create app trampolines for /Applications/Nix Apps/ (system-level)
@@ -105,6 +111,8 @@
       inputs = {
         nixpkgs.follows = "nixpkgs";
         # Consolidate systems to avoid duplicate systems entries in flake.lock
+        # Uses transitive follow through blueprint (llm-agents' internal dependency)
+        # because blueprint is the flake that actually consumes systems
         blueprint.inputs.systems.follows = "systems";
       };
     };

@@ -7,14 +7,18 @@ Automated dependency monitoring and update system for nix-darwin configuration.
 This repository uses a **complementary dependency update strategy** combining:
 
 1. **Renovate Bot** (primary) - Automated dependency PRs with grouping and auto-merge
-2. **Custom Workflow** (fallback) - Manual flake updates when Renovate hasn't acted
+2. **Custom Workflow** (fallback) - Manual flake updates ONLY when Renovate hasn't acted
 
-| Automation | What Updates | When |
-|------------|--------------|------|
-| **Renovate Bot** | Critical infrastructure, AI tools, npm packages | Mon/Thu (critical), Sun/Wed/Fri (AI), Mon (npm) |
-| **Custom Workflow** (schedule) | Fallback if no Renovate PR exists | Tue/Fri (all), daily (AI-focused) |
-| **repository_dispatch** | ai-assistant-instructions only | Instant (on push) |
-| **workflow_dispatch** | Manual trigger | On demand |
+## Update Automation Layers
+
+| Layer | Role | What Updates | When | Auto-merge |
+|-------|------|--------------|------|------------|
+| **Renovate Bot** (Primary) | Proactive updates | Critical infrastructure, AI tools, npm packages | Mon/Thu (critical), Sun/Wed/Fri (AI), Mon (npm) | Yes (patch/minor) |
+| **Custom Workflow** (Fallback) | Safety net | All inputs IF no Renovate PR exists | Tue/Fri (all), daily (AI-focused) | No |
+| **repository_dispatch** | Rapid response | ai-assistant-instructions only | Instant (on push to source) | No |
+| **workflow_dispatch** | Manual | Any inputs | On demand | No |
+
+**Key relationship:** Custom Workflow checks if a Renovate PR exists and skips if one does, preventing duplicate update attempts.
 
 ## Renovate Bot (Primary Automation)
 

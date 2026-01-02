@@ -59,13 +59,13 @@ get_last_modified() {
   jq -r ".nodes.\"$package\".locked.lastModified // 0" "$FLAKE_LOCK"
 }
 
-# Function: Check if package matches any exemption pattern (supports globs)
-is_in_array() {
+# Function: Check if package matches any exemption pattern (supports glob patterns)
+matches_exemption_pattern() {
   local element=$1
   shift
   local array=("$@")
   for pattern in "${array[@]}"; do
-    # Use glob pattern matching (supports wildcards)
+    # Use glob pattern matching (supports wildcards like "prefix*")
     [[ "$element" == $pattern ]] && return 0
   done
   return 1
@@ -117,12 +117,12 @@ while IFS= read -r package; do
   [[ "$package" == "root" ]] && continue
 
   # Skip if already checked in critical packages
-  if is_in_array "$package" "${CRITICAL_PACKAGES[@]}"; then
+  if matches_exemption_pattern "$package" "${CRITICAL_PACKAGES[@]}"; then
     continue
   fi
 
   # Skip if in exempt list
-  if is_in_array "$package" "${EXEMPT_PACKAGES[@]}"; then
+  if matches_exemption_pattern "$package" "${EXEMPT_PACKAGES[@]}"; then
     echo -e "  ${YELLOW}⊘ EXEMPT${NC}: $package (in exemption list)"
     continue
   fi

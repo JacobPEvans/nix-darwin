@@ -42,15 +42,18 @@
 # CURRENT STATUS
 # ============================================================================
 #
-# Bunx wrappers in this file:
-#   cclint: @felixgeelhaar/cclint@0.12.1 (TODO: migrate to buildBunPackage)
-#   gh-copilot: @githubnext/github-copilot-cli@latest (nixpkgs broken)
-#   chatgpt: chatgpt-cli@3.3.0 (not in nixpkgs)
+# DIRECT NIXPKGS PACKAGES (from pkgs):
+#   gemini-cli: 0.22.5 (via nixpkgs)
 #
-# Nixpkgs packages in this file:
-#   gemini-cli: 0.22.5
+# BUNX WRAPPER PACKAGES (online-only, should migrate to buildBunPackage):
+#   cclint: @felixgeelhaar/cclint@0.12.1
+#     - Status: TODO - migrate to buildBunPackage
+#   gh-copilot: @githubnext/github-copilot-cli@latest
+#     - Status: Waiting - nixpkgs 0.0.373 has broken package-lock
+#   chatgpt: chatgpt-cli@3.3.0
+#     - Status: Not in nixpkgs
 #
-# Aider:
+# OTHER TOOLS (installed via other methods):
 #   aider: Via pipx (Python package, not available in nixpkgs)
 #
 # NOTE: These are home-manager packages, not system packages.
@@ -62,9 +65,12 @@
   # AI-specific development tools
   # Install via: home.packages = [ ... ] ++ (import ./ai-cli/ai-tools.nix { inherit pkgs; }).packages;
   #
-  # NOTE: Only claude-code and claude-monitor come from nixpkgs (via darwin/common.nix).
-  # Other packages below are provided as bunx wrappers due to nixpkgs build issues.
-  # See CURRENT STATUS section at the top of this file for details.
+  # PACKAGING STRATEGY:
+  # - Direct nixpkgs packages: gemini-cli (available in nixpkgs)
+  # - Bunx wrappers: cclint, gh-copilot, chatgpt (not in nixpkgs or nixpkgs broken)
+  # - Python tools: aider via pipx (not available in nixpkgs)
+  #
+  # See CURRENT STATUS section at the top of this file for package details.
   packages = with pkgs; [
     # ==========================================================================
     # Claude Code Ecosystem

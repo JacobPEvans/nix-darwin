@@ -34,7 +34,10 @@
       "matchStrings": [
         // Pattern: bunx --bun @scope/package@version OR bunx --bun package@version
         // Handles both scoped (@scope/package) and unscoped packages
-        // Version supports full semver: 1.2.3, 1.2.3-beta.1, 1.2.3+build.1, etc.
+        // Version pattern: [0-9]+\\.[0-9]+\\.[0-9]+ matches X.Y.Z semver format
+        // - Pre-release: (?:-[a-zA-Z0-9.-]+)? matches -beta.1, -alpha, -rc.1, etc.
+        // - Build metadata: (?:\\+[a-zA-Z0-9.-]+)? matches +build.1, +meta, etc.
+        // Examples matched: 1.0.0, 1.2.3-beta.1, 2.0.0-rc.1+build.123
         "bunx\\s+(?:--bun\\s+)?(?<depName>@?(?:[a-zA-Z0-9_.-]+/)?[a-zA-Z0-9_.-]+)@(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+(?:-[a-zA-Z0-9.-]+)?(?:\\+[a-zA-Z0-9.-]+)?)"
       ],
       "datasourceTemplate": "npm",
@@ -98,7 +101,11 @@
       "description": "Node.js - track LTS versions only (inactive - see comment above)",
       "matchDatasources": ["github-releases", "npm"],
       "matchPackageNames": ["nodejs", "node"],
-      "allowedVersions": "20.x || 22.x", // LTS versions only; update when 24.x becomes LTS in Oct 2026
+      "allowedVersions": "20.x || 22.x",
+      // TODO(2026-10): Review Node.js LTS versions
+      // - Node.js 24.x becomes LTS in October 2026
+      // - Update allowedVersions to "20.x || 22.x || 24.x" when LTS is confirmed
+      // - Create GitHub issue to track this reminder
       "automerge": false, // Always review Node.js updates
       "enabled": false // Disabled: Node.js managed via nixpkgs flake, not direct npm/github-releases
     },
