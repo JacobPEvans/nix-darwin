@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  llm-agents,
   ...
 }:
 
@@ -10,11 +9,6 @@ let
 
   # Universal packages (pre-commit, linters) shared across all systems
   commonPackages = import ../common/packages.nix { inherit pkgs; };
-
-  # LLM Agents packages from numtide/llm-agents.nix flake
-  # Daily-updated packages with binary cache for faster builds
-  # https://github.com/numtide/llm-agents.nix
-  llmAgentsPkgs = llm-agents.packages.${pkgs.system};
 in
 {
   imports = [
@@ -90,36 +84,34 @@ in
       # Development tools
       # ========================================================================
       gh # GitHub CLI
-    ])
-    # ========================================================================
-    # AI Coding Agents (from numtide/llm-agents.nix)
-    # Daily-updated packages with binary cache
-    # https://github.com/numtide/llm-agents.nix
-    # ========================================================================
-    ++ [
-      llmAgentsPkgs.claude-code # Anthropic's agentic coding CLI
+
+      # ========================================================================
+      # AI Coding Agents (sourced from nixpkgs)
+      # All packages are available in nixpkgs, but some are temporarily disabled
+      # due to build issues (see inline comments). The llm-agents.nix flake has
+      # been removed to simplify dependencies, but can be re-introduced as a
+      # fallback for packages that are broken or severely outdated in nixpkgs.
+      # ========================================================================
+      claude-code # Anthropic's agentic coding CLI
+      claude-monitor # Real-time Claude Code usage monitor
 
       # DISABLED: gemini-cli 0.22.5 has stale npm dependency cache
       # npm ci fails: "ENOTCACHED - request to registry.npmjs.org/string-width failed"
-      # llm-agents.nix needs to regenerate npmDepsHash - re-enable after fix
-      # llmAgentsPkgs.gemini-cli # Google's Gemini CLI
+      # Re-enable when nixpkgs updates to fixed version
+      # gemini-cli # Google's Gemini CLI
 
-      # DISABLED: copilot-cli 0.0.373 has broken package-lock.json
+      # DISABLED: github-copilot-cli 0.0.373 has broken package-lock.json
       # npm ci fails: "Missing: @github/copilot-darwin-arm64@ from lock file"
-      # Upstream issue in numtide/llm-agents.nix - re-enable after fix
-      # llmAgentsPkgs.copilot-cli # GitHub Copilot CLI
+      # Re-enable when nixpkgs updates to fixed version
+      # github-copilot-cli # GitHub Copilot CLI
 
       # DISABLED: The following packages depend on python3.13-twisted, which has
       # test failures in nixpkgs (IPv6 TCP tests timeout after 120s).
       # Re-enable when the upstream twisted package is fixed.
-      # llmAgentsPkgs.crush # Charmbracelet's AI coding agent (successor to OpenCode)
-      # llmAgentsPkgs.goose-cli # Block's open-source AI agent
-
-      # llmAgentsPkgs.codex # OpenAI Codex agent (enable if needed)
-      # llmAgentsPkgs.qwen-code # Alibaba's Qwen3-Coder (enable if needed)
-    ]
+      # crush # Charmbracelet's AI coding agent (successor to OpenCode)
+      # goose-cli # Block's open-source AI agent
+    ])
     ++ (with pkgs; [
-      claude-monitor # Real-time Claude Code usage monitor (nixpkgs)
 
       mas # Mac App Store CLI (search: mas search <app>, install: mas install <id>)
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
