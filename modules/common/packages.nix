@@ -85,10 +85,9 @@ with pkgs;
   # Using python3.withPackages instead of individual python3Packages.*
   (python3.withPackages (ps: [
     ps.grip # Preview GitHub Markdown files locally
-    # DISABLED: langchain-ollama pulls in langchain → langsmith → anthropic →
-    # tokenizers → datasets → pyarrow → arrow-cpp → thrift → twisted
-    # python3.13-twisted has test failures (IPv6 TCP timeout errors in nixpkgs)
-    # Re-enable when twisted package is fixed upstream
+    # DISABLED: langchain-ollama ultimately depends on python3.13-twisted,
+    # which currently has failing tests (IPv6 TCP timeout errors) in nixpkgs.
+    # Re-enable when the twisted package is fixed upstream.
     # ps.langchain-ollama # LangChain integration for Ollama
     ps.ollama # Ollama Python library for local LLM interaction
     ps.pipx # Install and run Python CLI apps in isolated environments
