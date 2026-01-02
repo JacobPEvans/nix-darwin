@@ -54,9 +54,10 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Function: Extract lastModified timestamp from flake.lock
+# SECURITY: Uses jq --arg to prevent package name from affecting jq expression
 get_last_modified() {
   local package=$1
-  jq -r ".nodes.\"$package\".locked.lastModified // 0" "$FLAKE_LOCK"
+  jq -r --arg pkg "$package" '.nodes[$pkg].locked.lastModified // 0' "$FLAKE_LOCK"
 }
 
 # Function: Check if package matches any exemption pattern (supports glob patterns)
@@ -85,7 +86,8 @@ echo ""
 echo "Checking CRITICAL packages (must be <$CRITICAL_THRESHOLD_DAYS days):"
 while IFS= read -r package; do
   # Check if package exists in flake.lock
-  if ! jq -e ".nodes.\"$package\"" "$FLAKE_LOCK" &> /dev/null; then
+  # SECURITY: Uses jq --arg to prevent package name from affecting jq expression
+  if ! jq -e --arg pkg "$package" '.nodes[$pkg]' "$FLAKE_LOCK" &> /dev/null; then
     echo -e "  ${YELLOW}⊘ SKIP${NC}: $package (not in flake.lock)"
     continue
   fi

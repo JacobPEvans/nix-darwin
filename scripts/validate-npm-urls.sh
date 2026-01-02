@@ -39,7 +39,8 @@ while IFS= read -r package; do
   url="https://registry.npmjs.org/${url_package}"
 
   # Check if URL exists (HTTP 200)
-  if ! curl -sf -o /dev/null -w "%{http_code}" "$url" | grep -q "200"; then
+  # Use -L to follow redirects (npm registry may redirect scoped packages)
+  if ! curl -sfL -o /dev/null -w "%{http_code}" "$url" | grep -q "^200$"; then
     echo "✗ FAILED: $package ($url returned non-200)"
     ((failed++))
   else

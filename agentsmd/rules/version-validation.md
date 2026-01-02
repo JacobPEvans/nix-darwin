@@ -22,7 +22,7 @@ When suggesting or pinning package versions, AI agents MUST:
 
 ### 2. Avoid Date-Based Assumptions
 
-- **NEVER assume current year is 2024** (Claude's training cutoff)
+- **NEVER assume knowledge of events after April 2024** (Claude's training cutoff)
 - ALWAYS use actual current date when evaluating version freshness
 - If unsure of current date, ask user to confirm
 

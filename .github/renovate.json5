@@ -155,10 +155,8 @@
   "dependencyDashboardFooter": "For manual updates, use: `nix flake update` or trigger the deps-update-flake.yml workflow.",
 
   // Post-update commands (run after updates)
-  "postUpdateOptions": [
-    "gomodTidy",
-    "npmDedupe"
-  ],
+  // Note: Nix flake repos don't use Go modules or npm lock files, so no post-update commands needed
+  "postUpdateOptions": [],
 
   // Ignore patterns
   "ignoreDeps": [
