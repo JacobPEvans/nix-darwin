@@ -83,18 +83,22 @@ jobs:
             ### Resolution Options
 
             1. **Update packages** (recommended):
-                 nix flake update
-                 git add flake.lock
-                 git commit -m "chore(deps): update flake inputs"
+            \`\`\`bash
+            nix flake update
+            git add flake.lock
+            git commit -m "chore(deps): update flake inputs"
+            \`\`\`
 
             2. **Update specific package**:
-                 nix flake lock --update-input <package-name>
+            \`\`\`bash
+            nix flake lock --update-input <package-name>
+            \`\`\`
 
             3. **Exempt package** (intentional pin):
-                 Add to EXEMPT_PACKAGES array in scripts/validate-package-freshness.sh
+            Add to EXEMPT_PACKAGES array in scripts/validate-package-freshness.sh
 
             4. **Emergency bypass** (use sparingly):
-                 Add skip-version-check label to this PR
+            Add skip-version-check label to this PR
 
             *This check enforces package freshness to prevent security vulnerabilities and outdated dependencies.*`;
 

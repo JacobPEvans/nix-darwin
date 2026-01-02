@@ -85,13 +85,13 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          # Check if Renovate bot has an open PR for flake.lock
+          # Check if Renovate bot has an open PR that modifies flake.lock
           # SECURITY: Only extracts PR number (integer) from JSON - safe from injection
           RENOVATE_PR=$(gh pr list \
-            --search "author:app/renovate flake.lock in:title" \
+            --search "author:app/renovate is:open" \
             --state open \
-            --json number \
-            --jq '.[0].number // ""')
+            --json number,files \
+            --jq '[.[] | select(any(.files[].path; . == "flake.lock"))][0].number // ""')
 
           if [[ -n "$RENOVATE_PR" ]]; then
             # SECURITY: RENOVATE_PR is always a number (from --json number field)

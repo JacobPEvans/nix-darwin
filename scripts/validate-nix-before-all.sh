@@ -4,6 +4,12 @@
 
 set -euo pipefail
 
+# Check if nix command is available
+if ! command -v nix &> /dev/null; then
+  echo "ERROR: nix command is required but not available"
+  exit 1
+fi
+
 # Known false positives: Same name, different apps
 # Format: "package-name:reason"
 EXCLUSIONS=(
@@ -18,10 +24,18 @@ if [[ ! -f "$HOMEBREW_FILE" ]]; then
 fi
 
 # Extract brew packages (brews = [...])
-brews=$(grep -A 50 'brews = \[' "$HOMEBREW_FILE" | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' || true)
+brews=$(awk '
+  /brews = \[/ {in_brews=1; next}
+  /\];/ && in_brews {in_brews=0; next}
+  in_brews {print}
+' "$HOMEBREW_FILE" | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' || true)
 
 # Extract cask packages (casks = [...])
-casks=$(grep -A 50 'casks = \[' "$HOMEBREW_FILE" | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' || true)
+casks=$(awk '
+  /casks = \[/ {in_casks=1; next}
+  /\];/ && in_casks {in_casks=0; next}
+  in_casks {print}
+' "$HOMEBREW_FILE" | grep '"' | sed 's/.*"\([^"]*\)".*/\1/' || true)
 
 if [[ -z "$brews" ]] && [[ -z "$casks" ]]; then
   echo "No homebrew packages to validate"

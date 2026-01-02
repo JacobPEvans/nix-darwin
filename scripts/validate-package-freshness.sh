@@ -83,7 +83,7 @@ echo ""
 
 # Check critical packages first
 echo "Checking CRITICAL packages (must be <$CRITICAL_THRESHOLD_DAYS days):"
-printf '%s\n' "${CRITICAL_PACKAGES[@]}" | while IFS= read -r package; do
+while IFS= read -r package; do
   # Check if package exists in flake.lock
   if ! jq -e ".nodes.\"$package\"" "$FLAKE_LOCK" &> /dev/null; then
     echo -e "  ${YELLOW}⊘ SKIP${NC}: $package (not in flake.lock)"
@@ -106,13 +106,13 @@ printf '%s\n' "${CRITICAL_PACKAGES[@]}" | while IFS= read -r package; do
   else
     echo -e "  ${GREEN}✓ OK${NC}:   $package ($DAYS_OLD days old)"
   fi
-done
+done < <(printf '%s\n' "${CRITICAL_PACKAGES[@]}")
 
 echo ""
 echo "Checking ALL packages (must be <$GENERAL_THRESHOLD_DAYS days):"
 
 # Check all packages in flake.lock
-jq -r '.nodes | keys[]' "$FLAKE_LOCK" | while IFS= read -r package; do
+while IFS= read -r package; do
   # Skip root node
   [[ "$package" == "root" ]] && continue
 
@@ -146,7 +146,7 @@ jq -r '.nodes | keys[]' "$FLAKE_LOCK" | while IFS= read -r package; do
   else
     echo -e "  ${GREEN}✓ OK${NC}:   $package ($DAYS_OLD days old)"
   fi
-done
+done < <(jq -r '.nodes | keys[]' "$FLAKE_LOCK")
 
 # Summary
 echo ""

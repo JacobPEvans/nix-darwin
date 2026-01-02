@@ -20,7 +20,7 @@ _:
     brews = [
       # CLI tools (only if not available in nixpkgs)
       "ccusage" # Claude Code usage analyzer - not in nixpkgs
-      "block-goose-cli" # Block Goose AI agent - conflicts with nixpkgs 'goose'
+      "block-goose-cli" # Block Goose AI agent (verified via: brew search goose) - conflicts with nixpkgs 'goose'
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)

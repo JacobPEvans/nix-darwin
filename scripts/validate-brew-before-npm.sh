@@ -4,6 +4,12 @@
 
 set -euo pipefail
 
+# Check if brew is available
+if ! command -v brew &> /dev/null; then
+  echo "ERROR: brew is required but not installed"
+  exit 1
+fi
+
 AI_TOOLS_FILE="modules/home-manager/ai-cli/ai-tools.nix"
 
 if [[ ! -f "$AI_TOOLS_FILE" ]]; then
@@ -11,9 +17,9 @@ if [[ ! -f "$AI_TOOLS_FILE" ]]; then
   exit 1
 fi
 
-# Extract package names from bunx wrappers (without @version and @scope)
+# Extract package names from bunx wrappers (without @version, preserving @scope)
 # Match: bunx --bun PACKAGE@version or bunx --bun @scope/PACKAGE@version
-packages=$(grep -oE 'bunx --bun (@[^/]+/)?[^@]+@' "$AI_TOOLS_FILE" | sed 's/bunx --bun //; s/@[^/]*\///; s/@$//' || true)
+packages=$(grep -oE 'bunx --bun (@[^/]+/)?[^@]+@' "$AI_TOOLS_FILE" | sed 's/bunx --bun //; s/@$//' || true)
 
 if [[ -z "$packages" ]]; then
   echo "No npm packages to validate against homebrew"

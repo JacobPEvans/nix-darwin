@@ -4,6 +4,12 @@
 
 set -euo pipefail
 
+# Check if curl is available
+if ! command -v curl &> /dev/null; then
+  echo "ERROR: curl is required but not installed"
+  exit 1
+fi
+
 # Extract npm package names from bunx wrappers in ai-tools.nix
 # Format: bunx --bun package@version or bunx --bun @scope/package@version
 AI_TOOLS_FILE="modules/home-manager/ai-cli/ai-tools.nix"
