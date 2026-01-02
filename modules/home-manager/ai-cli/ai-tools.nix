@@ -42,26 +42,14 @@
 # CURRENT STATUS
 # ============================================================================
 #
-# Claude Code Ecosystem:
-#   cclint: Using bunx wrapper (pinned @0.12.1, TODO: migrate to buildBunPackage)
-#   ccusage: Using bunx wrapper (pinned @0.6.2, TODO: migrate to buildBunPackage)
+# Bunx wrappers in this file:
+#   cclint: @felixgeelhaar/cclint@0.12.1 (TODO: migrate to buildBunPackage)
+#   gh-copilot: @githubnext/github-copilot-cli@latest (nixpkgs broken)
+#   chatgpt: chatgpt-cli@3.3.0 (not in nixpkgs)
+#   crush: @charmbracelet/crush@0.1.1 (nixpkgs broken dependency)
 #
-# Google Gemini:
-#   gemini: Using bunx wrapper (nixpkgs 0.22.5 has stale npm cache:
-#           "ENOTCACHED - request to registry.npmjs.org/string-width failed")
-#
-# GitHub Copilot:
-#   gh-copilot: Using bunx wrapper (nixpkgs 0.0.373 has broken package-lock.json:
-#               "Missing: @github/copilot-darwin-arm64@ from lock file")
-#
-# OpenAI:
-#   chatgpt: Using bunx wrapper (pinned @3.3.0, not available in nixpkgs)
-#
-# Block Goose:
-#   goose: Using bunx wrapper (pinned @0.9.4, nixpkgs depends on broken python3.13-twisted)
-#
-# Charmbracelet:
-#   crush: Using bunx wrapper (pinned @0.1.1, nixpkgs depends on broken python3.13-twisted)
+# Nixpkgs packages in this file:
+#   gemini-cli: 0.22.5
 #
 # Aider:
 #   aider: Via pipx (Python package, not available in nixpkgs)
@@ -92,24 +80,12 @@
       exec ${bun}/bin/bunx --bun @felixgeelhaar/cclint@0.12.1 "$@"
     '')
 
-    # Claude Code usage analyzer
-    # Source: https://github.com/ryoppippi/ccusage
-    # NPM: ccusage
-    # SECURITY: Uses bunx wrapper with pinned version; not yet packaged in nixpkgs.
-    (writeShellScriptBin "ccusage" ''
-      exec ${bun}/bin/bunx --bun ccusage@0.6.2 "$@"
-    '')
-
     # ==========================================================================
     # Google Gemini CLI
     # ==========================================================================
+    # Available in nixpkgs (0.22.5)
     # Source: https://github.com/google-gemini/gemini-cli
-    # NPM: @google/generative-ai-cli
-    # SECURITY: Uses bunx wrapper (latest tag); nixpkgs 0.22.5 has stale npm cache
-    # TODO: Pin version and migrate to buildBunPackage once nixpkgs is fixed
-    (writeShellScriptBin "gemini" ''
-      exec ${bun}/bin/bunx --bun @google/generative-ai-cli@latest "$@"
-    '')
+    gemini-cli
 
     # ==========================================================================
     # GitHub Copilot CLI
@@ -133,16 +109,6 @@
     '')
 
     # ==========================================================================
-    # Block Goose CLI
-    # ==========================================================================
-    # Source: https://github.com/block/goose
-    # NPM: goose-ai
-    # SECURITY: Uses bunx wrapper with pinned version; nixpkgs depends on broken twisted
-    (writeShellScriptBin "goose" ''
-      exec ${bun}/bin/bunx --bun goose-ai@0.9.4 "$@"
-    '')
-
-    # ==========================================================================
     # Charmbracelet Crush (successor to OpenCode)
     # ==========================================================================
     # Source: https://github.com/charmbracelet/crush
@@ -161,5 +127,6 @@
     # Note: Using python3.withPackages pipx from common/packages.nix
     # Install: pipx install aider-chat
     # This creates a marker comment so users know aider is via pipx
+
   ];
 }

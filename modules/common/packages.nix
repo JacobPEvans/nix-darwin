@@ -20,6 +20,14 @@ with pkgs;
   pre-commit
 
   # ==========================================================================
+  # Node.js and Bun Runtimes
+  # ==========================================================================
+  # Provides npm, npx (from nodejs) and bunx (from bun)
+  # Essential development tools for JavaScript/TypeScript projects
+  nodejs # Provides npm and npx (node package executor)
+  bun # Fast all-in-one JavaScript runtime (provides bunx)
+
+  # ==========================================================================
   # Universal Linters
   # ==========================================================================
   # These are the most common linters used across projects. They support

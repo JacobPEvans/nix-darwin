@@ -115,6 +115,38 @@ repos:
         types: [file]
         pass_filenames: false
 
+      # NPM package URL validation
+      # Validates that npm package URLs in ai-tools.nix actually exist (no 404s)
+      - id: validate-npm-urls
+        name: Validate npm package URLs
+        entry: scripts/validate-npm-urls.sh
+        language: system
+        files: '^modules/home-manager/ai-cli/ai-tools\.nix$'
+        types: [file]
+        pass_filenames: false
+
+      # Homebrew package hierarchy validation
+      # HARD FAIL if any npm/bunx packages are available in homebrew
+      # Enforces: nixpkgs → homebrew → bun → npm → bunx
+      - id: validate-brew-over-npm
+        name: Check homebrew alternatives for npm packages
+        entry: scripts/validate-brew-over-npm.sh
+        language: system
+        files: '^modules/home-manager/ai-cli/ai-tools\.nix$'
+        types: [file]
+        pass_filenames: false
+
+      # Nixpkgs package hierarchy validation
+      # HARD FAIL if any homebrew packages are available in nixpkgs
+      # Enforces: nixpkgs → homebrew → bun → npm → bunx
+      - id: validate-nix-over-brew
+        name: Check nixpkgs alternatives for homebrew packages
+        entry: scripts/validate-nix-over-brew.sh
+        language: system
+        files: '^modules/darwin/homebrew\.nix$'
+        types: [file]
+        pass_filenames: false
+
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs

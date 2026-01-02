@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# HARD FAIL if any npm/npx/bunx packages are available in homebrew
+# This enforces the package hierarchy: nixpkgs -> homebrew -> bun -> npm -> bunx
+
+set -euo pipefail
+
+AI_TOOLS_FILE="modules/home-manager/ai-cli/ai-tools.nix"
+
+if [[ ! -f "$AI_TOOLS_FILE" ]]; then
+  echo "ERROR: $AI_TOOLS_FILE not found"
+  exit 1
+fi
+
+# Extract package names from bunx wrappers (without @version and @scope)
+# Match: bunx --bun PACKAGE@version or bunx --bun @scope/PACKAGE@version
+packages=$(grep -oE 'bunx --bun (@[^/]+/)?[^@]+@' "$AI_TOOLS_FILE" | sed 's/bunx --bun //; s/@[^/]*\///; s/@$//' || true)
+
+if [[ -z "$packages" ]]; then
+  echo "No npm packages to validate against homebrew"
+  exit 0
+fi
+
+echo "Checking if npm packages are available in homebrew..."
+failed=0
+violations=""
+
+while IFS= read -r package; do
+  # Check if package exists in homebrew
+  if brew search "$package" 2>/dev/null | grep -qE "^${package}$"; then
+    echo "✗ VIOLATION: '$package' is available in homebrew - use homebrew instead of bunx"
+    violations+="  - $package\n"
+    ((failed++))
+  else
+    echo "✓ OK: '$package' not in homebrew (bunx is appropriate)"
+  fi
+done <<< "$packages"
+
+if [[ $failed -gt 0 ]]; then
+  echo ""
+  echo "=========================================="
+  echo "PACKAGE HIERARCHY VIOLATION"
+  echo "=========================================="
+  echo ""
+  echo "The following packages are available in homebrew but defined as npm packages:"
+  echo -e "$violations"
+  echo "REQUIRED ACTION:"
+  echo "1. Add package to modules/darwin/homebrew.nix (brews section)"
+  echo "2. Remove bunx wrapper from $AI_TOOLS_FILE"
+  echo "3. Add comment documenting why homebrew is used"
+  echo ""
+  echo "Package hierarchy (STRICT): nixpkgs → homebrew → bun → npm → bunx"
+  exit 1
+fi
+
+echo "All npm packages validated - no homebrew alternatives available"

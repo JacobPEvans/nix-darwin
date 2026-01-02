@@ -19,7 +19,8 @@ _:
     ];
     brews = [
       # CLI tools (only if not available in nixpkgs)
-      # ccusage moved to nix - see modules/home-manager/ai-cli/ai-tools.nix
+      "ccusage" # Claude Code usage analyzer - not in nixpkgs
+      "block-goose-cli" # Block Goose AI agent - conflicts with nixpkgs 'goose'
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
