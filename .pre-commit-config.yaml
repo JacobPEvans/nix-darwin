@@ -128,9 +128,9 @@ repos:
       # Homebrew package hierarchy validation
       # HARD FAIL if any npm/bunx packages are available in homebrew
       # Enforces: nixpkgs → homebrew → bun → npm → bunx
-      - id: validate-brew-over-npm
-        name: Check homebrew alternatives for npm packages
-        entry: scripts/validate-brew-over-npm.sh
+      - id: validate-brew-before-npm
+        name: Check homebrew before npm/bunx (hierarchy)
+        entry: scripts/validate-brew-before-npm.sh
         language: system
         files: '^modules/home-manager/ai-cli/ai-tools\.nix$'
         types: [file]
@@ -139,9 +139,9 @@ repos:
       # Nixpkgs package hierarchy validation
       # HARD FAIL if any homebrew packages are available in nixpkgs
       # Enforces: nixpkgs → homebrew → bun → npm → bunx
-      - id: validate-nix-over-brew
-        name: Check nixpkgs alternatives for homebrew packages
-        entry: scripts/validate-nix-over-brew.sh
+      - id: validate-nix-before-all
+        name: Check nixpkgs before all others (hierarchy)
+        entry: scripts/validate-nix-before-all.sh
         language: system
         files: '^modules/darwin/homebrew\.nix$'
         types: [file]
