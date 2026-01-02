@@ -1,0 +1,119 @@
+name: Package Staleness Check
+
+# Purpose: Block PR merges if packages are too old
+# Thresholds:
+#   - Critical packages (nixpkgs, darwin, home-manager): >30 days = FAIL
+#   - All packages: >90 days = FAIL
+# Override: Add 'skip-version-check' label to bypass (emergency only)
+
+on:
+  pull_request:
+    paths:
+      - 'flake.lock'
+      - '.github/workflows/ci-package-staleness.yml'
+      - 'scripts/validate-package-freshness.sh'
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: read
+  pull-requests: write # Needed to post comments
+
+jobs:
+  check-staleness:
+    name: Verify package freshness
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for skip label
+        id: check-skip
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request?.labels || [];
+            const skipLabel = labels.find(l => l.name === 'skip-version-check');
+            if (skipLabel) {
+              core.notice('⊘ SKIP: skip-version-check label detected');
+              core.setOutput('skip', 'true');
+            } else {
+              core.setOutput('skip', 'false');
+            }
+
+      - name: Install jq
+        if: steps.check-skip.outputs.skip == 'false'
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run package freshness validation
+        if: steps.check-skip.outputs.skip == 'false'
+        id: validate
+        continue-on-error: true
+        run: |
+          # Run validation script and capture output
+          bash scripts/validate-package-freshness.sh > staleness-report.txt 2>&1
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+
+          # Capture report for PR comment (safe - no untrusted input)
+          {
+            echo "STALENESS_REPORT<<EOF"
+            cat staleness-report.txt
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+          exit "$EXIT_CODE"
+
+      - name: Post staleness report as PR comment
+        if: steps.check-skip.outputs.skip == 'false' && steps.validate.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // SECURITY: All inputs here are from trusted sources (our own script output)
+            // No untrusted user input (PR title, body, etc.) is used
+            const report = process.env.STALENESS_REPORT;
+            const exitCode = process.env.EXIT_CODE;
+
+            const comment = `## ⚠️ Package Staleness Check Failed
+
+            ${report}
+
+            **Exit Code:** ${exitCode}
+
+            ### Resolution Options
+
+            1. **Update packages** (recommended):
+                 nix flake update
+                 git add flake.lock
+                 git commit -m "chore(deps): update flake inputs"
+
+            2. **Update specific package**:
+                 nix flake lock --update-input <package-name>
+
+            3. **Exempt package** (intentional pin):
+                 Add to EXEMPT_PACKAGES array in scripts/validate-package-freshness.sh
+
+            4. **Emergency bypass** (use sparingly):
+                 Add skip-version-check label to this PR
+
+            *This check enforces package freshness to prevent security vulnerabilities and outdated dependencies.*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+        env:
+          EXIT_CODE: ${{ steps.validate.outputs.exit_code }}
+
+      - name: Fail if packages are stale
+        if: steps.check-skip.outputs.skip == 'false' && steps.validate.outputs.exit_code != '0'
+        run: |
+          echo "::error::Package staleness check failed. See PR comment for details."
+          exit 1
+
+      - name: Success summary
+        if: steps.check-skip.outputs.skip == 'false' && steps.validate.outputs.exit_code == '0'
+        run: |
+          echo "::notice::✓ All packages are fresh and within acceptable age ranges"

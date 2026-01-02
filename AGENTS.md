@@ -342,6 +342,9 @@ In rare cases where a security update is urgent:
 
 **Remember**: Version stability is a feature, not a bug. Resist the urge to "helpfully" update things.
 
+**AI agents**: See [agentsmd/rules/version-validation.md](agentsmd/rules/version-validation.md) for mandatory version selection
+rules. Research package currency before suggesting versions to avoid pre-commit validation failures.
+
 ---
 
 ## Task Management Workflow

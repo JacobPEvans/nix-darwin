@@ -80,10 +80,35 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
+      - name: Check for existing Renovate PR
+        id: check-renovate
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Check if Renovate bot has an open PR for flake.lock
+          # SECURITY: Only extracts PR number (integer) from JSON - safe from injection
+          RENOVATE_PR=$(gh pr list \
+            --search "author:app/renovate flake.lock in:title" \
+            --state open \
+            --json number \
+            --jq '.[0].number // ""')
+
+          if [[ -n "$RENOVATE_PR" ]]; then
+            # SECURITY: RENOVATE_PR is always a number (from --json number field)
+            # Using printf with %s format to avoid any potential expansion issues
+            printf "::notice::Renovate PR #%s already exists for flake.lock updates\n" "$RENOVATE_PR"
+            echo "::notice::Skipping custom workflow to avoid conflicts"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install Nix
+        if: steps.check-renovate.outputs.skip == 'false'
         uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Update flake.lock
+        if: steps.check-renovate.outputs.skip == 'false'
         run: |
           if [ -n "${{ steps.inputs.outputs.inputs }}" ]; then
             nix flake update ${{ steps.inputs.outputs.inputs }}
@@ -92,6 +117,7 @@ jobs:
           fi
 
       - name: Create Pull Request
+        if: steps.check-renovate.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
