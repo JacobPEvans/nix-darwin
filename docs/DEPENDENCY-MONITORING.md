@@ -46,7 +46,7 @@ It provides native Nix flake support and can scan arbitrary files for package ve
 |-------|----------|----------|------------|
 | **Critical Infrastructure** | nixpkgs, darwin, home-manager, ai-assistant-instructions | Mon/Thu 3am | No (manual review) |
 | **AI Tools** | claude-code-plugins, agent-os, llm-agents, etc. | Sun/Wed/Fri 10pm | Yes (patch/minor) |
-| **npm Packages** | cclint, chatgpt-cli, crush, gh-copilot | Monday 10pm | Yes (patch/minor) |
+| **npm Packages** | cclint, chatgpt-cli, gh-copilot | Monday 10pm | Yes (patch/minor) |
 
 **Auto-merge policy:**
 
