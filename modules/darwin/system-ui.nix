@@ -88,7 +88,9 @@
     # Settings not exposed as first-class nix-darwin options
     CustomUserPreferences = {
       "com.apple.menuextra.clock" = {
-        DateFormat = "yyyy-MM-dd HH:mm:ss"; # ISO 8601 format
+        # Custom date/time format (overrides menuExtraClock display settings)
+        # menuExtraClock controls WHICH elements show; DateFormat controls HOW they display
+        DateFormat = "yyyy-MM-dd HH:mm:ss"; # ISO 8601-like format (space separator)
         FlashDateSeparators = false; # Don't blink separators
       };
     };
@@ -107,7 +109,7 @@
 
     if defaults -currentHost write -globalDomain NSStatusItemSpacing -int 4; then
       echo "[$(date '+%H:%M:%S')] [INFO] Menu bar icon spacing set to 4 (compact)"
-      spacing_applied=1
+      spacing_applied=$((spacing_applied + 1))
     else
       echo "[$(date '+%H:%M:%S')] [WARN] Failed to set NSStatusItemSpacing to 4 - check defaults permissions" >&2
     fi
