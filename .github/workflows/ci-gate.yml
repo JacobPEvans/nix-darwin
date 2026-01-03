@@ -45,6 +45,7 @@ jobs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
       claude: ${{ steps.filter.outputs.claude }}
+      is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -65,13 +66,28 @@ jobs:
               - 'modules/home-manager/ai-cli/**'
               - 'modules/home-manager/permissions/**'
 
+      - name: Detect Dependency-Only Commits
+        id: detect-deps
+        env:
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          COMMIT_MSG: ${{ github.event.pull_request.title }}
+        run: |
+          # Skip nix-build only if:
+          # 1. Author is jacobpevans-github-actions (Renovate bot)
+          # 2. Commit message starts with "chore(deps)"
+          if [[ "$AUTHOR" == "jacobpevans-github-actions" && "$COMMIT_MSG" == chore\(deps\)* ]]; then
+            echo "is-deps-only=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-deps-only=false" >> $GITHUB_OUTPUT
+          fi
+
   # ==========================================================================
   # CONDITIONAL CHECKS (call reusable workflows)
   # ==========================================================================
   nix-build:
     name: Nix Build
     needs: changes
-    if: needs.changes.outputs.nix == 'true'
+    if: needs.changes.outputs.nix == 'true' && needs.changes.outputs.is-deps-only == 'false'
     uses: ./.github/workflows/_nix-build.yml
     with:
       # Skip cache upload on PRs to speed up Merge Gate completion
