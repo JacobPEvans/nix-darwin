@@ -102,7 +102,7 @@ settings.json (merged configuration)
 
 ## Plugins
 
-### Enabled Plugins (12)
+### Enabled Plugins (13)
 
 All plugins are from the `anthropics/claude-code` marketplace:
 
@@ -143,7 +143,12 @@ All plugins are from the `anthropics/claude-code` marketplace:
 
 #### Experimental
 
-- **ralph-wiggum** - Autonomous iteration loops (commented out by default)
+- **ralph-wiggum** - Autonomous iteration loops
+  - Commands: `/ralph-loop`, `/cancel-ralph`
+  - Creates self-referential feedback loops with file/git history preservation
+  - Use for: Well-defined tasks, TDD workflows, iterative refinement
+  - Avoid: Production debugging, tasks requiring human judgment
+  - Configuration: `modules/home-manager/ai-cli/claude/plugins/experimental.nix`
 
 ### Plugin Marketplaces
 
@@ -167,7 +172,16 @@ marketplaces = {
 
 ### Managing Plugins
 
-To enable/disable plugins, edit `modules/home-manager/ai-cli/claude-plugins.nix`:
+To enable/disable plugins, edit the appropriate category file in `modules/home-manager/ai-cli/claude/plugins/`:
+
+- `official.nix` - Official Anthropic plugins
+- `community.nix` - Community marketplace plugins
+- `development.nix` - Development and engineering tools
+- `infrastructure.nix` - DevOps and cloud operations
+- `monitoring.nix` - Time tracking and monitoring
+- `experimental.nix` - Experimental and autonomous plugins
+
+Example:
 
 ```nix
 enabledPlugins = {

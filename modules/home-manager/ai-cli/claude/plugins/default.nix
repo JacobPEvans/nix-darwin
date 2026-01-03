@@ -7,6 +7,7 @@
 # - infrastructure.nix: Infrastructure, DevOps, and cloud operations
 # - development.nix: Software development and engineering tools
 # - monitoring.nix: Time tracking and monitoring tools
+# - experimental.nix: Experimental and autonomous plugins
 #
 # Each module exports an enabledPlugins attrset that gets merged.
 # The marketplaces module exports a marketplaces attrset.
@@ -21,6 +22,7 @@ let
   infrastructureModule = import ./infrastructure.nix { };
   developmentModule = import ./development.nix { };
   monitoringModule = import ./monitoring.nix { };
+  experimentalModule = import ./experimental.nix { };
 
   # Merge all enabled plugins from category modules
   enabledPlugins =
@@ -28,7 +30,8 @@ let
     // communityModule.enabledPlugins
     // infrastructureModule.enabledPlugins
     // developmentModule.enabledPlugins
-    // monitoringModule.enabledPlugins;
+    // monitoringModule.enabledPlugins
+    // experimentalModule.enabledPlugins;
 in
 {
   # Return the complete plugin configuration
