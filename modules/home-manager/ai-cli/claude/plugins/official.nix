@@ -23,8 +23,6 @@ _:
     # ========================================================================
     # Skills (from anthropics/skills repo, marketplace name: anthropic-agent-skills)
     # ========================================================================
-    # Example skills including skill-creator for building custom skills
-    "example-skills@anthropic-agent-skills" = true;
     # Document processing: xlsx, docx, pptx, pdf
     "document-skills@anthropic-agent-skills" = true;
     # ========================================================================
