@@ -44,7 +44,7 @@ get_keychain_secret() {
   fi
 
   # Capture both stdout and stderr to detect actual errors
-  local output error_msg exit_code
+  local output exit_code
   output=$(security find-generic-password -a "$KEYCHAIN_ACCOUNT" -s "$service_name" -w "$AUTOMATION_KEYCHAIN" 2>&1) || {
     exit_code=$?
     # Only log if it's a real error (not just "item not found" which is expected for optional secrets)
