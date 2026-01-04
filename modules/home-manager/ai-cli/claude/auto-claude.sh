@@ -63,6 +63,24 @@ if [[ -z "$SLACK_CHANNEL" ]] && [[ -f "$AUTOMATION_KEYCHAIN" ]]; then
   SLACK_CHANNEL=$(get_keychain_secret "$KEYCHAIN_SERVICE") || true
 fi
 
+# --- SSH AGENT SETUP FOR GIT OPERATIONS ---
+# LaunchD agents don't inherit the user's SSH agent
+# Start a new agent and add keys from macOS Keychain if available
+if [[ -z "${SSH_AUTH_SOCK:-}" ]]; then
+  eval "$(ssh-agent -s 2>/dev/null)" || true
+  # Add keys from Keychain (requires AddKeysToAgent and UseKeychain in SSH config)
+  ssh-add --apple-use-keychain 2>/dev/null || true
+fi
+
+# --- GIT SSH BATCH MODE ---
+# If SSH agent has no identities, configure git to fail fast on SSH by forcing
+# SSH BatchMode (this only affects git's SSH operations, not gh CLI auth).
+# gh CLI authentication is handled separately via its config directory
+# (controlled by GH_CONFIG_DIR in the Nix configuration).
+if ! ssh-add -l >/dev/null 2>&1; then
+  export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=yes"
+fi
+
 # --- INPUT VALIDATION ---
 if [[ ! -d "$TARGET_DIR" ]]; then
   echo "Error: Directory $TARGET_DIR does not exist." >&2
