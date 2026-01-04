@@ -67,16 +67,18 @@ fi
 # LaunchD agents don't inherit the user's SSH agent
 # Start a new agent and add keys from macOS Keychain if available
 if [[ -z "${SSH_AUTH_SOCK:-}" ]]; then
-  eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
+  eval "$(ssh-agent -s 2>/dev/null)" || true
   # Add keys from Keychain (requires AddKeysToAgent and UseKeychain in SSH config)
   ssh-add --apple-use-keychain 2>/dev/null || true
 fi
 
-# --- GITHUB HTTPS FALLBACK ---
-# If SSH agent has no identities, configure git to fail fast on SSH
-# gh CLI will use the token from ~/.config/gh/hosts.yml for API operations
+# --- GIT SSH BATCH MODE ---
+# If SSH agent has no identities, configure git to fail fast on SSH by forcing
+# SSH BatchMode (this only affects git's SSH operations, not gh CLI auth).
+# gh CLI authentication is handled separately via its config directory
+# (controlled by GH_CONFIG_DIR in the Nix configuration).
 if ! ssh-add -l >/dev/null 2>&1; then
-  export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
+  export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=yes"
 fi
 
 # --- INPUT VALIDATION ---
