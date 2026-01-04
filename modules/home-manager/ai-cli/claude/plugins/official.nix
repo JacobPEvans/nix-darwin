@@ -15,65 +15,45 @@
 #
 # How to verify: See docs/TESTING-MARKETPLACES.md
 # ============================================================================
+#
+# Minimal set for actual usage patterns based on JacobPEvans repos:
+# Terraform, Nix, Python, Splunk, Proxmox, Shell scripts
 
 _:
 
 {
   enabledPlugins = {
-    # ========================================================================
-    # Skills (from anthropics/skills repo, marketplace name: anthropic-agent-skills)
-    # ========================================================================
-    # Document processing: xlsx, docx, pptx, pdf
-    "document-skills@anthropic-agent-skills" = true;
-    # ========================================================================
-    # Git Workflow
-    # ========================================================================
+    # Git Workflow (essential)
     "commit-commands@claude-plugins-official" = true;
 
-    # ========================================================================
-    # Code Review & Quality
-    # ========================================================================
+    # Code Review (essential)
     "code-review@claude-plugins-official" = true;
     "pr-review-toolkit@claude-plugins-official" = true;
 
-    # ========================================================================
-    # Feature Development
-    # ========================================================================
+    # Feature Development (useful)
     "feature-dev@claude-plugins-official" = true;
 
-    # ========================================================================
-    # Security
-    # ========================================================================
+    # Security (useful for infra work)
     "security-guidance@claude-plugins-official" = true;
 
-    # ========================================================================
-    # Plugin & Hook Development
-    # ========================================================================
+    # Plugin Development (user maintains claude-code-plugins repo)
     "plugin-dev@claude-plugins-official" = true;
     "hookify@claude-plugins-official" = true;
 
-    # ========================================================================
-    # SDK Development
-    # ========================================================================
-    "agent-sdk-dev@claude-plugins-official" = true;
-
-    # ========================================================================
-    # UI/UX Design
-    # ========================================================================
-    "frontend-design@claude-plugins-official" = true;
-
-    # ========================================================================
-    # Output Styles
-    # ========================================================================
-    "explanatory-output-style@claude-plugins-official" = true;
-    "learning-output-style@claude-plugins-official" = true;
-
-    # ========================================================================
-    # Integrations
-    # ========================================================================
+    # GitHub Integration (essential)
     "github@claude-plugins-official" = true;
-    "typescript-lsp@claude-plugins-official" = true;
-    "greptile@claude-plugins-official" = true;
-    "slack@claude-plugins-official" = true;
+
+    # Greptile - DISABLED due to context bloat (MCP integration consumes tokens)
+    # Keep visible for potential future use
+    # "greptile@claude-plugins-official" = true;
+
+    # REMOVED - unused or token-heavy:
+    # document-skills - xlsx, docx, pptx, pdf not used
+    # agent-sdk-dev - not building SDKs
+    # frontend-design - no frontend repos
+    # explanatory-output-style - output fluff
+    # learning-output-style - output fluff
+    # typescript-lsp - minimal TS usage
+    # slack - rarely used
   };
 }

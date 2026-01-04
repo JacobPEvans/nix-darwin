@@ -102,19 +102,15 @@ _:
     # ==========================================================================
 
     # Four-finger spread to show Desktop
-    # Default: true
     showDesktopGestureEnabled = true;
 
     # Four-finger pinch to show Launchpad
-    # Default: true
     showLaunchpadGestureEnabled = true;
 
     # Three-finger swipe up for Mission Control
-    # Default: true
     showMissionControlGestureEnabled = true;
 
     # Three-finger swipe down for App Exposé
-    # Default: true
     showAppExposeGestureEnabled = true;
 
     # ==========================================================================

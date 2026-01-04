@@ -13,51 +13,31 @@
 #
 # See docs/TESTING-MARKETPLACES.md for verification
 # ============================================================================
+#
+# Focused on: Terraform, Proxmox, Nix
 
 _:
 
 {
   enabledPlugins = {
-    # ========================================================================
-    # Lunar Claude - Infrastructure Automation
-    # ========================================================================
-    "proxmox-infrastructure@lunar-claude" = true; # User actively uses Proxmox
-    "ansible-workflows@lunar-claude" = true; # User actively uses Ansible
+    # Proxmox (terraform-proxmox repo)
+    "proxmox-infrastructure@lunar-claude" = true;
 
-    # Removed - redundant with commit-commands@official:
-    # "git-workflow@lunar-claude" = true;  # Redundant with commit-commands:commit-push-pr
+    # Terraform (tf-splunk-aws, terraform-aws-static-website repos)
+    "infrastructure-as-code-generator@claude-code-plugins-plus" = true;
+    "terraform-module-builder@claude-code-plugins-plus" = true;
 
-    # ========================================================================
-    # Claude Code Plugins Plus - IaC Tools
-    # ========================================================================
-    "infrastructure-as-code-generator@claude-code-plugins-plus" = true; # User actively uses Terraform
-    "terraform-module-builder@claude-code-plugins-plus" = true; # User actively uses Terraform
-
-    # ========================================================================
-    # WSHobson Agents - Cloud & Infrastructure (Keep - active DevOps user)
-    # ========================================================================
-    "cloud-infrastructure@claude-code-workflows" = true;
-    "kubernetes-operations@claude-code-workflows" = true;
+    # CI/CD (GitHub Actions in repos)
     "cicd-automation@claude-code-workflows" = true;
-    "deployment-strategies@claude-code-workflows" = true;
-    "deployment-validation@claude-code-workflows" = true;
 
-    # ========================================================================
-    # WSHobson Agents - Observability & Monitoring (Keep - active DevOps user)
-    # ========================================================================
-    "observability-monitoring@claude-code-workflows" = true;
-
-    # ========================================================================
-    # WSHobson Agents - Security (Removed - large plugins rarely used)
-    # ========================================================================
-    # "security-scanning@claude-code-workflows" = true; # 26k tokens, includes threat-mitigation-mapping
-    # "security-compliance@claude-code-workflows" = true;
-    # "backend-api-security@claude-code-workflows" = true;
-
-    # ========================================================================
-    # WSHobson Agents - Database & Performance (Keep - useful for DevOps)
-    # ========================================================================
-    "database-design@claude-code-workflows" = true;
-    "application-performance@claude-code-workflows" = true;
+    # REMOVED - not actively used:
+    # ansible-workflows - no ansible repos found
+    # cloud-infrastructure - too generic
+    # kubernetes-operations - no k8s repos
+    # deployment-strategies - too generic
+    # deployment-validation - too generic
+    # observability-monitoring - splunk repos don't need this plugin
+    # database-design - no database repos
+    # application-performance - too generic
   };
 }

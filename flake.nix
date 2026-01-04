@@ -3,6 +3,8 @@
   description = "nix-darwin configuration for M4 Max MacBook Pro";
 
   inputs = {
+    # Using nixpkgs-unstable for latest options and packages
+    # NOTE: mac-app-util disabled due to ECL 24.5.10 build failure
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     # Consolidated systems input for darwin-only configuration
@@ -11,18 +13,12 @@
 
     darwin = {
       url = "github:nix-darwin/nix-darwin";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        systems.follows = "systems";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        systems.follows = "systems";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # mac-app-util: Create app trampolines for /Applications/Nix Apps/ (system-level)
@@ -210,12 +206,9 @@
         modules = [
           ./hosts/macbook-m4/default.nix
 
-          # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
-          # NOTE: These trampolines still point to /nix/store paths, so TCC isn't fully stable.
-          # For TCC-sensitive apps (camera, mic), use home.packages + copyApps instead.
-          # TEMPORARILY DISABLED: ECL 24.5.10 build failure in nixpkgs-unstable
-          # https://github.com/NixOS/nixpkgs/issues - ECL 'bool' type error on darwin
-          # TODO: Re-enable once nixpkgs fixes ECL build
+          # mac-app-util: DISABLED - ECL 24.5.10 build failure in nixpkgs-unstable
+          # Creates trampolines for system-level apps (/Applications/Nix Apps/)
+          # TODO: Re-enable when nixpkgs fixes ECL build
           # mac-app-util.darwinModules.default
 
           home-manager.darwinModules.home-manager
@@ -268,8 +261,7 @@
         };
       };
 
-      # Formatter for `nix fmt` command (2025 best practice)
-      # nixfmt-tree = treefmt pre-configured with nixfmt
+      # Formatter for `nix fmt` command
       formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
 
       # Quality checks for `nix flake check` (DRY principle)

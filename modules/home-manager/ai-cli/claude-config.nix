@@ -30,7 +30,7 @@ let
   inherit (aiCommon) formatters;
 
   # Dynamic command discovery from flake inputs
-  # No more hardcoded lists - discovers all .md files automatically
+  # Excludes high-token commands to reduce context bloat
   discoverCommands =
     dir:
     let
@@ -39,9 +39,20 @@ let
     in
     map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
 
+  # Commands to EXCLUDE from auto-discovery (high token cost)
+  # These can still be used via /skill if needed
+  excludedCommands = [
+    "auto-claude" # Very large, not actively used due to token issues
+    "shape-issues" # Should be a plugin, not a command
+    "consolidate-issues" # Large, rarely used
+    "init-change" # Deprecated, replaced by init-worktree
+  ];
+
   # Commands from agentsmd (Nix store / flake input)
-  # Auto-discovers all .md files in agentsmd/commands/
-  agentsMdCommands = discoverCommands "${ai-assistant-instructions}/agentsmd/commands";
+  # Auto-discovers all .md files in agentsmd/commands/ (minus excluded)
+  agentsMdCommands = lib.filter (cmd: !(builtins.elem cmd excludedCommands)) (
+    discoverCommands "${ai-assistant-instructions}/agentsmd/commands"
+  );
 
   # Commands from claude-cookbooks (immutable from flake)
   # Auto-discovers all .md files in .claude/commands/
