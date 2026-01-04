@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1767409996,
-        "narHash": "sha256-qVjAkj/J4MKUYb7pjWyNg/tSEcLHyItnbHg3RBkfT70=",
+        "lastModified": 1767506370,
+        "narHash": "sha256-wrEC1jvMDoOmnXaxGFXfRTOvIi73783cb4gx6KyHkKk=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "ab4449366033e8ea04eed0b7ea50c40ccdb72b9d",
+        "rev": "406792ac7e9bc3899b99525c0f1bbdbc743134ec",
         "type": "github"
       },
       "original": {
@@ -139,11 +139,11 @@
     "claude-powerline": {
       "flake": false,
       "locked": {
-        "lastModified": 1766893597,
-        "narHash": "sha256-PbGocvvpG0wVOA1Te2zDOAZYS6HBrbIvzVvlTdkfgeI=",
+        "lastModified": 1767498594,
+        "narHash": "sha256-ORKgoqwKsGvpo/tv9t5h5h68NYBV60MnkWl5hYM6zMc=",
         "owner": "Owloops",
         "repo": "claude-powerline",
-        "rev": "069be73f7443a196da0fc8f0bc357848e56b6995",
+        "rev": "8473bdf69a37eaa1f1a99d75626e5ef9478c0c7f",
         "type": "github"
       },
       "original": {
