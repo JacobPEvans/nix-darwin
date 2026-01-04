@@ -112,5 +112,24 @@ in
       ".claude/settings.json".source = settingsJson;
     }
     // statusLineScript;
+
+    # Cleanup activation script: Remove blocking regular files before symlink creation
+    # This handles the case where settings.json exists as a regular file (e.g., created by Claude Code)
+    # which would prevent home-manager from creating the Nix-managed symlink
+    home.activation.cleanupClaudeSettings = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+      SETTINGS="${homeDir}/.claude/settings.json"
+      if [ -e "$SETTINGS" ] && [ ! -L "$SETTINGS" ]; then
+        BACKUP="$SETTINGS.backup.$(date +%s)"
+        mv "$SETTINGS" "$BACKUP"
+        echo "Backed up existing settings.json to $BACKUP"
+      fi
+
+      # Also clean up broken statusline symlink
+      OLD_STATUSLINE="${homeDir}/.claude/statusline/Config.toml"
+      if [ -L "$OLD_STATUSLINE" ] && [ ! -e "$OLD_STATUSLINE" ]; then
+        rm "$OLD_STATUSLINE"
+        echo "Removed broken statusline symlink"
+      fi
+    '';
   };
 }

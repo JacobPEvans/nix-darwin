@@ -136,6 +136,15 @@ let
         url = "wakatime/claude-code-wakatime";
       };
     };
+
+    # --- Personal Plugins ---
+    # User's custom Claude Code plugins
+    "jacobpevans-cc-plugins" = {
+      source = {
+        type = "github";
+        url = "JacobPEvans/claude-code-plugins";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time

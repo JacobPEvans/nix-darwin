@@ -229,6 +229,22 @@
         "type": "github"
       }
     },
+    "jacob-claude-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767390076,
+        "narHash": "sha256-lCtAiMSl+I30+9PajL71ZYx4nQaszs1n9+VSEoKMcDM=",
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "rev": "8a642899d2c5287cb2cdb48c3f2b5209c796ba79",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "type": "github"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "blueprint": "blueprint",
@@ -305,6 +321,7 @@
         "claude-powerline": "claude-powerline",
         "darwin": "darwin",
         "home-manager": "home-manager",
+        "jacob-claude-plugins": "jacob-claude-plugins",
         "llm-agents": "llm-agents",
         "mac-app-util": "mac-app-util",
         "nixpkgs": "nixpkgs",

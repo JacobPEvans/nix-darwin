@@ -53,14 +53,15 @@
   // Package grouping and scheduling strategy
   "packageRules": [
     // GROUP 1: Critical infrastructure (Daily 7am with automerge)
+    // Note: matchPackageNames uses GitHub repo paths (owner/repo), not flake input names
     {
       "description": "Critical system inputs - daily updates at 7am",
       "matchDatasources": ["github-tags", "github-releases"],
       "matchPackageNames": [
-        "nixpkgs",
-        "darwin",
-        "home-manager",
-        "ai-assistant-instructions"
+        "NixOS/nixpkgs",
+        "nix-darwin/nix-darwin",
+        "nix-community/home-manager",
+        "JacobPEvans/ai-assistant-instructions"
       ],
       "groupName": "critical-infrastructure",
       "schedule": ["after 7am every day"],
@@ -68,14 +69,15 @@
     },
 
     // GROUP 2: AI tools (Daily 7am)
+    // Note: matchPackagePatterns uses GitHub repo patterns, not flake input names
     {
       "description": "AI-focused flake inputs - daily updates at 7am",
       "matchPackagePatterns": [
-        "claude-code-plugins",
-        "agent-os",
-        "claude-plugins-official",
-        "llm-agents",
-        "anthropic-skills"
+        "anthropics/",
+        "buildermethods/agent-os",
+        "numtide/llm-agents",
+        "obra/superpowers",
+        "JacobPEvans/claude-code-plugins"
       ],
       "groupName": "ai-tools",
       "schedule": ["after 7am every day"]

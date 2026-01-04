@@ -8,6 +8,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   superpowers-marketplace,
+  jacob-claude-plugins,
   ...
 }:
 
@@ -57,6 +58,7 @@ let
       anthropic-skills
       ai-assistant-instructions
       superpowers-marketplace
+      jacob-claude-plugins
       ;
   };
 

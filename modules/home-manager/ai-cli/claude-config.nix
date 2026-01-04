@@ -12,6 +12,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   superpowers-marketplace,
+  jacob-claude-plugins,
   ...
 }:
 
@@ -143,9 +144,26 @@ in
   };
 
   plugins = {
-    # Marketplaces from modular configuration
+    # Marketplaces from modular configuration with flakeInput for Nix symlinks
     # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
-    inherit (claudePlugins.pluginConfig) marketplaces;
+    # Adding flakeInput enables Nix to create immutable symlinks instead of runtime downloads
+    marketplaces = lib.mapAttrs (
+      name: marketplace:
+      marketplace
+      // (
+        # Map marketplace names to flake inputs for Nix-managed symlinks
+        if name == "claude-plugins-official" then
+          { flakeInput = claude-plugins-official; }
+        else if name == "superpowers-marketplace" then
+          { flakeInput = superpowers-marketplace; }
+        else if name == "jacobpevans-cc-plugins" then
+          { flakeInput = jacob-claude-plugins; }
+        else if name == "anthropic-agent-skills" then
+          { flakeInput = anthropic-skills; }
+        else
+          { } # No flakeInput - will be fetched at runtime
+      )
+    ) claudePlugins.pluginConfig.marketplaces;
 
     enabled = enabledPlugins;
     # Enable runtime plugin installation from community marketplaces.
@@ -224,12 +242,15 @@ in
     ];
   };
 
-  mcpServers = {
-    bitwarden = {
-      command = "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
-      args = [ ];
-    };
-  };
+  # MCPs disabled - token cost too high for context window
+  # Can be re-enabled by adding entries like:
+  # mcpServers = {
+  #   bitwarden = {
+  #     command = "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
+  #     args = [ ];
+  #   };
+  # };
+  mcpServers = { };
 
   statusLine = {
     enable = true;

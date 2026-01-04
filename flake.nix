@@ -102,6 +102,14 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
+    # User's personal Claude Code plugins
+    # Contains: git-rebase-workflow, webfetch-guard, markdown-validator, token-validator, issue-limiter
+    # https://github.com/JacobPEvans/claude-code-plugins
+    jacob-claude-plugins = {
+      url = "github:JacobPEvans/claude-code-plugins";
+      flake = false; # Not a flake, just fetch the repo
+    };
+
     # LLM Agents - Nix packages for 40+ AI coding agents
     # Daily-updated packages with binary cache from Numtide
     # Includes: claude-code, crush, gemini-cli, copilot-cli, goose-cli, etc.
@@ -133,6 +141,7 @@
       ai-assistant-instructions,
       claude-powerline,
       superpowers-marketplace,
+      jacob-claude-plugins,
       llm-agents,
       ...
     }:
@@ -189,6 +198,7 @@
           ai-assistant-instructions
           claude-powerline
           superpowers-marketplace
+          jacob-claude-plugins
           llm-agents
           ;
       };
@@ -203,7 +213,10 @@
           # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
           # NOTE: These trampolines still point to /nix/store paths, so TCC isn't fully stable.
           # For TCC-sensitive apps (camera, mic), use home.packages + copyApps instead.
-          mac-app-util.darwinModules.default
+          # TEMPORARILY DISABLED: ECL 24.5.10 build failure in nixpkgs-unstable
+          # https://github.com/NixOS/nixpkgs/issues - ECL 'bool' type error on darwin
+          # TODO: Re-enable once nixpkgs fixes ECL build
+          # mac-app-util.darwinModules.default
 
           home-manager.darwinModules.home-manager
           {

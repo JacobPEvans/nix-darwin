@@ -57,11 +57,11 @@ in
     command = "${homeDir}/.claude/statusline-command.sh";
   };
 
-  # MCP Servers
-  mcpServers = {
-    bitwarden = {
-      command = "${homeDir}/.npm-packages/bin/mcp-server-bitwarden";
-      args = [ ];
-    };
-  };
+  # MCP Servers - disabled (token cost too high)
+  # mcpServers = {
+  #   bitwarden = {
+  #     command = "${homeDir}/.npm-packages/bin/mcp-server-bitwarden";
+  #     args = [ ];
+  #   };
+  # };
 }

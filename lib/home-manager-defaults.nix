@@ -15,8 +15,7 @@
   # Install user packages to /etc/profiles instead of ~/.nix-profile
   useUserPackages = true;
 
-  # No backups needed - everything is git/Nix version controlled
-  # Remove conflicting files instead of creating .backup files that accumulate
-  # This prevents "would be clobbered" errors on repeated rebuilds
-  backupFileExtension = null;
+  # Backup conflicting files to allow home-manager to update symlinks
+  # After rebuild, clean up .backup files with: find ~ -name "*.backup" -delete
+  backupFileExtension = "backup";
 }
