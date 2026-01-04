@@ -139,6 +139,12 @@ in
         fi
         echo "[INFO] Removed broken statusline symlink" >&2
       fi
+
+      # Warn about excluded commands (hardcoded in claude-config.nix)
+      # These commands are excluded from auto-discovery to reduce token usage
+      echo "[WARNING] Claude Code: Some commands are excluded from auto-load (high token cost):" >&2
+      echo "[WARNING]   - auto-claude, shape-issues, consolidate-issues, init-change" >&2
+      echo "[WARNING]   These can still be used via /skill if needed." >&2
     '';
   };
 }

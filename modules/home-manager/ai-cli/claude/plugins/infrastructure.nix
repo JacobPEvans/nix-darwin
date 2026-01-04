@@ -14,7 +14,7 @@
 # See docs/TESTING-MARKETPLACES.md for verification
 # ============================================================================
 #
-# Focused on: Terraform, Proxmox, Nix
+# Focused on: Terraform, Proxmox, Nix, Ansible
 
 _:
 
@@ -23,6 +23,9 @@ _:
     # Proxmox (terraform-proxmox repo)
     "proxmox-infrastructure@lunar-claude" = true;
 
+    # Ansible (user requested restore)
+    "ansible-workflows@lunar-claude" = true;
+
     # Terraform (tf-splunk-aws, terraform-aws-static-website repos)
     "infrastructure-as-code-generator@claude-code-plugins-plus" = true;
     "terraform-module-builder@claude-code-plugins-plus" = true;
@@ -30,13 +33,14 @@ _:
     # CI/CD (GitHub Actions in repos)
     "cicd-automation@claude-code-workflows" = true;
 
+    # Observability & Monitoring (user requested restore)
+    "observability-monitoring@claude-code-workflows" = true;
+
     # REMOVED - not actively used:
-    # ansible-workflows - no ansible repos found
     # cloud-infrastructure - too generic
     # kubernetes-operations - no k8s repos
     # deployment-strategies - too generic
     # deployment-validation - too generic
-    # observability-monitoring - splunk repos don't need this plugin
     # database-design - no database repos
     # application-performance - too generic
   };

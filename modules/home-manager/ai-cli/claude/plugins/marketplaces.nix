@@ -75,6 +75,15 @@ let
   # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
   # ============================================================================
   marketplaces = {
+    # --- Personal Plugins (listed first) ---
+    # User's custom Claude Code plugins - name matches manifest
+    "jacobpevans-cc-plugins" = {
+      source = {
+        type = "github";
+        url = "JacobPEvans/claude-code-plugins";
+      };
+    };
+
     # --- Official Anthropic ---
     "claude-plugins-official" = {
       source = {
@@ -134,15 +143,6 @@ let
       source = {
         type = "github";
         url = "wakatime/claude-code-wakatime";
-      };
-    };
-
-    # --- Personal Plugins ---
-    # User's custom Claude Code plugins
-    "jacobpevans-cc-plugins" = {
-      source = {
-        type = "github";
-        url = "JacobPEvans/claude-code-plugins";
       };
     };
   };

@@ -102,7 +102,7 @@
     # User's personal Claude Code plugins
     # Contains: git-rebase-workflow, webfetch-guard, markdown-validator, token-validator, issue-limiter
     # https://github.com/JacobPEvans/claude-code-plugins
-    jacob-claude-plugins = {
+    jacobpevans-cc-plugins = {
       url = "github:JacobPEvans/claude-code-plugins";
       flake = false; # Not a flake, just fetch the repo
     };
@@ -111,10 +111,13 @@
     # Daily-updated packages with binary cache from Numtide
     # Includes: claude-code, crush, gemini-cli, copilot-cli, goose-cli, etc.
     # https://github.com/numtide/llm-agents.nix
+    #
+    # IMPORTANT: DO NOT add `nixpkgs.follows = "nixpkgs"` here!
+    # llm-agents must use its own unstable nixpkgs to get latest package versions.
+    # Forcing stable nixpkgs causes claude-code and other AI tools to be outdated.
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs = {
-        nixpkgs.follows = "nixpkgs";
         # Consolidate systems to avoid duplicate systems entries in flake.lock
         # Uses transitive follow through blueprint (llm-agents' internal dependency)
         # because blueprint is the flake that actually consumes systems
@@ -138,7 +141,7 @@
       ai-assistant-instructions,
       claude-powerline,
       superpowers-marketplace,
-      jacob-claude-plugins,
+      jacobpevans-cc-plugins,
       llm-agents,
       ...
     }:
@@ -195,7 +198,7 @@
           ai-assistant-instructions
           claude-powerline
           superpowers-marketplace
-          jacob-claude-plugins
+          jacobpevans-cc-plugins
           llm-agents
           ;
       };

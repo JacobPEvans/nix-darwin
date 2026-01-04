@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  llm-agents,
   ...
 }:
 
@@ -9,6 +10,10 @@ let
 
   # Universal packages (pre-commit, linters) shared across all systems
   commonPackages = import ../common/packages.nix { inherit pkgs; };
+
+  # Get claude-code from llm-agents (uses unstable nixpkgs for latest versions)
+  # This overrides the older version from stable nixpkgs
+  llmAgentsPkgs = llm-agents.packages.${pkgs.system};
 in
 {
   imports = [
@@ -77,9 +82,10 @@ in
       # --- Development tools ---
       gh # GitHub CLI
 
-      # --- AI Coding Agents (from nixpkgs) ---
-      # Some disabled due to build issues; can re-enable when nixpkgs fixes them
-      claude-code # Anthropic's agentic coding CLI
+      # --- AI Coding Agents ---
+      # claude-code from llm-agents.nix (uses unstable nixpkgs for latest versions)
+      # Other AI tools from stable nixpkgs when available
+      llmAgentsPkgs.claude-code # Latest Claude Code from llm-agents.nix
       claude-monitor # Real-time Claude Code usage monitor
 
       # DISABLED: gemini-cli 0.22.5 has stale npm dependency cache

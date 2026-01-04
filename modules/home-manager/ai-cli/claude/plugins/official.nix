@@ -43,6 +43,9 @@ _:
     # GitHub Integration (essential)
     "github@claude-plugins-official" = true;
 
+    # Slack Integration (user requested restore)
+    "slack@claude-plugins-official" = true;
+
     # Greptile - DISABLED due to context bloat (MCP integration consumes tokens)
     # Keep visible for potential future use
     # "greptile@claude-plugins-official" = true;
@@ -54,6 +57,5 @@ _:
     # explanatory-output-style - output fluff
     # learning-output-style - output fluff
     # typescript-lsp - minimal TS usage
-    # slack - rarely used
   };
 }

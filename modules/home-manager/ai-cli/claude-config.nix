@@ -12,7 +12,7 @@
   anthropic-skills,
   ai-assistant-instructions,
   superpowers-marketplace,
-  jacob-claude-plugins,
+  jacobpevans-cc-plugins,
   ...
 }:
 
@@ -162,10 +162,11 @@ in
       let
         # Map marketplace names to flake inputs for Nix-managed symlinks
         # Using a lookup table for better maintainability and readability
+        # Keys MUST match marketplace.nix keys exactly
         flakeInputMap = {
+          "jacobpevans-cc-plugins" = jacobpevans-cc-plugins; # User's personal plugins (listed first in marketplaces.nix)
           "claude-plugins-official" = claude-plugins-official;
           "superpowers-marketplace" = superpowers-marketplace;
-          "jacobpevans-cc-plugins" = jacob-claude-plugins;
           "anthropic-agent-skills" = anthropic-skills;
         };
       in

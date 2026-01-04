@@ -15,13 +15,15 @@ _:
     "code-refactoring@claude-code-workflows" = true;
     "codebase-cleanup@claude-code-workflows" = true;
 
+    # Agent Orchestration (user requested restore)
+    "agent-orchestration@claude-code-workflows" = true;
+
     # REMOVED - not used based on repos:
     # full-stack-orchestration - no full-stack web apps
     # code-documentation - built-in sufficient
     # api-scaffolding - no API development repos
     # api-testing-observability - no API repos
     # llm-application-dev - no LLM app repos
-    # agent-orchestration - unnecessary
     # context-management - unnecessary
     # machine-learning-ops - no ML repos
     # data-engineering - no data eng repos
