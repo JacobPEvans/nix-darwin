@@ -3,21 +3,22 @@
   description = "nix-darwin configuration for M4 Max MacBook Pro";
 
   inputs = {
-    # Using nixpkgs-unstable for latest options and packages
-    # NOTE: mac-app-util disabled due to ECL 24.5.10 build failure
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Using stable nixpkgs-25.11 for reliability
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
 
     # Consolidated systems input for darwin-only configuration
     # All transitive dependencies should follow this to avoid duplicate systems entries
     systems.url = "github:nix-systems/default-darwin";
 
+    # Using stable nix-darwin-25.11 to match nixpkgs
     darwin = {
-      url = "github:nix-darwin/nix-darwin";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Using stable home-manager release-25.11 to match nixpkgs
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -206,10 +207,8 @@
         modules = [
           ./hosts/macbook-m4/default.nix
 
-          # mac-app-util: DISABLED - ECL 24.5.10 build failure in nixpkgs-unstable
-          # Creates trampolines for system-level apps (/Applications/Nix Apps/)
-          # TODO: Re-enable when nixpkgs fixes ECL build
-          # mac-app-util.darwinModules.default
+          # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
+          mac-app-util.darwinModules.default
 
           home-manager.darwinModules.home-manager
           {
