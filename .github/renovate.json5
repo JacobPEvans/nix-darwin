@@ -75,8 +75,8 @@
       "matchPackagePatterns": [
         "anthropics/",
         "buildermethods/agent-os",
-        "numtide/llm-agents",
-        "obra/superpowers",
+        "numtide/llm-agents.*",
+        "obra/superpowers-marketplace",
         "JacobPEvans/claude-code-plugins"
       ],
       "groupName": "ai-tools",

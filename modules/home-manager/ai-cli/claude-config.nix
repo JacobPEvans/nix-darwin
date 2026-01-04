@@ -158,23 +158,24 @@ in
     # Marketplaces from modular configuration with flakeInput for Nix symlinks
     # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
     # Adding flakeInput enables Nix to create immutable symlinks instead of runtime downloads
-    marketplaces = lib.mapAttrs (
-      name: marketplace:
-      marketplace
-      // (
+    marketplaces =
+      let
         # Map marketplace names to flake inputs for Nix-managed symlinks
-        if name == "claude-plugins-official" then
-          { flakeInput = claude-plugins-official; }
-        else if name == "superpowers-marketplace" then
-          { flakeInput = superpowers-marketplace; }
-        else if name == "jacobpevans-cc-plugins" then
-          { flakeInput = jacob-claude-plugins; }
-        else if name == "anthropic-agent-skills" then
-          { flakeInput = anthropic-skills; }
-        else
-          { } # No flakeInput - will be fetched at runtime
-      )
-    ) claudePlugins.pluginConfig.marketplaces;
+        # Using a lookup table for better maintainability and readability
+        flakeInputMap = {
+          "claude-plugins-official" = claude-plugins-official;
+          "superpowers-marketplace" = superpowers-marketplace;
+          "jacobpevans-cc-plugins" = jacob-claude-plugins;
+          "anthropic-agent-skills" = anthropic-skills;
+        };
+      in
+      lib.mapAttrs (
+        name: marketplace:
+        let
+          flakeInput = flakeInputMap.${name} or null;
+        in
+        marketplace // lib.optionalAttrs (flakeInput != null) { inherit flakeInput; }
+      ) claudePlugins.pluginConfig.marketplaces;
 
     enabled = enabledPlugins;
     # Enable runtime plugin installation from community marketplaces.

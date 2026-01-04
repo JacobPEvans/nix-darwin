@@ -57,11 +57,7 @@ in
     command = "${homeDir}/.claude/statusline-command.sh";
   };
 
-  # MCP Servers - disabled (token cost too high)
-  # mcpServers = {
-  #   bitwarden = {
-  #     command = "${homeDir}/.npm-packages/bin/mcp-server-bitwarden";
-  #     args = [ ];
-  #   };
-  # };
+  # MCP Servers - empty object for schema compliance
+  # Disabled for token cost reasons, but field must exist for schema validation
+  mcpServers = { };
 }
