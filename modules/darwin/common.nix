@@ -13,7 +13,7 @@ let
 
   # Get claude-code from llm-agents (uses unstable nixpkgs for latest versions)
   # This overrides the older version from stable nixpkgs
-  llmAgentsPkgs = llm-agents.packages.${pkgs.system};
+  llmAgentsPkgs = llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   imports = [

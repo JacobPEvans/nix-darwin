@@ -74,7 +74,9 @@ in
       ac = 0; # Never sleep when plugged in (AC power)
       battery = 60; # Sleep after 1 hour on battery
     };
-    disksleep = 0; # Never spin down (good for SSDs)
+    # Set disksleep to non-zero when battery sleep is non-zero (Apple best practice)
+    # This ensures optimal power state transition on battery (Safe Sleep requires this)
+    disksleep = 10; # Disk optimizes power after 10 minutes (before system sleep at 60)
     wakeOnMagicPacket = true;
     autoRestartOnPowerLoss = true;
   };

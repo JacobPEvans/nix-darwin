@@ -58,6 +58,10 @@ let
   # Auto-discovers all .md files in .claude/commands/
   cookbookCommands = discoverCommands "${claude-cookbooks}/.claude/commands";
 
+  # Agents from ai-assistant-instructions (agentsmd)
+  # Auto-discovers all .md files in agentsmd/agents/
+  agentsMdAgents = discoverCommands "${ai-assistant-instructions}/agentsmd/agents";
+
   # Agents from claude-cookbooks
   # Auto-discovers all .md files in .claude/agents/
   cookbookAgents = discoverCommands "${claude-cookbooks}/.claude/agents";
@@ -202,10 +206,18 @@ in
         }) cookbookCommands);
   };
 
-  agents.fromFlakeInputs = map (name: {
-    inherit name;
-    source = "${claude-cookbooks}/.claude/agents/${name}.md";
-  }) cookbookAgents;
+  agents.fromFlakeInputs =
+    # Agents from ai-assistant-instructions (agentsmd)
+    (map (name: {
+      inherit name;
+      source = "${ai-assistant-instructions}/agentsmd/agents/${name}.md";
+    }) agentsMdAgents)
+    ++
+      # Agents from claude-cookbooks
+      (map (name: {
+        inherit name;
+        source = "${claude-cookbooks}/.claude/agents/${name}.md";
+      }) cookbookAgents);
 
   settings = {
     # Extended thinking enabled with token budget controlled via env vars
