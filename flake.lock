@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1767506370,
-        "narHash": "sha256-wrEC1jvMDoOmnXaxGFXfRTOvIi73783cb4gx6KyHkKk=",
+        "lastModified": 1767579407,
+        "narHash": "sha256-+poFWMiWzJxNNVuuFnBSkuVOowilTwGWMAb1FZhkB38=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "406792ac7e9bc3899b99525c0f1bbdbc743134ec",
+        "rev": "54095bbf5d4b9a62d2984f75cc74e99fd5b97f02",
         "type": "github"
       },
       "original": {
@@ -91,11 +91,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1766182394,
-        "narHash": "sha256-SleLxTUjM7HNHc78YklikuFwix2DPaTDIACUnsSQCrA=",
+        "lastModified": 1767598068,
+        "narHash": "sha256-+k1Pi7+WLRq/WrgNZ9UjCDa0/rpT9fmSbRqO6Sv0JrA=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "d213a74fc8e3b6efded52729196e0c2d4c3abb3e",
+        "rev": "5c92b97cc42a8d20e56511594007d5e122611b7e",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1766118579,
-        "narHash": "sha256-JZNy8pFiYe2+vGkXO3jlBz0GGB1m95AWScNcHAL8kxM=",
+        "lastModified": 1767597399,
+        "narHash": "sha256-sNzdemmX7Ha16FGfosXUoLEvRI9Zz6uwC+VsXhrCHeQ=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "6d3752c000e2b3d0e6137bd7adb04895d6f40f14",
+        "rev": "15b07b46dab33aa07efb447e1b592297b9eaa17c",
         "type": "github"
       },
       "original": {
@@ -312,11 +312,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1767325753,
-        "narHash": "sha256-yA/CuWyqm+AQo2ivGy6PlYrjZBQm7jfbe461+4HF2fo=",
+        "lastModified": 1767480499,
+        "narHash": "sha256-8IQQUorUGiSmFaPnLSo2+T+rjHtiNWc+OAzeHck7N48=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "64049ca74d63e971b627b5f3178d95642e61cedd",
+        "rev": "30a3c519afcf3f99e2c6df3b359aec5692054d92",
         "type": "github"
       },
       "original": {
