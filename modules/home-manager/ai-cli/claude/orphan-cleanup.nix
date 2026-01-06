@@ -55,20 +55,14 @@ let
   # Post-cleanup: Remove broken symlinks (targets that don't exist)
   cleanupBrokenSymlinks = dir: type: ''
     if [ -d "${dir}" ]; then
-      for link in "${dir}"/*; do
-        # Skip if no files match the glob
-        [ -e "$link" ] || [ -L "$link" ] || continue
-
-        # Only process symlinks
-        if [ -L "$link" ]; then
-          # Check if target exists
-          if [ ! -e "$link" ]; then
-            # Broken symlink - remove it
-            if $DRY_RUN_CMD rm "$link"; then
-              log_info "Removed orphan ${type}: $(basename "$link")"
-            else
-              log_warn "Failed to remove orphan ${type}: $(basename "$link")"
-            fi
+      # Use find and while-read to avoid a for loop, per repo guidelines.
+      find "${dir}" -maxdepth 1 -type l | while IFS= read -r link; do
+        # Check if the symlink is broken
+        if [ ! -e "$link" ]; then
+          if $DRY_RUN_CMD rm "$link"; then
+            log_info "Removed orphan ${type}: $(basename "$link")"
+          else
+            log_warn "Failed to remove orphan ${type}: $(basename "$link")"
           fi
         fi
       done
@@ -89,12 +83,18 @@ in
         ${lib.concatMapStringsSep "\n" preCleanupDir componentDirs}
 
         # Also clean up root-level directory symlinks if they conflict
-        for path in "${homeDir}/CLAUDE.md" "${homeDir}/GEMINI.md" "${homeDir}/AGENTS.md" "${homeDir}/agentsmd"; do
+        printf '%s\n' \
+          "${homeDir}/CLAUDE.md" \
+          "${homeDir}/GEMINI.md" \
+          "${homeDir}/AGENTS.md" \
+          "${homeDir}/agentsmd" | while IFS= read -r path; do
           if [ -L "$path" ]; then
             TARGET=$(readlink "$path")
             if [[ "$TARGET" == /nix/store/* ]] && [ ! -e "$TARGET" ]; then
               if $DRY_RUN_CMD rm "$path"; then
                 log_info "Removed stale symlink: $path"
+              else
+                log_warn "Failed to remove stale symlink: $path"
               fi
             fi
           fi
