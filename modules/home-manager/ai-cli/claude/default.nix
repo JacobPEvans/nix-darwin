@@ -37,6 +37,7 @@ in
     ./auto-claude.nix
     ./auto-claude-reporting.nix
     ./menubar.nix
+    ./orphan-cleanup.nix
   ];
 
   config = lib.mkIf cfg.enable {

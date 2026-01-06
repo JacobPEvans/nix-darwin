@@ -40,6 +40,7 @@ in
       activation = {
         # Activation script to clean up conflicting marketplace directories
         # MUST run before linkGeneration to prevent "cannot overwrite directory" errors
+        # Log format: [HH:MM:SS] [LOG_LEVEL] message
         cleanupMarketplaceDirectories = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
           # Clean up marketplace directories that conflict with Nix-managed symlinks
           # This handles the case where runtime plugin installs created real directories
@@ -55,44 +56,36 @@ in
 
               # Move directory to backup
               mv "${path}" "$BACKUP"
-              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-              echo "Cleaned up marketplace directory: ${path}"
-              echo "  Backup saved to: $BACKUP"
-              echo "  After activation completes, a diff will be shown"
-              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "[$(date '+%H:%M:%S')] [INFO] Cleaned up marketplace directory: ${path}" >&2
+              echo "[$(date '+%H:%M:%S')] [INFO]   Backup saved to: $BACKUP" >&2
+              echo "[$(date '+%H:%M:%S')] [INFO]   After activation completes, a diff will be shown" >&2
             fi
           '') marketplacePaths}
         '';
 
         # Post-activation script to show diffs for manual review
+        # Log format: [HH:MM:SS] [LOG_LEVEL] message
         reportMarketplaceDiffs = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
           # Show diffs between backed-up directories and new Nix-managed symlinks
           # Backups are kept for manual review and deletion
           ${lib.concatMapStringsSep "\n" (path: ''
             BACKUP="${path}.backup"
             if [ -d "$BACKUP" ]; then
-              echo ""
-              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-              echo "Marketplace update: ${path}"
-              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "" >&2
+              echo "[$(date '+%H:%M:%S')] [INFO] Marketplace update: ${path}" >&2
 
               if [ -L "${path}" ]; then
                 NEW_TARGET=$(readlink "${path}")
-                echo "Old: Real directory (runtime install)"
-                echo "New: Symlink -> $NEW_TARGET (Nix-managed)"
-                echo ""
-                echo "Comparing directories (showing first 20 differences):"
-                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo "[$(date '+%H:%M:%S')] [INFO]   Old: Real directory (runtime install)" >&2
+                echo "[$(date '+%H:%M:%S')] [INFO]   New: Symlink -> $NEW_TARGET (Nix-managed)" >&2
+                echo "[$(date '+%H:%M:%S')] [INFO]   Comparing directories (showing first 20 differences):" >&2
 
                 # Show directory structure comparison
                 diff -r "$BACKUP" "${path}" 2>&1 | head -20 || true
 
-                echo ""
-                echo "Full comparison available at: $BACKUP"
-                echo "Review and manually delete backup when satisfied."
+                echo "[$(date '+%H:%M:%S')] [INFO]   Full comparison available at: $BACKUP" >&2
+                echo "[$(date '+%H:%M:%S')] [INFO]   Review and manually delete backup when satisfied." >&2
               fi
-
-              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             fi
           '') marketplacePaths}
         '';

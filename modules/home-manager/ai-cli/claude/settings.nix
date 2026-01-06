@@ -119,32 +119,33 @@ in
     #
     # Note: Uses .backup suffix (same as home-manager's backup mechanism) for consistency.
     # Timestamped backups would create accumulating files; single .backup is cleaner.
+    # Log format: [HH:MM:SS] [LOG_LEVEL] message
     home.activation.cleanupClaudeSettings = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
       SETTINGS="${homeDir}/.claude/settings.json"
       if [ -e "$SETTINGS" ] && [ ! -L "$SETTINGS" ]; then
         BACKUP="$SETTINGS.backup"
         if ! $DRY_RUN_CMD mv "$SETTINGS" "$BACKUP"; then
-          echo "[ERROR] Failed to back up existing settings.json from $SETTINGS to $BACKUP" >&2
+          echo "[$(date '+%H:%M:%S')] [ERROR] Failed to back up existing settings.json from $SETTINGS to $BACKUP" >&2
           exit 1
         fi
-        echo "[INFO] Backed up existing settings.json to $BACKUP" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] Backed up existing settings.json to $BACKUP" >&2
       fi
 
       # Also clean up broken statusline symlink
       OLD_STATUSLINE="${homeDir}/.claude/statusline/Config.toml"
       if [ -L "$OLD_STATUSLINE" ] && [ ! -e "$OLD_STATUSLINE" ]; then
         if ! $DRY_RUN_CMD rm "$OLD_STATUSLINE"; then
-          echo "[ERROR] Failed to remove broken statusline symlink at $OLD_STATUSLINE" >&2
+          echo "[$(date '+%H:%M:%S')] [ERROR] Failed to remove broken statusline symlink at $OLD_STATUSLINE" >&2
           exit 1
         fi
-        echo "[INFO] Removed broken statusline symlink" >&2
+        echo "[$(date '+%H:%M:%S')] [INFO] Removed broken statusline symlink" >&2
       fi
 
       # Warn about excluded commands (hardcoded in claude-config.nix)
       # These commands are excluded from auto-discovery to reduce token usage
-      echo "[WARNING] Claude Code: Some commands are excluded from auto-load (high token cost):" >&2
-      echo "[WARNING]   - auto-claude, shape-issues, consolidate-issues, init-change" >&2
-      echo "[WARNING]   These can still be used via /skill if needed." >&2
+      echo "[$(date '+%H:%M:%S')] [WARN] Claude Code: Some commands are excluded from auto-load (high token cost):" >&2
+      echo "[$(date '+%H:%M:%S')] [WARN]   - auto-claude, shape-issues, consolidate-issues, init-change" >&2
+      echo "[$(date '+%H:%M:%S')] [WARN]   These can still be used via /skill if needed." >&2
     '';
   };
 }

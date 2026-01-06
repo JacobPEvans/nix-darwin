@@ -55,7 +55,11 @@ in
   config = lib.mkIf cfg.enable {
     home.file = {
       # Marketplace sources - managed by Nix configuration (pretty-printed)
-      ".claude/plugins/known_marketplaces.json".source = marketplacesJson;
+      # Uses force = true to overwrite any existing files (git provides version control)
+      ".claude/plugins/known_marketplaces.json" = {
+        source = marketplacesJson;
+        force = true;
+      };
 
       # NOTE: installed_plugins.json is NOT managed by Nix
       # Claude Code auto-creates this file on first plugin installation.

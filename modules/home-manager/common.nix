@@ -66,16 +66,29 @@ let
   # Changes require darwin-rebuild, but ensures reproducibility
   # NOTE: .copilot and .gemini directories are NOT symlinked because
   # Nix manages files inside them (config.json, settings.json)
+  # Uses force = true to overwrite any existing files (git provides version control)
   agentsMdSymlinks = {
     # Root instruction files accessible from home directory
     # CLAUDE.md and GEMINI.md are pointers to agentsmd/AGENTS.md
     # AGENTS.md contains the actual centralized instructions
-    "CLAUDE.md".source = "${ai-assistant-instructions}/CLAUDE.md";
-    "GEMINI.md".source = "${ai-assistant-instructions}/GEMINI.md";
-    "AGENTS.md".source = "${ai-assistant-instructions}/agentsmd/AGENTS.md";
+    "CLAUDE.md" = {
+      source = "${ai-assistant-instructions}/CLAUDE.md";
+      force = true;
+    };
+    "GEMINI.md" = {
+      source = "${ai-assistant-instructions}/GEMINI.md";
+      force = true;
+    };
+    "AGENTS.md" = {
+      source = "${ai-assistant-instructions}/AGENTS.md";
+      force = true;
+    };
 
     # agentsmd - folder containing commands/, rules/, workflows/
-    "agentsmd".source = "${ai-assistant-instructions}/agentsmd";
+    "agentsmd" = {
+      source = "${ai-assistant-instructions}/agentsmd";
+      force = true;
+    };
   };
   geminiFiles = import ./ai-cli/gemini.nix {
     inherit
