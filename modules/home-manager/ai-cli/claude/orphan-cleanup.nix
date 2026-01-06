@@ -56,7 +56,7 @@ let
   cleanupBrokenSymlinks = dir: type: ''
     if [ -d "${dir}" ]; then
       # Use find and while-read to avoid a for loop, per repo guidelines.
-      find "${dir}" -maxdepth 1 -type l | while IFS= read -r link; do
+      find "${dir}" -maxdepth 1 -type l -print0 | while IFS= read -d $'\0' -r link; do
         # Check if the symlink is broken
         if [ ! -e "$link" ]; then
           if $DRY_RUN_CMD rm "$link"; then
