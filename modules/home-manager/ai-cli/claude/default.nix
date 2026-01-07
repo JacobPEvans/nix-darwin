@@ -33,7 +33,7 @@ in
     ./settings.nix
     ./statusline.nix
     ./statusline # New modular statusline (Issue #80)
-    ./mcp.nix
+    # Note: MCP server configuration is handled in settings.nix via the `mcpServers` option.
     ./auto-claude.nix
     ./auto-claude-reporting.nix
     ./menubar.nix
