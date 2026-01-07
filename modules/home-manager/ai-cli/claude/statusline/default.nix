@@ -22,6 +22,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -30,7 +31,7 @@ let
 
   # Platform detection: Check if we're on Darwin (macOS)
   # The statusline packages use BSD stat which only works on Darwin
-  inherit (lib.systems.elaborate config.nixpkgs) isDarwin;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin;
 in
 {
   imports = [
@@ -53,7 +54,7 @@ in
           Darwin-specific. Linux support would require updating the scripts to
           detect and use GNU stat syntax (stat -c "%Y") instead.
 
-          Current platform: ${config.nixpkgs.system}
+          Current platform: ${pkgs.stdenv.hostPlatform.system}
           Required: *-darwin (e.g., aarch64-darwin, x86_64-darwin)
         '';
       }
