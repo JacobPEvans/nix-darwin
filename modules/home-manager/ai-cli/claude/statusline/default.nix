@@ -27,6 +27,10 @@
 
 let
   cfg = config.programs.claudeStatusline;
+
+  # Platform detection: Check if we're on Darwin (macOS)
+  # The statusline packages use BSD stat which only works on Darwin
+  inherit (lib.systems.elaborate config.nixpkgs) isDarwin;
 in
 {
   imports = [
@@ -38,6 +42,22 @@ in
 
   config = lib.mkIf cfg.enable {
     assertions = [
+      # Platform check: statusline packages require Darwin (macOS)
+      # The underlying scripts use BSD stat (stat -f "%m") which is not available on Linux
+      {
+        assertion = isDarwin;
+        message = ''
+          programs.claudeStatusline requires macOS/Darwin.
+
+          The statusline packages use BSD stat command (stat -f "%m") which is
+          Darwin-specific. Linux support would require updating the scripts to
+          detect and use GNU stat syntax (stat -c "%Y") instead.
+
+          Current platform: ${config.nixpkgs.system}
+          Required: *-darwin (e.g., aarch64-darwin, x86_64-darwin)
+        '';
+      }
+
       # Prevent conflicts between old and new statusline modules
       {
         assertion = !(config.programs.claude.statusLine.enhanced.enable or false);
