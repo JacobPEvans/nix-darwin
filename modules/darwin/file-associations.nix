@@ -18,8 +18,6 @@
   ...
 }:
 
-with lib;
-
 let
   cfg = config.system.fileAssociations;
 
@@ -56,27 +54,27 @@ in
   # Module Options
   # ==========================================================================
   options.system.fileAssociations = {
-    enable = mkEnableOption "custom file type associations" // {
+    enable = lib.mkEnableOption "custom file type associations" // {
       default = true;
     };
 
-    customExtensions = mkOption {
+    customExtensions = lib.mkOption {
       type = types.listOf (
         types.submodule {
           options = {
-            extension = mkOption {
+            extension = lib.mkOption {
               type = types.str;
               description = "File extension (without leading dot)";
               example = "spl";
             };
 
-            uti = mkOption {
+            uti = lib.mkOption {
               type = types.str;
               description = "Uniform Type Identifier for the file type";
               example = "public.tar-archive";
             };
 
-            description = mkOption {
+            description = lib.mkOption {
               type = types.str;
               default = "";
               description = "Human-readable description of the file type";
@@ -136,7 +134,7 @@ in
   # ==========================================================================
   # Module Implementation
   # ==========================================================================
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # Add duti package for file association management
     environment.systemPackages = [ pkgs.duti ];
 

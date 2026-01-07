@@ -39,11 +39,11 @@ let
     # TypeScript build process (runs tsup to generate dist/)
     npmBuild = "npm run build";
 
-    meta = with lib; {
+    meta = {
       description = "Beautiful powerline statusline for Claude Code";
       homepage = "https://github.com/Owloops/claude-powerline";
-      license = licenses.mit;
-      platforms = platforms.all;
+      license = lib.licenses.mit;
+      platforms = lib.platforms.all;
       mainProgram = "claude-powerline";
     };
   };

@@ -4,8 +4,6 @@
 # Provides mkOption definitions for theme-based statusline configuration.
 { lib, ... }:
 
-with lib;
-
 let
   # Import shared theme definitions
   themes = import ./themes.nix { };
@@ -13,9 +11,9 @@ let
 in
 {
   options.programs.claudeStatusline = {
-    enable = mkEnableOption "Claude Code statusline with theme support";
+    enable = lib.mkEnableOption "Claude Code statusline with theme support";
 
-    theme = mkOption {
+    theme = lib.mkOption {
       type = types.enum [
         "powerline"
         "robbyrussell"
@@ -35,10 +33,10 @@ in
     };
 
     # Theme-specific configuration
-    powerline = mkOption {
+    powerline = lib.mkOption {
       type = types.submodule {
         options = {
-          style = mkOption {
+          style = lib.mkOption {
             type = types.enum [
               "default"
               "minimal"
@@ -66,10 +64,10 @@ in
       description = "Powerline theme-specific options";
     };
 
-    advanced = mkOption {
+    advanced = lib.mkOption {
       type = types.submodule {
         options = {
-          theme = mkOption {
+          theme = lib.mkOption {
             type = types.enum availableThemes;
             default = "gruvbox";
             description = ''
@@ -92,7 +90,7 @@ in
             example = "nord";
           };
 
-          showSystemInfo = mkOption {
+          showSystemInfo = lib.mkOption {
             type = types.bool;
             default = true;
             description = "Show system information in advanced statusline (CPU, memory, disk)";

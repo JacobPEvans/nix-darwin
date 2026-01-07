@@ -4,16 +4,14 @@
 # Cross-platform: no Darwin-specific code here.
 { lib, ... }:
 
-with lib;
-
 let
   # Reusable submodule types
   marketplaceModule = types.submodule {
     options = {
-      source = mkOption {
+      source = lib.mkOption {
         type = types.submodule {
           options = {
-            type = mkOption {
+            type = lib.mkOption {
               type = types.enum [
                 "git"
                 "github"
@@ -21,11 +19,11 @@ let
               ];
               default = "git";
             };
-            url = mkOption { type = types.str; };
+            url = lib.mkOption { type = types.str; };
           };
         };
       };
-      flakeInput = mkOption {
+      flakeInput = lib.mkOption {
         type = types.nullOr types.path;
         default = null;
         description = "Flake input for Nix-managed (immutable) plugins";
@@ -35,23 +33,23 @@ let
 
   componentModule = types.submodule {
     options = {
-      name = mkOption { type = types.str; };
-      source = mkOption { type = types.path; };
+      name = lib.mkOption { type = types.str; };
+      source = lib.mkOption { type = types.path; };
     };
   };
 
   mcpServerModule = types.submodule {
     options = {
-      command = mkOption { type = types.str; };
-      args = mkOption {
+      command = lib.mkOption { type = types.str; };
+      args = lib.mkOption {
         type = types.listOf types.str;
         default = [ ];
       };
-      env = mkOption {
+      env = lib.mkOption {
         type = types.attrsOf types.str;
         default = { };
       };
-      disabled = mkOption {
+      disabled = lib.mkOption {
         type = types.bool;
         default = false;
       };
@@ -63,19 +61,19 @@ let
 in
 {
   options.programs.claude = {
-    enable = mkEnableOption "Claude Code configuration";
+    enable = lib.mkEnableOption "Claude Code configuration";
 
     # Plugins
     plugins = {
-      marketplaces = mkOption {
+      marketplaces = lib.mkOption {
         type = types.attrsOf marketplaceModule;
         default = { };
       };
-      enabled = mkOption {
+      enabled = lib.mkOption {
         type = types.attrsOf types.bool;
         default = { };
       };
-      allowRuntimeInstall = mkOption {
+      allowRuntimeInstall = lib.mkOption {
         type = types.bool;
         default = true;
       };
@@ -83,19 +81,19 @@ in
 
     # Commands
     commands = {
-      fromFlakeInputs = mkOption {
+      fromFlakeInputs = lib.mkOption {
         type = types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
+      local = lib.mkOption {
         type = types.attrsOf types.path;
         default = { };
       };
-      fromLiveRepo = mkOption {
+      fromLiveRepo = lib.mkOption {
         type = types.nullOr types.path;
         default = null;
       };
-      liveRepoCommands = mkOption {
+      liveRepoCommands = lib.mkOption {
         type = types.listOf types.str;
         default = [ ];
       };
@@ -103,11 +101,11 @@ in
 
     # Agents
     agents = {
-      fromFlakeInputs = mkOption {
+      fromFlakeInputs = lib.mkOption {
         type = types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
+      local = lib.mkOption {
         type = types.attrsOf types.path;
         default = { };
       };
@@ -115,11 +113,11 @@ in
 
     # Skills
     skills = {
-      fromFlakeInputs = mkOption {
+      fromFlakeInputs = lib.mkOption {
         type = types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
+      local = lib.mkOption {
         type = types.attrsOf types.path;
         default = { };
       };
@@ -129,38 +127,38 @@ in
     # These options are declared for future hook support.
     # Implementation will generate ~/.claude/hooks/ scripts.
     hooks = {
-      preToolUse = mkOption {
+      preToolUse = lib.mkOption {
         type = hookType;
         default = null;
       };
-      postToolUse = mkOption {
+      postToolUse = lib.mkOption {
         type = hookType;
         default = null;
       };
-      userPromptSubmit = mkOption {
+      userPromptSubmit = lib.mkOption {
         type = hookType;
         default = null;
       };
-      stop = mkOption {
+      stop = lib.mkOption {
         type = hookType;
         default = null;
       };
-      subagentStop = mkOption {
+      subagentStop = lib.mkOption {
         type = hookType;
         default = null;
       };
-      sessionStart = mkOption {
+      sessionStart = lib.mkOption {
         type = hookType;
         default = null;
       };
-      sessionEnd = mkOption {
+      sessionEnd = lib.mkOption {
         type = hookType;
         default = null;
       };
     };
 
     # MCP Servers
-    mcpServers = mkOption {
+    mcpServers = lib.mkOption {
       type = types.attrsOf mcpServerModule;
       default = { };
     };
@@ -181,9 +179,9 @@ in
     #   - it contains all variables expected by bws_helper.py
     #   - the file has appropriate permissions (not world-readable)
     apiKeyHelper = {
-      enable = mkEnableOption "API key helper for headless Claude authentication";
+      enable = lib.mkEnableOption "API key helper for headless Claude authentication";
 
-      scriptPath = mkOption {
+      scriptPath = lib.mkOption {
         type = types.str;
         default = ".local/bin/claude-api-key-helper";
         description = "Path (relative to home) where the API key helper script is installed";
@@ -193,7 +191,7 @@ in
     # Settings
     settings = {
       # Extended thinking mode
-      alwaysThinkingEnabled = mkOption {
+      alwaysThinkingEnabled = lib.mkOption {
         type = types.bool;
         default = true;
         description = ''
@@ -204,7 +202,7 @@ in
       };
 
       # Session management
-      cleanupPeriodDays = mkOption {
+      cleanupPeriodDays = lib.mkOption {
         type = types.int;
         default = 14;
         description = ''
@@ -215,24 +213,24 @@ in
 
       # Permissions
       permissions = {
-        allow = mkOption {
+        allow = lib.mkOption {
           type = types.listOf types.str;
           default = [ ];
           description = "Commands and operations to auto-approve without prompting";
         };
-        deny = mkOption {
+        deny = lib.mkOption {
           type = types.listOf types.str;
           default = [ ];
           description = "Commands and operations to permanently block";
         };
-        ask = mkOption {
+        ask = lib.mkOption {
           type = types.listOf types.str;
           default = [ ];
           description = "Commands and operations requiring user confirmation";
         };
       };
 
-      additionalDirectories = mkOption {
+      additionalDirectories = lib.mkOption {
         type = types.listOf types.str;
         default = [ ];
         description = "Directories accessible to Claude Code without prompts";
@@ -240,7 +238,7 @@ in
 
       # Environment variables for Claude Code
       # See: https://code.claude.com/docs/en/settings
-      env = mkOption {
+      env = lib.mkOption {
         type = types.attrsOf types.str;
         default = { };
         description = ''
@@ -258,7 +256,7 @@ in
         };
       };
 
-      schemaUrl = mkOption {
+      schemaUrl = lib.mkOption {
         type = types.str;
         default = "https://json.schemastore.org/claude-code-settings.json";
         description = "JSON schema URL for settings validation";
@@ -267,36 +265,36 @@ in
 
     # Status Line (supports claude-code-statusline)
     statusLine = {
-      enable = mkOption {
+      enable = lib.mkOption {
         type = types.bool;
         default = false;
       };
-      script = mkOption {
+      script = lib.mkOption {
         type = types.nullOr types.lines;
         default = null;
       };
       enhanced = {
-        enable = mkOption {
+        enable = lib.mkOption {
           type = types.bool;
           default = false;
         };
-        source = mkOption {
+        source = lib.mkOption {
           type = types.nullOr types.path;
           default = null;
           description = "Flake input path to claude-code-statusline repo";
         };
-        configFile = mkOption {
+        configFile = lib.mkOption {
           type = types.nullOr types.path;
           default = null;
           description = "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
         };
-        mobileConfigFile = mkOption {
+        mobileConfigFile = lib.mkOption {
           type = types.nullOr types.path;
           default = null;
           description = "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
         };
         # Internal: package built by statusline.nix, used by settings.nix
-        package = mkOption {
+        package = lib.mkOption {
           type = types.nullOr types.package;
           default = null;
           internal = true;
@@ -307,11 +305,11 @@ in
 
     # Feature Flags
     features = {
-      pluginSchemaVersion = mkOption {
+      pluginSchemaVersion = lib.mkOption {
         type = types.int;
         default = 1;
       };
-      experimental = mkOption {
+      experimental = lib.mkOption {
         type = types.attrsOf types.bool;
         default = { };
       };

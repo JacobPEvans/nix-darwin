@@ -48,14 +48,14 @@
         runHook postInstall
       '';
 
-      meta = with lib; {
+      meta = {
         description = "Configurable statusline for Claude Code with git and cost tracking";
         homepage = "https://github.com/rz1989s/claude-code-statusline";
-        license = licenses.mit;
+        license = lib.licenses.mit;
         # This package only supports macOS/Darwin due to dependency on BSD stat command.
         # The script uses `stat -f "%m"` which is BSD syntax; GNU stat uses `stat -c "%Y"`.
         # Linux support would require updating the script to detect and use the correct variant.
-        platforms = platforms.darwin;
+        platforms = lib.platforms.darwin;
         mainProgram = "claude-code-statusline";
       };
     };
