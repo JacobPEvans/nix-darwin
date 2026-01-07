@@ -19,6 +19,9 @@
 let
   userConfig = import ../../../lib/user-config.nix;
 
+  # Import Claude Code constants for DRY principle
+  claudeConstants = import ../../../lib/claude-constants.nix { };
+
   # Local repo path - ONLY used for autoClaude (needs writable git for commits)
   # All other ai-assistant-instructions content comes from Nix store (flake input)
   autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
@@ -39,14 +42,9 @@ let
     in
     map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
 
-  # Commands to EXCLUDE from auto-discovery (high token cost)
-  # These can still be used via /skill if needed
-  excludedCommands = [
-    "auto-claude" # Very large, not actively used due to token issues
-    "shape-issues" # Should be a plugin, not a command
-    "consolidate-issues" # Large, rarely used
-    "init-change" # Deprecated, replaced by init-worktree
-  ];
+  # Commands to EXCLUDE from auto-discovery (defined in lib/claude-constants.nix)
+  # Single source of truth to avoid duplication with settings.nix warning
+  inherit (claudeConstants) excludedCommands;
 
   # Commands from agentsmd (Nix store / flake input)
   # Auto-discovers all .md files in agentsmd/commands/ (minus excluded)

@@ -14,6 +14,9 @@
 
 let
   cfg = config.programs.claude;
+
+  # Import Claude Code constants for DRY principle
+  claudeConstants = import ../../../../lib/claude-constants.nix { };
   homeDir = config.home.homeDirectory;
 
   # Import the single source of truth for marketplace formatting
@@ -141,10 +144,10 @@ in
         echo "[$(date '+%H:%M:%S')] [INFO] Removed broken statusline symlink" >&2
       fi
 
-      # Warn about excluded commands (hardcoded in claude-config.nix)
+      # Warn about excluded commands (defined in lib/claude-constants.nix)
       # These commands are excluded from auto-discovery to reduce token usage
       echo "[$(date '+%H:%M:%S')] [WARN] Claude Code: Some commands are excluded from auto-load (high token cost):" >&2
-      echo "[$(date '+%H:%M:%S')] [WARN]   - auto-claude, shape-issues, consolidate-issues, init-change" >&2
+      echo "[$(date '+%H:%M:%S')] [WARN]   - ${claudeConstants.excludedCommandsFormatted}" >&2
       echo "[$(date '+%H:%M:%S')] [WARN]   These can still be used via /skill if needed." >&2
     '';
   };
