@@ -33,8 +33,7 @@ in
     ./settings.nix
     ./statusline.nix
     ./statusline # New modular statusline (Issue #80)
-    # Note: MCP server configuration handled in settings.nix (mcpServers option)
-    # No separate mcp.nix needed - MCPs currently disabled due to token cost
+    # Note: MCP server configuration is handled in settings.nix via the `mcpServers` option.
     ./auto-claude.nix
     ./auto-claude-reporting.nix
     ./menubar.nix
