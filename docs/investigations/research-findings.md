@@ -129,7 +129,7 @@ nix-env -p /nix/var/nix/profiles/system --set "$systemConfig"
 ## Sources
 
 - [nix-darwin activation-scripts.nix](https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/activation-scripts.nix)
-- [darwin-rebuild.sh](https://github.com/LnL7/nix-darwin/blob/master/pkgs/nix-tools/darwin-rebuild.sh)
+- [darwin-rebuild.sh](https://github.com/nix-darwin/nix-darwin/blob/master/pkgs/nix-tools/darwin-rebuild.sh)
 - [Issue #258: /run/current-system symlink not created](https://github.com/nix-darwin/nix-darwin/issues/258)
 - [Issue #1462: System activation broken](https://github.com/nix-darwin/nix-darwin/issues/1462)
 - [Issue #1457: Activation must run as root](https://github.com/nix-darwin/nix-darwin/issues/1457)
