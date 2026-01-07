@@ -236,6 +236,11 @@ in
         type = types.listOf types.str;
         default = [ ];
         description = "Directories accessible to Claude Code without prompts";
+        example = [
+          "~/projects"
+          "~/Documents"
+          "~/.config"
+        ];
       };
 
       # Environment variables for Claude Code

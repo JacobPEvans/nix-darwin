@@ -5,6 +5,23 @@
 #
 # Automatic cleanup: When a marketplace directory exists but should be a symlink,
 # it's automatically removed (with diff reporting). Only one backup is kept.
+#
+# ACTIVATION SCRIPT ORDERING (using home-manager DAG):
+#
+# 1. cleanupMarketplaceDirectories (entryBefore linkGeneration)
+#    - Runs BEFORE home-manager creates symlinks
+#    - Moves conflicting directories to .backup
+#    - Required to prevent "cannot overwrite directory" errors
+#
+# 2. linkGeneration (home-manager built-in)
+#    - Creates all symlinks defined in home.file
+#
+# 3. reportMarketplaceDiffs (entryAfter linkGeneration)
+#    - Runs AFTER symlinks are created
+#    - Shows diffs between backup and new Nix-managed content
+#    - Helps users verify marketplace transitions
+#
+# Do NOT change this ordering without understanding the dependencies.
 { config, lib, ... }:
 
 let
