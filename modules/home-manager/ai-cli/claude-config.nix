@@ -107,7 +107,10 @@ in
       ai-assistant-instructions = {
         enabled = true;
         path = autoClaudeLocalRepoPath;
-        schedule.hours = lib.lists.genList (i: i * 4) 6;
+        schedule.times = map (hour: {
+          inherit hour;
+          minute = 0;
+        }) (lib.lists.genList (i: i * 4) 6);
         maxBudget = 20.0;
       };
       # nix config: every 4 hours starting at 1am (offset +1 to prevent concurrent runs)
@@ -115,7 +118,10 @@ in
       nix = {
         enabled = true;
         path = "${config.home.homeDirectory}/.config/nix";
-        schedule.hours = lib.lists.genList (i: i * 4 + 1) 6;
+        schedule.times = map (hour: {
+          inherit hour;
+          minute = 0;
+        }) (lib.lists.genList (i: i * 4 + 1) 6);
         maxBudget = 20.0;
       };
       # terraform-proxmox: every 4 hours starting at 2am (offset +2 to prevent concurrent runs)
@@ -123,7 +129,10 @@ in
       terraform-proxmox = {
         enabled = true;
         path = "${config.home.homeDirectory}/git/terraform-proxmox/main";
-        schedule.hours = lib.lists.genList (i: i * 4 + 2) 6;
+        schedule.times = map (hour: {
+          inherit hour;
+          minute = 0;
+        }) (lib.lists.genList (i: i * 4 + 2) 6);
         maxBudget = 20.0;
       };
     };

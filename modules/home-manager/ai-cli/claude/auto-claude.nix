@@ -40,22 +40,8 @@ let
         Minute = time.minute or 0;
       };
 
-  # Normalize schedule settings (supports single hour, list of hours, or list of times)
-  getScheduleTimes =
-    schedule:
-    let
-      timesList = schedule.times;
-      hoursList = schedule.hours;
-      hourOpt = schedule.hour;
-    in
-    if timesList != [ ] then
-      timesList
-    else if hoursList != [ ] then
-      hoursList
-    else if hourOpt != null then
-      [ hourOpt ]
-    else
-      [ ];
+  # Get schedule times (deprecated fallback logic removed)
+  getScheduleTimes = schedule: schedule.times;
 
   # Filter to only enabled repositories
   enabledRepos = lib.filterAttrs (_: r: r.enabled) cfg.autoClaude.repositories;
@@ -77,24 +63,6 @@ in
             schedule = lib.mkOption {
               type = lib.types.submodule {
                 options = {
-                  hour = lib.mkOption {
-                    type = lib.types.nullOr (lib.types.ints.between 0 23);
-                    default = null;
-                    description = "Hour of day to run (0-23). Deprecated in favor of hours/times.";
-                  };
-
-                  hours = lib.mkOption {
-                    type = lib.types.listOf (lib.types.ints.between 0 23);
-                    default = [ ];
-                    description = ''
-                      List of hours (0-23) to run each day at minute 0.
-                      Deprecated in favor of times for hour+minute control.
-
-                      If empty and schedule.hour is set, falls back to that single hour.
-                      Example: To run every 2 hours, set to [0 2 4 6 8 10 12 14 16 18 20 22].
-                    '';
-                  };
-
                   times = lib.mkOption {
                     type = lib.types.listOf (
                       lib.types.submodule {
@@ -114,10 +82,7 @@ in
                     default = [ ];
                     description = ''
                       List of times to run each day. Each time has hour (0-23) and minute (0-59).
-
-                      If empty, falls back to the deprecated 'hours' or 'hour' options.
-                      Default runs once daily at 2:00 PM to minimize unexpected costs.
-                      Add more times for more frequent maintenance runs.
+                      Required field - must have at least one scheduled time when repository is enabled.
 
                       Example:
                         times = [
