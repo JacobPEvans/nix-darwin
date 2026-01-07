@@ -107,11 +107,11 @@
     "claude-cookbooks": {
       "flake": false,
       "locked": {
-        "lastModified": 1767107335,
-        "narHash": "sha256-7B1F+D79PLABLMf9WM3XPKtGIE9yQFni6UJnP7QQ9TM=",
+        "lastModified": 1767636807,
+        "narHash": "sha256-owN+kARnb4i43pvDiMgYAX8CSBqoHdpciz26+Vmab3w=",
         "owner": "anthropics",
         "repo": "claude-cookbooks",
-        "rev": "04250bbe52429a7ff0b783689a5092ae505f05ff",
+        "rev": "7dc310a7231a6b0e3db5534c930156f2bd54f4c8",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1767597399,
-        "narHash": "sha256-sNzdemmX7Ha16FGfosXUoLEvRI9Zz6uwC+VsXhrCHeQ=",
+        "lastModified": 1767676535,
+        "narHash": "sha256-PZnjypUiqOMsBiOvb9yBJQUJuh4VUK+a4FDXMiuQGrw=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "15b07b46dab33aa07efb447e1b592297b9eaa17c",
+        "rev": "dbc4a7733cd4dea7501c57e9fe01af324e8a314c",
         "type": "github"
       },
       "original": {
@@ -217,11 +217,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1767280655,
-        "narHash": "sha256-YmaYMduV5ko8zURUT1VLGDbVC1L/bxHS0NsiPoZ6bBM=",
+        "lastModified": 1767619900,
+        "narHash": "sha256-KpoCBPvwHz3gAQtIUkohE2InRBFK3r0/FM6z5SPWfvM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "d49d2543f02dbd789ed032188c84570d929223cb",
+        "rev": "6bd04da47cfb48dfd15eabf08364b78ad894f5b2",
         "type": "github"
       },
       "original": {
@@ -234,11 +234,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1767390076,
-        "narHash": "sha256-lCtAiMSl+I30+9PajL71ZYx4nQaszs1n9+VSEoKMcDM=",
+        "lastModified": 1767550116,
+        "narHash": "sha256-V/XEKxDbYdSJWN4Ehe23Arz21K6Qd+SeJ6ICv1EZN1s=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "8a642899d2c5287cb2cdb48c3f2b5209c796ba79",
+        "rev": "4738717d5072458e5954ce6e674b629390e1bccc",
         "type": "github"
       },
       "original": {
@@ -254,11 +254,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1767497014,
-        "narHash": "sha256-/KkagvdwDwYWVoEOBWSZ5C6ZkpXTaE891P37m5gY1hU=",
+        "lastModified": 1767696937,
+        "narHash": "sha256-EGWdSUVTHNvZhYEUzN1Rxv0twwFvznWPHrg6O7MShXA=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "5d901d72146a84022c88b94e528b971f72267cab",
+        "rev": "336cda19c067185e0d8536bf17538ae9b8d34c1a",
         "type": "github"
       },
       "original": {
