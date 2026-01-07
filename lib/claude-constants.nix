@@ -4,7 +4,7 @@
 # Single source of truth to avoid duplication and drift.
 _:
 
-{
+rec {
   # Commands excluded from auto-discovery due to high token cost
   # These can still be used via /skill if needed
   #
@@ -20,5 +20,5 @@ _:
 
   # Formatted list for display in warnings/logs
   # Example: "auto-claude, shape-issues, consolidate-issues, init-change"
-  excludedCommandsFormatted = "auto-claude, shape-issues, consolidate-issues, init-change";
+  excludedCommandsFormatted = builtins.concatStringsSep ", " excludedCommands;
 }
