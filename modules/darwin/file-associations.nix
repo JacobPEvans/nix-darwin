@@ -54,8 +54,10 @@ in
   # Module Options
   # ==========================================================================
   options.system.fileAssociations = {
-    enable = lib.mkEnableOption "custom file type associations" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "Whether to enable custom file type associations";
     };
 
     customExtensions = lib.mkOption {
@@ -74,10 +76,10 @@ in
               example = "public.tar-archive";
             };
 
-            description = lib.mkOption {
+            displayName = lib.mkOption {
               type = lib.types.str;
               default = "";
-              description = "Human-readable description of the file type";
+              description = "Human-readable display name for the file type";
               example = "Splunk archive";
             };
           };
@@ -88,12 +90,12 @@ in
         {
           extension = "spl";
           uti = "public.tar-archive";
-          description = "Splunk archive (tar.gz)";
+          displayName = "Splunk archive (tar.gz)";
         }
         {
           extension = "crbl";
           uti = "public.tar-archive";
-          description = "CRBL archive (tar.gz)";
+          displayName = "CRBL archive (tar.gz)";
         }
       ];
 
@@ -119,12 +121,12 @@ in
           {
             extension = "spl";
             uti = "public.tar-archive";
-            description = "Splunk archive";
+            displayName = "Splunk archive";
           }
           {
             extension = "myarchive";
             uti = "public.tar-archive";
-            description = "My custom archive format";
+            displayName = "My custom archive format";
           }
         ]
       '';
@@ -149,7 +151,7 @@ in
       ${lib.concatMapStringsSep "\n" (
         assoc:
         ''echo "  - .${assoc.extension} → ${assoc.uti}${
-          lib.optionalString (assoc.description != "") " (${assoc.description})"
+          lib.optionalString (assoc.displayName != "") " (${assoc.displayName})"
         }"''
       ) cfg.customExtensions}
       echo ""
