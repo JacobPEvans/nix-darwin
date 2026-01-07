@@ -14,7 +14,7 @@ in
     enable = lib.mkEnableOption "Claude Code statusline with theme support";
 
     theme = lib.mkOption {
-      type = types.enum [
+      type = lib.types.enum [
         "powerline"
         "robbyrussell"
         "advanced"
@@ -34,10 +34,10 @@ in
 
     # Theme-specific configuration
     powerline = lib.mkOption {
-      type = types.submodule {
+      type = lib.types.submodule {
         options = {
           style = lib.mkOption {
-            type = types.enum [
+            type = lib.types.enum [
               "default"
               "minimal"
               "rainbow"
@@ -65,10 +65,10 @@ in
     };
 
     advanced = lib.mkOption {
-      type = types.submodule {
+      type = lib.types.submodule {
         options = {
           theme = lib.mkOption {
-            type = types.enum availableThemes;
+            type = lib.types.enum availableThemes;
             default = "gruvbox";
             description = ''
               Color theme for advanced statusline.
@@ -91,7 +91,7 @@ in
           };
 
           showSystemInfo = lib.mkOption {
-            type = types.bool;
+            type = lib.types.bool;
             default = true;
             description = "Show system information in advanced statusline (CPU, memory, disk)";
           };

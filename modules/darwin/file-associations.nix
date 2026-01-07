@@ -36,7 +36,7 @@ let
   # Generate activation script for all file associations
   activationScript = ''
     echo "Configuring file type associations..."
-    ${concatMapStringsSep "\n" associationToDutiCommand cfg.customExtensions}
+    ${lib.concatMapStringsSep "\n" associationToDutiCommand cfg.customExtensions}
 
     # Restart Finder to apply changes immediately
     # (Launch Services database updates may not be visible until restart)
@@ -59,23 +59,23 @@ in
     };
 
     customExtensions = lib.mkOption {
-      type = types.listOf (
-        types.submodule {
+      type = lib.types.listOf (
+        lib.types.submodule {
           options = {
             extension = lib.mkOption {
-              type = types.str;
+              type = lib.types.str;
               description = "File extension (without leading dot)";
               example = "spl";
             };
 
             uti = lib.mkOption {
-              type = types.str;
+              type = lib.types.str;
               description = "Uniform Type Identifier for the file type";
               example = "public.tar-archive";
             };
 
             description = lib.mkOption {
-              type = types.str;
+              type = lib.types.str;
               default = "";
               description = "Human-readable description of the file type";
               example = "Splunk archive";
@@ -114,7 +114,7 @@ in
           mdls -name kMDItemContentType <filename>
       '';
 
-      example = literalExpression ''
+      example = lib.literalExpression ''
         [
           {
             extension = "spl";
@@ -143,13 +143,13 @@ in
     system.activationScripts.fileAssociations.text = activationScript;
 
     # User instructions displayed after rebuild
-    system.activationScripts.postActivation.text = mkAfter ''
+    system.activationScripts.postActivation.text = lib.mkAfter ''
       echo ""
       echo "File associations configured for:"
-      ${concatMapStringsSep "\n" (
+      ${lib.concatMapStringsSep "\n" (
         assoc:
         ''echo "  - .${assoc.extension} → ${assoc.uti}${
-          optionalString (assoc.description != "") " (${assoc.description})"
+          lib.optionalString (assoc.description != "") " (${assoc.description})"
         }"''
       ) cfg.customExtensions}
       echo ""

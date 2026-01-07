@@ -6,57 +6,57 @@
 
 let
   # Reusable submodule types
-  marketplaceModule = types.submodule {
+  marketplaceModule = lib.types.submodule {
     options = {
       source = lib.mkOption {
-        type = types.submodule {
+        type = lib.types.submodule {
           options = {
             type = lib.mkOption {
-              type = types.enum [
+              type = lib.types.enum [
                 "git"
                 "github"
                 "local"
               ];
               default = "git";
             };
-            url = lib.mkOption { type = types.str; };
+            url = lib.mkOption { type = lib.types.str; };
           };
         };
       };
       flakeInput = lib.mkOption {
-        type = types.nullOr types.path;
+        type = lib.types.nullOr lib.types.path;
         default = null;
         description = "Flake input for Nix-managed (immutable) plugins";
       };
     };
   };
 
-  componentModule = types.submodule {
+  componentModule = lib.types.submodule {
     options = {
-      name = lib.mkOption { type = types.str; };
-      source = lib.mkOption { type = types.path; };
+      name = lib.mkOption { type = lib.types.str; };
+      source = lib.mkOption { type = lib.types.path; };
     };
   };
 
-  mcpServerModule = types.submodule {
+  mcpServerModule = lib.types.submodule {
     options = {
-      command = lib.mkOption { type = types.str; };
+      command = lib.mkOption { type = lib.types.str; };
       args = lib.mkOption {
-        type = types.listOf types.str;
+        type = lib.types.listOf lib.types.str;
         default = [ ];
       };
       env = lib.mkOption {
-        type = types.attrsOf types.str;
+        type = lib.types.attrsOf lib.types.str;
         default = { };
       };
       disabled = lib.mkOption {
-        type = types.bool;
+        type = lib.types.bool;
         default = false;
       };
     };
   };
 
-  hookType = types.nullOr (types.either types.path types.lines);
+  hookType = lib.types.nullOr (lib.types.either lib.types.path lib.types.lines);
 
 in
 {
@@ -66,15 +66,15 @@ in
     # Plugins
     plugins = {
       marketplaces = lib.mkOption {
-        type = types.attrsOf marketplaceModule;
+        type = lib.types.attrsOf marketplaceModule;
         default = { };
       };
       enabled = lib.mkOption {
-        type = types.attrsOf types.bool;
+        type = lib.types.attrsOf lib.types.bool;
         default = { };
       };
       allowRuntimeInstall = lib.mkOption {
-        type = types.bool;
+        type = lib.types.bool;
         default = true;
       };
     };
@@ -82,19 +82,19 @@ in
     # Commands
     commands = {
       fromFlakeInputs = lib.mkOption {
-        type = types.listOf componentModule;
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
       local = lib.mkOption {
-        type = types.attrsOf types.path;
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
       fromLiveRepo = lib.mkOption {
-        type = types.nullOr types.path;
+        type = lib.types.nullOr lib.types.path;
         default = null;
       };
       liveRepoCommands = lib.mkOption {
-        type = types.listOf types.str;
+        type = lib.types.listOf lib.types.str;
         default = [ ];
       };
     };
@@ -102,11 +102,11 @@ in
     # Agents
     agents = {
       fromFlakeInputs = lib.mkOption {
-        type = types.listOf componentModule;
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
       local = lib.mkOption {
-        type = types.attrsOf types.path;
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
     };
@@ -114,11 +114,11 @@ in
     # Skills
     skills = {
       fromFlakeInputs = lib.mkOption {
-        type = types.listOf componentModule;
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
       local = lib.mkOption {
-        type = types.attrsOf types.path;
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
     };
@@ -159,7 +159,7 @@ in
 
     # MCP Servers
     mcpServers = lib.mkOption {
-      type = types.attrsOf mcpServerModule;
+      type = lib.types.attrsOf mcpServerModule;
       default = { };
     };
 
@@ -182,7 +182,7 @@ in
       enable = lib.mkEnableOption "API key helper for headless Claude authentication";
 
       scriptPath = lib.mkOption {
-        type = types.str;
+        type = lib.types.str;
         default = ".local/bin/claude-api-key-helper";
         description = "Path (relative to home) where the API key helper script is installed";
       };
@@ -192,7 +192,7 @@ in
     settings = {
       # Extended thinking mode
       alwaysThinkingEnabled = lib.mkOption {
-        type = types.bool;
+        type = lib.types.bool;
         default = true;
         description = ''
           Enable Claude's extended thinking capability by default.
@@ -203,7 +203,7 @@ in
 
       # Session management
       cleanupPeriodDays = lib.mkOption {
-        type = types.int;
+        type = lib.types.int;
         default = 14;
         description = ''
           Sessions inactive longer than this period are deleted.
@@ -214,24 +214,24 @@ in
       # Permissions
       permissions = {
         allow = lib.mkOption {
-          type = types.listOf types.str;
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations to auto-approve without prompting";
         };
         deny = lib.mkOption {
-          type = types.listOf types.str;
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations to permanently block";
         };
         ask = lib.mkOption {
-          type = types.listOf types.str;
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations requiring user confirmation";
         };
       };
 
       additionalDirectories = lib.mkOption {
-        type = types.listOf types.str;
+        type = lib.types.listOf lib.types.str;
         default = [ ];
         description = "Directories accessible to Claude Code without prompts";
       };
@@ -239,7 +239,7 @@ in
       # Environment variables for Claude Code
       # See: https://code.claude.com/docs/en/settings
       env = lib.mkOption {
-        type = types.attrsOf types.str;
+        type = lib.types.attrsOf lib.types.str;
         default = { };
         description = ''
           Environment variables passed to Claude Code.
@@ -257,7 +257,7 @@ in
       };
 
       schemaUrl = lib.mkOption {
-        type = types.str;
+        type = lib.types.str;
         default = "https://json.schemastore.org/claude-code-settings.json";
         description = "JSON schema URL for settings validation";
       };
@@ -266,36 +266,36 @@ in
     # Status Line (supports claude-code-statusline)
     statusLine = {
       enable = lib.mkOption {
-        type = types.bool;
+        type = lib.types.bool;
         default = false;
       };
       script = lib.mkOption {
-        type = types.nullOr types.lines;
+        type = lib.types.nullOr lib.types.lines;
         default = null;
       };
       enhanced = {
         enable = lib.mkOption {
-          type = types.bool;
+          type = lib.types.bool;
           default = false;
         };
         source = lib.mkOption {
-          type = types.nullOr types.path;
+          type = lib.types.nullOr lib.types.path;
           default = null;
           description = "Flake input path to claude-code-statusline repo";
         };
         configFile = lib.mkOption {
-          type = types.nullOr types.path;
+          type = lib.types.nullOr lib.types.path;
           default = null;
           description = "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
         };
         mobileConfigFile = lib.mkOption {
-          type = types.nullOr types.path;
+          type = lib.types.nullOr lib.types.path;
           default = null;
           description = "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
         };
         # Internal: package built by statusline.nix, used by settings.nix
         package = lib.mkOption {
-          type = types.nullOr types.package;
+          type = lib.types.nullOr lib.types.package;
           default = null;
           internal = true;
           description = "Internal: built statusline package";
@@ -306,11 +306,11 @@ in
     # Feature Flags
     features = {
       pluginSchemaVersion = lib.mkOption {
-        type = types.int;
+        type = lib.types.int;
         default = 1;
       };
       experimental = lib.mkOption {
-        type = types.attrsOf types.bool;
+        type = lib.types.attrsOf lib.types.bool;
         default = { };
       };
     };
