@@ -129,9 +129,8 @@ in
       # Use tool with path for specific patterns: Read(/path/to/file)
       builtin = [
         "Read"
-        "Edit"
+        "Edit" # Handles all editing including multi-file refactoring
         "Write"
-        "MultiEdit" # Multi-file editing for complex refactoring
         "NotebookEdit" # Jupyter notebook editing
         "Glob"
         "Grep"
