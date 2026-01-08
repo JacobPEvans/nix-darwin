@@ -145,6 +145,14 @@ let
         url = "wakatime/claude-code-wakatime";
       };
     };
+
+    # --- Claude Skills Marketplace ---
+    "claude-skills" = {
+      source = {
+        type = "github";
+        url = "secondsky/claude-skills";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time

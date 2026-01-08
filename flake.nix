@@ -107,6 +107,18 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
+    # Claude Code Workflows - Backend, testing, code quality
+    claude-code-workflows = {
+      url = "github:wshobson/agents";
+      flake = false;
+    };
+
+    # Claude Skills Marketplace - 174 production-ready skills
+    claude-skills-marketplace = {
+      url = "github:secondsky/claude-skills";
+      flake = false;
+    };
+
     # LLM Agents - Nix packages for 40+ AI coding agents
     # Daily-updated packages with binary cache from Numtide
     # Includes: claude-code, crush, gemini-cli, copilot-cli, goose-cli, etc.
@@ -142,6 +154,8 @@
       claude-powerline,
       superpowers-marketplace,
       jacobpevans-cc-plugins,
+      claude-code-workflows,
+      claude-skills-marketplace,
       llm-agents,
       ...
     }:
@@ -199,6 +213,8 @@
           claude-powerline
           superpowers-marketplace
           jacobpevans-cc-plugins
+          claude-code-workflows
+          claude-skills-marketplace
           llm-agents
           ;
       };
