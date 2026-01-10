@@ -28,7 +28,6 @@ CRITICAL_PACKAGES=(
   "darwin"
   "home-manager"
   "ai-assistant-instructions"
-  "llm-agents"
 )
 
 # Exempt packages (archived repos, intentional pins)

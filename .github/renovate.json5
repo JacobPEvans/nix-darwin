@@ -75,7 +75,6 @@
       "matchPackagePatterns": [
         "anthropics/",
         "buildermethods/agent-os",
-        "numtide/llm-agents.*",
         "obra/superpowers-marketplace",
         "JacobPEvans/claude-code-plugins"
       ],
@@ -100,6 +99,16 @@
       "groupName": "github-actions",
       "schedule": ["after 7am on Monday"],
       "automergeRequireAllStatusChecks": true
+    },
+
+    // GROUP 5: Homebrew Brewfile - Weekly Monday 7am (Claude Code version pinning)
+    {
+      "description": "Homebrew brewfile.lock.json - weekly updates for claude-code",
+      "matchFileNames": ["brewfile.lock.json"],
+      "groupName": "homebrew-claude",
+      "schedule": ["after 7am on Monday"],
+      "minimumReleaseAge": "3 days", // Wait for stability before updating pinned version
+      "automerge": false // Manual review required for version changes
     },
 
     // SPECIAL: Node.js LTS tracking (no latest/current versions)

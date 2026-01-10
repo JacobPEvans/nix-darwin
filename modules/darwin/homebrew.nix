@@ -2,6 +2,12 @@
 #
 # Homebrew is a FALLBACK ONLY for packages not in nixpkgs or severely outdated.
 # Prefer nixpkgs for everything - only use homebrew when absolutely necessary.
+#
+# Version Pinning:
+# Claude Code is pinned to 2.1.3 to ensure consistent versions across rebuilds.
+# To update: 1. Change version in this comment and Brewfile
+#            2. Run: brew update && brew upgrade claude-code
+#            3. Run: darwin-rebuild switch --flake .
 
 _:
 
@@ -21,6 +27,7 @@ _:
       # CLI tools (only if not available in nixpkgs)
       "ccusage" # Claude Code usage analyzer - not in nixpkgs
       "block-goose-cli" # Block Goose AI agent (verified via: brew search goose) - conflicts with nixpkgs 'goose'
+      "claude-code" # Anthropic Claude Code CLI - version pinned to 2.1.3
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)

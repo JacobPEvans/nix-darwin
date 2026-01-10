@@ -16,19 +16,12 @@ Crush provides an intelligent development companion with:
 
 ## Installation
 
-Installed via numtide/llm-agents.nix in `modules/darwin/common.nix`:
-
-```nix
-environment.systemPackages = [
-  llmAgentsPkgs.crush
-];
-```
+**NOTE**: Crush is currently disabled in this configuration due to python3.13-twisted test failures.
 
 Alternative installation methods:
 
 ```bash
 # Via Nix
-nix run github:numtide/llm-agents.nix#crush
 nix run github:numtide/nix-ai-tools#crush
 
 # Via Homebrew

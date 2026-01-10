@@ -119,24 +119,6 @@
       flake = false;
     };
 
-    # LLM Agents - Nix packages for 40+ AI coding agents
-    # Daily-updated packages with binary cache from Numtide
-    # Includes: claude-code, crush, gemini-cli, copilot-cli, goose-cli, etc.
-    # https://github.com/numtide/llm-agents.nix
-    #
-    # IMPORTANT: DO NOT add `nixpkgs.follows = "nixpkgs"` here!
-    # llm-agents must use its own unstable nixpkgs to get latest package versions.
-    # Forcing stable nixpkgs causes claude-code and other AI tools to be outdated.
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs = {
-        # Consolidate systems to avoid duplicate systems entries in flake.lock
-        # Uses transitive follow through blueprint (llm-agents' internal dependency)
-        # because blueprint is the flake that actually consumes systems
-        blueprint.inputs.systems.follows = "systems";
-      };
-    };
-
   };
 
   outputs =
@@ -156,7 +138,6 @@
       jacobpevans-cc-plugins,
       claude-code-workflows,
       claude-skills,
-      llm-agents,
       ...
     }:
     let
@@ -217,14 +198,11 @@
           jacobpevans-cc-plugins
           claude-code-workflows
           claude-skills
-          llm-agents
           ;
       };
       # Define configuration once, assign to multiple names
       darwinConfig = darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        # Pass llm-agents to darwin modules for AI tool packages
-        specialArgs = { inherit llm-agents; };
         modules = [
           ./hosts/macbook-m4/default.nix
 
