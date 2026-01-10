@@ -195,6 +195,8 @@
                 claude-cookbooks
                 claude-plugins-official
                 anthropic-skills
+                claude-code-workflows
+                claude-skills
                 ;
               inherit (nixpkgs) lib;
               config = { }; # Unused but required by signature
