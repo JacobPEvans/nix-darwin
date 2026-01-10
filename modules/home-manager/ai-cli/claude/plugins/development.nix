@@ -26,39 +26,11 @@ _:
     "observability-monitoring@claude-code-workflows" = true;
 
     # ========================================================================
-    # Claude Code Workflows - Explicitly Excluded (set to false)
+    # Note: Claude Code Workflows plugins contain multiple skills
     # ========================================================================
-    # These are not needed for Terraform/Nix/Python development
-
-    # Event Sourcing/CQRS - Not used (user will create separate Ansible repo)
-    "microservices-patterns@claude-code-workflows" = false;
-    "projection-patterns@claude-code-workflows" = false;
-    "saga-orchestration@claude-code-workflows" = false;
-    "cqrs-implementation@claude-code-workflows" = false;
-
-    # Temporal Workflows - Not currently in use
-    "workflow-orchestration-patterns@claude-code-workflows" = false;
-    "temporal-python-testing@claude-code-workflows" = false;
-
-    # Event Store Design - Not needed
-    "event-store-design@claude-code-workflows" = false;
-
-    # Removed in previous phase
-    "gitlab-ci-patterns@claude-code-workflows" = false;
-    "mcp-cli@claude-code-workflows" = false;
-
-    # Other excluded
-    "full-stack-orchestration@claude-code-workflows" = false;
-    "code-documentation@claude-code-workflows" = false;
-    "api-scaffolding@claude-code-workflows" = false;
-    "api-testing-observability@claude-code-workflows" = false;
-    "llm-application-dev@claude-code-workflows" = false;
-    "context-management@claude-code-workflows" = false;
-    "machine-learning-ops@claude-code-workflows" = false;
-    "data-engineering@claude-code-workflows" = false;
-    "data-validation-suite@claude-code-workflows" = false;
-    "systems-programming@claude-code-workflows" = false;
-    "dependency-management@claude-code-workflows" = false;
+    # We enable the plugin (e.g., backend-development), which loads all its skills.
+    # Skills within plugins (like cqrs-implementation, event-store-design) cannot be
+    # individually disabled - they come with the parent plugin.
 
     # ========================================================================
     # JacobPEvans Personal Plugins - ALL ENABLED
@@ -71,24 +43,33 @@ _:
     "issue-limiter@jacobpevans-cc-plugins" = true;
 
     # ========================================================================
-    # Claude Skills Marketplace - Selected Suite Plugins
+    # Claude Skills Marketplace - Individual Plugins
     # ========================================================================
-    # Note: Claude Skills uses suite plugins that contain multiple skills.
-    # Install suite plugins, not individual skills.
+    # Claude Skills has individual plugins (not suites)
 
-    # API Skills - includes rest-api-design, graphql-implementation, etc.
-    "api-skills@claude-skills" = true;
+    # API Design & Implementation
+    "api-design-principles@claude-skills" = true;
+    "rest-api-design@claude-skills" = true;
+    "graphql-implementation@claude-skills" = true;
+    "websocket-implementation@claude-skills" = true;
 
-    # Testing Skills - includes playwright-testing, vitest-testing, jest-generator, etc.
-    "testing-skills@claude-skills" = true;
+    # Testing
+    "playwright@claude-skills" = true;
+    "vitest-testing@claude-skills" = true;
+    "jest-generator@claude-skills" = true;
 
-    # Security Skills - includes vulnerability-scanning, csrf-protection, xss-prevention, etc.
-    "security-skills@claude-skills" = true;
+    # Security
+    "vulnerability-scanning@claude-skills" = true;
+    "csrf-protection@claude-skills" = true;
+    "xss-prevention@claude-skills" = true;
 
-    # Data Skills - includes recommendation-engine, sql-query-optimization, etc.
-    "data-skills@claude-skills" = true;
+    # Data & Recommendations
+    "recommendation-engine@claude-skills" = true;
+    "sql-query-optimization@claude-skills" = true;
 
-    # Auth Skills - includes better-auth, clerk-auth, oauth-implementation
-    "auth-skills@claude-skills" = true;
+    # Authentication
+    "better-auth@claude-skills" = true;
+    "clerk-auth@claude-skills" = true;
+    "oauth-implementation@claude-skills" = true;
   };
 }
