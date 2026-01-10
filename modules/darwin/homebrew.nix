@@ -25,12 +25,12 @@ _:
       # CLI tools (only if not available in nixpkgs)
       "ccusage" # Claude Code usage analyzer - not in nixpkgs
       "block-goose-cli" # Block Goose AI agent (verified via: brew search goose) - conflicts with nixpkgs 'goose'
-      "claude-code" # Anthropic Claude Code CLI
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
       "shortwave" # AI-powered email client
       "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
+      "claude-code" # Anthropic Claude Code CLI (version 2.1.3)
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
     ];
 
