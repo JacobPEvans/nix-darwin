@@ -33,10 +33,8 @@ _:
     # CI/CD (GitHub Actions in repos)
     "cicd-automation@claude-code-workflows" = true;
 
-    # Observability & Monitoring (user requested restore)
-    "observability-monitoring@claude-code-workflows" = true;
-
     # REMOVED - not actively used:
+    # observability-monitoring - moved to development.nix (avoid duplication)
     # cloud-infrastructure - too generic
     # kubernetes-operations - no k8s repos
     # deployment-strategies - too generic

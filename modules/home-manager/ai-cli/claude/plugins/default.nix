@@ -12,11 +12,23 @@
 # Each module exports an enabledPlugins attrset that gets merged.
 # The marketplaces module exports a marketplaces attrset.
 
-{ lib, ... }:
+{
+  lib,
+  claude-code-workflows,
+  claude-skills,
+  ...
+}:
 
 let
   # Import all plugin category modules
-  marketplacesModule = import ./marketplaces.nix { inherit lib; };
+  # Pass flake inputs to marketplaces.nix for DRY URL configuration
+  marketplacesModule = import ./marketplaces.nix {
+    inherit
+      lib
+      claude-code-workflows
+      claude-skills
+      ;
+  };
   officialModule = import ./official.nix { };
   communityModule = import ./community.nix { };
   infrastructureModule = import ./infrastructure.nix { };

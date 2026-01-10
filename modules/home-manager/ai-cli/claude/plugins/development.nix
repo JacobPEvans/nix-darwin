@@ -1,9 +1,13 @@
-# Development Plugins - Minimal set for Terraform/Nix/Python/Shell
+# Development Plugins - Terraform/Nix/Python/Shell + selected marketplace plugins
 
 _:
 
 {
   enabledPlugins = {
+    # ========================================================================
+    # Claude Code Workflows - Core Development Tools
+    # ========================================================================
+
     # Backend (Python, Shell)
     "backend-development@claude-code-workflows" = true;
 
@@ -15,20 +19,57 @@ _:
     "code-refactoring@claude-code-workflows" = true;
     "codebase-cleanup@claude-code-workflows" = true;
 
-    # Agent Orchestration (user requested restore)
+    # Agent Orchestration (user requested)
     "agent-orchestration@claude-code-workflows" = true;
 
-    # REMOVED - not used based on repos:
-    # full-stack-orchestration - no full-stack web apps
-    # code-documentation - built-in sufficient
-    # api-scaffolding - no API development repos
-    # api-testing-observability - no API repos
-    # llm-application-dev - no LLM app repos
-    # context-management - unnecessary
-    # machine-learning-ops - no ML repos
-    # data-engineering - no data eng repos
-    # data-validation-suite - no data eng repos
-    # systems-programming - no Rust/Go repos
-    # dependency-management - built-in sufficient
+    # Observability - Keep distributed-tracing and slo-implementation, exclude prometheus/grafana
+    "observability-monitoring@claude-code-workflows" = true;
+
+    # ========================================================================
+    # Note: Claude Code Workflows plugins contain multiple skills
+    # ========================================================================
+    # We enable the plugin (e.g., backend-development), which loads all its skills.
+    # Skills within plugins (like cqrs-implementation, event-store-design) cannot be
+    # individually disabled - they come with the parent plugin.
+
+    # ========================================================================
+    # JacobPEvans Personal Plugins - ALL ENABLED
+    # ========================================================================
+    # Enable all plugins from user's custom marketplace
+    "git-rebase-workflow@jacobpevans-cc-plugins" = true;
+    "webfetch-guard@jacobpevans-cc-plugins" = true;
+    "markdown-validator@jacobpevans-cc-plugins" = true;
+    "token-validator@jacobpevans-cc-plugins" = true;
+    "issue-limiter@jacobpevans-cc-plugins" = true;
+
+    # ========================================================================
+    # Claude Skills Marketplace - Individual Plugins
+    # ========================================================================
+    # Claude Skills has individual plugins (not suites)
+
+    # API Design & Implementation
+    "api-design-principles@claude-skills" = true;
+    "rest-api-design@claude-skills" = true;
+    "graphql-implementation@claude-skills" = true;
+    "websocket-implementation@claude-skills" = true;
+
+    # Testing
+    "playwright@claude-skills" = true;
+    "vitest-testing@claude-skills" = true;
+    "jest-generator@claude-skills" = true;
+
+    # Security
+    "vulnerability-scanning@claude-skills" = true;
+    "csrf-protection@claude-skills" = true;
+    "xss-prevention@claude-skills" = true;
+
+    # Data & Recommendations
+    "recommendation-engine@claude-skills" = true;
+    "sql-query-optimization@claude-skills" = true;
+
+    # Authentication
+    "better-auth@claude-skills" = true;
+    "clerk-auth@claude-skills" = true;
+    "oauth-implementation@claude-skills" = true;
   };
 }

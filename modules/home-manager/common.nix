@@ -9,6 +9,8 @@
   ai-assistant-instructions,
   superpowers-marketplace,
   jacobpevans-cc-plugins,
+  claude-code-workflows,
+  claude-skills,
   ...
 }:
 
@@ -59,6 +61,8 @@ let
       ai-assistant-instructions
       superpowers-marketplace
       jacobpevans-cc-plugins
+      claude-code-workflows
+      claude-skills
       ;
   };
 

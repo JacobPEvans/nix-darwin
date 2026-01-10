@@ -13,6 +13,8 @@
   ai-assistant-instructions,
   superpowers-marketplace,
   jacobpevans-cc-plugins,
+  claude-code-workflows,
+  claude-skills,
   ...
 }:
 
@@ -75,6 +77,8 @@ let
       claude-cookbooks
       claude-plugins-official
       anthropic-skills
+      claude-code-workflows
+      claude-skills
       ;
   };
 

@@ -19,12 +19,21 @@
 {
   lib,
   claude-cookbooks,
+  claude-code-workflows,
+  claude-skills,
   ...
 }:
 
 let
   # Import modular plugin configuration
-  pluginModules = import ./claude/plugins/default.nix { inherit lib; };
+  # Pass flake inputs to enable DRY marketplace URL configuration
+  pluginModules = import ./claude/plugins/default.nix {
+    inherit
+      lib
+      claude-code-workflows
+      claude-skills
+      ;
+  };
 
   # Commands from claude-cookbooks to install globally
   # These are copied directly to ~/.claude/commands/
