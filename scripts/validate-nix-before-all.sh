@@ -14,7 +14,7 @@ fi
 # Format: "package-name:reason"
 EXCLUSIONS=(
   "shortwave:Different apps - nixpkgs=radio client, homebrew=email client"
-  "claude-code:Intentionally pinned to homebrew via Brewfile.lock.json for version stability despite nixpkgs availability"
+  "claude-code:Intentionally using homebrew due to recent nixpkgs version instability"
 )
 
 HOMEBREW_FILE="modules/darwin/homebrew.nix"

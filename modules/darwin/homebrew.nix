@@ -3,12 +3,10 @@
 # Homebrew is a FALLBACK ONLY for packages not in nixpkgs or severely outdated.
 # Prefer nixpkgs for everything - only use homebrew when absolutely necessary.
 #
-# Version Pinning:
-# Claude Code is pinned to 2.1.3 to ensure consistent versions across rebuilds.
-# To update: 1. Update `version` in Brewfile.lock.json
-#            2. Run: brew update && brew bundle install
-#            3. Commit the updated Brewfile.lock.json
-#            4. Run: darwin-rebuild switch --flake .
+# NOTE: nix-darwin does NOT support version pinning for individual homebrew packages.
+# Packages will be upgraded to latest available when `upgrade = true` and you run
+# `darwin-rebuild switch`. To prevent upgrades, set `upgrade = false` or pin the
+# package version manually via `brew pin <package>`.
 
 _:
 
@@ -18,8 +16,7 @@ _:
     onActivation = {
       autoUpdate = false; # Don't download 45MB index on every rebuild (fast)
       cleanup = "none"; # Don't remove manually installed packages
-      upgrade = true; # Upgrade packages based on cached index
-      # To get new versions: run `brew update` then `darwin-rebuild switch`
+      upgrade = true; # Upgrade packages to latest available
     };
     taps = [
       # "homebrew/cask"   # Example: additional taps
@@ -28,7 +25,7 @@ _:
       # CLI tools (only if not available in nixpkgs)
       "ccusage" # Claude Code usage analyzer - not in nixpkgs
       "block-goose-cli" # Block Goose AI agent (verified via: brew search goose) - conflicts with nixpkgs 'goose'
-      "claude-code" # Anthropic Claude Code CLI - version pinned to 2.1.3
+      "claude-code" # Anthropic Claude Code CLI
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
