@@ -10,10 +10,11 @@ if ! command -v nix &> /dev/null; then
   exit 1
 fi
 
-# Known false positives: Same name, different apps
+# Known false positives: Same name, different apps, or intentional overrides
 # Format: "package-name:reason"
 EXCLUSIONS=(
   "shortwave:Different apps - nixpkgs=radio client, homebrew=email client"
+  "claude-code:Intentionally using homebrew due to recent nixpkgs version instability"
 )
 
 HOMEBREW_FILE="modules/darwin/homebrew.nix"

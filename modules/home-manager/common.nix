@@ -113,14 +113,6 @@ let
       ai-assistant-instructions
       ;
   };
-  crushFiles = import ./ai-cli/crush.nix {
-    inherit
-      config
-      lib
-      pkgs
-      ai-assistant-instructions
-      ;
-  };
 in
 {
   # ==========================================================================
@@ -134,7 +126,6 @@ in
     # - claude.nix: Claude Code settings + status line script
     # - gemini.nix: Gemini CLI settings
     # - copilot.nix: GitHub Copilot CLI config
-    # - crush.nix: Crush AI agent configuration (Charmbracelet, successor to OpenCode)
     #
     # Permissions: Now read from JSON in ai-assistant-instructions repo
     # Symlinks: ai-assistant-instructions flake input provides CLAUDE.md, GEMINI.md, AGENTS.md
@@ -145,7 +136,6 @@ in
       // geminiFiles
       // geminiCommands
       // copilotFiles
-      // crushFiles
       // agentsMdSymlinks
       // gitHooks
       // gitMergeDrivers;

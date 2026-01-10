@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  llm-agents,
   ...
 }:
 
@@ -10,10 +9,6 @@ let
 
   # Universal packages (pre-commit, linters) shared across all systems
   commonPackages = import ../common/packages.nix { inherit pkgs; };
-
-  # Get claude-code from llm-agents (uses unstable nixpkgs for latest versions)
-  # This overrides the older version from stable nixpkgs
-  llmAgentsPkgs = llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   imports = [
@@ -81,28 +76,6 @@ in
 
       # --- Development tools ---
       gh # GitHub CLI
-
-      # --- AI Coding Agents ---
-      # claude-code from llm-agents.nix (uses unstable nixpkgs for latest versions)
-      # Other AI tools from stable nixpkgs when available
-      llmAgentsPkgs.claude-code # Latest Claude Code from llm-agents.nix
-      claude-monitor # Real-time Claude Code usage monitor
-
-      # DISABLED: gemini-cli 0.22.5 has stale npm dependency cache
-      # npm ci fails: "ENOTCACHED - request to registry.npmjs.org/string-width failed"
-      # Re-enable when nixpkgs updates to fixed version
-      # gemini-cli # Google's Gemini CLI
-
-      # DISABLED: github-copilot-cli 0.0.373 has broken package-lock.json
-      # npm ci fails: "Missing: @github/copilot-darwin-arm64@ from lock file"
-      # Re-enable when nixpkgs updates to fixed version
-      # github-copilot-cli # GitHub Copilot CLI
-
-      # DISABLED: The following packages depend on python3.13-twisted, which has
-      # test failures in nixpkgs (IPv6 TCP tests timeout after 120s).
-      # Re-enable when the upstream twisted package is fixed.
-      # crush # Charmbracelet's AI coding agent (successor to OpenCode)
-      # goose-cli # Block's open-source AI agent
     ])
     ++ (with pkgs; [
       mas # Mac App Store CLI

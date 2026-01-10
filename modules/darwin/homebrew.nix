@@ -2,6 +2,11 @@
 #
 # Homebrew is a FALLBACK ONLY for packages not in nixpkgs or severely outdated.
 # Prefer nixpkgs for everything - only use homebrew when absolutely necessary.
+#
+# NOTE: nix-darwin does NOT support version pinning for individual homebrew packages.
+# Packages will be upgraded to latest available when `upgrade = true` and you run
+# `darwin-rebuild switch`. To prevent upgrades, set `upgrade = false` or pin the
+# package version manually via `brew pin <package>`.
 
 _:
 
@@ -11,8 +16,7 @@ _:
     onActivation = {
       autoUpdate = false; # Don't download 45MB index on every rebuild (fast)
       cleanup = "none"; # Don't remove manually installed packages
-      upgrade = true; # Upgrade packages based on cached index
-      # To get new versions: run `brew update` then `darwin-rebuild switch`
+      upgrade = true; # Upgrade packages to latest available
     };
     taps = [
       # "homebrew/cask"   # Example: additional taps
@@ -26,6 +30,7 @@ _:
       # GUI applications (only if not available in nixpkgs)
       "shortwave" # AI-powered email client
       "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
+      "claude-code" # Anthropic Claude Code CLI (version 2.1.3)
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
     ];
 

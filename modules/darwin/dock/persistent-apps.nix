@@ -39,6 +39,10 @@ in
       "${homeDir}/Applications/Home Manager Apps/zoom.us.app"
       "/Applications/Webex.app"
 
+      # AI Assistants
+      "${homeDir}/Applications/Gemini.app" # Google Gemini AI assistant
+      "/Applications/Claude.app" # Anthropic Claude desktop app (homebrew cask)
+
       # Knowledge & Notes
       "/Applications/Nix Apps/Obsidian.app"
       # Note: Additional note-taking apps may be installed locally
@@ -55,26 +59,16 @@ in
       "/Applications/Safari.app"
       "/Applications/Brave Browser.app"
 
-      # NOTE: AI Tools (Gemini, Antigravity, Claude, ChatGPT, Cursor) are in
-      # the AI Tools folder on the right side of the Dock (persistent-others).
-      # Ollama runs headless via LaunchAgent, no dock icon needed.
+      # NOTE: Ollama runs headless via LaunchAgent, no dock icon needed.
+      # NOTE: Additional AI tools (Antigravity, ChatGPT, Cursor) can be found in
+      # ~/Applications/Home Manager Apps/ but are not pinned to the Dock.
     ];
 
     # ========================================================================
     # Right side of Dock (after separator) - Folders & utilities
     # ========================================================================
-    # AI Tools folder contains symlinks to all AI desktop apps.
-    # Click to expand as a fan/grid showing: Gemini, Antigravity, Claude,
-    # ChatGPT, and Cursor.
-    persistent-others = [
-      {
-        folder = {
-          path = "${homeDir}/Applications/AI Tools";
-          displayas = "folder"; # Show as folder icon
-          showas = "grid"; # Expand as grid when clicked
-          arrangement = "name"; # Sort alphabetically
-        };
-      }
-    ];
+    # No persistent folders configured.
+    # Recent apps will appear here if show-recents is enabled.
+    persistent-others = [ ];
   };
 }

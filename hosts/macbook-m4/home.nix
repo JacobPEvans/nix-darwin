@@ -92,30 +92,11 @@
       ++ (import ../../modules/home-manager/ai-cli/ai-tools.nix { inherit pkgs; }).packages;
 
     # ========================================================================
-    # AI Tools Dock Folder
+    # Host-specific symlinks for external volumes
     # ========================================================================
-    # Creates ~/Applications/AI Tools/ folder with symlinks to all AI apps.
-    # This folder is added to the Dock's right side (persistent-others) as a
-    # clickable stack that expands to show all AI tools in one place.
-    #
-    # Host-specific symlinks for external volumes are also defined here.
     # NOTE: These symlinks point to data on external volumes.
     # Nix does NOT manage the volume contents - only creates symlinks.
     file = {
-      # AI Tools folder symlinks
-      # Gemini.app is installed separately (e.g., from App Store) into ~/Applications,
-      # not managed by home.packages; this symlink adds it to the AI Tools folder.
-      "Applications/AI Tools/Gemini.app".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Gemini.app";
-      "Applications/AI Tools/Antigravity.app".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/Antigravity.app";
-      "Applications/AI Tools/Claude.app".source =
-        config.lib.file.mkOutOfStoreSymlink "/Applications/Claude.app";
-      "Applications/AI Tools/ChatGPT.app".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/ChatGPT.app";
-      "Applications/AI Tools/Cursor.app".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Applications/Home Manager Apps/Cursor.app";
-
       # Ollama models symlink managed by modules/home-manager/ollama.nix
 
       # OrbStack data on dedicated APFS volume

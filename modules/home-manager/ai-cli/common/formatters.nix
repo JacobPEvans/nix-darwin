@@ -176,21 +176,6 @@ in
   };
 
   # ============================================================================
-  # CRUSH FORMATTER
-  # ============================================================================
-  # Format: Direct command strings for shell_allowlist in crush.json permissions
-  # Crush uses simple command strings without special formatting
-  # Reference: https://github.com/charmbracelet/crush
-
-  crush = {
-    # Format a single shell command for Crush (passthrough)
-    formatShellCommand = cmd: cmd;
-
-    # Format a list of shell commands (passthrough)
-    formatShellCommands = cmds: cmds;
-  };
-
-  # ============================================================================
   # UTILITY FUNCTIONS
   # ============================================================================
 
