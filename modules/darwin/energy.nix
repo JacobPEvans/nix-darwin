@@ -79,7 +79,7 @@ in
       #   * All errors logged as warnings, not fatal
       #   * Must reach /run/current-system symlink update
 
-      echo "[$(date '+%H:%M:%S')] [INFO] Configuring energy and sleep settings..."
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring energy and sleep settings..."
       failures=0
 
       # Settings that apply to all power sources
@@ -88,32 +88,32 @@ in
         disksleep ${toString cfg.disksleep} \
         womp ${if cfg.wakeOnMagicPacket then "1" else "0"} \
         autorestart ${if cfg.autoRestartOnPowerLoss then "1" else "0"}; then
-        echo "[$(date '+%H:%M:%S')] [INFO] Common energy settings applied"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Common energy settings applied"
       else
-        echo "[$(date '+%H:%M:%S')] [WARN] Failed to apply common energy settings (attempted: display ${toString cfg.displaysleep}m, disk ${toString cfg.disksleep}m)" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to apply common energy settings (attempted: display ${toString cfg.displaysleep}m, disk ${toString cfg.disksleep}m)" >&2
         failures=$((failures + 1))
       fi
 
       # AC power (plugged in) settings
       if sudo pmset -c sleep ${toString cfg.sleep.ac}; then
-        echo "[$(date '+%H:%M:%S')] [INFO] AC power settings applied (sleep: ${toString cfg.sleep.ac} min)"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] AC power settings applied (sleep: ${toString cfg.sleep.ac} min)"
       else
-        echo "[$(date '+%H:%M:%S')] [WARN] Failed to apply AC power settings (attempted: ${toString cfg.sleep.ac} min)" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to apply AC power settings (attempted: ${toString cfg.sleep.ac} min)" >&2
         failures=$((failures + 1))
       fi
 
       # Battery settings
       if sudo pmset -b sleep ${toString cfg.sleep.battery}; then
-        echo "[$(date '+%H:%M:%S')] [INFO] Battery settings applied (sleep: ${toString cfg.sleep.battery} min)"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Battery settings applied (sleep: ${toString cfg.sleep.battery} min)"
       else
-        echo "[$(date '+%H:%M:%S')] [WARN] Failed to apply battery settings (attempted: ${toString cfg.sleep.battery} min)" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to apply battery settings (attempted: ${toString cfg.sleep.battery} min)" >&2
         failures=$((failures + 1))
       fi
 
       # Display current settings only if at least one phase succeeded
       if [ $failures -lt 3 ]; then
-        echo "[$(date '+%H:%M:%S')] [INFO] Current pmset configuration:"
-        sudo pmset -g || echo "[$(date '+%H:%M:%S')] [WARN] Could not display pmset settings" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Current pmset configuration:"
+        sudo pmset -g || echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Could not display pmset settings" >&2
       fi
     '';
   };

@@ -46,25 +46,25 @@
         TOTAL_PHASES_FAILED=$((TOTAL_PHASES_FAILED + 1))
         ACTIVATION_PHASES_FAILED="''${ACTIVATION_PHASES_FAILED}
         - $phase_name (exit $exit_code, elapsed: $${elapsed_time}s)"
-        echo "[$(date '+%H:%M:%S')] [WARN] Activation phase '$phase_name' returned exit code $exit_code (elapsed: $${elapsed_time}s)" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Activation phase '$phase_name' returned exit code $exit_code (elapsed: $${elapsed_time}s)" >&2
       else
-        echo "[$(date '+%H:%M:%S')] [DEBUG] Activation phase '$phase_name' completed successfully (elapsed: $${elapsed_time}s)"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Activation phase '$phase_name' completed successfully (elapsed: $${elapsed_time}s)"
       fi
     }
 
     # Print final activation summary
     print_activation_summary() {
-      echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
-      echo "[$(date '+%H:%M:%S')] [INFO] Activation Complete"
-      echo "[$(date '+%H:%M:%S')] [INFO] ============================================"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] ============================================"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Activation Complete"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] ============================================"
 
       if [ "''${TOTAL_PHASES_FAILED}" -gt 0 ]; then
-        echo "[$(date '+%H:%M:%S')] [WARN] ''${TOTAL_PHASES_FAILED} activation phase(s) had non-zero exit codes:" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] ''${TOTAL_PHASES_FAILED} activation phase(s) had non-zero exit codes:" >&2
         echo "''${ACTIVATION_PHASES_FAILED}" >&2
-        echo "[$(date '+%H:%M:%S')] [INFO] Note: Some phases may succeed despite returning non-zero exit codes"
-        echo "[$(date '+%H:%M:%S')] [INFO] Check /run/current-system symlink to verify if activation actually succeeded"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Note: Some phases may succeed despite returning non-zero exit codes"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Check /run/current-system symlink to verify if activation actually succeeded"
       else
-        echo "[$(date '+%H:%M:%S')] [INFO] All activation phases completed successfully"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] All activation phases completed successfully"
       fi
     }
 

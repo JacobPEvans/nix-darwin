@@ -104,25 +104,25 @@
     #   * All errors logged as warnings, not fatal
     #   * Must reach /run/current-system symlink update
 
-    echo "[$(date '+%H:%M:%S')] [INFO] Applying menu bar spacing settings (compact mode)..."
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Applying menu bar spacing settings (compact mode)..."
     spacing_applied=0
 
     if defaults -currentHost write -globalDomain NSStatusItemSpacing -int 4; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Menu bar icon spacing set to 4 (compact)"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Menu bar icon spacing set to 4 (compact)"
       spacing_applied=$((spacing_applied + 1))
     else
-      echo "[$(date '+%H:%M:%S')] [WARN] Failed to set NSStatusItemSpacing to 4 - check defaults permissions" >&2
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set NSStatusItemSpacing to 4 - check defaults permissions" >&2
     fi
 
     if defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 8; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Menu bar icon padding set to 8 (compact)"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Menu bar icon padding set to 8 (compact)"
       spacing_applied=$((spacing_applied + 1))
     else
-      echo "[$(date '+%H:%M:%S')] [WARN] Failed to set NSStatusItemSelectionPadding to 8 - check defaults permissions" >&2
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set NSStatusItemSelectionPadding to 8 - check defaults permissions" >&2
     fi
 
     if [ $spacing_applied -gt 0 ]; then
-      echo "[$(date '+%H:%M:%S')] [INFO] Note: Menu bar spacing changes require logout/login to fully take effect"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Note: Menu bar spacing changes require logout/login to fully take effect"
     fi
   '';
 }

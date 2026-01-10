@@ -14,3 +14,6 @@ worktrees/
 
 # Python
 __pycache__/
+
+# Log files
+*.log

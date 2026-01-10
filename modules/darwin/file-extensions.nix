@@ -72,7 +72,7 @@ in
 
     # Configure file associations using duti during system activation
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      echo "Configuring custom file extension mappings..."
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Configuring custom file extension mappings..."
 
       # Create temporary duti configuration file
       DUTI_CONFIG=$(mktemp)
@@ -95,34 +95,45 @@ in
       #   * Treat all errors as warnings, not fatal failures
       #   * Must reach /run/current-system symlink update (the critical phase)
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
-        echo "Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)"
 
         # Rebuild Launch Services database to ensure changes take effect
-        # Note: lsregister can fail on some systems, so we add error handling to prevent
-        # activation failure. The file mappings still work even if lsregister fails.
+        # Note: lsregister can fail on some systems (permission/sandbox issues), but file mappings still work.
         # Again using if/then/else to continue activation on failure (not || exit pattern)
-        if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>&1; then
-          echo "Launch Services database rebuilt"
+        # Use mktemp for secure temporary file creation to prevent symlink attacks
+        LS_ERROR_LOG=$(mktemp)
+        if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>"$LS_ERROR_LOG" >/dev/null; then
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Launch Services database rebuilt successfully"
         else
-          echo "Warning: Failed to rebuild Launch Services database (file mappings still applied)" >&2
+          if [ -s "$LS_ERROR_LOG" ]; then
+            LS_ERROR=$(cat "$LS_ERROR_LOG" 2>/dev/null)
+            echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] [FileMapping] Failed to rebuild Launch Services database" >&2
+            echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Error: $LS_ERROR" >&2
+          else
+            echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] [FileMapping] Failed to rebuild Launch Services database" >&2
+          fi
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] File mappings still applied but cache may be stale" >&2
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] To manually rebuild after activation, run:" >&2
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping]   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user" >&2
         fi
+        rm -f "$LS_ERROR_LOG"
       else
-        echo "Warning: Failed to apply file extension mappings" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] [FileMapping] Failed to apply file extension mappings" >&2
       fi
 
       # Display configured mappings
-      echo "Configured mappings:"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Configured mappings:"
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (ext: uti: ''
-          echo "  ${ext} → ${uti}"
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping]   ${ext} → ${uti}"
         '') cfg.customMappings
       )}
     '';
 
     # Inform user about activation
     system.activationScripts.preActivation.text = lib.mkBefore ''
-      echo "Note: Custom file extension mappings will be configured during activation"
-      echo "Extensions: ${lib.concatStringsSep ", " (lib.attrNames cfg.customMappings)}"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Custom file extension mappings will be configured during activation"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] [FileMapping] Extensions: ${lib.concatStringsSep ", " (lib.attrNames cfg.customMappings)}"
     '';
   };
 }

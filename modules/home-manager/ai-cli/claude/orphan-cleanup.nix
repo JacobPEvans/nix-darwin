@@ -18,13 +18,13 @@ let
   homeDir = config.home.homeDirectory;
 
   # Log helper function with timestamp and level
-  # Format: [HH:MM:SS] [LOG_LEVEL] message
+  # Format: YYYY-MM-DD HH:MM:SS [LOG_LEVEL] message
   logHelper = ''
     log_info() {
-      echo "[$(date '+%H:%M:%S')] [INFO] $1" >&2
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >&2
     }
     log_warn() {
-      echo "[$(date '+%H:%M:%S')] [WARN] $1" >&2
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] $1" >&2
     }
   '';
 
