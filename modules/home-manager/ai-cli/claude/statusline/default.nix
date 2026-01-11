@@ -5,18 +5,12 @@
 #
 # This module follows NixOS module patterns:
 # - Options defined in options.nix
-# - Theme implementations in separate files (powerline.nix, etc.)
+# - Theme implementation in powerline.nix
 # - Config logic uses lib.mkIf for conditional activation
-#
-# CURRENT STATUS:
-# - powerline: WORKING (uses github:Owloops/claude-powerline)
-# - robbyrussell: DEPRECATED (upstream repo 404)
-# - advanced: DEPRECATED (upstream repo 404)
 #
 # Usage:
 #   programs.claudeStatusline = {
 #     enable = true;
-#     theme = "powerline";
 #     powerline.style = "dracula";  # default, minimal, rainbow, gruvbox, dracula, nord
 #   };
 {
@@ -31,9 +25,7 @@ in
 {
   imports = [
     ./options.nix
-    ./robbyrussell.nix
     ./powerline.nix
-    ./advanced.nix
   ];
 
   config = lib.mkIf cfg.enable {

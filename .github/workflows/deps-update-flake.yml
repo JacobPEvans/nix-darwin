@@ -44,7 +44,6 @@ jobs:
         claude-cookbooks
         claude-plugins-official
         anthropic-skills
-        claude-powerline
         superpowers-marketplace
         agent-os
     steps:

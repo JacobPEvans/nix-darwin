@@ -265,12 +265,9 @@ in
     # Claude Statusline
     # ==========================================================================
     # Powerline-style statusline for Claude Code terminal
-    # Uses Owloops/claude-powerline (working alternative to defunct rz1989s repo)
-    claudeStatusline = {
-      enable = true;
-      theme = "powerline";
-      powerline.style = "dracula"; # Options: default, minimal, rainbow, gruvbox, dracula, nord
-    };
+    # Uses @owloops/claude-powerline via bunx at runtime (no build hashes)
+    # Config: Rose Pine theme, capsule style, 3-line layout
+    claudeStatusline.enable = true;
 
     # ==========================================================================
     # Agent OS

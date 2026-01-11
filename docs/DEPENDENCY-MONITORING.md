@@ -150,7 +150,6 @@ Updated daily at noon UTC:
 - `claude-cookbooks`
 - `claude-plugins-official`
 - `anthropic-skills`
-- `claude-powerline`
 - `superpowers-marketplace`
 - `agent-os`
 

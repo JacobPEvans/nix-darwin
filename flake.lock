@@ -128,22 +128,6 @@
         "type": "github"
       }
     },
-    "claude-powerline": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1768103354,
-        "narHash": "sha256-MkLDHsIZBnqSr8G08QyN/2YEq4m9mMXYDhUn3FmB+Mk=",
-        "owner": "Owloops",
-        "repo": "claude-powerline",
-        "rev": "160ec3a459f454903b4351a086f3ca39437b9e81",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Owloops",
-        "repo": "claude-powerline",
-        "type": "github"
-      }
-    },
     "claude-skills": {
       "flake": false,
       "locked": {
@@ -307,7 +291,6 @@
         "claude-code-workflows": "claude-code-workflows",
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
-        "claude-powerline": "claude-powerline",
         "claude-skills": "claude-skills",
         "darwin": "darwin",
         "home-manager": "home-manager",
