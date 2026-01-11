@@ -32,7 +32,8 @@ _:
 
     # GitHub - repository management, issues, PRs
     # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
-    "github@claude-plugins-official" = true;
+    # DISABLED: Use gh CLI instead (more reliable)
+    "github@claude-plugins-official" = false;
 
     # GitLab - repository management, issues, merge requests
     # Requires: GitLab API token
