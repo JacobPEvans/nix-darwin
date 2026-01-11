@@ -73,6 +73,17 @@ repos:
         files: '\.claude/settings(\.local)?\.json$'
         types: [json]
 
+      # Validate no double-wildcard patterns in permissions
+      # Prevents :*:* patterns that result from incorrect source format
+      - id: validate-permission-wildcards
+        name: Check for invalid :*:* permission patterns
+        entry: >
+          bash -c 'if nix eval --json .#darwinConfigurations.macbook-m4.config.home-manager.users.jevans.programs.claude.settings.permissions 2>/dev/null | grep -q ":\*:\*"; then echo "ERROR: Found :*:* pattern in permissions. Source files should not have :* suffix."; exit 1; fi'
+        language: system
+        files: 'modules/home-manager/ai-cli/(common/(formatters|permissions)|claude-config)\.nix$'
+        types: [file]
+        pass_filenames: false
+
       # File size check - DRY with GitHub Actions via shared config
       # Config: scripts/workflows/file-size-config.sh (single source of truth)
       # Limits: 6KB recommended, 12KB hard, 32KB extended

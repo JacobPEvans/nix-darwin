@@ -32,3 +32,17 @@ jobs:
             check-jsonschema --schemafile claude-code-settings.schema.json settings-generated.json
             echo "Settings validation passed!"
           '
+
+      - name: Check for invalid permission patterns
+        run: |
+          echo "Checking for :*:* patterns in permissions..."
+          PATTERN_CHECK=$(nix eval --json '.#darwinConfigurations.macbook-m4.config.home-manager.users.jevans.programs.claude.settings.permissions' 2>/dev/null | grep -c ':\*:\*' || true)
+          if [ "$PATTERN_CHECK" -gt 0 ]; then
+            echo "::error::Found :*:* pattern in permissions"
+            echo "::error::Source permission files should not have :* suffix"
+            echo "::error::The Nix formatter adds :* automatically"
+            echo "::error::Example: 'git' → 'Bash(git:*)' (correct)"
+            echo "::error::Example: 'git:*' → 'Bash(git:*:*)' (wrong)"
+            exit 1
+          fi
+          echo "Permission patterns are valid!"
