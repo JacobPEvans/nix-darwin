@@ -158,7 +158,7 @@ if [[ $FAILED -gt 0 ]]; then
   echo ""
   echo "To fix outdated packages:"
   echo "  1. Update flake inputs: nix flake update"
-  echo "  2. Or update specific input: nix flake lock --update-input <package>"
+  echo "  2. Or update specific input: nix flake update <package>"
   echo "  3. Review changes: nix flake metadata"
   echo "  4. Test rebuild: darwin-rebuild switch --flake ."
   echo ""

@@ -549,10 +549,10 @@ Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).
 Update specific repository:
 
 ```bash
-nix flake lock --update-input claude-code-plugins
-nix flake lock --update-input claude-cookbooks
-nix flake lock --update-input claude-plugins-official
-nix flake lock --update-input anthropic-skills
+nix flake update claude-code-plugins
+nix flake update claude-cookbooks
+nix flake update claude-plugins-official
+nix flake update anthropic-skills
 ```
 
 ### Testing Changes

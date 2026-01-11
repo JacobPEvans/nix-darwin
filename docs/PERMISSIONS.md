@@ -118,7 +118,7 @@ Configured via `additionalDirectories` in `modules/home-manager/ai-cli/claude.ni
 
 1. Edit appropriate JSON file in `ai-assistant-instructions` repository
 2. Add to appropriate category (allow, ask, or deny)
-3. Update flake input: `nix flake lock --update-input ai-assistant-instructions`
+3. Update flake input: `nix flake update ai-assistant-instructions`
 4. Rebuild to apply changes
 
 **For quick approval**: Just click "accept indefinitely" in Claude UI

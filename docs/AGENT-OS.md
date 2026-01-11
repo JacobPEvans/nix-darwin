@@ -158,7 +158,7 @@ Agent OS coexists with ai-assistant-instructions and Anthropic ecosystem in `~/.
 **Update Agent OS**:
 
 ```bash
-nix flake lock --update-input agent-os
+nix flake update agent-os
 ```
 
 Then rebuild (see [RUNBOOK.md](../RUNBOOK.md#everyday-commands)).

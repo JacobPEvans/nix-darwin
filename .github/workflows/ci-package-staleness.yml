@@ -93,7 +93,7 @@ jobs:
             2. **Update specific package**:
 
             \`\`\`bash
-            nix flake lock --update-input <package-name>
+            nix flake update <package-name>
             \`\`\`
 
             3. **Exempt package** (intentional pin):
