@@ -75,10 +75,11 @@ repos:
 
       # Validate no double-wildcard patterns in permissions
       # Prevents :*:* patterns that result from incorrect source format
+      # Uses default configuration if specific host is not available
       - id: validate-permission-wildcards
         name: Check for invalid :*:* permission patterns
         entry: >
-          bash -c 'if nix eval --json .#darwinConfigurations.macbook-m4.config.home-manager.users.jevans.programs.claude.settings.permissions 2>/dev/null | grep -q ":\*:\*"; then echo "ERROR: Found :*:* pattern in permissions. Source files should not have :* suffix."; exit 1; fi'
+          bash -c 'nix eval --json ".#darwinConfigurations.default.config.home-manager.users.\${HM_USER:-\${USER}}.programs.claude.settings.permissions" 2>/dev/null | grep -q ":\*:\*" && echo "ERROR: Found :*:* pattern in permissions. Source files should not have :* suffix." && exit 1 || exit 0'
         language: system
         files: 'modules/home-manager/ai-cli/(common/(formatters|permissions)|claude-config)\.nix$'
         types: [file]

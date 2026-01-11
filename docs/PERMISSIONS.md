@@ -102,9 +102,9 @@ The Nix formatter automatically adds wildcards when generating tool-specific out
 
 - Source: `"git:*"` → Output: `"Bash(git:*:*)"` ✗ (invalid double wildcard)
 
-The validation script (`validate-permissions.sh`) rejects patterns ending with
-`:*` to prevent double-wildcard issues. Pre-commit and CI hooks also validate
-the generated output contains no `:*:*` patterns.
+Pre-commit and CI validation hooks reject source patterns ending with `:*` to
+prevent double-wildcard issues, and also verify that the generated output
+contains no `:*:*` patterns.
 
 ### Directory Access
 
