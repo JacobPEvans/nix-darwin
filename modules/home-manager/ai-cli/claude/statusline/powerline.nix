@@ -50,7 +50,7 @@ let
           {
             "segments": {
               "today": { "enabled": true, "type": "breakdown" },
-              "block": { "enabled": false, "type": "weighted", "burnType": "both" },
+              "block": { "enabled": true, "type": "weighted", "burnType": "both" },
               "session": { "enabled": true, "type": "tokens", "costSource": "calculated" },
               "metrics": { "enabled": false },
               "version": { "enabled": false }
@@ -59,9 +59,9 @@ let
         ]
       },
       "budget": {
-        "today": { "amount": 100, "warningThreshold": 80 },
-        "session": { "amount": 20, "warningThreshold": 80 },
-        "block": { "amount": 50, "type": "cost", "warningThreshold": 80 }
+        "today": { "amount": 200, "warningThreshold": 80 },
+        "block": { "amount": 100, "type": "tokens", "warningThreshold": 80 },
+        "session": { "amount": 25, "warningThreshold": 80 }
       }
     }
   '';
