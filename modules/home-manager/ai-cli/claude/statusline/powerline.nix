@@ -27,7 +27,7 @@ let
           {
             "segments": {
               "model": { "enabled": true },
-              "context": { "enabled": true, "showPercentageOnly": false }
+              "context": { "enabled": true, "showPercentageOnly": true }
             }
           },
           {
