@@ -21,9 +21,6 @@
 let
   userConfig = import ../../../lib/user-config.nix;
 
-  # Import Claude Code constants for DRY principle
-  claudeConstants = import ../../../lib/claude-constants.nix { };
-
   # Local repo path - ONLY used for autoClaude (needs writable git for commits)
   # All other ai-assistant-instructions content comes from Nix store (flake input)
   autoClaudeLocalRepoPath = userConfig.ai.instructionsRepo;
@@ -35,7 +32,6 @@ let
   inherit (aiCommon) formatters;
 
   # Dynamic command discovery from flake inputs
-  # Excludes high-token commands to reduce context bloat
   discoverCommands =
     dir:
     let
@@ -44,15 +40,9 @@ let
     in
     map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
 
-  # Commands to EXCLUDE from auto-discovery (defined in lib/claude-constants.nix)
-  # Single source of truth to avoid duplication with settings.nix warning
-  inherit (claudeConstants) excludedCommands;
-
   # Commands from agentsmd (Nix store / flake input)
-  # Auto-discovers all .md files in agentsmd/commands/ (minus excluded)
-  agentsMdCommands = lib.filter (cmd: !(builtins.elem cmd excludedCommands)) (
-    discoverCommands "${ai-assistant-instructions}/agentsmd/commands"
-  );
+  # Auto-discovers all .md files in agentsmd/commands/
+  agentsMdCommands = discoverCommands "${ai-assistant-instructions}/agentsmd/commands";
 
   # Commands from claude-cookbooks (immutable from flake)
   # Auto-discovers all .md files in .claude/commands/
