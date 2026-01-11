@@ -220,6 +220,14 @@ in
         export PATH="$HOME/.npm-packages/bin:$PATH"
         export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
 
+        # MCP Server API keys (from macOS Keychain)
+        # GitHub - for github@claude-plugins-official MCP server
+        export GITHUB_PERSONAL_ACCESS_TOKEN="$(security find-generic-password \
+          -s "github-pat" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"
+        # Context7 - for context7@claude-plugins-official MCP server
+        export CONTEXT7_API_KEY="$(security find-generic-password \
+          -s "CONTEXT7_API_KEY" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"
+
         # Claude statusline SSH detection (disabled - enhanced statusline unavailable)
         # source ${./zsh/claude-statusline-switch.zsh}
 

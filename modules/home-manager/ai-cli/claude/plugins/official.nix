@@ -40,15 +40,7 @@ _:
     "plugin-dev@claude-plugins-official" = true;
     "hookify@claude-plugins-official" = true;
 
-    # GitHub Integration (essential)
-    "github@claude-plugins-official" = true;
-
-    # Slack Integration (user requested restore)
-    "slack@claude-plugins-official" = true;
-
-    # Greptile - DISABLED due to context bloat (MCP integration consumes tokens)
-    # Keep visible for potential future use
-    # "greptile@claude-plugins-official" = true;
+    # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
 
     # REMOVED - unused or token-heavy:
     # document-skills - xlsx, docx, pptx, pdf not used

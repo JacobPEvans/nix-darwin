@@ -3,6 +3,7 @@
 # Modular plugin configuration organized by category:
 # - marketplaces.nix: All available plugin marketplaces
 # - official.nix: Official Anthropic plugins
+# - external.nix: External third-party plugins (via claude-plugins-official)
 # - community.nix: Community marketplace plugins
 # - infrastructure.nix: Infrastructure, DevOps, and cloud operations
 # - development.nix: Software development and engineering tools
@@ -30,6 +31,7 @@ let
       ;
   };
   officialModule = import ./official.nix { };
+  externalModule = import ./external.nix { };
   communityModule = import ./community.nix { };
   infrastructureModule = import ./infrastructure.nix { };
   developmentModule = import ./development.nix { };
@@ -39,6 +41,7 @@ let
   # Merge all enabled plugins from category modules
   enabledPlugins =
     officialModule.enabledPlugins
+    // externalModule.enabledPlugins
     // communityModule.enabledPlugins
     // infrastructureModule.enabledPlugins
     // developmentModule.enabledPlugins
