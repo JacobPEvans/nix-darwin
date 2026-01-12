@@ -51,48 +51,52 @@ let
   # Default values for all profiles (change here to update all)
   defaultRegion = "us-east-2";
   defaultOutput = "json";
-in
-{
-  # ~/.aws/config - AWS CLI configuration
-  ".aws/config".text = ''
-    # Default profile - used when no --profile is specified
-    [default]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
 
-    # Development environment
-    [profile dev]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
+  # A single list to define all profiles
+  profiles = [
+    {
+      name = "default";
+      comment = "Default profile - used when no --profile is specified";
+    }
+    {
+      name = "dev";
+      comment = "Development environment";
+    }
+    {
+      name = "test";
+      comment = "Test environment";
+    }
+    {
+      name = "terraform";
+      comment = "Terraform automation";
+    }
+    {
+      name = "cribl";
+      comment = "Cribl environment";
+    }
+    {
+      name = "splunk";
+      comment = "Splunk environment";
+    }
+    {
+      name = "terraform-bedrock";
+      comment = "Terraform with Bedrock";
+    }
+    {
+      name = "iam-user";
+      comment = "IAM user profile";
+    }
+  ];
 
-    # Test environment
-    [profile test]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
-
-    # Terraform automation
-    [profile terraform]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
-
-    # Cribl environment
-    [profile cribl]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
-
-    # Splunk environment
-    [profile splunk]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
-
-    # Terraform with Bedrock
-    [profile terraform-bedrock]
-    region = ${defaultRegion}
-    output = ${defaultOutput}
-
-    # IAM user profile
-    [profile iam-user]
+  # A function to generate a single profile block from a definition
+  generateProfile = profile: ''
+    # ${profile.comment}
+    [${if profile.name == "default" then "default" else "profile ${profile.name}"}]
     region = ${defaultRegion}
     output = ${defaultOutput}
   '';
+in
+{
+  # ~/.aws/config - AWS CLI configuration
+  ".aws/config".text = builtins.concatStringsSep "\n\n" (map generateProfile profiles);
 }
