@@ -226,7 +226,7 @@ in
           -s "github-pat" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
         # Context7 - for context7@claude-plugins-official MCP server
         export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(security find-generic-password \
-          -s "context7-api-key" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+          -s "CONTEXT7_API_KEY" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
 
 
         # Claude statusline SSH detection (disabled - enhanced statusline unavailable)
