@@ -31,6 +31,7 @@ _:
       "shortwave" # AI-powered email client
       "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
       "claude-code" # Anthropic Claude Code CLI (version 2.1.3)
+      "wispr-flow" # AI voice dictation app (fastest, smartest way to type with your voice)
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
     ];
 
