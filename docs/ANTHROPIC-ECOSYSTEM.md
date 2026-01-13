@@ -143,7 +143,7 @@ All plugins are from the `anthropics/claude-code` marketplace:
 
 #### Experimental
 
-- **ralph-wiggum** - Autonomous iteration loops
+- **ralph-loop** - Autonomous iteration loops
   - Commands: `/ralph-loop`, `/cancel-ralph`
   - Creates self-referential feedback loops with file/git history preservation
   - Use for: Well-defined tasks, TDD workflows, iterative refinement

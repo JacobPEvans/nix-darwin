@@ -91,7 +91,7 @@ in
       # NOTE: OrbStack managed via programs.orbstack module for system-level
       # installation. See modules/darwin/apps/orbstack.nix and
       # hosts/macbook-m4/default.nix for configuration.
-      # NOTE: Zoom in home.packages with copyApps enabled for stable TCC paths.
+      # NOTE: Zoom was in home.packages but is now DISABLED.
       # See hosts/macbook-m4/home.nix for TCC-sensitive app configuration.
       raycast # Productivity launcher (replaces Spotlight)
       swiftbar # Menu bar customization (auto-claude status)

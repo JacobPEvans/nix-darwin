@@ -75,6 +75,11 @@ let
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
 
+  # Import Nix-native MCP servers configuration
+  # All servers are built/fetched at configuration time (no runtime npm)
+  mcpConfig = import ./mcp { inherit config pkgs lib; };
+  inherit (mcpConfig) mcpServers;
+
 in
 {
   enable = true;
@@ -301,15 +306,11 @@ in
     };
   };
 
-  # MCPs disabled - token cost too high for context window
-  # Can be re-enabled by adding entries like:
-  # mcpServers = {
-  #   bitwarden = {
-  #     command = "${config.home.homeDirectory}/.npm-packages/bin/mcp-server-bitwarden";
-  #     args = [ ];
-  #   };
-  # };
-  mcpServers = { };
+  # MCP Servers - Nix-native configuration
+  # All servers are defined in modules/home-manager/ai-cli/mcp/default.nix
+  # Built/fetched at configuration time (no runtime npm/npx/bunx)
+  # To enable a server, set its enable attribute to true in mcp/default.nix
+  inherit mcpServers;
 
   statusLine = {
     enable = true;
