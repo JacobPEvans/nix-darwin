@@ -39,7 +39,7 @@ let
     owner = "modelcontextprotocol";
     repo = "servers";
     rev = "861c11b786b3efbc87eb2e878a4039d33846a031";
-    sha256 = lib.fakeHash;
+    sha256 = "sha256-qVlm+4iYoMcN/FP6kQF3++6Va6S42hgDp8PhOKBQlAI=";
   };
 
   # Helper to create server definition from the fetched repo
