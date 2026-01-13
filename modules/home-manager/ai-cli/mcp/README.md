@@ -5,24 +5,34 @@ npx, or bunx - everything is deterministic and reproducible.
 
 ## Architecture
 
-- **Native nixpkgs packages**: terraform-mcp-server, github-mcp-server, docker, etc.
+- **Native nixpkgs packages**: terraform-mcp-server, github-mcp-server
   - Referenced directly with `pkgs.package-name`
   - Always up-to-date with nixpkgs version
 
-- **Fetched from GitHub**: Official MCP servers from modelcontextprotocol
-  - `modelcontextprotocol/servers` - Official Anthropic MCP servers
+- **Fetched from GitHub**: Official MCP servers from `modelcontextprotocol/servers`
+  - Single fetch of entire repo, pinned to specific commit
   - Fetched once and cached in `/nix/store`
+
+- **npm packages via npx**: For servers not in official repo or nixpkgs
+  - Uses `${pkgs.nodejs}/bin/npx -y @package/name` pattern
+  - Example: Context7 for documentation lookup
 
 ## Enabling Servers
 
-Edit `modules/home-manager/ai-cli/mcp/default.nix` and set `enable = true`
+Edit `modules/home-manager/ai-cli/mcp/default.nix` and set `enabled = true`
 for the servers you want to use.
 
 ```nix
-# Example: Enable a server
-github = mkServer {
+# Example: Enable a nixpkgs package
+github = mkServerDef {
   enabled = true;
   command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
+};
+
+# Example: Enable an official MCP server
+docker = officialServerDef {
+  name = "docker";
+  enabled = true;
 };
 ```
 
@@ -34,54 +44,54 @@ Use your secrets manager (Doppler, Keychain, 1Password, etc.) to inject env vars
 Required env vars are documented in comments above each server definition.
 The config does NOT store any secrets - it only references the server binaries.
 
-## Updating Hashes
+## Updating the MCP Servers Repo Hash
 
-When you add a new server or update the GitHub revisions, you'll need to generate
-correct hashes for the `fetchFromGitHub` calls.
+When updating to a newer commit of `modelcontextprotocol/servers`:
 
-### Method 1: Let Nix calculate the hash
-
-1. Build your configuration:
+1. Update the `rev` in `mcpServersRepo` to the new commit SHA
+2. Set `sha256 = lib.fakeHash;` temporarily
+3. Build to get the correct hash:
 
    ```bash
    darwin-rebuild switch --flake . 2>&1 | grep "got: sha256"
    ```
 
-2. Copy the hash from the error message
-3. Replace `lib.fakeHash` with the actual hash
-
-### Method 2: Pre-calculate the hash
-
-```bash
-nix-hash --flat --sri --type sha256 \
-  $(nix flake prefetch --json github:modelcontextprotocol/servers main | jq -r '.storePath')
-```
+4. Replace `lib.fakeHash` with the actual hash from the error message
 
 ## Adding New Servers
 
 1. Determine the server source:
    - Check if it's in nixpkgs: `nix search nixpkgs mcp-server`
-   - Otherwise, find it in modelcontextprotocol/servers repo
+   - Check if it's in `modelcontextprotocol/servers` repo
+   - Otherwise, use npx pattern for npm packages
 
 2. For nixpkgs packages:
 
    ```nix
-   my-server = mkServer {
+   my-server = mkServerDef {
      enabled = false;
      command = "${pkgs.my-mcp-server}/bin/my-mcp-server";
    };
    ```
 
-3. For GitHub servers:
+3. For official MCP servers (modelcontextprotocol/servers):
 
    ```nix
-   my-server = (officialServer {
-     name = "my-server";
-     hash = lib.fakeHash;
-   }) // { enable = false; };
+   my-server = officialServerDef {
+     name = "my-server";  # Directory name in src/
+     enabled = false;
+   };
    ```
 
-4. Run `darwin-rebuild switch --flake .` to calculate the hash
+4. For npm packages not in the official repo:
+
+   ```nix
+   my-server = mkServerDef {
+     enabled = false;
+     command = "${pkgs.nodejs}/bin/npx";
+     args = [ "-y" "@my-org/mcp-server" ];
+   };
+   ```
 
 ## Performance
 
@@ -93,7 +103,7 @@ nix-hash --flat --sri --type sha256 \
 
 ### "hash mismatch" error
 
-The cached hash doesn't match. Generate new hash (Method 1 above).
+The cached hash doesn't match. Update the hash using the method above.
 
 ### "not found" when running server
 
@@ -102,7 +112,7 @@ Native packages: Verify package exists: `nix search nixpkgs package-name`
 
 ### Server not loading in Claude Code
 
-1. Check `enable = true` in mcp/default.nix
+1. Check `enabled = true` in mcp/default.nix
 2. Run `darwin-rebuild switch --flake .`
 3. Restart Claude Code
 4. Verify in Claude Code: check `/mcp` command

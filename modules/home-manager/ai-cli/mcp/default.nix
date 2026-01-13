@@ -121,10 +121,12 @@ let
       command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
     };
 
-    # Docker - Container management via docker CLI
-    docker = mkServerDef {
+    # Docker - Container management via OrbStack/Docker socket
+    # Uses official MCP server from modelcontextprotocol/servers
+    # Requires: Docker/OrbStack running (socket at /var/run/docker.sock)
+    docker = officialServerDef {
+      name = "docker";
       enabled = true;
-      command = "${pkgs.docker}/bin/docker";
     };
 
     # ================================================================
@@ -161,6 +163,23 @@ let
     aws = officialServerDef {
       name = "aws-kb-retrieval-server";
       enabled = true;
+    };
+
+    # ================================================================
+    # Documentation & Knowledge (npm packages - use npx at runtime)
+    # ================================================================
+
+    # Context7 - Library documentation lookup
+    # Provides: resolve-library-id, query-docs for any npm/pypi/etc package
+    # Low token cost (queries on-demand, doesn't load full docs into context)
+    # Uses npx at runtime since not in official MCP repo or nixpkgs
+    context7 = mkServerDef {
+      enabled = true;
+      command = "${pkgs.nodejs}/bin/npx";
+      args = [
+        "-y"
+        "@context7/mcp-server"
+      ];
     };
 
     # ================================================================
