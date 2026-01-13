@@ -9,9 +9,8 @@ npx, or bunx - everything is deterministic and reproducible.
   - Referenced directly with `pkgs.package-name`
   - Always up-to-date with nixpkgs version
 
-- **Fetched from GitHub**: Anthropic official and community MCP servers
-  - `anthropics/mcp-servers` - Official Anthropic MCP servers
-  - `modelcontextprotocol/servers` - Community-maintained servers
+- **Fetched from GitHub**: Official MCP servers from modelcontextprotocol
+  - `modelcontextprotocol/servers` - Official Anthropic MCP servers
   - Fetched once and cached in `/nix/store`
 
 ## Enabling Servers
@@ -20,15 +19,20 @@ Edit `modules/home-manager/ai-cli/mcp/default.nix` and set `enable = true`
 for the servers you want to use.
 
 ```nix
-# Example: Enable GitHub MCP Server
+# Example: Enable a server
 github = mkServer {
-  enabled = true;  # Set to true
+  enabled = true;
   command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
-  env = {
-    GITHUB_PERSONAL_ACCESS_TOKEN = "";
-  };
 };
 ```
+
+## Secrets Management
+
+Servers requiring API keys read them from environment variables at runtime.
+Use your secrets manager (Doppler, Keychain, 1Password, etc.) to inject env vars.
+
+Required env vars are documented in comments above each server definition.
+The config does NOT store any secrets - it only references the server binaries.
 
 ## Updating Hashes
 
@@ -49,44 +53,15 @@ correct hashes for the `fetchFromGitHub` calls.
 ### Method 2: Pre-calculate the hash
 
 ```bash
-# For Anthropic servers
-nix-hash --flat --sri --type sha256 \
-  $(nix flake prefetch --json github:anthropics/mcp-servers main | jq -r '.storePath')
-
-# For community servers
 nix-hash --flat --sri --type sha256 \
   $(nix flake prefetch --json github:modelcontextprotocol/servers main | jq -r '.storePath')
-```
-
-## Secrets Management
-
-MCP servers requiring API keys have empty `env` values by default:
-
-```nix
-brave-search = (communityServer {
-  name = "brave-search";
-  hash = lib.fakeHash;
-})
-// {
-  enable = false;
-  env = {
-    BRAVE_API_KEY = "";  # Set this via environment or keychain
-  };
-};
-```
-
-To use a server requiring secrets, set the env var before running Claude Code:
-
-```bash
-export BRAVE_API_KEY="your-api-key"
-# OR set it in ~/.claude/settings.json
 ```
 
 ## Adding New Servers
 
 1. Determine the server source:
    - Check if it's in nixpkgs: `nix search nixpkgs mcp-server`
-   - Otherwise, find it in GitHub (Anthropic or community repos)
+   - Otherwise, find it in modelcontextprotocol/servers repo
 
 2. For nixpkgs packages:
 
@@ -100,9 +75,9 @@ export BRAVE_API_KEY="your-api-key"
 3. For GitHub servers:
 
    ```nix
-   my-server = (anthropicServer {
+   my-server = (officialServer {
      name = "my-server";
-     hash = lib.fakeHash;  # Generate actual hash
+     hash = lib.fakeHash;
    }) // { enable = false; };
    ```
 

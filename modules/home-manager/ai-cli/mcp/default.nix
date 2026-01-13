@@ -8,6 +8,9 @@
 # No runtime dependency installation - everything is deterministic and cached.
 #
 # Official MCP Servers: https://github.com/modelcontextprotocol/servers
+#
+# Note: Servers requiring API keys will read them from environment variables.
+# Use your secrets manager (Doppler, Keychain, etc.) to inject env vars at runtime.
 
 {
   config,
@@ -23,10 +26,9 @@ let
       enabled ? false,
       command,
       args ? [ ],
-      env ? { },
     }:
     {
-      inherit command args env;
+      inherit command args;
     }
     // lib.optionalAttrs (!enabled) { enable = false; }
     // lib.optionalAttrs enabled { enable = true; };
@@ -144,12 +146,10 @@ in
     };
 
     # GitHub - Available in nixpkgs as native package
+    # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
     github = mkServer {
       enabled = true;
       command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
-      env = {
-        GITHUB_PERSONAL_ACCESS_TOKEN = "";
-      };
     };
 
     # Docker - Container management via docker CLI
@@ -163,6 +163,7 @@ in
     # ================================================================
 
     # Exa - AI-focused semantic search
+    # Requires: EXA_API_KEY env var
     exa =
       (officialServer {
         name = "exa";
@@ -170,12 +171,10 @@ in
       })
       // {
         enable = true;
-        env = {
-          EXA_API_KEY = "";
-        };
       };
 
     # Firecrawl - Web scraping for LLMs
+    # Requires: FIRECRAWL_API_KEY env var
     firecrawl =
       (officialServer {
         name = "firecrawl";
@@ -183,9 +182,6 @@ in
       })
       // {
         enable = true;
-        env = {
-          FIRECRAWL_API_KEY = "";
-        };
       };
 
     # ================================================================
@@ -193,6 +189,7 @@ in
     # ================================================================
 
     # Cloudflare - Workers, KV, R2, D1 management
+    # Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID env vars
     cloudflare =
       (officialServer {
         name = "cloudflare";
@@ -200,13 +197,10 @@ in
       })
       // {
         enable = true;
-        env = {
-          CLOUDFLARE_API_TOKEN = "";
-          CLOUDFLARE_ACCOUNT_ID = "";
-        };
       };
 
     # AWS - Multi-service AWS integration
+    # Requires: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION env vars
     aws =
       (officialServer {
         name = "aws-kb-retrieval-server";
@@ -214,11 +208,6 @@ in
       })
       // {
         enable = true;
-        env = {
-          AWS_ACCESS_KEY_ID = "";
-          AWS_SECRET_ACCESS_KEY = "";
-          AWS_REGION = "us-east-1";
-        };
       };
 
     # ================================================================
@@ -226,6 +215,7 @@ in
     # ================================================================
 
     # PostgreSQL - Database queries with natural language
+    # Requires: DATABASE_URL env var
     postgresql =
       (officialServer {
         name = "postgres";
@@ -233,12 +223,10 @@ in
       })
       // {
         enable = false;
-        env = {
-          DATABASE_URL = "";
-        };
       };
 
     # SQLite - Local database queries
+    # Requires: SQLITE_DB_PATH env var
     sqlite =
       (officialServer {
         name = "sqlite";
@@ -246,9 +234,6 @@ in
       })
       // {
         enable = false;
-        env = {
-          SQLITE_DB_PATH = "";
-        };
       };
 
     # ================================================================
@@ -256,6 +241,7 @@ in
     # ================================================================
 
     # Brave Search - Web search capabilities
+    # Requires: BRAVE_API_KEY env var
     brave-search =
       (officialServer {
         name = "brave-search";
@@ -263,12 +249,10 @@ in
       })
       // {
         enable = false;
-        env = {
-          BRAVE_API_KEY = "";
-        };
       };
 
     # Google Drive - Google Drive file access
+    # Requires: GDRIVE_CREDENTIALS env var
     gdrive =
       (officialServer {
         name = "gdrive";
@@ -276,12 +260,10 @@ in
       })
       // {
         enable = false;
-        env = {
-          GDRIVE_CREDENTIALS = "";
-        };
       };
 
     # Google Maps - Location and mapping services
+    # Requires: GOOGLE_MAPS_API_KEY env var
     google-maps =
       (officialServer {
         name = "google-maps";
@@ -289,9 +271,6 @@ in
       })
       // {
         enable = false;
-        env = {
-          GOOGLE_MAPS_API_KEY = "";
-        };
       };
 
     # Puppeteer - Browser automation (alternative to Playwright)
@@ -305,6 +284,7 @@ in
       };
 
     # Slack - Team communication integration
+    # Requires: SLACK_BOT_TOKEN, SLACK_TEAM_ID env vars
     slack =
       (officialServer {
         name = "slack";
@@ -312,13 +292,10 @@ in
       })
       // {
         enable = false;
-        env = {
-          SLACK_BOT_TOKEN = "";
-          SLACK_TEAM_ID = "";
-        };
       };
 
     # Sentry - Error tracking and monitoring
+    # Requires: SENTRY_AUTH_TOKEN env var
     sentry =
       (officialServer {
         name = "sentry";
@@ -326,9 +303,6 @@ in
       })
       // {
         enable = false;
-        env = {
-          SENTRY_AUTH_TOKEN = "";
-        };
       };
   };
 }
