@@ -10,7 +10,7 @@
 #   - Manual installs: /Applications/
 #   - User apps: ~/Applications/
 #
-# NOTE: TCC-sensitive apps (Zoom, Ghostty, VS Code) now use copyApps (migrated
+# NOTE: TCC-sensitive apps (Ghostty, VS Code) use copyApps (migrated
 # from mac-app-util trampolines) for stable paths that persist macOS TCC
 # permissions across darwin-rebuild.
 
@@ -36,7 +36,7 @@ in
       "/System/Applications/Messages.app"
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
       "/Applications/Slack.app"
-      "${homeDir}/Applications/Home Manager Apps/zoom.us.app"
+      # "${homeDir}/Applications/Home Manager Apps/zoom.us.app" # DISABLED - no longer using Zoom
       "/Applications/Webex.app"
 
       # AI Assistants

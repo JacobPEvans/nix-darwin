@@ -86,7 +86,7 @@
         claudebar # Menu bar app for AI coding assistant quota monitoring
 
         # Communication
-        zoom-us # Video conferencing - needs camera/mic TCC permissions
+        # zoom-us # DISABLED - no longer using Zoom
       ])
       # AI Development Tools (linters, formatters, analyzers)
       # See modules/home-manager/ai-cli/ai-tools.nix for package definitions
