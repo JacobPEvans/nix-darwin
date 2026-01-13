@@ -28,9 +28,15 @@ _:
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
+      #
+      # TCC NOTE: Homebrew casks install directly to /Applications/ (real copies,
+      # not symlinks to /nix/store), so macOS TCC permissions (camera, mic, screen
+      # recording) persist across darwin-rebuild. This is different from nixpkgs
+      # apps which require copyApps workaround in home-manager.
       "shortwave" # AI-powered email client
       "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
       "claude-code" # Anthropic Claude Code CLI (version 2.1.3)
+      "wispr-flow" # AI-powered voice dictation app
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
     ];
 
