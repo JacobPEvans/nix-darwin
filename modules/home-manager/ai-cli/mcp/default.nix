@@ -1,28 +1,19 @@
-# MCP Servers Configuration - Nix-Native
+# MCP Servers Configuration
 #
-# Strategy: Avoid runtime npm/npx/bunx entirely
-# All MCP servers are either:
-# 1. Native nixpkgs packages (terraform-mcp-server, github-mcp-server, etc.)
-# 2. Fetched and cached from GitHub (official MCP servers from modelcontextprotocol)
-#
-# No runtime dependency installation - everything is deterministic and cached.
+# Simple, portable MCP server definitions using standard commands.
+# Uses bunx for npm packages (faster than npx, auto-installs).
+# Uses binary names for nixpkgs packages (resolved via PATH).
 #
 # Official MCP Servers: https://github.com/modelcontextprotocol/servers
 #
-# Note: Servers requiring API keys will read them from environment variables.
-# Use your secrets manager (Doppler, Keychain, etc.) to inject env vars at runtime.
+# Note: Servers requiring API keys read them from environment variables.
+# Use your secrets manager (Doppler, Keychain, etc.) to inject env vars.
 
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ pkgs, lib, ... }:
 
 let
-  # Helper to create MCP server definition with enable flag
-  # The enable flag is used for filtering, not passed to programs.claude
-  mkServerDef =
+  # Helper to create MCP server definition
+  mkServer =
     {
       enabled ? false,
       command,
@@ -32,222 +23,145 @@ let
       inherit enabled command args;
     };
 
-  # Fetch the entire official MCP servers repository once
-  # Pinned to commit: 861c11b786b3efbc87eb2e878a4039d33846a031 (2026-01-13)
-  # Single fetch for all servers to avoid sparseCheckout hash non-determinism
-  mcpServersRepo = pkgs.fetchFromGitHub {
-    owner = "modelcontextprotocol";
-    repo = "servers";
-    rev = "861c11b786b3efbc87eb2e878a4039d33846a031";
-    sha256 = "sha256-qVlm+4iYoMcN/FP6kQF3++6Va6S42hgDp8PhOKBQlAI=";
-  };
-
-  # Helper to create server definition from the fetched repo
-  officialServerDef =
+  # Official MCP server via bunx (fast, auto-installs)
+  officialServer =
     {
       name,
       enabled ? false,
     }:
-    mkServerDef {
+    mkServer {
       inherit enabled;
-      command = "${pkgs.nodejs}/bin/node";
-      args = [ "${mcpServersRepo}/src/${name}/dist/index.js" ];
+      command = "bunx";
+      args = [ "@modelcontextprotocol/server-${name}" ];
     };
 
-  # All server definitions with enable flags
-  # To enable/disable a server, change its `enabled` attribute
+  # All server definitions
   allServers = {
     # ================================================================
-    # Official Anthropic MCP Servers (modelcontextprotocol/servers)
-    # ALL enabled by default
+    # Official Anthropic MCP Servers (via bunx)
     # ================================================================
 
-    # Everything - Reference/test server with prompts, resources, and tools
-    everything = officialServerDef {
+    everything = officialServer {
       name = "everything";
       enabled = true;
     };
-
-    # Fetch - Web content fetching and conversion for efficient LLM usage
-    fetch = officialServerDef {
+    fetch = officialServer {
       name = "fetch";
       enabled = true;
     };
-
-    # Filesystem - Secure file operations with configurable access controls
-    filesystem = officialServerDef {
+    filesystem = officialServer {
       name = "filesystem";
       enabled = true;
     };
-
-    # Git - Tools for git repository manipulation
-    git = officialServerDef {
+    git = officialServer {
       name = "git";
       enabled = true;
     };
-
-    # Memory - Knowledge graph-based persistent context
-    memory = officialServerDef {
+    memory = officialServer {
       name = "memory";
       enabled = true;
     };
-
-    # Sequential Thinking - Problem-solving through thought sequences
-    sequentialthinking = officialServerDef {
+    sequentialthinking = officialServer {
       name = "sequentialthinking";
       enabled = true;
     };
-
-    # Time - Timezone conversion utilities
-    time = officialServerDef {
+    time = officialServer {
       name = "time";
       enabled = true;
     };
-
-    # ================================================================
-    # Infrastructure & DevOps (Native nixpkgs packages)
-    # ================================================================
-
-    # Terraform - Available in nixpkgs as native package
-    terraform = mkServerDef {
-      enabled = true;
-      command = "${pkgs.terraform-mcp-server}/bin/terraform-mcp-server";
-    };
-
-    # GitHub - Available in nixpkgs as native package
-    # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
-    github = mkServerDef {
-      enabled = true;
-      command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
-    };
-
-    # Docker - Container management via OrbStack/Docker socket
-    # Uses official MCP server from modelcontextprotocol/servers
-    # Requires: Docker/OrbStack running (socket at /var/run/docker.sock)
-    docker = officialServerDef {
+    docker = officialServer {
       name = "docker";
       enabled = true;
     };
-
-    # ================================================================
-    # Search (from official MCP servers repo)
-    # ================================================================
-
-    # Exa - AI-focused semantic search
-    # Requires: EXA_API_KEY env var
-    exa = officialServerDef {
+    exa = officialServer {
       name = "exa";
       enabled = true;
     };
-
-    # Firecrawl - Web scraping for LLMs
-    # Requires: FIRECRAWL_API_KEY env var
-    firecrawl = officialServerDef {
+    firecrawl = officialServer {
       name = "firecrawl";
       enabled = true;
     };
-
-    # ================================================================
-    # Cloud Services (from official MCP servers repo)
-    # ================================================================
-
-    # Cloudflare - Workers, KV, R2, D1 management
-    # Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID env vars
-    cloudflare = officialServerDef {
+    cloudflare = officialServer {
       name = "cloudflare";
       enabled = true;
     };
-
-    # AWS - Multi-service AWS integration
-    # Requires: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION env vars
-    aws = officialServerDef {
-      name = "aws-kb-retrieval-server";
+    aws = officialServer {
+      name = "aws-kb-retrieval";
       enabled = true;
     };
 
     # ================================================================
-    # Documentation & Knowledge (npm packages - use npx at runtime)
+    # Native nixpkgs packages (binary name, resolved via PATH)
+    # ================================================================
+
+    # Terraform - terraform-mcp-server from nixpkgs
+    terraform = mkServer {
+      enabled = true;
+      command = "terraform-mcp-server";
+    };
+
+    # GitHub - github-mcp-server from nixpkgs
+    # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
+    github = mkServer {
+      enabled = true;
+      command = "github-mcp-server";
+    };
+
+    # ================================================================
+    # Third-party npm packages (via bunx)
     # ================================================================
 
     # Context7 - Library documentation lookup
-    # Provides: resolve-library-id, query-docs for any npm/pypi/etc package
-    # Low token cost (queries on-demand, doesn't load full docs into context)
-    # Uses npx at runtime since not in official MCP repo or nixpkgs
-    context7 = mkServerDef {
+    context7 = mkServer {
       enabled = true;
-      command = "${pkgs.nodejs}/bin/npx";
-      args = [
-        "-y"
-        "@context7/mcp-server"
-      ];
+      command = "bunx";
+      args = [ "@context7/mcp-server" ];
     };
 
     # ================================================================
-    # Database (disabled by default - require setup)
+    # Database (disabled by default)
     # ================================================================
 
-    # PostgreSQL - Database queries with natural language
-    # Requires: DATABASE_URL env var
-    postgresql = officialServerDef {
+    postgresql = officialServer {
       name = "postgres";
       enabled = false;
     };
-
-    # SQLite - Local database queries
-    # Requires: SQLITE_DB_PATH env var
-    sqlite = officialServerDef {
+    sqlite = officialServer {
       name = "sqlite";
       enabled = false;
     };
 
     # ================================================================
-    # Additional Official Servers (disabled - specialized use cases)
+    # Additional (disabled - specialized use cases)
     # ================================================================
 
-    # Brave Search - Web search capabilities
-    # Requires: BRAVE_API_KEY env var
-    brave-search = officialServerDef {
+    brave-search = officialServer {
       name = "brave-search";
       enabled = false;
     };
-
-    # Google Drive - Google Drive file access
-    # Requires: GDRIVE_CREDENTIALS env var
-    gdrive = officialServerDef {
+    gdrive = officialServer {
       name = "gdrive";
       enabled = false;
     };
-
-    # Google Maps - Location and mapping services
-    # Requires: GOOGLE_MAPS_API_KEY env var
-    google-maps = officialServerDef {
+    google-maps = officialServer {
       name = "google-maps";
       enabled = false;
     };
-
-    # Puppeteer - Browser automation (alternative to Playwright)
-    puppeteer = officialServerDef {
+    puppeteer = officialServer {
       name = "puppeteer";
       enabled = false;
     };
-
-    # Slack - Team communication integration
-    # Requires: SLACK_BOT_TOKEN, SLACK_TEAM_ID env vars
-    slack = officialServerDef {
+    slack = officialServer {
       name = "slack";
       enabled = false;
     };
-
-    # Sentry - Error tracking and monitoring
-    # Requires: SENTRY_AUTH_TOKEN env var
-    sentry = officialServerDef {
+    sentry = officialServer {
       name = "sentry";
       enabled = false;
     };
   };
 
-  # Filter to only enabled servers and remove the `enabled` attribute
-  # This is what gets passed to programs.claude.mcpServers
+  # Filter to enabled servers, remove the enabled flag for output
   enabledServers = lib.filterAttrs (_: v: v.enabled) allServers;
   mcpServersForClaude = lib.mapAttrs (_: v: {
     inherit (v) command args;
@@ -255,7 +169,5 @@ let
 
 in
 {
-  # Export mcpServers for use in claude-config.nix
-  # These are filtered to only enabled servers and formatted for programs.claude
   mcpServers = mcpServersForClaude;
 }
