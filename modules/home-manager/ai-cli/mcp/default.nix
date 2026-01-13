@@ -34,6 +34,7 @@ let
 
   # Helper to fetch MCP server from official modelcontextprotocol repo
   # This is Anthropic's official MCP servers repository
+  # Pinned to commit: 861c11b786b3efbc87eb2e878a4039d33846a031 (2026-01-13)
   officialServerDef =
     {
       name,
@@ -48,7 +49,7 @@ let
           pkgs.fetchFromGitHub {
             owner = "modelcontextprotocol";
             repo = "servers";
-            rev = "main";
+            rev = "861c11b786b3efbc87eb2e878a4039d33846a031";
             sparseCheckout = [ "src/${name}" ];
             sha256 = hash;
           }
