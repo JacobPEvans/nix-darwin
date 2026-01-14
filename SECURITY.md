@@ -71,7 +71,7 @@ these criteria.
 ### Requires Fix
 
 - Logging of actual API keys, tokens, passwords in non-helper scripts
-- Missing GitHub Actions workflow permissions (always add explicit `permissions: contents: read`)
+- Missing GitHub Actions workflow permissions (always add an explicit `permissions` block, defaulting to `contents: read` for least privilege)
 - Any alert not covered by the dismissal criteria above
 
 ### Ongoing Monitoring
