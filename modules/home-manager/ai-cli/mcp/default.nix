@@ -125,15 +125,26 @@ let
     # ================================================================
     # Provider Abstraction Layer for routing tasks to different AI models
     # Tools: chat, thinkdeep, planner, consensus, codereview, precommit, debug, apilookup, challenge
-    # Requires: API keys for providers (Gemini, OpenAI, Ollama, etc.) via environment
     # See: https://github.com/BeehiveInnovations/pal-mcp-server
+    #
+    # Required environment variables (provide at least one provider API key):
+    #   - GEMINI_API_KEY (Google Gemini)
+    #   - OPENAI_API_KEY (OpenAI)
+    #   - ANTHROPIC_API_KEY (Anthropic Claude)
+    #   - Other providers: OPENROUTER_API_KEY, AZURE_OPENAI_API_KEY, XAI_API_KEY
+    #
+    # Optional configuration (set via environment):
+    #   - DISABLED_TOOLS (comma-separated, e.g., "analyze,refactor")
+    #   - DEFAULT_MODEL (default model selection strategy)
+    #   - OLLAMA_HOST (for local Ollama models)
+    #   - LOG_LEVEL (logging verbosity)
 
     pal = mkServer {
       enabled = true;
       command = "uvx";
       args = [
         "--from"
-        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git"
+        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@7afc7c1cc96e23992c8f105f960132c657883bb1"
         "pal-mcp-server"
       ];
     };

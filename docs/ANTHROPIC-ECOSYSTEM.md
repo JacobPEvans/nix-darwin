@@ -241,7 +241,7 @@ claude /shape-issues    # Shape issues (community)
 
 Skills from `anthropics/skills` provide reusable capabilities. Skills are managed through the Claude Code plugin system and can be enabled via plugin marketplaces.
 
-**Note**: See the [Skills README](https://github.com/anthropics/claude-cookbooks/blob/main/skills/README.md) for available skills and documentation.
+**Note**: See the [Skills README](https://github.com/anthropics/skills/blob/main/README.md) for available skills and documentation.
 
 ---
 
