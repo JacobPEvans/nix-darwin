@@ -18,10 +18,12 @@ let
       enabled ? false,
       command,
       args ? [ ],
+      env ? { },
     }:
     {
       inherit enabled command args;
-    };
+    }
+    // lib.optionalAttrs (env != { }) { inherit env; };
 
   # Official MCP server via bunx (fast, auto-installs)
   officialServer =
@@ -119,6 +121,24 @@ let
     };
 
     # ================================================================
+    # PAL MCP - Multi-model orchestration
+    # ================================================================
+    # Provider Abstraction Layer for routing tasks to different AI models
+    # Tools: chat, thinkdeep, planner, consensus, codereview, precommit, debug, apilookup, challenge
+    # Requires: API keys for providers (Gemini, OpenAI, Ollama, etc.) via environment
+    # See: https://github.com/BeehiveInnovations/pal-mcp-server
+
+    pal = mkServer {
+      enabled = true;
+      command = "uvx";
+      args = [
+        "--from"
+        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git"
+        "pal-mcp-server"
+      ];
+    };
+
+    # ================================================================
     # Database (disabled by default)
     # ================================================================
 
@@ -163,9 +183,13 @@ let
 
   # Filter to enabled servers, remove the enabled flag for output
   enabledServers = lib.filterAttrs (_: v: v.enabled) allServers;
-  mcpServersForClaude = lib.mapAttrs (_: v: {
-    inherit (v) command args;
-  }) enabledServers;
+  mcpServersForClaude = lib.mapAttrs (
+    _: v:
+    {
+      inherit (v) command args;
+    }
+    // lib.optionalAttrs (v.env or { } != { }) { inherit (v) env; }
+  ) enabledServers;
 
 in
 {
