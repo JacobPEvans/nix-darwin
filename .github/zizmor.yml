@@ -1,0 +1,60 @@
+# Zizmor security scanner configuration
+# See: https://docs.zizmor.sh/configuration/
+#
+# Pre-commit uses: --persona=regular --min-severity=medium --min-confidence=medium
+# This catches high-signal security issues while reducing noise.
+#
+# To run a full audit: zizmor --persona=auditor .github/workflows/
+
+rules:
+  # IGNORED: Requires pinning all actions to SHA hashes
+  # TODO: Create a separate PR to pin all actions to commit SHAs
+  # This is a significant change requiring updates across all workflows
+  unpinned-uses:
+    ignore:
+      - _claude-settings.yml
+      - _file-size.yml
+      - _markdown-lint.yml
+      - _nix-build.yml
+      - _nix-validate.yml
+      - ai-openhands.yml
+      - ci-auto-claude.yml
+      - ci-eol-check.yml
+      - ci-file-length.yml
+      - ci-gate.yml
+      - ci-markdownlint.yml
+      - ci-nix.yml
+      - ci-package-staleness.yml
+      - ci-validate-settings.yml
+      - ci-validate.yml
+      - deps-monitor-packages.yml
+      - deps-update-flake.yml
+      - nixos-release-check.yml
+      - review-code.yml
+      - review-deps.yml
+
+  # IGNORED: Low-confidence credential persistence warnings
+  # Most checkouts don't need persist-credentials: false unless
+  # the workflow later runs untrusted code with git access
+  artipacked:
+    ignore:
+      - _claude-settings.yml
+      - _file-size.yml
+      - _markdown-lint.yml
+      - _nix-build.yml
+      - _nix-validate.yml
+      - ai-openhands.yml
+      - ci-auto-claude.yml
+      - ci-eol-check.yml
+      - ci-file-length.yml
+      - ci-gate.yml
+      - ci-markdownlint.yml
+      - ci-nix.yml
+      - ci-package-staleness.yml
+      - ci-validate-settings.yml
+      - ci-validate.yml
+      - deps-monitor-packages.yml
+      - deps-update-flake.yml
+      - nixos-release-check.yml
+      - review-code.yml
+      - review-deps.yml
