@@ -32,6 +32,28 @@ repos:
       - id: markdownlint-cli2
         files: \.md$
 
+  # GitHub Actions security scanner - zizmor
+  # Detects: excessive permissions, template injection, credential leakage,
+  # dangerous triggers, and 25+ other security issues
+  # Uses 'regular' persona (excludes pedantic checks like unpinned-uses)
+  # Config: .github/zizmor.yml for rule customization
+  # See: https://docs.zizmor.sh/audits/
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.9.0
+    hooks:
+      - id: zizmor
+        args: ['--persona=regular', '--min-severity=medium', '--min-confidence=medium']
+
+  # Python/JS/Go security scanner - semgrep
+  # Detects: injection vulnerabilities, hardcoded secrets, insecure patterns
+  # Runs security-audit rules on all supported languages
+  # See: https://semgrep.dev/docs/extensions/pre-commit
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.99.0
+    hooks:
+      - id: semgrep
+        args: ['--config', 'p/security-audit', '--skip-unknown-extensions']
+
   # Local hooks using system-installed tools (from nix)
   - repo: local
     hooks:
