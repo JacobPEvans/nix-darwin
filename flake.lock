@@ -19,11 +19,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1768184546,
-        "narHash": "sha256-uFllFdtu9bQrdwhCrVrPO5Lt0rKvX4dfF9OKaDeX5iU=",
+        "lastModified": 1768391293,
+        "narHash": "sha256-YWQ2a2NoFq1MMygX3HZ6BUeLH7HhWXKi3c0/7Sj2uvQ=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "9714c47c1f0e7d0d9f0c397793f0e644dd6f9c25",
+        "rev": "27714b2e794c0fb4beb7a639d543e674d9e3cfc4",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1768271143,
-        "narHash": "sha256-isMNL/1UVcjtcZYcnSKAeU9viPBSqdzgAbtIEET8VRs=",
+        "lastModified": 1768349037,
+        "narHash": "sha256-nMeHXP2EinLOvUXY7wkOSRz7T2Hib7V2kOWWIXAcTww=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "f860f671dc050ea42076dff34edc33871329f7ac",
+        "rev": "6a2936ab79c01e4f078105584f8cae521e7851dc",
         "type": "github"
       },
       "original": {
