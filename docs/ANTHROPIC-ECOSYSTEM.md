@@ -77,11 +77,11 @@ inputs = {
 
 ```text
 modules/home-manager/ai-cli/
-├── claude.nix                    # Main Claude Code settings
+├── claude/                       # Claude Code module (settings, options, statusline)
+├── claude-config.nix             # Main Claude Code configuration values
 ├── claude-plugins.nix            # Plugin marketplace & enabled plugins
-├── claude-community-commands.nix # Community-contributed commands
-├── claude-skills.nix             # Skills configuration
-└── claude-patterns.nix           # Cookbook pattern references
+├── common/                       # Shared permissions and formatters
+└── mcp/                          # MCP server configurations
 ```
 
 ### Configuration Flow
@@ -239,30 +239,9 @@ claude /shape-issues    # Shape issues (community)
 
 ## Skills
 
-### Skills System
+Skills from `anthropics/skills` provide reusable capabilities. Skills are managed through the Claude Code plugin system and can be enabled via plugin marketplaces.
 
-Skills from `anthropics/skills` provide reusable capabilities:
-
-- Document generation
-- Code analysis
-- Data processing
-- Workflow automation
-
-### Configuration
-
-Skills are managed in `modules/home-manager/ai-cli/claude-skills.nix`:
-
-```nix
-selectedSkills = [
-  # "document-generator"
-  # "code-analyzer"
-  # "workflow-automator"
-];
-```
-
-**Note**: Skills are commented out by default. Uncomment desired skills and rebuild to enable.
-
-Skills are installed to `~/.claude/skills/` and auto-discovered by Claude Code.
+**Note**: See the [Skills README](https://github.com/anthropics/skills/blob/main/README.md) for available skills and documentation.
 
 ---
 
@@ -270,7 +249,7 @@ Skills are installed to `~/.claude/skills/` and auto-discovered by Claude Code.
 
 ### Agent Workflow Patterns
 
-From `anthropics/claude-cookbooks`, documented in `claude-patterns.nix`:
+From `anthropics/claude-cookbooks`:
 
 #### Basic Workflows
 
@@ -293,10 +272,6 @@ Patterns are demonstrated in Jupyter notebooks in the `claude-cookbooks` reposit
 
 - `patterns/agents/basic_workflows.ipynb` - Basic patterns
 - `patterns/agents/orchestrator_workers.ipynb` - Advanced patterns
-
-### Pattern Usage
-
-Refer to `modules/home-manager/ai-cli/claude-patterns.nix` for pattern documentation.
 
 ---
 
@@ -589,21 +564,15 @@ cat ~/.claude/settings.json | jq '.enabledPlugins'
 2. Check file copied to `~/.claude/commands/`
 3. Restart Claude Code to refresh command list
 
-**Skills not working**:
-
-1. Verify skills enabled in `claude-skills.nix`
-2. Check files copied to `~/.claude/skills/`
-3. Verify skill file format (should be Markdown)
-
 ---
 
 ## Contributing
 
-To add new plugins, commands, or skills:
+To add new plugins, commands, or MCP servers:
 
-1. **Plugins**: Add to `enabledPlugins` in `claude-plugins.nix`
-2. **Commands**: Add to `cookbookCommands` or create new command file
-3. **Skills**: Add to `selectedSkills` in `claude-skills.nix`
+1. **Plugins**: Add to `enabledPlugins` in appropriate `claude/plugins/*.nix` file
+2. **Commands**: Add to flake input command list in `claude-config.nix`
+3. **MCP Servers**: Add to `mcp/default.nix`
 4. **Rebuild**: See [RUNBOOK.md](../RUNBOOK.md#everyday-commands)
 5. **Test**: Run `/help` in Claude Code to verify
 

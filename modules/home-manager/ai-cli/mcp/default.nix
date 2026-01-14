@@ -18,10 +18,12 @@ let
       enabled ? false,
       command,
       args ? [ ],
+      env ? { },
     }:
     {
       inherit enabled command args;
-    };
+    }
+    // lib.optionalAttrs (env != { }) { inherit env; };
 
   # Official MCP server via bunx (fast, auto-installs)
   officialServer =
@@ -119,6 +121,35 @@ let
     };
 
     # ================================================================
+    # PAL MCP - Multi-model orchestration
+    # ================================================================
+    # Provider Abstraction Layer for routing tasks to different AI models
+    # Tools: chat, thinkdeep, planner, consensus, codereview, precommit, debug, apilookup, challenge
+    # See: https://github.com/BeehiveInnovations/pal-mcp-server
+    #
+    # Required environment variables (provide at least one provider API key):
+    #   - GEMINI_API_KEY (Google Gemini)
+    #   - OPENAI_API_KEY (OpenAI)
+    #   - ANTHROPIC_API_KEY (Anthropic Claude)
+    #   - Other providers: OPENROUTER_API_KEY, AZURE_OPENAI_API_KEY, XAI_API_KEY
+    #
+    # Optional configuration (set via environment):
+    #   - DISABLED_TOOLS (comma-separated, e.g., "analyze,refactor")
+    #   - DEFAULT_MODEL (default model selection strategy)
+    #   - OLLAMA_HOST (for local Ollama models)
+    #   - LOG_LEVEL (logging verbosity)
+
+    pal = mkServer {
+      enabled = true;
+      command = "uvx";
+      args = [
+        "--from"
+        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@7afc7c1cc96e23992c8f105f960132c657883bb1"
+        "pal-mcp-server"
+      ];
+    };
+
+    # ================================================================
     # Database (disabled by default)
     # ================================================================
 
@@ -163,9 +194,13 @@ let
 
   # Filter to enabled servers, remove the enabled flag for output
   enabledServers = lib.filterAttrs (_: v: v.enabled) allServers;
-  mcpServersForClaude = lib.mapAttrs (_: v: {
-    inherit (v) command args;
-  }) enabledServers;
+  mcpServersForClaude = lib.mapAttrs (
+    _: v:
+    {
+      inherit (v) command args;
+    }
+    // lib.optionalAttrs (v.env or { } != { }) { inherit (v) env; }
+  ) enabledServers;
 
 in
 {
