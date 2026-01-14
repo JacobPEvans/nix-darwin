@@ -39,16 +39,17 @@ jobs:
 
       - name: Extract issue details
         id: issue
+        env:
+          # Use env vars to prevent template injection (untrusted input)
+          # See: https://docs.zizmor.sh/audits/template-injection/
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          echo "title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
-          echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-          # Escape multiline body for use in prompt
-          BODY=$(cat << 'EOF'
-          ${{ github.event.issue.body }}
-          EOF
-          )
+          echo "title=${ISSUE_TITLE}" >> $GITHUB_OUTPUT
+          echo "number=${ISSUE_NUMBER}" >> $GITHUB_OUTPUT
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "${ISSUE_BODY}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run OpenHands Agent

@@ -48,6 +48,37 @@ For critical issues (like accidentally committed secrets), I'll prioritize accor
 - Broken links in documentation
 - Typos (unless they cause dangerous behavior)
 
+## Code Scanning Alert Policy
+
+This repository uses GitHub's code scanning with CodeQL. Alerts are triaged according to
+these criteria.
+
+### Automatic Dismissal Criteria
+
+**False Positive** - Dismissed immediately:
+
+- Logging of non-sensitive operational metadata (status, counts, ratios)
+- Slack/Discord channel IDs (public workspace identifiers, not secrets)
+- Configuration key names (metadata, not actual values)
+- Other data not matching the alert's threat model
+
+**Won't Fix** - Intentional design:
+
+- Credential helper scripts (`bws_helper.py`, `get-api-key.py`) that output secrets by design
+- Output piped to environment variables or credential stores (not logged)
+- Essential for headless authentication in CI/CD and cron contexts
+
+### Requires Fix
+
+- Logging of actual API keys, tokens, passwords in non-helper scripts
+- Missing GitHub Actions workflow permissions (always add an explicit `permissions` block, defaulting to `contents: read` for least privilege)
+- Any alert not covered by the dismissal criteria above
+
+### Ongoing Monitoring
+
+New alerts should be triaged within 48 hours using this policy. When in doubt,
+see [Security Alert Triage](agentsmd/rules/security-alert-triage.md) for additional guidance.
+
 ---
 
 *Thanks for helping keep this project safe.*

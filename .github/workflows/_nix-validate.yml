@@ -5,6 +5,9 @@ name: _nix-validate
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate

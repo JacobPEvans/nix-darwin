@@ -28,7 +28,8 @@ sudo darwin-rebuild switch --flake .
 
 - **Permissions**: `ai-assistant-instructions` flake → `~/.claude/settings.json`
 - **Plugins**: `modules/home-manager/ai-cli/claude/plugins/`
-- **Rules**: `agentsmd/rules/` (worktrees, version-validation, branch-hygiene)
+- **Rules**: `agentsmd/rules/` (worktrees, version-validation, branch-hygiene, security-alert-triage)
+- **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
 
 ## PR Rules
 
