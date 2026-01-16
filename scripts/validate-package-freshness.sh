@@ -96,7 +96,7 @@ while IFS= read -r package; do
 
   if [[ "$LAST_MOD" == "0" ]]; then
     echo -e "  ${YELLOW}⚠  WARN${NC}: $package (no lastModified field)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     continue
   fi
 
@@ -104,7 +104,7 @@ while IFS= read -r package; do
 
   if [[ $DAYS_OLD -gt $CRITICAL_THRESHOLD_DAYS ]]; then
     echo -e "  ${RED}✗ FAIL${NC}: $package is ${RED}$DAYS_OLD days${NC} old (threshold: $CRITICAL_THRESHOLD_DAYS days)"
-    ((FAILED++))
+    FAILED=$((FAILED + 1))
   else
     echo -e "  ${GREEN}✓ OK${NC}:   $package ($DAYS_OLD days old)"
   fi
@@ -140,11 +140,11 @@ while IFS= read -r package; do
 
   if [[ $DAYS_OLD -gt $GENERAL_THRESHOLD_DAYS ]]; then
     echo -e "  ${RED}✗ FAIL${NC}: $package is ${RED}$DAYS_OLD days${NC} old (threshold: $GENERAL_THRESHOLD_DAYS days)"
-    ((FAILED++))
+    FAILED=$((FAILED + 1))
   elif [[ $DAYS_OLD -gt 60 ]]; then
     # Warn if approaching threshold
     echo -e "  ${YELLOW}⚠  WARN${NC}: $package is $DAYS_OLD days old (approaching threshold)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
   else
     echo -e "  ${GREEN}✓ OK${NC}:   $package ($DAYS_OLD days old)"
   fi

@@ -28,6 +28,7 @@ _:
 
     # Code Review (essential)
     "code-review@claude-plugins-official" = true;
+    "code-simplifier@claude-plugins-official" = true;
     "pr-review-toolkit@claude-plugins-official" = true;
 
     # Feature Development (useful)
@@ -39,6 +40,12 @@ _:
     # Plugin Development (user maintains claude-code-plugins repo)
     "plugin-dev@claude-plugins-official" = true;
     "hookify@claude-plugins-official" = true;
+
+    # Language Servers & Developer Tools
+    "pyright-lsp@claude-plugins-official" = true;
+
+    # Workflow
+    "ralph-loop@claude-plugins-official" = true;
 
     # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
 

@@ -84,6 +84,7 @@ with pkgs;
   # ==========================================================================
   # Fast Python package installer and management tools.
   uv # Extremely fast Python package installer and resolver
+  pyright # Type checker for Python language
 
   # ==========================================================================
   # Python Environment
