@@ -1,18 +1,18 @@
 # Community Marketplace Plugins
 #
 # Plugins from community-maintained marketplaces:
-# - cc-marketplace: General development tools
-# - superpowers-marketplace: Enhanced Claude capabilities
-# - awesome-claude-code-plugins: Curated community plugins
+# - cc-marketplace: Official source for claudecodecommands.directory plugins
+# - superpowers-marketplace: Enhanced Claude capabilities (obra/Jesse Vincent)
 
 _:
 
 {
   enabledPlugins = {
-    # CC Marketplace - essential tools
+    # CC Marketplace - essential tools (official source for claudecodecommands.directory)
     "analyze-issue@cc-marketplace" = true;
     "create-worktrees@cc-marketplace" = true;
     "python-expert@cc-marketplace" = true; # User actively uses Python
+    "devops-automator@cc-marketplace" = true; # CI/CD, cloud infra, monitoring, deployment
 
     # Superpowers - comprehensive Claude enhancement suite
     "superpowers@superpowers-marketplace" = true;
@@ -20,15 +20,10 @@ _:
     "superpowers-lab@superpowers-marketplace" = true; # User requested add
     "superpowers-developing-for-claude-code@superpowers-marketplace" = true; # User requested restore
 
-    # Awesome Claude Code Plugins - curated collection
-    # DevOps automation (CI/CD, cloud infra, monitoring, deployment)
-    "devops-automator@awesome-claude-code-plugins" = true;
-
     # REMOVED - redundant or unused:
     # double-check - unnecessary
     # infrastructure-maintainer - too generic
     # monitoring-observability-specialist - splunk repos don't need this
-    # python-expert@awesome-claude-code-plugins - duplicate of cc-marketplace version (same author/content)
-    # context7-docs-fetcher@awesome-claude-code-plugins - context7@claude-plugins-official is official MCP version
+    # awesome-claude-code-plugins - AGGREGATION, use true source (cc-marketplace) instead
   };
 }

@@ -46,6 +46,15 @@
 # - The KEY becomes the display name (for plugin references)
 # - This ensures Claude Code can locate and fetch the marketplace
 # ========================================================================
+#
+# WARNING: AGGREGATION MARKETPLACES TO AVOID
+# ============================================================================
+# DO NOT use "awesome-claude-code-plugins" (ccplugins/awesome-claude-code-plugins)
+# It is an AGGREGATION that copies plugins from other sources without regular updates.
+# Always find and use the TRUE SOURCE for plugins:
+#   - Plugins from claudecodecommands.directory → use "cc-marketplace"
+#   - Check plugin.json homepage/author fields to find original source
+# ============================================================================
 
 {
   lib,
@@ -168,13 +177,6 @@ let
     };
 
     # --- Additional Community Marketplaces ---
-    # Curated collection of Claude Code plugins
-    "awesome-claude-code-plugins" = {
-      source = {
-        type = "github";
-        url = "ccplugins/awesome-claude-code-plugins";
-      };
-    };
     # Multi-model AI integrations (OpenAI, Gemini) and notifications
     "cc-dev-tools" = {
       source = {
