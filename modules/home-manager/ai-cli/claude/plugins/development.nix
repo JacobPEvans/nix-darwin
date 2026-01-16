@@ -25,6 +25,18 @@ _:
     # Observability - Keep distributed-tracing and slo-implementation, exclude prometheus/grafana
     "observability-monitoring@claude-code-workflows" = true;
 
+    # Python Development (Django/FastAPI with 5 specialized skills)
+    "python-development@claude-code-workflows" = true;
+
+    # Full-Stack Orchestration (multi-agent workflows coordinating 7+ agents)
+    "full-stack-orchestration@claude-code-workflows" = true;
+
+    # Developer Essentials (common dev tools and utilities)
+    "developer-essentials@claude-code-workflows" = true;
+
+    # Performance Testing & Review (analysis and test coverage review)
+    "performance-testing-review@claude-code-workflows" = true;
+
     # ========================================================================
     # Note: Claude Code Workflows plugins contain multiple skills
     # ========================================================================

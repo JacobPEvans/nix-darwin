@@ -36,7 +36,7 @@ in
       "/System/Applications/Messages.app"
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
       "/Applications/Slack.app"
-      # "${homeDir}/Applications/Home Manager Apps/zoom.us.app" # DISABLED - no longer using Zoom
+      "${homeDir}/Applications/zoom.us.app" # Manual install (Nix package was broken)
       "/Applications/Webex.app"
 
       # AI Assistants

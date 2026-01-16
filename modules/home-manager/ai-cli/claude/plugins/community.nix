@@ -1,17 +1,18 @@
 # Community Marketplace Plugins
 #
 # Plugins from community-maintained marketplaces:
-# - cc-marketplace: General development tools
-# - superpowers-marketplace: Enhanced Claude capabilities
+# - cc-marketplace: Official source for claudecodecommands.directory plugins
+# - superpowers-marketplace: Enhanced Claude capabilities (obra/Jesse Vincent)
 
 _:
 
 {
   enabledPlugins = {
-    # CC Marketplace - essential tools
+    # CC Marketplace - essential tools (official source for claudecodecommands.directory)
     "analyze-issue@cc-marketplace" = true;
     "create-worktrees@cc-marketplace" = true;
     "python-expert@cc-marketplace" = true; # User actively uses Python
+    "devops-automator@cc-marketplace" = true; # CI/CD, cloud infra, monitoring, deployment
 
     # Superpowers - comprehensive Claude enhancement suite
     "superpowers@superpowers-marketplace" = true;
@@ -20,9 +21,9 @@ _:
     "superpowers-developing-for-claude-code@superpowers-marketplace" = true; # User requested restore
 
     # REMOVED - redundant or unused:
-    # devops-automator - too generic, terraform plugins better
     # double-check - unnecessary
     # infrastructure-maintainer - too generic
     # monitoring-observability-specialist - splunk repos don't need this
+    # awesome-claude-code-plugins - AGGREGATION, use true source (cc-marketplace) instead
   };
 }
