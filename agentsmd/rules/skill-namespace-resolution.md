@@ -3,7 +3,7 @@
 ## Problem
 
 Claude was repeatedly calling skills with incorrect namespaces (e.g.,
-`pr-review-toolkit:code-simplifier` when the correct was
+`pr-review-toolkit:code-simplifier` when the correct namespace was
 `code-simplifier:code-simplifier`). This happened across multiple
 skills and sessions.
 
@@ -83,7 +83,7 @@ Result: WRONG - Error again
 | Situation | ❌ Wrong | ✓ Correct | Why |
 |-----------|----------|-----------|-----|
 | Error shows `code-simplifier:code-simplifier` | `pr-review-toolkit:code-simplifier` | Copy exact string | Trust system output |
-| Unsure of full namespace | Use short name only | Use `namespace:skill-name` | Exact format required |
+| Unsure of full namespace | Use only the skill name without namespace | Use `namespace:skill-name` | Exact format required |
 | Want to guess based on task type | Assume a namespace | Copy from error list | Error lists are authoritative |
 | Multiple similar namespaces | Pick what seems right | Ask user or copy exact | Never guess |
 
@@ -104,12 +104,11 @@ Result: WRONG - Error again
 
 ## Files Using This Rule
 
-- `.claude/settings.json` - Hook configuration
 - `AGENTS.md` - Agent invocation instructions
 - `CLAUDE.md` - Project-specific instructions
 - This file - Rule documentation
 
 ## Related
 
-- See AGENTS.md and CLAUDE.md "Skill and Agent Invocation Rules" for user instructions
+- See AGENTS.md and CLAUDE.md "Skill and Agent Invocation Rules" for user instructions in this repo
 - See pr-review-toolkit, code-simplifier, and other skill namespaces for examples
