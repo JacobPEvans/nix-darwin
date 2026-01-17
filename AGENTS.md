@@ -28,8 +28,14 @@ sudo darwin-rebuild switch --flake .
 
 - **Permissions**: `ai-assistant-instructions` flake → `~/.claude/settings.json`
 - **Plugins**: `modules/home-manager/ai-cli/claude/plugins/`
-- **Rules**: `agentsmd/rules/` (worktrees, version-validation, branch-hygiene, security-alert-triage)
+- **Rules**: `agentsmd/rules/` (worktrees, version-validation, skill-namespace-resolution, security-alert-triage)
 - **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
+
+## Skill and Agent Invocation Rules
+
+See the "Skill and Agent Invocation Rules" section below for complete instructions on
+invoking skills and agents correctly. This covers namespace format, common mistakes, and
+error resolution procedures.
 
 ## PR Rules
 
