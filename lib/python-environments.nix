@@ -1,85 +1,138 @@
 # Python Development Environments
 #
 # Shared, modular definitions for Python versions and package configurations.
-# This module supports multiple Python versions with reusable package sets
-# that can be composed into development shells.
+# All packages are installed via Nix - pip is intentionally excluded.
 #
-# Available via Nix (nixpkgs-25.11): 3.10, 3.11, 3.12, 3.13
-# For EOL versions (3.9): Use `uv` which downloads on-demand (see below)
+# Available via Nix (nixpkgs-25.11): 3.10, 3.11, 3.12, 3.13, 3.14
+# For EOL versions (3.9): Use `uv run --python 3.9` (on-demand download)
 #
-# Intended to be imported by Nix modules and dev shells to share Python versions
-# and reusable package sets.
+# Usage:
+#   pythonEnvs = import ./lib/python-environments.nix { inherit pkgs; };
+#   pythonEnvs.versions.py312                    # Python 3.12 interpreter
+#   pythonEnvs.packageSets.dev                   # Dev tools package function
+#   pythonEnvs.mkDevShell { ... }                # Create a dev shell
 #
 # Design goals:
-# - DRY: Define each Python version and package set once
-# - Composable: Shells import only what they need
-# - Modular: Can add/remove versions independently without affecting others
-# - Documented: Clear separation of concern for backwards compatibility testing
-#
-# Python 3.9 (EOL, not in nixpkgs):
-#   Use `uv` for on-demand interpreter downloads from python-build-standalone:
-#     uv venv --python 3.9 .venv-splunk
-#     uv run --python 3.9 pytest tests/
-#   Interpreters are cached in ~/.cache/uv/, not system-installed.
-#   This is the recommended approach for Splunk development and CI testing.
+# - Nix-only: No pip, virtualenv, or imperative package management
+# - DRY: Versions, packages, and shell generator defined once
+# - Composable: Mix versions and package sets as needed
 
 { pkgs }:
 
-{
-  # Python versions available via nixpkgs-25.11
-  # Each version is defined once here and referenced everywhere
-  # Format: pyXY = pkgs.pythonXY for easy lookup
-  #
-  # NOTE: Python 3.9 is EOL and removed from nixpkgs.
-  # Use `uv run --python 3.9` for 3.9 testing (see header comment).
+rec {
+  # ===========================================================================
+  # Python Versions
+  # ===========================================================================
+  # All available Python interpreters from nixpkgs-25.11
+  # NOTE: Python 3.9 is EOL. Use `uv run --python 3.9` for Splunk testing.
   versions = {
-    py310 = pkgs.python310; # Older compatibility testing
-    py311 = pkgs.python311; # Claude SDK development
-    py312 = pkgs.python312; # General development, testing
-    py313 = pkgs.python3; # Latest features (system default)
+    py310 = pkgs.python310; # 3.10.x - Older compatibility
+    py311 = pkgs.python311; # 3.11.x - Claude SDK
+    py312 = pkgs.python312; # 3.12.x - General development
+    py313 = pkgs.python3; # 3.13.x - System default
+    py314 = pkgs.python314; # 3.14.x - Bleeding edge
   };
 
-  # Reusable package sets for different development contexts
-  # These are functions that take a package set (ps) and return a list
-  # They can be combined with any Python version via withPackages
-  #
-  # Pattern: packageSets.NAME = ps: with ps; [ package1 package2 ... ];
+  # ===========================================================================
+  # Package Sets (Nix-only, no pip)
+  # ===========================================================================
+  # Functions that take a Python package set and return a list of packages.
+  # All packages come from nixpkgs - no pip or runtime package management.
   packageSets = {
-    # Minimal: pip and virtualenv only (for project-specific installs via uv)
-    # Used by: shells/python310 (compatibility testing)
-    minimal =
-      ps: with ps; [
-        pip # Python package installer
-        virtualenv # Virtual environment tool
-      ];
+    # Minimal: Just the interpreter (no dev tools)
+    # Use for: Quick scripts, compatibility testing
+    minimal = _: [ ];
 
-    # Full development suite: testing, linting, formatting, coverage
-    # Used by: shells/python312 (backwards compat testing, pre-commit)
-    full-dev =
+    # Development: Testing, linting, formatting, type checking
+    # Use for: General Python development, CI/CD
+    dev =
       ps: with ps; [
-        pip # Python package installer
-        virtualenv # Virtual environment tool
-        setuptools # Build system
-        pytest # Testing framework
+        # Testing
+        pytest # Test framework
         pytest-asyncio # Async test support
-        pytest-cov # Coverage plugin for pytest
-        coverage # Code coverage measurement
-        ruff # Fast Python linter and formatter
+        pytest-cov # Coverage plugin
+        coverage # Coverage measurement
+
+        # Code quality
+        ruff # Fast linter and formatter
         mypy # Static type checker
         black # Code formatter
-        ipython # Enhanced interactive shell
+
+        # Interactive
+        ipython # Enhanced REPL
       ];
 
-    # Data science stack: analytical tools
-    # Used by: shells/python-data/
-    data-science =
+    # Data science: Analysis and visualization
+    # Use for: Data projects, notebooks
+    data =
       ps: with ps; [
-        pip
-        virtualenv
         pandas # Data manipulation
         numpy # Numerical computing
         scipy # Scientific computing
         jupyter # Interactive notebooks
+        matplotlib # Plotting
       ];
+  };
+
+  # ===========================================================================
+  # Shell Generator (DRY)
+  # ===========================================================================
+  # Creates a development shell with specified Python version and packages.
+  #
+  # Arguments:
+  #   python: Python interpreter (e.g., versions.py312)
+  #   packages: Package set function (e.g., packageSets.dev)
+  #   name: Shell name (e.g., "python312-dev")
+  #   extraBuildInputs: Additional packages (default: [])
+  #   shellHookExtra: Additional shell hook commands (default: "")
+  #
+  # Returns: A mkShell derivation
+  mkDevShell =
+    {
+      python,
+      packages ? packageSets.minimal,
+      name ? "python-dev",
+      extraBuildInputs ? [ ],
+      shellHookExtra ? "",
+    }:
+    pkgs.mkShell {
+      inherit name;
+
+      buildInputs = [ (python.withPackages packages) ] ++ extraBuildInputs;
+
+      shellHook = ''
+        echo "======================================"
+        echo "Python Development Environment"
+        echo "======================================"
+        echo ""
+        echo "$(python --version)"
+        echo ""
+        echo "Packages installed via Nix (no pip)."
+        echo "Add packages to your shell's flake.nix or project's flake.nix."
+        echo ""
+        ${shellHookExtra}
+      '';
+    };
+
+  # ===========================================================================
+  # Pre-configured Shells (convenience)
+  # ===========================================================================
+  # Ready-to-use shell configurations for common use cases.
+  shells = {
+    py310-minimal = mkDevShell {
+      python = versions.py310;
+      packages = packageSets.minimal;
+      name = "python310-minimal";
+    };
+    py312-dev = mkDevShell {
+      python = versions.py312;
+      packages = packageSets.dev;
+      name = "python312-dev";
+    };
+    py314-dev = mkDevShell {
+      python = versions.py314;
+      packages = packageSets.dev;
+      name = "python314-dev";
+    };
   };
 }

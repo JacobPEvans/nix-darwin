@@ -1,6 +1,6 @@
-# Python 3.12 Development Shell
+# Python 3.14 Development Shell
 #
-# Full dev environment with testing, linting, formatting, type checking.
+# Bleeding-edge Python 3.14 with full dev tools.
 # All packages installed via Nix - no pip available.
 #
 # Usage: nix develop or direnv (use flake)
@@ -8,7 +8,7 @@
 # Included: pytest, ruff, mypy, black, coverage, ipython
 
 {
-  description = "Python 3.12 development environment";
+  description = "Python 3.14 development environment (bleeding edge)";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
@@ -31,9 +31,9 @@
         in
         {
           default = pyEnv.mkDevShell {
-            python = pyEnv.versions.py312;
+            python = pyEnv.versions.py314;
             packages = pyEnv.packageSets.dev;
-            name = "python312-dev";
+            name = "python314-dev";
             shellHookExtra = ''
               echo "Dev tools: pytest, ruff, mypy, black, coverage, ipython"
               echo ""
