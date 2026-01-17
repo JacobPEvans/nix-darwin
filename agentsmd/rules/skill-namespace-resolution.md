@@ -29,7 +29,7 @@ Examples (EXACT):
 #### Task Tool Agent Invocation
 
 ```yaml
-subagent_type parameter: "namespace-name"
+subagent_type parameter: "namespace:skill-name"
 
 Examples (EXACT):
   - code-simplifier:code-simplifier
@@ -105,10 +105,11 @@ Result: WRONG - Error again
 ## Files Using This Rule
 
 - `.claude/settings.json` - Hook configuration
-- `CLAUDE.md` - User-facing instructions
+- `AGENTS.md` - Agent invocation instructions
+- `CLAUDE.md` - Project-specific instructions
 - This file - Rule documentation
 
 ## Related
 
-- See CLAUDE.md "Skill and Agent Invocation Rules" for user instructions
+- See AGENTS.md and CLAUDE.md "Skill and Agent Invocation Rules" for user instructions
 - See pr-review-toolkit, code-simplifier, and other skill namespaces for examples
