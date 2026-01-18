@@ -42,3 +42,31 @@ error resolution procedures.
 - Never auto-merge without explicit user approval
 - 50-comment limit per PR
 - Batch commits locally, push once
+
+## Dependency Management
+
+### Claude Code Update Philosophy
+
+Claude Code and related AI tool dependencies follow an **always-update strategy**:
+
+- **Auto-update Daily**: Daily flake updates automatically include claude-code, claude-code-plugins, and jacobpevans-cc-plugins
+- **Manual Validation**: After updating, manually test and validate new versions during CI and darwin-rebuild
+- **Accept by Default**: Merge PR unless issues are discovered during validation
+- **Revert on Issues**: Only revert updates if testing reveals bugs, breaking changes, or integration problems
+
+This aggressive update approach keeps Claude Code current with latest features, bug
+fixes, and improvements, while maintaining reliability through manual testing gates.
+
+### AI-Focused Inputs
+
+The following inputs update daily (when not on Tue/Fri full-update schedule):
+
+- nixpkgs (stable channel)
+- ai-assistant-instructions
+- claude-code-plugins (official Anthropic)
+- claude-cookbooks
+- claude-plugins-official
+- jacobpevans-cc-plugins (personal custom plugins)
+- anthropic-skills
+- superpowers-marketplace
+- agent-os
