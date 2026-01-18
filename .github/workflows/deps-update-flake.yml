@@ -12,8 +12,10 @@
 #
 # Update Strategy:
 # - Tue/Fri or manual with update_all: Updates ALL flake inputs
-# - Other days: Updates only AI-focused inputs
+# - Other days: Updates AI-focused inputs (including claude-code for agile updates)
 # - repository_dispatch: Updates only ai-assistant-instructions (fast sync)
+# - Claude Code Philosophy: Always update when available. Manually research and validate
+#   new versions. Accept updates; revert only if issues discovered during testing.
 name: Update flake.lock
 
 on:
@@ -43,6 +45,7 @@ jobs:
         claude-code-plugins
         claude-cookbooks
         claude-plugins-official
+        jacobpevans-cc-plugins
         anthropic-skills
         superpowers-marketplace
         agent-os
@@ -141,8 +144,9 @@ jobs:
 
             ## Review Notes
             - CI validates flake structure and build
-            - Low-risk updates (AI tools, plugins) run daily
-            - Full updates (darwin, home-manager) run Tue/Fri
+            - AI tool updates (including claude-code) run daily
+            - Claude Code philosophy: Always accept updates, manually validate, revert only if issues found
+            - Full dependency updates (darwin, home-manager) run Tue/Fri
 
             ---
             *Created by JacobPEvans-github-actions*
