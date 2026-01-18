@@ -30,13 +30,6 @@ spec:
             - name: health
               containerPort: 13133
               protocol: TCP
-          env:
-            - name: SPLUNK_HEC_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: splunk-hec-token
-                  key: token
-                  optional: true
           volumeMounts:
             - name: config
               mountPath: /etc/otel-collector-config.yaml

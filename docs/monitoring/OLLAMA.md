@@ -14,11 +14,11 @@ Cribl Edge can route log copies to Ollama for AI-powered enrichment:
 ## Architecture
 
 ```text
-Logs → Cribl Edge → Ollama (enrichment) → Enriched logs → Splunk
-                 ↘ Original logs → Splunk
+Logs → Cribl Edge → Ollama (enrichment) → Enriched logs → Cribl Cloud
+                 ↘ Original logs → Cribl Cloud
 ```
 
-Both original and enriched logs are stored for comparison and validation.
+Both original and enriched logs are shipped to Cribl Cloud for long-term storage and analysis.
 
 ## Ollama Configuration
 
@@ -137,41 +137,6 @@ if (__e.event === 'run_completed' && __e.exit_code !== 0) {
   );
   __e.ai_root_cause = JSON.parse(response.body).response.trim();
 }
-```
-
-## Splunk Searches for AI-Enriched Logs
-
-### Error Distribution by AI Classification
-
-```spl
-index=claude ai_classification=*
-| stats count by ai_classification
-| sort -count
-```
-
-### Anomalies Over Time
-
-```spl
-index=claude anomaly=*
-| timechart count by anomaly
-```
-
-### AI Summaries
-
-```spl
-index=claude ai_summary=*
-| table _time repo ai_summary total_cost duration_minutes
-| sort -_time
-```
-
-### Root Cause Patterns
-
-```spl
-index=claude ai_root_cause=*
-| rex field=ai_root_cause "1\.\s*(?<cause1>[^\n]+)"
-| stats count by cause1
-| sort -count
-| head 10
 ```
 
 ## Performance Considerations
@@ -306,5 +271,5 @@ ollama pull qwen3-next:latest
 ## Related Documentation
 
 - [Kubernetes Setup](./KUBERNETES.md)
-- [Splunk Queries](./SPLUNK.md)
+- [OTEL Configuration](./OTEL.md)
 - [Main Monitoring Overview](../MONITORING.md)

@@ -16,21 +16,12 @@ Before deploying, create the required secrets:
 # Create namespace first
 kubectl apply -f modules/monitoring/k8s/namespace.yaml
 
-# Create Splunk admin password secret
-kubectl -n monitoring create secret generic splunk-admin \
-  --from-literal=password='YOUR_SPLUNK_PASSWORD'
-
-# Create Splunk HEC token secret (generate a UUID)
-kubectl -n monitoring create secret generic splunk-hec-token \
-  --from-literal=token="$(uuidgen)"
-
 # Create Cribl Cloud config secret (copy full URL from Cribl Cloud console)
 kubectl -n monitoring create secret generic cribl-cloud-config \
   --from-literal=master-url='tls://YOUR_AUTH_TOKEN@YOUR_ORG.cribl.cloud?group=YOUR_FLEET'
 ```
 
-**Important**: Store the Splunk password and HEC token securely.
-You'll need the HEC token for OTEL Collector config.
+**Important**: Splunk is no longer supported on ARM64/macOS environments. All logging is shipped to Cribl Cloud for long-term storage and analysis.
 
 ## OTEL Collector
 
@@ -98,37 +89,6 @@ kubectl -n monitoring port-forward svc/cribl-edge 9000:9000
 
 Also check the Cribl Cloud console for Edge node enrollment status.
 
-## Splunk
-
-Local SIEM for immediate log queries and dashboards.
-
-**Ports:**
-
-| Port | Protocol | Purpose |
-|------|----------|---------|
-| 8000 | HTTP | Web UI |
-| 8088 | HTTP | HEC (HTTP Event Collector) |
-| 8089 | HTTP | Management API |
-| 9997 | TCP | Splunk forwarder receiving |
-| 9998 | TCP | Splunk-to-Splunk |
-
-**Deploy:**
-
-```bash
-kubectl apply -f modules/monitoring/k8s/splunk/
-kubectl -n monitoring get secret splunk-admin -o jsonpath='{.data.password}' | base64 -d
-```
-
-**Access:** `kubectl -n monitoring port-forward svc/splunk 8000:8000` → <http://localhost:8000>
-
-**Post-deploy configuration:**
-
-1. Create `claude` index: Settings → Indexes → New Index
-2. Configure HEC: Settings → Data Inputs → HTTP Event Collector
-3. Enable HEC with the token from the secret
-
-**Storage:** 50Gi PVC (configurable in statefulset.yaml)
-
 ## Full Stack Deployment
 
 Deploy all components at once using kustomization:
@@ -156,7 +116,7 @@ kubectl -n monitoring describe pod <pod-name>
 kubectl -n monitoring get secrets
 
 # Check secret contents (be careful with sensitive data)
-kubectl -n monitoring get secret splunk-admin -o yaml
+kubectl -n monitoring get secret cribl-cloud-config -o yaml
 ```
 
 ### Network Issues
@@ -173,7 +133,6 @@ wget -qO- http://otel-collector:13133/health
 Check if OrbStack has sufficient resources allocated:
 
 - Recommended: 4 CPU cores, 8GB RAM for full stack
-- Splunk alone needs ~2GB RAM
 
 ## Related Documentation
 

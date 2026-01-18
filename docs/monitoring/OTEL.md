@@ -141,16 +141,8 @@ exporters:
     endpoint: http://cribl-edge:9420
 
   # Debug logging
-  logging:
-    loglevel: debug
-
-  # Optional: Direct to Splunk HEC
-  splunk_hec:
-    token: "${SPLUNK_HEC_TOKEN}"
-    endpoint: "http://splunk:8088/services/collector"
-    source: "otel"
-    sourcetype: "otel:trace"
-    index: "claude"
+  debug:
+    verbosity: normal
 ```
 
 ### Service Pipeline
@@ -193,13 +185,6 @@ otel-cli span \
   --service "test-service" \
   --name "test-span" \
   --endpoint "http://localhost:4317"
-```
-
-### Verify in Splunk
-
-```spl
-index=claude sourcetype=otel:trace
-| head 10
 ```
 
 ## Trace Sampling

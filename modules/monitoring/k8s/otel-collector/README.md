@@ -16,7 +16,6 @@ Receives traces, metrics, and logs from Claude Code and other sources.
 |----------|-------------|---------|
 | `otlphttp` | Cribl Edge (9420) | Forward to log pipeline |
 | `debug` | stdout | Debug output |
-| `splunk_hec` | Splunk (8088) | Direct to Splunk (disabled) |
 
 ## Configuration
 

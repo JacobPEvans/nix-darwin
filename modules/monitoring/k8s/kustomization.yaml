@@ -16,10 +16,6 @@ resources:
   - cribl-stream/deployment.yaml
   - cribl-stream/service.yaml
   - cribl-stream/service-ui.yaml
-  # Splunk (disabled - ARM64 incompatible)
-  # - splunk/statefulset.yaml
-  # - splunk/service.yaml
-  # - splunk/configmap.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: nix-config

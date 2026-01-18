@@ -57,14 +57,6 @@ data:
         sampling_initial: 5
         sampling_thereafter: 200
 
-      # Send to Splunk HEC
-      splunk_hec:
-        token: "${SPLUNK_HEC_TOKEN}"
-        endpoint: http://splunk:8088/services/collector
-        source: otel
-        sourcetype: otel
-        index: claude
-
     service:
       extensions: [health_check]
       pipelines:
@@ -79,4 +71,4 @@ data:
         logs:
           receivers: [otlp, filelog]
           processors: [batch, resource]
-          exporters: [otlphttp, splunk_hec, debug]
+          exporters: [otlphttp, debug]

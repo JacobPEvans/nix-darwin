@@ -4,7 +4,7 @@
 # - Kubernetes manifests for OrbStack cluster
 # - OTEL Collector configuration
 # - Cribl Edge configuration
-# - Splunk deployment
+# - Cribl Stream (local log routing)
 #
 # Usage:
 #   imports = [ ./modules/monitoring ];
@@ -60,16 +60,6 @@ in
         description = "Cribl Cloud organization URL (e.g., https://your-org.cribl.cloud:4200)";
       };
     };
-
-    splunk = {
-      enable = lib.mkEnableOption "Local Splunk instance";
-
-      storageSize = lib.mkOption {
-        type = lib.types.str;
-        default = "50Gi";
-        description = "Persistent volume size for Splunk data";
-      };
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -95,11 +85,6 @@ in
               homeDir = config.home.homeDirectory;
             };
         ".config/monitoring/k8s/cribl-edge/service.yaml".source = ./k8s/cribl-edge/service.yaml;
-
-        # Splunk manifests
-        ".config/monitoring/k8s/splunk/statefulset.yaml".source = ./k8s/splunk/statefulset.yaml;
-        ".config/monitoring/k8s/splunk/service.yaml".source = ./k8s/splunk/service.yaml;
-        ".config/monitoring/k8s/splunk/configmap.yaml".source = ./k8s/splunk/configmap.yaml;
       };
 
       # Helper scripts for Kubernetes-based monitoring
@@ -120,8 +105,10 @@ in
 
           echo "Monitoring stack deployed to namespace: $NAMESPACE"
           echo ""
-          echo "Access Splunk UI: kubectl --context $CONTEXT -n $NAMESPACE port-forward svc/splunk 8000:8000"
-          echo "Then open: http://localhost:8000"
+          echo "Components deployed:"
+          echo "  - OTEL Collector (gRPC: 4317, HTTP: 4318)"
+          echo "  - Cribl Edge (OTEL receiver: 9420)"
+          echo "  - Cribl Stream (local leader)"
         '')
 
         (pkgs.writeShellScriptBin "monitoring-status" ''
