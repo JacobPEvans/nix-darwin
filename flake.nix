@@ -43,9 +43,8 @@
 
     # Official Anthropic repositories for Claude Code plugins/commands
     # These provide slash commands, agents, and skills for Claude Code
-    # Pinned to specific release tag for stability (uses semantic versioning)
     claude-code-plugins = {
-      url = "github:anthropics/claude-code/v2.1.12";
+      url = "github:anthropics/claude-code";
       flake = false; # Not a flake, just fetch the repo
     };
 

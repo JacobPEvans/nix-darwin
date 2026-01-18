@@ -76,7 +76,6 @@
       },
       "original": {
         "owner": "anthropics",
-        "ref": "v2.1.12",
         "repo": "claude-code",
         "type": "github"
       }
