@@ -89,6 +89,20 @@ in
   };
 
   # ==========================================================================
+  # Logging Configuration
+  # ==========================================================================
+  logging = {
+    syslog = {
+      # Remote syslog server for centralized log collection
+      # Logs are forwarded via macOS built-in syslogd to HAProxy -> Cribl Edge -> Splunk
+      server = "haproxy.jacobpevans.com";
+      port = 1514;
+      # Protocol: udp or tcp
+      protocol = "udp";
+    };
+  };
+
+  # ==========================================================================
   # Nix/NixOS Configuration
   # ==========================================================================
   nix = {
