@@ -286,10 +286,11 @@ in
   #
   # Pre-configured servers (add manually via CLI):
   #   claude mcp add --scope user --transport stdio pal -- uvx --from "git+https://github.com/BeehiveInnovations/pal-mcp-server.git" pal-mcp-server
-  #   claude mcp add --scope user --transport stdio github -- github-mcp-server
-  #   claude mcp add --scope user --transport stdio terraform -- terraform-mcp-server
+  #   claude mcp add --scope user --transport stdio github -- github-mcp-server stdio
+  #   claude mcp add --scope user --transport stdio terraform -- terraform-mcp-server stdio
   #
-  # For API keys, use d-claude alias which injects secrets via Doppler
+  # API Keys: Servers requiring API keys (github, pal) work with d-claude alias
+  # which injects secrets from Doppler (ai-ci-automation project)
 
   statusLine = {
     enable = true;

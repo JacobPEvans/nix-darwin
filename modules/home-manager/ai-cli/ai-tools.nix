@@ -90,6 +90,21 @@
     '')
 
     # ==========================================================================
+    # MCP Servers (Model Context Protocol)
+    # ==========================================================================
+    # Used with Claude Code via `claude mcp add --scope user --transport stdio`
+    # Configured in ~/.claude.json (user scope)
+
+    # GitHub MCP Server - GitHub API integration
+    # Source: https://github.com/github/github-mcp-server
+    # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
+    github-mcp-server
+
+    # Terraform MCP Server - Terraform/OpenTofu integration
+    # Source: https://github.com/hashicorp/terraform-mcp-server
+    terraform-mcp-server
+
+    # ==========================================================================
     # Google Gemini CLI
     # ==========================================================================
     # Available in nixpkgs (0.22.5)
