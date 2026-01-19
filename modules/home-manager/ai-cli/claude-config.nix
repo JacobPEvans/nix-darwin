@@ -4,7 +4,6 @@
 # Imported by common.nix to keep it clean and high-level.
 {
   config,
-  pkgs,
   lib,
   claude-code-plugins,
   claude-cookbooks,
@@ -74,11 +73,6 @@ let
 
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
-
-  # Import Nix-native MCP servers configuration
-  # All servers are built/fetched at configuration time (no runtime npm)
-  mcpConfig = import ./mcp { inherit config pkgs lib; };
-  inherit (mcpConfig) mcpServers;
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -286,11 +280,16 @@ in
     };
   };
 
-  # MCP Servers - Nix-native configuration
-  # All servers are defined in modules/home-manager/ai-cli/mcp/default.nix
-  # Built/fetched at configuration time (no runtime npm/npx/bunx)
-  # To enable a server, set its enable attribute to true in mcp/default.nix
-  inherit mcpServers;
+  # MCP Servers - NOT managed via settings.json
+  # Claude Code reads MCP servers from ~/.claude.json (user scope) or .mcp.json (project scope)
+  # Use CLI to add servers: `claude mcp add --scope user --transport stdio <name> -- <command> [args]`
+  #
+  # Pre-configured servers (add manually via CLI):
+  #   claude mcp add --scope user --transport stdio pal -- uvx --from "git+https://github.com/BeehiveInnovations/pal-mcp-server.git" pal-mcp-server
+  #   claude mcp add --scope user --transport stdio github -- github-mcp-server
+  #   claude mcp add --scope user --transport stdio terraform -- terraform-mcp-server
+  #
+  # For API keys, use d-claude alias which injects secrets via Doppler
 
   statusLine = {
     enable = true;

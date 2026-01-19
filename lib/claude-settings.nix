@@ -57,9 +57,8 @@ in
     command = "${homeDir}/.claude/statusline-command.sh";
   };
 
-  # MCP Servers - populated from modules/home-manager/ai-cli/mcp/default.nix in actual deployment
-  # Includes: context7, everything, fetch, filesystem, git, memory, sequentialthinking, time,
-  # docker, exa, firecrawl, cloudflare, aws, terraform, github, pal
-  # This pure generator shows empty object for CI schema validation only.
-  mcpServers = { };
+  # NOTE: MCP servers are NOT configured in settings.json
+  # Claude Code reads MCP servers from ~/.claude.json (user scope) or .mcp.json (project scope)
+  # Use `claude mcp add --scope user` to add servers declaratively
+  # Available servers: pal, github, terraform (add via CLI as needed)
 }
