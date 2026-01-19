@@ -238,6 +238,10 @@ in
       # ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-5-20250929";
       # ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001";
 
+      # MCP timeout settings (5 minutes) - required for PAL MCP complex operations
+      MCP_TIMEOUT = "300000";
+      MCP_TOOL_TIMEOUT = "300000";
+
       # DEFAULT VALUES - do not remove, reference only
       # These are commented out because they match upstream defaults.
       # Kept for reference in case adjustments are needed in the future.

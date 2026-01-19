@@ -127,13 +127,13 @@ let
     # Tools: chat, thinkdeep, planner, consensus, codereview, precommit, debug, apilookup, challenge
     # See: https://github.com/BeehiveInnovations/pal-mcp-server
     #
-    # Required environment variables (provide at least one provider API key):
+    # API keys inherited from shell environment (at least one required):
     #   - GEMINI_API_KEY (Google Gemini)
     #   - OPENAI_API_KEY (OpenAI)
     #   - ANTHROPIC_API_KEY (Anthropic Claude)
     #   - Other providers: OPENROUTER_API_KEY, AZURE_OPENAI_API_KEY, XAI_API_KEY
     #
-    # Optional configuration (set via environment):
+    # Optional configuration (also inherited from shell):
     #   - DISABLED_TOOLS (comma-separated, e.g., "analyze,refactor")
     #   - DEFAULT_MODEL (default model selection strategy)
     #   - OLLAMA_HOST (for local Ollama models)
@@ -144,7 +144,7 @@ let
       command = "uvx";
       args = [
         "--from"
-        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@7afc7c1cc96e23992c8f105f960132c657883bb1"
+        "git+https://github.com/BeehiveInnovations/pal-mcp-server.git"
         "pal-mcp-server"
       ];
     };
