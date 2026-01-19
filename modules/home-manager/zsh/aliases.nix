@@ -72,4 +72,18 @@
   avd = "aws-vault exec default --"; # Execute with default profile
   ava = "aws-vault add"; # Add new profile credentials to vault
   avr = "aws-vault remove"; # Remove profile from vault
+
+  # ===========================================================================
+  # AI CLI Tools (Doppler for secrets injection)
+  # ===========================================================================
+  # Doppler injects API keys from 'ai-ci-automation' project:
+  #   - GEMINI_API_KEY (Google Gemini - used by PAL MCP)
+  #   - OPENROUTER_API_KEY (OpenRouter - unified model access)
+  #   - OLLAMA_HOST (local Ollama server URL)
+  #
+  # Usage:
+  #   d-claude             # Interactive Claude Code with injected secrets
+  #   d-claude -p "prompt" # Non-interactive with prompt
+  #
+  d-claude = "doppler run -p ai-ci-automation -c prd -- claude";
 }
