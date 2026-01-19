@@ -31,8 +31,8 @@ let
   inherit (aiCommon) permissions;
   inherit (aiCommon) formatters;
 
-  # Dynamic command discovery from flake inputs
-  discoverCommands =
+  # Dynamic discovery helper - finds all .md files in a directory
+  discoverMarkdownFiles =
     dir:
     let
       files = if builtins.pathExists dir then builtins.readDir dir else { };
@@ -40,21 +40,21 @@ let
     in
     map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
 
-  # Commands from agentsmd (Nix store / flake input)
-  # Auto-discovers all .md files in agentsmd/commands/
-  agentsMdCommands = discoverCommands "${ai-assistant-instructions}/agentsmd/commands";
+  # Discover items from both ai-assistant-instructions and claude-cookbooks
+  # Used for both commands and agents
+  discoveredItems = {
+    aiCommands = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/commands";
+    cbCommands = discoverMarkdownFiles "${claude-cookbooks}/.claude/commands";
+    aiAgents = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/agents";
+    cbAgents = discoverMarkdownFiles "${claude-cookbooks}/.claude/agents";
+  };
 
-  # Commands from claude-cookbooks (immutable from flake)
-  # Auto-discovers all .md files in .claude/commands/
-  cookbookCommands = discoverCommands "${claude-cookbooks}/.claude/commands";
-
-  # Agents from ai-assistant-instructions (agentsmd)
-  # Auto-discovers all .md files in agentsmd/agents/
-  agentsMdAgents = discoverCommands "${ai-assistant-instructions}/agentsmd/agents";
-
-  # Agents from claude-cookbooks
-  # Auto-discovers all .md files in .claude/agents/
-  cookbookAgents = discoverCommands "${claude-cookbooks}/.claude/agents";
+  inherit (discoveredItems)
+    aiCommands
+    cbCommands
+    aiAgents
+    cbAgents
+    ;
 
   # Import modular plugin configuration
   # Plugin configuration moved to claude-plugins.nix and organized by category
@@ -79,6 +79,14 @@ let
   # All servers are built/fetched at configuration time (no runtime npm)
   mcpConfig = import ./mcp { inherit config pkgs lib; };
   inherit (mcpConfig) mcpServers;
+
+  # Helper to build command/agent entries from discovered names
+  mkSourceEntries =
+    sourcePath: names:
+    map (name: {
+      inherit name;
+      source = "${sourcePath}/${name}.md";
+    }) names;
 
 in
 {
@@ -200,45 +208,13 @@ in
   commands = {
     # All commands from Nix store (flake inputs) for reproducibility
     fromFlakeInputs =
-      lib.concatMap
-        (
-          set:
-          map (name: {
-            inherit name;
-            source = "${set.path}/${name}.md";
-          }) set.names
-        )
-        [
-          {
-            path = "${ai-assistant-instructions}/.claude/commands";
-            names = agentsMdCommands;
-          }
-          {
-            path = "${claude-cookbooks}/.claude/commands";
-            names = cookbookCommands;
-          }
-        ];
+      (mkSourceEntries "${ai-assistant-instructions}/.claude/commands" aiCommands)
+      ++ (mkSourceEntries "${claude-cookbooks}/.claude/commands" cbCommands);
   };
 
   agents.fromFlakeInputs =
-    lib.concatMap
-      (
-        set:
-        map (name: {
-          inherit name;
-          source = "${set.path}/${name}.md";
-        }) set.names
-      )
-      [
-        {
-          path = "${ai-assistant-instructions}/agentsmd/agents";
-          names = agentsMdAgents;
-        }
-        {
-          path = "${claude-cookbooks}/.claude/agents";
-          names = cookbookAgents;
-        }
-      ];
+    (mkSourceEntries "${ai-assistant-instructions}/agentsmd/agents" aiAgents)
+    ++ (mkSourceEntries "${claude-cookbooks}/.claude/agents" cbAgents);
 
   settings = {
     # Extended thinking enabled with token budget controlled via env vars
@@ -255,12 +231,12 @@ in
       # Use `opusplan` alias for complex tasks (Opus for planning, Sonnet for execution).
       # Auto-claude background jobs use their own CLAUDE_MODEL env var (haiku).
       ANTHROPIC_MODEL = "sonnet";
-      CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
+      # CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
 
-      # Explicit model versions (Jan 2026) - pin to known working versions
-      ANTHROPIC_DEFAULT_OPUS_MODEL = "claude-opus-4-5-20251101";
-      ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-5-20250929";
-      ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001";
+      # Explicit model versions (Jan 2026) - pin to known working versions if customization needed
+      # ANTHROPIC_DEFAULT_OPUS_MODEL = "claude-opus-4-5-20251101";
+      # ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-5-20250929";
+      # ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001";
 
       # DEFAULT VALUES - do not remove, reference only
       # These are commented out because they match upstream defaults.

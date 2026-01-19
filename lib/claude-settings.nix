@@ -57,7 +57,9 @@ in
     command = "${homeDir}/.claude/statusline-command.sh";
   };
 
-  # MCP Servers - empty object for schema compliance
-  # Disabled for token cost reasons, but field must exist for schema validation
+  # MCP Servers - populated from modules/home-manager/ai-cli/mcp/default.nix in actual deployment
+  # Includes: context7, everything, fetch, filesystem, git, memory, sequentialthinking, time,
+  # docker, exa, firecrawl, cloudflare, aws, terraform, github, pal
+  # This pure generator shows empty object for CI schema validation only.
   mcpServers = { };
 }
