@@ -56,14 +56,10 @@ let
 
     enabledPlugins = cfg.plugins.enabled;
 
-    # MCP servers (filtered out disabled ones)
-    mcpServers = lib.mapAttrs (
-      _: s:
-      {
-        inherit (s) command args;
-      }
-      // lib.optionalAttrs (s.env != { }) { inherit (s) env; }
-    ) (lib.filterAttrs (_: s: !(s.disabled or false)) cfg.mcpServers);
+    # NOTE: MCP servers are NOT configured in settings.json
+    # Claude Code reads MCP servers from ~/.claude.json (user scope) or .mcp.json (project scope)
+    # Use `claude mcp add --scope user` to add servers, or run with d-claude alias for Doppler secrets
+    # The mcpServers option is kept for documentation but not output here
 
     # Environment variables (user-defined + apiKeyHelper if enabled)
   }

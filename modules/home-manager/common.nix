@@ -52,7 +52,6 @@ let
   claudeConfig = import ./ai-cli/claude-config.nix {
     inherit
       config
-      pkgs
       lib
       claude-code-plugins
       claude-cookbooks
