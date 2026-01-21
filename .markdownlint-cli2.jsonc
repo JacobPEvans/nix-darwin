@@ -3,6 +3,8 @@
     "default": true,
     "MD013": {
       "line_length": 160,
+      "heading_line_length": 120,
+      "code_block_line_length": 160,
       "tables": false
     },
     // MD060 (table-column-style) disabled: GitHub Actions markdownlint-cli2-action
@@ -10,7 +12,5 @@
     // includes markdownlint v0.38.0 (without MD060). Re-enable when nixpkgs updates.
     "MD060": false
   },
-  "ignores": ["result/**"],
-  "fix": true,
-  "gitignore": true
+  "fix": true
 }
