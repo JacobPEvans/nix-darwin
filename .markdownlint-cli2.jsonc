@@ -12,5 +12,6 @@
     // includes markdownlint v0.38.0 (without MD060). Re-enable when nixpkgs updates.
     "MD060": false
   },
-  "fix": true
+  "fix": true,
+  "gitignore": true
 }
