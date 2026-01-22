@@ -15,6 +15,11 @@ on:
         type: string
         default: 'enabled'
 
+# Performance: Cancel in-progress builds when new commits arrive
+concurrency:
+  group: nix-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build
@@ -25,8 +30,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Performance: Install Nix with built-in caching
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+
+      # Performance: GitHub Actions cache for Nix store paths
+      # Reduces build time by caching derivations across workflow runs
+      - name: Cache Nix Store
+        uses: actions/cache@v4
+        with:
+          path: |
+            /nix/store
+            ~/.cache/nix
+          key: nix-macos-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-macos-${{ runner.os }}-
 
       - name: Determinate Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
