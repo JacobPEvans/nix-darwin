@@ -561,6 +561,37 @@ def blocks_session_summary(
     return blocks, text
 
 
+def blocks_user_input_needed(session: str, question: str) -> tuple[list, str]:
+    """Block Kit for user input needed notification."""
+    safe_session = escape_slack_markdown(session)
+    safe_question = escape_slack_markdown(question)
+    text = f"Claude needs input: {safe_question}"
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": "🤔 Claude needs your input", "emoji": True},
+        },
+        {
+            "type": "section",
+            "fields": [
+                {"type": "mrkdwn", "text": f"*Session*\n{safe_session}"},
+                {"type": "mrkdwn", "text": f"*Time*\n{datetime.now().strftime('%I:%M %p')}"},
+            ],
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*Question:*\n{safe_question}"},
+        },
+        {
+            "type": "context",
+            "elements": [{"type": "mrkdwn", "text": "Return to your terminal to respond"}],
+        },
+    ]
+
+    return blocks, text
+
+
 def blocks_cross_issue_update(
     issues: list[str],
     prs: list[str],
@@ -657,6 +688,18 @@ def cmd_session_summary(args):
     return 0 if result else 1
 
 
+def cmd_user_input_needed(args):
+    """Handle user_input_needed event - sends push notification."""
+    error = check_channel_and_handle_error(args.channel)
+    if error is not None:
+        return error
+
+    token = get_slack_token()
+    blocks, text = blocks_user_input_needed(args.session, args.question)
+    result = post_message(token, args.channel, blocks, text)
+    return 0 if result else 1
+
+
 def cmd_cross_issue_update(args):
     """Handle cross_issue_update event - posts to Slack thread, NOT GitHub."""
     error = check_channel_and_handle_error(args.channel)
@@ -742,6 +785,13 @@ def main():
     p_summary.add_argument("--pr-count", type=int, help="Open PR count")
     p_summary.add_argument("--ratio", type=float, help="Issue:PR ratio")
     p_summary.set_defaults(func=cmd_session_summary)
+
+    # user_input_needed - push notification for AskUserQuestion
+    p_input = subparsers.add_parser("user_input_needed", help="Notify when Claude needs user input")
+    p_input.add_argument("--session", required=True, help="Session context (repo @ branch)")
+    p_input.add_argument("--question", required=True, help="Question text from AskUserQuestion")
+    p_input.add_argument("--channel", required=True, help="Slack channel ID")
+    p_input.set_defaults(func=cmd_user_input_needed)
 
     # cross_issue_update - goes to Slack thread, NOT GitHub
     p_cross = subparsers.add_parser("cross_issue_update", help="Post cross-issue update to Slack (not GitHub)")

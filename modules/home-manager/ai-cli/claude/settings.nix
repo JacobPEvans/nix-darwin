@@ -123,6 +123,50 @@ let
         };
       };
 
+  # Hook scripts generator
+  # Converts hook options to executable scripts in ~/.claude/hooks/
+  hookFiles =
+    let
+      # Map of hook names to their filenames
+      hookMapping = {
+        preToolUse = "pre-tool-use.sh";
+        postToolUse = "post-tool-use.sh";
+        userPromptSubmit = "user-prompt-submit.sh";
+        stop = "stop.sh";
+        subagentStop = "subagent-stop.sh";
+        sessionStart = "session-start.sh";
+        sessionEnd = "session-end.sh";
+      };
+
+      # Generate a single hook file attribute
+      mkHookFile =
+        _hookName: fileName: hookValue:
+        if hookValue == null then
+          { }
+        else if builtins.isPath hookValue then
+          {
+            ".claude/hooks/${fileName}".source = hookValue;
+          }
+        else
+          {
+            ".claude/hooks/${fileName}" = {
+              text = hookValue;
+              executable = true;
+            };
+          };
+
+      # Generate all hook files
+      allHookFiles = lib.mapAttrs' (
+        hookName: fileName: lib.nameValuePair hookName (mkHookFile hookName fileName cfg.hooks.${hookName})
+      ) hookMapping;
+
+      # Merge all non-null hook files
+      mergedHookFiles = lib.foldl' (acc: hookAttr: if hookAttr == { } then acc else acc // hookAttr) { } (
+        builtins.attrValues allHookFiles
+      );
+    in
+    mergedHookFiles;
+
 in
 {
   config = lib.mkIf cfg.enable {
@@ -143,7 +187,8 @@ in
     home.file = {
       ".claude/settings.json".source = settingsJson;
     }
-    // statusLineScript;
+    // statusLineScript
+    // hookFiles;
 
     # Cleanup activation script: Remove blocking regular files before symlink creation
     # This handles the case where settings.json exists as a regular file (e.g., created by Claude Code)

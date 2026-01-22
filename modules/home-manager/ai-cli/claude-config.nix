@@ -304,4 +304,18 @@ in
       # mobileConfigFile = statuslineConfigMobile;
     };
   };
+
+  # Hooks: Event-driven automation for Claude Code
+  # See: https://code.claude.com/docs/en/hooks
+  hooks = {
+    # Notify on user input needed (Issue #455)
+    # Sends Slack notification when Claude needs input via AskUserQuestion
+    # Enables mobile/async workflows
+    preToolUse = ./claude/hooks/ask-user-notify.sh;
+
+    # Capture last output for statusline display (Issue #479)
+    # Writes compact summary of last tool execution to ~/.cache/claude-last-output.txt
+    # Can be read by statusline, tmux, or other display tools
+    postToolUse = ./claude/hooks/last-output.sh;
+  };
 }
