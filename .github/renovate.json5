@@ -15,6 +15,7 @@
   ],
 
   // Repository settings
+  "baseBranches": ["main"],
   "timezone": "America/New_York",
   "labels": ["dependencies", "renovate"],
   "assignees": ["@JacobPEvans"],
@@ -64,7 +65,7 @@
         "JacobPEvans/ai-assistant-instructions"
       ],
       "groupName": "critical-infrastructure",
-      "schedule": ["after 7am every day"],
+      "schedule": ["after 7am"],
       "minimumReleaseAge": "1 day" // Wait 1 day for bug reports before merging
     },
 
@@ -97,8 +98,7 @@
       "description": "GitHub Actions updates - weekly at 7am Monday",
       "matchManagers": ["github-actions"],
       "groupName": "github-actions",
-      "schedule": ["after 7am on Monday"],
-      "automergeRequireAllStatusChecks": true
+      "schedule": ["after 7am on Monday"]
     },
 
     // SPECIAL: Node.js LTS tracking (no latest/current versions)
@@ -163,8 +163,7 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"],
-    "automerge": true,
-    "automergeRequireAllStatusChecks": true
+    "automerge": true
   },
 
   // Ignore patterns
