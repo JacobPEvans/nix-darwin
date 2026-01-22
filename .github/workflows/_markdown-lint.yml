@@ -5,6 +5,11 @@ name: _markdown-lint
 on:
   workflow_call:
 
+# Performance: Cancel in-progress lint when new commits arrive
+concurrency:
+  group: markdown-lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -13,10 +18,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      # Performance: Shallow clone is sufficient for linting
+      # Full history (fetch-depth: 0) not needed
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Run markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v22
