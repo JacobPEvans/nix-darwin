@@ -48,6 +48,9 @@ let
   # AWS CLI configuration (home.file entries)
   awsFiles = import ./aws/config.nix { inherit config; };
 
+  # Linter configurations (markdownlint, etc.)
+  linterFiles = import ./linters/markdownlint.nix { inherit config; };
+
   # Claude Code configuration (extracted to separate file for clarity)
   claudeConfig = import ./ai-cli/claude-config.nix {
     inherit
@@ -132,6 +135,7 @@ in
     file =
       npmFiles
       // awsFiles
+      // linterFiles
       // geminiFiles
       // geminiCommands
       // copilotFiles
