@@ -57,7 +57,7 @@
     // Note: matchPackageNames uses GitHub repo paths (owner/repo), not flake input names
     {
       "description": "Critical system inputs - daily updates at 7am",
-      "matchDatasources": ["github-tags", "github-releases"],
+      "matchDatasources": ["git-refs"],
       "matchPackageNames": [
         "NixOS/nixpkgs",
         "nix-darwin/nix-darwin",
