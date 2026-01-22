@@ -54,7 +54,8 @@ in
       failures=0
 
       DUTI_CONFIG=$(mktemp)
-      trap 'rm -f $DUTI_CONFIG' EXIT
+      LS_ERROR_LOG=$(mktemp)
+      trap 'rm -f "$DUTI_CONFIG" "$LS_ERROR_LOG"' EXIT
 
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (ext: uti: ''
@@ -65,14 +66,12 @@ in
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)"
 
-        LS_ERROR_LOG=$(mktemp)
         if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>"$LS_ERROR_LOG" >/dev/null; then
           echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Launch Services database rebuilt"
         else
           echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to rebuild Launch Services database" >&2
           failures=$((failures + 1))
         fi
-        rm -f "$LS_ERROR_LOG"
       else
         echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to apply file extension mappings" >&2
         failures=$((failures + 1))
