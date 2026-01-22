@@ -232,6 +232,7 @@
               sharedModules = [
                 ./modules/home-manager/ai-cli/agent-os
                 ./modules/home-manager/ai-cli/claude
+                ./modules/home-manager/ai-cli/maestro
                 ./modules/monitoring
               ];
             };
