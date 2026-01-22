@@ -6,7 +6,7 @@
 set -uo pipefail
 
 # Package definitions: name, priority
-# Priority: Security (security-critical) | AI Tool (AI tooling)
+# Priority: Security (security-critical) | AI Tool (AI tooling) | GUI App (desktop apps from unstable)
 PACKAGES=(
   "git:Security"
   "gnupg:Security"
@@ -16,6 +16,16 @@ PACKAGES=(
   "claude-monitor:AI Tool"
   "gemini-cli:AI Tool"
   "ollama:AI Tool"
+  "antigravity:GUI App"
+  "bitwarden-desktop:GUI App"
+  "chatgpt:GUI App"
+  "code-cursor:GUI App"
+  "ghostty-bin:GUI App"
+  "obsidian:GUI App"
+  "postman:GUI App"
+  "rapidapi:GUI App"
+  "raycast:GUI App"
+  "swiftbar:GUI App"
 )
 
 # Global counters for exit status

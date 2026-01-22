@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  unstablePkgs,
   ...
 }:
 
@@ -35,6 +36,23 @@ in
   nixpkgs.overlays = [
     (import ../../overlays/python-packages.nix)
     (import ../../overlays/macos-apps.nix)
+    # GUI apps from nixpkgs-unstable for faster version updates
+    # Stable branches (25.11) only get security fixes, not version bumps
+    # This overlay ensures GUI apps stay current with upstream releases
+    (_final: _prev: {
+      inherit (unstablePkgs)
+        antigravity
+        bitwarden-desktop
+        chatgpt
+        code-cursor
+        ghostty-bin
+        obsidian
+        postman
+        rapidapi
+        raycast
+        swiftbar
+        ;
+    })
   ];
 
   # --- User Configuration ---
