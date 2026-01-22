@@ -18,3 +18,8 @@ https://raw.githubusercontent.com/nix-darwin/.*
 
 # Local file references that won't exist in CI
 file://.*
+
+# API key pages with authentication restrictions
+https://console.anthropic.com/.*
+https://aistudio.google.com/.*
+https://platform.openai.com/.*
