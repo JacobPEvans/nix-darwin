@@ -27,14 +27,12 @@ in
   options.system.energy = {
     enable = lib.mkEnableOption "Energy and sleep configuration";
 
-    # Display sleep (applies to all power sources)
     displaysleep = lib.mkOption {
       type = lib.types.int;
       default = 10;
       description = "Display sleep timer in minutes (0 = never). Applies to all power sources.";
     };
 
-    # System sleep - separate for AC and battery
     sleep = {
       ac = lib.mkOption {
         type = lib.types.int;
@@ -49,14 +47,12 @@ in
       };
     };
 
-    # Disk sleep (applies to all power sources)
     disksleep = lib.mkOption {
       type = lib.types.int;
       default = 10;
       description = "Disk spindown timer in minutes (0 = never). Set to 0 for SSDs.";
     };
 
-    # Wake and restart options
     wakeOnMagicPacket = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -72,17 +68,9 @@ in
 
   config = lib.mkIf cfg.enable {
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Configure macOS energy and sleep settings
-      #
-      # NOTE: Follows CRITICAL RULES from docs/ACTIVATION-SCRIPTS-RULES.md:
-      #   * NEVER use 'set -e' - errors must not abort activation
-      #   * All errors logged as warnings, not fatal
-      #   * Must reach /run/current-system symlink update
-
       echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring energy and sleep settings..."
       failures=0
 
-      # Settings that apply to all power sources
       if sudo pmset -a \
         displaysleep ${toString cfg.displaysleep} \
         disksleep ${toString cfg.disksleep} \
@@ -94,7 +82,6 @@ in
         failures=$((failures + 1))
       fi
 
-      # AC power (plugged in) settings
       if sudo pmset -c sleep ${toString cfg.sleep.ac}; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] AC power settings applied (sleep: ${toString cfg.sleep.ac} min)"
       else
@@ -102,7 +89,6 @@ in
         failures=$((failures + 1))
       fi
 
-      # Battery settings
       if sudo pmset -b sleep ${toString cfg.sleep.battery}; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Battery settings applied (sleep: ${toString cfg.sleep.battery} min)"
       else
@@ -110,7 +96,6 @@ in
         failures=$((failures + 1))
       fi
 
-      # Display current settings only if at least one phase succeeded
       if [ $failures -lt 3 ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Current pmset configuration:"
         sudo pmset -g || echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Could not display pmset settings" >&2

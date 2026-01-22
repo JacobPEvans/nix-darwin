@@ -1,17 +1,5 @@
-# Terminal.app Configuration Module
-#
-# macOS Terminal.app stores window settings in nested plist structures
-# that require PlistBuddy for modification. Standard `defaults write`
-# cannot set nested dictionary values.
-#
-# Usage:
-#   programs.terminal = {
-#     enable = true;
-#     windowSize = {
-#       columns = 180;
-#       rows = 80;
-#     };
-#   };
+# Terminal.app window size configuration using PlistBuddy
+# for nested plist modification (defaults write cannot handle nested values).
 
 { lib, config, ... }:
 
@@ -46,59 +34,50 @@ in
 
   config = lib.mkIf cfg.enable {
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Configure Terminal.app default profile window size
-      #
-      # NOTE: This activation script follows CRITICAL RULES from docs/ACTIVATION-SCRIPTS-RULES.md:
-      #   * NEVER use 'set -e' - errors must not abort the script
-      #   * All errors logged as warnings, not fatal failures
-      #   * Must reach /run/current-system symlink update (symlink update is critical)
-      # This is why we use 'if ... then ... else echo warning' instead of '|| exit' patterns
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring Terminal.app window size..."
+      failures=0
+
       PLIST="${userConfig.user.homeDir}/Library/Preferences/com.apple.Terminal.plist"
       PROFILE="${cfg.profile}"
       COLUMNS=${toString cfg.windowSize.columns}
       ROWS=${toString cfg.windowSize.rows}
 
-      # Ensure the plist file exists; create it if missing (e.g., fresh install)
       if [ ! -f "$PLIST" ]; then
-        # Terminal.app hasn't been launched yet - create minimal plist
-        plutil -create xml1 "$PLIST"
-        echo "Created Terminal.app plist file"
-      fi
-
-      # Ensure the profile dictionary exists
-      if ! /usr/libexec/PlistBuddy -c "Print 'Window Settings':$PROFILE" "$PLIST" >/dev/null 2>&1; then
-        if ! /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE dict" "$PLIST" 2>/dev/null; then
-          echo "Error: Could not create profile dictionary 'Window Settings':$PROFILE" >&2
+        if plutil -create xml1 "$PLIST" 2>/dev/null; then
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Created Terminal.app plist"
+        else
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to create Terminal.app plist" >&2
+          failures=$((failures + 1))
         fi
       fi
 
-      # Track success for final message
-      colSuccess=0
-      rowSuccess=0
-
-      # Set columns for the profile
-      if /usr/libexec/PlistBuddy -c "Set 'Window Settings':$PROFILE:columnCount $COLUMNS" "$PLIST" 2>/dev/null; then
-        colSuccess=1
-      elif /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE:columnCount integer $COLUMNS" "$PLIST" 2>/dev/null; then
-        colSuccess=1
-      else
-        echo "Error: Failed to set columnCount for Terminal profile '$PROFILE'" >&2
+      if ! /usr/libexec/PlistBuddy -c "Print 'Window Settings':$PROFILE" "$PLIST" >/dev/null 2>&1; then
+        if ! /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE dict" "$PLIST" 2>/dev/null; then
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to create profile dictionary" >&2
+          failures=$((failures + 1))
+        fi
       fi
 
-      # Set rows for the profile
-      if /usr/libexec/PlistBuddy -c "Set 'Window Settings':$PROFILE:rowCount $ROWS" "$PLIST" 2>/dev/null; then
-        rowSuccess=1
-      elif /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE:rowCount integer $ROWS" "$PLIST" 2>/dev/null; then
-        rowSuccess=1
+      if /usr/libexec/PlistBuddy -c "Set 'Window Settings':$PROFILE:columnCount $COLUMNS" "$PLIST" 2>/dev/null ||
+         /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE:columnCount integer $COLUMNS" "$PLIST" 2>/dev/null; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Set columns to $COLUMNS"
       else
-        echo "Error: Failed to set rowCount for Terminal profile '$PROFILE'" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set columnCount" >&2
+        failures=$((failures + 1))
       fi
 
-      # Report success or failure
-      if [ $colSuccess -eq 1 ] && [ $rowSuccess -eq 1 ]; then
-        echo "Terminal.app profile '$PROFILE' configured for ''${COLUMNS}x''${ROWS}"
+      if /usr/libexec/PlistBuddy -c "Set 'Window Settings':$PROFILE:rowCount $ROWS" "$PLIST" 2>/dev/null ||
+         /usr/libexec/PlistBuddy -c "Add 'Window Settings':$PROFILE:rowCount integer $ROWS" "$PLIST" 2>/dev/null; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Set rows to $ROWS"
       else
-        echo "Warning: Terminal.app profile '$PROFILE' configuration incomplete" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set rowCount" >&2
+        failures=$((failures + 1))
+      fi
+
+      if [ $failures -eq 0 ]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Terminal.app configured for ''${COLUMNS}x''${ROWS}"
+      else
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Terminal.app configuration completed with $failures failure(s)" >&2
       fi
     '';
   };
