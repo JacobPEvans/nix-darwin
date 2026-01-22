@@ -281,12 +281,5 @@ in
     # Config: Rose Pine theme, capsule style, 3-line layout
     claudeStatusline.enable = true;
 
-    # ==========================================================================
-    # Agent OS
-    # ==========================================================================
-    # Spec-driven development system for AI coding agents
-    # Commands and agents installed globally to ~/.claude/ (no per-project setup)
-    # Config stored in ~/agent-os/config.yml
-    agent-os.enable = true;
   };
 }

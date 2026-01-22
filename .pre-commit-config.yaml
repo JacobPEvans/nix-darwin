@@ -195,8 +195,8 @@ repos:
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs
-        name: Update flake inputs (nixpkgs, ai-assistant-instructions, agent-os, nix-config-main)
-        entry: nix flake update nixpkgs ai-assistant-instructions agent-os nix-config-main
+        name: Update flake inputs (nixpkgs, ai-assistant-instructions, nix-config-main)
+        entry: nix flake update nixpkgs ai-assistant-instructions nix-config-main
         language: system
         stages: [manual]
         pass_filenames: false

@@ -49,7 +49,7 @@ It provides native Nix flake support and can scan arbitrary files for package ve
 | Group | Packages | Schedule | Auto-merge |
 |-------|----------|----------|------------|
 | **Critical Infrastructure** | nixpkgs, darwin, home-manager, ai-assistant-instructions | Mon/Thu 3am | No (manual review) |
-| **AI Tools** | claude-code-plugins, agent-os, llm-agents, etc. | Sun/Wed/Fri 10pm | Yes (patch/minor) |
+| **AI Tools** | claude-code-plugins, llm-agents, etc. | Sun/Wed/Fri 10pm | Yes (patch/minor) |
 | **npm Packages** | cclint, chatgpt-cli, gh-copilot | Monday 10pm | Yes (patch/minor) |
 
 **Auto-merge policy:**
@@ -151,7 +151,6 @@ Updated daily at noon UTC:
 - `claude-plugins-official`
 - `anthropic-skills`
 - `superpowers-marketplace`
-- `agent-os`
 
 ### Full Updates (Tue/Fri)
 

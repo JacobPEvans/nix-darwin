@@ -1,29 +1,13 @@
 {
   "nodes": {
-    "agent-os": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1765489693,
-        "narHash": "sha256-33PFC8HLgzVRpyTXSOxS09ffIjcr2P96/RKoZzQZ22o=",
-        "owner": "buildermethods",
-        "repo": "agent-os",
-        "rev": "8b12ec5b3d002988da7171b89b9f60e5dbd88abc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "buildermethods",
-        "repo": "agent-os",
-        "type": "github"
-      }
-    },
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1768871324,
-        "narHash": "sha256-rqgyztNjOxK4X84DTRsCL4ve0/TC5FKE2P70B7xuum0=",
+        "lastModified": 1769075842,
+        "narHash": "sha256-208QwRaOfxDXAtHbOYUiYzIo51yz5ZmDukMsBGXla4M=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "de5f47bb33a5685780d6134afe0824ecda369bdb",
+        "rev": "314a4f9e93658f9e52f9143adc627e08ab453147",
         "type": "github"
       },
       "original": {
@@ -284,7 +268,6 @@
     },
     "root": {
       "inputs": {
-        "agent-os": "agent-os",
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-skills": "anthropic-skills",
         "claude-code-plugins": "claude-code-plugins",

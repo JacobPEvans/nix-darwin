@@ -325,7 +325,7 @@ Renovate creates PRs on a schedule based on package criticality:
 | Package Group | Schedule | Auto-merge |
 |---------------|----------|------------|
 | Critical Infrastructure (nixpkgs, darwin, home-manager) | Mon/Thu 3am | No |
-| AI Tools (claude-code-plugins, agent-os, etc.) | Sun/Wed/Fri 10pm | Yes (patch/minor) |
+| AI Tools (claude-code-plugins, etc.) | Sun/Wed/Fri 10pm | Yes (patch/minor) |
 | npm Packages (cclint, chatgpt-cli, gh-copilot) | Monday 10pm | Yes (patch/minor) |
 
 **Auto-merge policy:**

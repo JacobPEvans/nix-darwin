@@ -67,14 +67,6 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Agent OS - spec-driven development system for AI coding agents
-    # Provides standards, workflows, agents, and commands
-    # https://buildermethods.com/agent-os
-    agent-os = {
-      url = "github:buildermethods/agent-os";
-      flake = false; # Not a flake, just fetch the repo
-    };
-
     # AI Assistant Instructions - source of truth for AI agent configuration
     # Contains permissions, commands, and instruction files
     # Consumed by claude.nix to generate settings.json
@@ -124,7 +116,6 @@
       claude-cookbooks,
       claude-plugins-official,
       anthropic-skills,
-      agent-os,
       ai-assistant-instructions,
       superpowers-marketplace,
       jacobpevans-cc-plugins,
@@ -183,7 +174,6 @@
           claude-cookbooks
           claude-plugins-official
           anthropic-skills
-          agent-os
           ai-assistant-instructions
           superpowers-marketplace
           jacobpevans-cc-plugins
@@ -206,7 +196,6 @@
               inherit extraSpecialArgs;
               users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
-              # Agent OS: Proper home-manager module for spec-driven AI development
               # Claude: Unified configuration for Claude Code ecosystem
               # Monitoring: K8s-based observability stack (OTEL, Cribl, Splunk)
               # Note: nix-config-symlink module intentionally removed.
@@ -218,7 +207,6 @@
               # making mac-app-util trampolines redundant for TCC permission persistence.
               # The darwin-level mac-app-util module is still used for /Applications/Nix Apps/.
               sharedModules = [
-                ./modules/home-manager/ai-cli/agent-os
                 ./modules/home-manager/ai-cli/claude
                 ./modules/monitoring
               ];
