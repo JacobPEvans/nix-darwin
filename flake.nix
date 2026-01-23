@@ -6,6 +6,9 @@
     # Using stable nixpkgs-25.11 for reliability
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
 
+    # Using unstable nixpkgs for faster updates to GUI apps
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
     # Consolidated systems input for darwin-only configuration
     # All transitive dependencies should follow this to avoid duplicate systems entries
     systems.url = "github:nix-systems/default-darwin";
@@ -109,6 +112,7 @@
   outputs =
     {
       nixpkgs,
+      nixpkgs-unstable,
       darwin,
       home-manager,
       mac-app-util,
@@ -126,6 +130,12 @@
     let
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
+
+      # Import nixpkgs-unstable for faster updates to GUI applications
+      unstablePkgs = import nixpkgs-unstable {
+        system = "aarch64-darwin";
+        config.allowUnfree = true;
+      };
 
       # Pure settings generator for CI (no derivations, cross-platform)
       # Reads permissions from unified ai-assistant-instructions structure
@@ -170,6 +180,7 @@
       # Pass external sources to home-manager modules
       extraSpecialArgs = {
         inherit
+          unstablePkgs
           claude-code-plugins
           claude-cookbooks
           claude-plugins-official
@@ -184,6 +195,7 @@
       # Define configuration once, assign to multiple names
       darwinConfig = darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        specialArgs = { inherit unstablePkgs; };
         modules = [
           ./hosts/macbook-m4/default.nix
 
@@ -208,6 +220,7 @@
               # The darwin-level mac-app-util module is still used for /Applications/Nix Apps/.
               sharedModules = [
                 ./modules/home-manager/ai-cli/claude
+                ./modules/home-manager/ai-cli/maestro
                 ./modules/monitoring
               ];
             };
