@@ -12,7 +12,6 @@ Comprehensive reference for the integrated Anthropic Claude Code ecosystem in th
 - [Patterns](#patterns)
 - [SDK Development](#sdk-development)
 - [GitHub Actions](#github-actions)
-- [Agent OS Integration](#agent-os-integration)
 - [Migration Notes](#migration-notes)
 - [Resources](#resources)
 
@@ -415,23 +414,6 @@ Workflows can be customized for your needs:
 - Configure severity thresholds
 - Modify comment formatting
 - Add additional checks
-
----
-
-## Agent OS Integration
-
-Agent OS is a spec-driven development system providing 7 commands, 8 agents, and 16+ skills for AI-assisted development.
-
-**Full documentation**: [docs/AGENT-OS.md](AGENT-OS.md)
-
-**Quick Start**:
-
-```bash
-claude /plan-product      # Product planning
-claude /write-spec        # Write technical spec
-claude /create-tasks      # Generate task list
-claude /implement-tasks   # Execute implementation
-```
 
 ---
 

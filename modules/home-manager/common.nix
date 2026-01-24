@@ -281,29 +281,5 @@ in
     # Config: Rose Pine theme, capsule style, 3-line layout
     claudeStatusline.enable = true;
 
-    # ==========================================================================
-    # Agent OS
-    # ==========================================================================
-    # Spec-driven development system for AI coding agents
-    # Commands and agents installed globally to ~/.claude/ (no per-project setup)
-    # Config stored in ~/agent-os/config.yml
-    agent-os.enable = true;
-
-    # ==========================================================================
-    # Maestro Auto Run
-    # ==========================================================================
-    # Autonomous issue resolution via scheduled playbook execution
-    # Playbooks deployed to ~/Maestro/Auto Run Docs/
-    # LaunchAgent executes maestro-cli on schedule
-    maestro = {
-      enable = true;
-      issueResolver = {
-        enable = false; # Disabled by default - enable in host-specific config
-        schedule = {
-          hour = 9;
-          minute = 0;
-        };
-      };
-    };
   };
 }
