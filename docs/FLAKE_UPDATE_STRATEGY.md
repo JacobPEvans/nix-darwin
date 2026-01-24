@@ -23,7 +23,6 @@ The following inputs update daily:
 - `jacobpevans-cc-plugins` (personal custom plugins)
 - `anthropic-skills` (Anthropic reusable skills)
 - `superpowers-marketplace` (superpowers development system)
-- `agent-os` (spec-driven development system)
 
 ## Claude Code Update Philosophy
 

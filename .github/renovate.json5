@@ -75,7 +75,6 @@
       "description": "AI-focused flake inputs - daily updates at 7am",
       "matchPackagePatterns": [
         "anthropics/",
-        "buildermethods/agent-os",
         "obra/superpowers-marketplace",
         "JacobPEvans/claude-code-plugins"
       ],
