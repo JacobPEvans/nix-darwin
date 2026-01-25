@@ -13,10 +13,15 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nix-config.url = "path:../..";
   };
 
   outputs =
-    { nixpkgs, ... }:
+    {
+      nixpkgs,
+      nix-config,
+      ...
+    }:
     let
       systems = [
         "aarch64-darwin"
@@ -39,6 +44,9 @@
     {
       devShells = forAllSystems (
         { pkgs }:
+        let
+          pythonEnvs = import "${nix-config}/lib/python-environments.nix" { inherit pkgs; };
+        in
         {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
@@ -65,7 +73,7 @@
 
               # === Cloud & Development ===
               awscli2
-              python3
+              (python3.withPackages pythonEnvs.packageSets.ansible)
               git
 
               # === Utilities ===
