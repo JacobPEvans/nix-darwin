@@ -31,7 +31,7 @@ let
       handler = "com.apple.archiveutility";
       role = "all"; # all = viewer, editor, and shell role
     in
-    ''${pkgs.duti}/bin/duti -s ${handler} .${assoc.extension} ${role}'';
+    "${pkgs.duti}/bin/duti -s ${handler} .${assoc.extension} ${role}";
 
   # Generate activation script for all file associations
   activationScript = ''
