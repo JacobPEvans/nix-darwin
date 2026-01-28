@@ -15,7 +15,7 @@ fi
 EXCLUSIONS=(
   "shortwave:Different apps - nixpkgs=radio client, homebrew=email client"
   "claude-code:Intentionally using homebrew due to recent nixpkgs version instability"
-  "claude:Not available for aarch64-darwin (only x86_64-linux)"
+  "claude:Not in nixpkgs for Darwin"
 )
 
 HOMEBREW_FILE="modules/darwin/homebrew.nix"

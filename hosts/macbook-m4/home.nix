@@ -85,11 +85,12 @@
         chatgpt # OpenAI ChatGPT desktop app
         claudebar # Menu bar app for AI coding assistant quota monitoring
 
-        # Media & Encoding
-        ffmpeg # Complete solution to record, convert and stream audio and video
-
         # Communication
         # zoom-us # DISABLED - no longer using Zoom
+      ])
+      # CLI / Media tools (non-GUI, no .app bundle)
+      ++ (with pkgs; [
+        ffmpeg # Complete solution to record, convert and stream audio and video
       ])
       # AI Development Tools (linters, formatters, analyzers)
       # See modules/home-manager/ai-cli/ai-tools.nix for package definitions
