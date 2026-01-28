@@ -85,6 +85,9 @@
         chatgpt # OpenAI ChatGPT desktop app
         claudebar # Menu bar app for AI coding assistant quota monitoring
 
+        # Media & Encoding
+        ffmpeg # Complete solution to record, convert and stream audio and video
+
         # Communication
         # zoom-us # DISABLED - no longer using Zoom
       ])
