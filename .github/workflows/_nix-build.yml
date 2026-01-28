@@ -37,7 +37,7 @@ jobs:
       # Performance: GitHub Actions cache for Nix store paths
       # Reduces build time by caching derivations across workflow runs
       - name: Cache Nix Store
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             /nix/store
