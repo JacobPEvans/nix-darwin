@@ -51,11 +51,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1769648954,
-        "narHash": "sha256-eRKxqH+sxclBW7dD4eMmKs5/aSfR2CXAIIP4DzKAG1w=",
+        "lastModified": 1769826624,
+        "narHash": "sha256-LDWUZnn7ZKmSszD0y06ChVt8862B5N7mUkoFPYgVi7g=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "cf98f1d9430c3935397ea50cb28fb097f9ada1bb",
+        "rev": "34f551fa919058abc0118beee08f378632c4b2d4",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "claude-cookbooks": {
       "flake": false,
       "locked": {
-        "lastModified": 1769541448,
-        "narHash": "sha256-eUqzLCAQdhpMmX6hI8FRztbPCdw28LqynL9+5wK4+P8=",
+        "lastModified": 1769816307,
+        "narHash": "sha256-miSHCWNnlSzd4Hnw1iLk1g5weX6pCgyYGEZkbtALceY=",
         "owner": "anthropics",
         "repo": "claude-cookbooks",
-        "rev": "968fc1698b3f5fe0a1c67d2185d3264de4569d52",
+        "rev": "ce4c093127bb52ad79294bd433b2de5a19dab31f",
         "type": "github"
       },
       "original": {
@@ -99,11 +99,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1769650870,
-        "narHash": "sha256-kVg1qa0QSvhNdI3NgolwB5OPW+/qTmh7DKQVlGJkus0=",
+        "lastModified": 1769730263,
+        "narHash": "sha256-hx8LNT3mnJs2RiwYMwC+T4CFXVOWQrZS7PLzgJO+rlY=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "d49ad355866978f67129695a5b6dbdbff5feb951",
+        "rev": "27d2b86d72da27c64585150857cee8472ad47abb",
         "type": "github"
       },
       "original": {
