@@ -145,7 +145,10 @@ let
           { }
         else if builtins.isPath hookValue then
           {
-            ".claude/hooks/${fileName}".source = hookValue;
+            ".claude/hooks/${fileName}" = {
+              source = hookValue;
+              executable = true;
+            };
           }
         else
           {

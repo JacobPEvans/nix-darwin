@@ -35,13 +35,13 @@ case "${TOOL_NAME:-}" in
   "Read")
     # For file reads, show the file path
     FILE_PATH=$(echo "${TOOL_INPUT:-}" | jq -r '.file_path // .filePath // "unknown"' 2>/dev/null || echo "unknown")
-    SUMMARY="read: $(basename "$FILE_PATH")"
+    SUMMARY="read: $(basename "${FILE_PATH}")"
     ;;
 
   "Write"|"Edit")
     # For file writes/edits, show the file path
     FILE_PATH=$(echo "${TOOL_INPUT:-}" | jq -r '.file_path // .filePath // "unknown"' 2>/dev/null || echo "unknown")
-    SUMMARY="$(echo "${TOOL_NAME}" | tr '[:upper:]' '[:lower:]'): $(basename "$FILE_PATH")"
+    SUMMARY="$(echo "${TOOL_NAME}" | tr '[:upper:]' '[:lower:]'): $(basename "${FILE_PATH}")"
     ;;
 
   "Grep"|"Glob")
@@ -69,7 +69,7 @@ echo "$OUTPUT" >> "$LOG_FILE"
 
 # Keep log file size under control (last 100 lines)
 if [[ -f "$LOG_FILE" ]]; then
-  TMP_LOG=$(mktemp "${LOG_FILE}.XXXXXXXXXX")
+  TMP_LOG=$(mktemp)
   tail -n 100 "$LOG_FILE" > "$TMP_LOG" && mv "$TMP_LOG" "$LOG_FILE"
 fi
 
