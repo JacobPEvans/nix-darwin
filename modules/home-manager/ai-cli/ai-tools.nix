@@ -52,6 +52,8 @@
 #     - Status: Waiting - nixpkgs 0.0.373 has broken package-lock
 #   chatgpt: chatgpt-cli@3.3.0
 #     - Status: Not in nixpkgs
+#   claude-flow: claude-flow@2.0.0
+#     - Status: Not in nixpkgs or homebrew - npm package for AI agent orchestration
 #
 # HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
 #   block-goose-cli: Block's AI agent
@@ -130,6 +132,17 @@
     # SECURITY: Uses bunx wrapper with pinned version; not available in nixpkgs
     (writeShellScriptBin "chatgpt" ''
       exec ${bun}/bin/bunx --bun chatgpt-cli@3.3.0 "$@"
+    '')
+
+    # ==========================================================================
+    # Claude Flow - AI Agent Orchestration Platform
+    # ==========================================================================
+    # Source: https://github.com/ruvnet/claude-flow
+    # NPM: claude-flow
+    # SECURITY: Uses bunx wrapper with pinned version; not in nixpkgs or homebrew
+    # TODO: Migrate to buildBunPackage for offline/reproducible builds
+    (writeShellScriptBin "claude-flow" ''
+      exec ${bun}/bin/bunx --bun claude-flow@2.0.0 "$@"
     '')
 
     # ==========================================================================
