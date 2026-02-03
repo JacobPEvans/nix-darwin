@@ -27,7 +27,7 @@ let
     inherit lib;
     # Generate ISO 8601 timestamp at build time via bash printf
     lastUpdated = builtins.readFile (
-      pkgs.runCommand "timestamp" { } ''printf '%(%Y-%m-%dT%H:%M:%S.000Z)T' -1 > $out''
+      pkgs.runCommand "timestamp" { } "printf '%(%Y-%m-%dT%H:%M:%S.000Z)T' -1 > $out"
     );
   };
 
