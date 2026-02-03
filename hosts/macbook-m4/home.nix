@@ -88,6 +88,10 @@
         # Communication
         # zoom-us # DISABLED - no longer using Zoom
       ])
+      # CLI / Media tools (non-GUI, no .app bundle)
+      ++ (with pkgs; [
+        ffmpeg # Complete solution to record, convert and stream audio and video
+      ])
       # AI Development Tools (linters, formatters, analyzers)
       # See modules/home-manager/ai-cli/ai-tools.nix for package definitions
       ++ (import ../../modules/home-manager/ai-cli/ai-tools.nix { inherit pkgs; }).packages;
