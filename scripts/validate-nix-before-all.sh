@@ -14,6 +14,7 @@ fi
 # Format: "package-name:reason"
 EXCLUSIONS=(
   "shortwave:Different apps - nixpkgs=radio client, homebrew=email client"
+  "claude:nixpkgs has unrelated packages (haskell lib), not the Claude desktop app"
   "claude-code:Intentionally using homebrew due to recent nixpkgs version instability"
 )
 
