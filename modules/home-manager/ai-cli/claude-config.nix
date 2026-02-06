@@ -94,9 +94,12 @@ in
     # scriptPath default: .local/bin/claude-api-key-helper
   };
 
+  # Agent teams display mode (direct settings.json property)
+  teammateMode = "auto";
+
   # Auto-Claude: Scheduled autonomous maintenance
   # ENABLED - Uses Haiku model for cost-efficiency (via per-repo CLAUDE_MODEL env var)
-  # Interactive sessions use Sonnet (via ANTHROPIC_MODEL), autoClaude overrides to Haiku
+  # Interactive sessions use the default model, autoClaude overrides to Haiku
   # Resource limits: max 10 PRs, max 50 issues, max 1 analysis per item per run
   autoClaude = {
     enable = true;
@@ -224,7 +227,7 @@ in
       # Model selection: Sonnet is default for interactive sessions (better reasoning).
       # Use `opusplan` alias for complex tasks (Opus for planning, Sonnet for execution).
       # Auto-claude background jobs use their own CLAUDE_MODEL env var (haiku).
-      ANTHROPIC_MODEL = "sonnet";
+      # ANTHROPIC_MODEL = "sonnet"; # Uncomment to override default model
       # CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
 
       # Explicit model versions (Jan 2026) - pin to known working versions if customization needed
@@ -235,6 +238,10 @@ in
       # MCP timeout settings (5 minutes) - required for PAL MCP complex operations
       MCP_TIMEOUT = "300000";
       MCP_TOOL_TIMEOUT = "300000";
+
+      # Experimental: Agent teams - coordinate multiple Claude Code instances
+      # See: https://code.claude.com/docs/en/agent-teams
+      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 
       # DEFAULT VALUES - do not remove, reference only
       # These are commented out because they match upstream defaults.

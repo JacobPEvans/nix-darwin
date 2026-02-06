@@ -190,6 +190,23 @@ in
       };
     };
 
+    # Agent teams: coordinate multiple Claude Code instances
+    # See: https://code.claude.com/docs/en/agent-teams
+    teammateMode = mkOption {
+      type = types.enum [
+        "auto"
+        "in-process"
+        "tmux"
+      ];
+      default = "auto";
+      description = ''
+        Display mode for agent team teammates.
+        - "auto": split panes if already in tmux, in-process otherwise
+        - "in-process": all teammates in main terminal (Shift+Up/Down to navigate)
+        - "tmux": force split-pane mode (requires tmux)
+      '';
+    };
+
     # Settings
     settings = {
       # Extended thinking mode
