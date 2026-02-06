@@ -224,7 +224,7 @@ in
       # Model selection: Sonnet is default for interactive sessions (better reasoning).
       # Use `opusplan` alias for complex tasks (Opus for planning, Sonnet for execution).
       # Auto-claude background jobs use their own CLAUDE_MODEL env var (haiku).
-      ANTHROPIC_MODEL = "sonnet";
+      # ANTHROPIC_MODEL = "sonnet"; # Uncomment to override default model
       # CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
 
       # Explicit model versions (Jan 2026) - pin to known working versions if customization needed
@@ -235,6 +235,10 @@ in
       # MCP timeout settings (5 minutes) - required for PAL MCP complex operations
       MCP_TIMEOUT = "300000";
       MCP_TOOL_TIMEOUT = "300000";
+
+      # Experimental: Agent teams - coordinate multiple Claude Code instances
+      # See: https://code.claude.com/docs/en/agent-teams
+      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 
       # DEFAULT VALUES - do not remove, reference only
       # These are commented out because they match upstream defaults.
