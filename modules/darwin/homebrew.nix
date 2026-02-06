@@ -53,6 +53,7 @@ _:
       # NOTE: GoPro Quik (561350520) removed - no longer needed
 
       # Microsoft 365 bundle (https://apps.apple.com/us/app-bundle/microsoft-365/id1450038993)
+      # NOTE: First-time install requires `sudo mas install <id>` due to TTY/sudo constraints
       # Individual apps from the bundle - replaces any non-App Store versions
       "Microsoft Word" = 462054704;
       "Microsoft Excel" = 462058435;
