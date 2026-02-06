@@ -121,9 +121,10 @@ repos:
       # Lychee link checker - validates links in markdown and HTML
       # Runs automatically on every commit (not manual-stage)
       # Lychee is fast with async validation and caching, minimal slowdown impact
+      # Uses .lychee.toml for accept rules and .lycheeignore for exclusions
       - id: lychee
         name: Lychee link checker
-        entry: lychee
+        entry: lychee --config .lychee.toml
         language: system
         files: \.(md|html)$
         types: [file]

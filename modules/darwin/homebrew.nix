@@ -51,6 +51,16 @@ _:
       "Toggl Track" = 1291898086; # Time tracking
       "Monarch Money Tweaks" = 6753774259; # Personal finance enhancements
       # NOTE: GoPro Quik (561350520) removed - no longer needed
+
+      # Microsoft 365 bundle (https://apps.apple.com/us/app-bundle/microsoft-365/id1450038993)
+      # NOTE: First-time install requires `sudo mas install <id>` due to TTY/sudo constraints
+      # Individual apps from the bundle - replaces any non-App Store versions
+      "Microsoft Word" = 462054704;
+      "Microsoft Excel" = 462058435;
+      "Microsoft PowerPoint" = 462062816;
+      "Microsoft Outlook" = 985367838;
+      "Microsoft OneNote" = 784801555;
+      "OneDrive" = 823766827;
     };
   };
 }
