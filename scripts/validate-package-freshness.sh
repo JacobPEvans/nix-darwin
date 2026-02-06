@@ -25,7 +25,6 @@ FLAKE_LOCK="flake.lock"
 # Critical packages that must be <30 days old
 CRITICAL_PACKAGES=(
   "nixpkgs"
-  "darwin"
   "home-manager"
   "ai-assistant-instructions"
 )
@@ -34,6 +33,7 @@ CRITICAL_PACKAGES=(
 # Add packages here that should never trigger staleness failures
 # Supports glob patterns: "prefix*" matches "prefix", "prefix_2", etc.
 EXEMPT_PACKAGES=(
+  "darwin"        # Pinned to nix-darwin-25.11 stable branch - infrequent backports
   "flake-compat"  # Compatibility shim - stable interface, infrequent updates needed
   "flake-utils"   # Utility library - stable helpers, infrequent updates needed
   "systems"       # nix-systems/default-darwin - system architectures, rarely updated
