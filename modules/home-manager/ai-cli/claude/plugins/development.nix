@@ -53,6 +53,9 @@ _:
     "markdown-validator@jacobpevans-cc-plugins" = true;
     "token-validator@jacobpevans-cc-plugins" = true;
     "issue-limiter@jacobpevans-cc-plugins" = true;
+    "codeql-resolver@jacobpevans-cc-plugins" = true;
+    "git-permission-guard@jacobpevans-cc-plugins" = true;
+    "main-branch-guard@jacobpevans-cc-plugins" = true;
 
     # ========================================================================
     # Claude Skills Marketplace - Individual Plugins
