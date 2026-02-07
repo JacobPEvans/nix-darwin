@@ -42,14 +42,12 @@ let
   # Discover items from both ai-assistant-instructions and claude-cookbooks
   # Used for both commands and agents
   discoveredItems = {
-    aiCommands = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/commands";
     cbCommands = discoverMarkdownFiles "${claude-cookbooks}/.claude/commands";
     aiAgents = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/agents";
     cbAgents = discoverMarkdownFiles "${claude-cookbooks}/.claude/agents";
   };
 
   inherit (discoveredItems)
-    aiCommands
     cbCommands
     aiAgents
     cbAgents
@@ -204,9 +202,7 @@ in
 
   commands = {
     # All commands from Nix store (flake inputs) for reproducibility
-    fromFlakeInputs =
-      (mkSourceEntries "${ai-assistant-instructions}/agentsmd/commands" aiCommands)
-      ++ (mkSourceEntries "${claude-cookbooks}/.claude/commands" cbCommands);
+    fromFlakeInputs = mkSourceEntries "${claude-cookbooks}/.claude/commands" cbCommands;
   };
 
   agents.fromFlakeInputs =
