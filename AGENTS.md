@@ -19,10 +19,19 @@ cd <branch>
 
 ## Test & Deploy
 
+**CRITICAL**: MUST run BOTH commands before every push/PR creation:
+
 ```bash
 nix flake check
 sudo darwin-rebuild switch --flake .
 ```
+
+These are NOT optional deployment steps - they are REQUIRED testing:
+
+- `nix flake check`: Validates flake syntax and structure
+- `sudo darwin-rebuild switch`: Tests that changes actually work in production
+
+**Never push or create a PR without running both commands successfully.**
 
 ## File References
 
