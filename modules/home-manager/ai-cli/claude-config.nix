@@ -39,19 +39,11 @@ let
     in
     map (name: lib.removeSuffix ".md" name) (builtins.attrNames mdFiles);
 
-  # Discover items from both ai-assistant-instructions and claude-cookbooks
-  # Used for both commands and agents
-  discoveredItems = {
-    cbCommands = discoverMarkdownFiles "${claude-cookbooks}/.claude/commands";
-    aiAgents = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/agents";
-    cbAgents = discoverMarkdownFiles "${claude-cookbooks}/.claude/agents";
-  };
-
-  inherit (discoveredItems)
-    cbCommands
-    aiAgents
-    cbAgents
-    ;
+  # Discover commands and agents from configured sources
+  # Commands are discovered from claude-cookbooks; agents from both ai-assistant-instructions and claude-cookbooks
+  cbCommands = discoverMarkdownFiles "${claude-cookbooks}/.claude/commands";
+  aiAgents = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/agents";
+  cbAgents = discoverMarkdownFiles "${claude-cookbooks}/.claude/agents";
 
   # Import modular plugin configuration
   # Plugin configuration moved to claude-plugins.nix and organized by category
