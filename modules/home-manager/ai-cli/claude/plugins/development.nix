@@ -47,15 +47,15 @@ _:
     # ========================================================================
     # JacobPEvans Personal Plugins - ALL ENABLED
     # ========================================================================
-    # Enable all plugins from user's custom marketplace
-    "git-rebase-workflow@jacobpevans-cc-plugins" = true;
-    "webfetch-guard@jacobpevans-cc-plugins" = true;
-    "markdown-validator@jacobpevans-cc-plugins" = true;
-    "token-validator@jacobpevans-cc-plugins" = true;
-    "issue-limiter@jacobpevans-cc-plugins" = true;
+    # Enable all plugins from user's custom marketplace (alphabetically sorted)
     "codeql-resolver@jacobpevans-cc-plugins" = true;
     "git-permission-guard@jacobpevans-cc-plugins" = true;
+    "git-rebase-workflow@jacobpevans-cc-plugins" = true;
+    "issue-limiter@jacobpevans-cc-plugins" = true;
     "main-branch-guard@jacobpevans-cc-plugins" = true;
+    "markdown-validator@jacobpevans-cc-plugins" = true;
+    "token-validator@jacobpevans-cc-plugins" = true;
+    "webfetch-guard@jacobpevans-cc-plugins" = true;
 
     # ========================================================================
     # Claude Skills Marketplace - Individual Plugins
