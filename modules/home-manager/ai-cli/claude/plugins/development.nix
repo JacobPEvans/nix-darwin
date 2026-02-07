@@ -48,9 +48,15 @@ _:
     # JacobPEvans Personal Plugins - ALL ENABLED
     # ========================================================================
     # Enable all plugins from user's custom marketplace (alphabetically sorted)
+    "ai-delegation@jacobpevans-cc-plugins" = true;
     "codeql-resolver@jacobpevans-cc-plugins" = true;
+    "config-management@jacobpevans-cc-plugins" = true;
     "git-permission-guard@jacobpevans-cc-plugins" = true;
     "git-rebase-workflow@jacobpevans-cc-plugins" = true;
+    "git-troubleshooting@jacobpevans-cc-plugins" = true;
+    "git-workflows@jacobpevans-cc-plugins" = true;
+    "github-workflows@jacobpevans-cc-plugins" = true;
+    "infra-orchestration@jacobpevans-cc-plugins" = true;
     "issue-limiter@jacobpevans-cc-plugins" = true;
     "main-branch-guard@jacobpevans-cc-plugins" = true;
     "markdown-validator@jacobpevans-cc-plugins" = true;
