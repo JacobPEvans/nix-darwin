@@ -19,11 +19,11 @@
     "anthropic-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1770171633,
-        "narHash": "sha256-8tANLG91vLbC30IFpEakPBN9bUjJJldpvX28w9e9y80=",
+        "lastModified": 1770412772,
+        "narHash": "sha256-9FGubcwHcGBJcKl02aJ+YsTMiwDOdgU/FHALjARG51c=",
         "owner": "anthropics",
         "repo": "skills",
-        "rev": "a5bcdd7e58cdff48566bf876f0a72a2008dcefbc",
+        "rev": "1ed29a03dc852d30fa6ef2ca53a67dc2c2c2c563",
         "type": "github"
       },
       "original": {
@@ -51,11 +51,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1770342392,
-        "narHash": "sha256-MEHaXfvLw97xpa8efrCMLI1MuwyPVKI/5gm0m/2VJ6E=",
+        "lastModified": 1770387960,
+        "narHash": "sha256-/bpV6xZi0Stwsm/p2CrOMQZmlDIVB5NOT80Evz8UrSc=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "ef1e0ac0981451ddb924f9c5789949ff48e1995c",
+        "rev": "2bc62d1456e3b3084bb8c7971a8b111ebe5f505d",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "claude-code-workflows": {
       "flake": false,
       "locked": {
-        "lastModified": 1770346937,
-        "narHash": "sha256-8WNCwLG0XgLpMJLXRd0Af7y+2LTNGw02szAbcjxyO84=",
+        "lastModified": 1770426416,
+        "narHash": "sha256-EDBsUWm/L9HQNiJBITMxutYRQO2oqhDQV70avH6X/3I=",
         "owner": "wshobson",
         "repo": "agents",
-        "rev": "4820385a315c9cad2cc4b794bdab49afcafd635e",
+        "rev": "5d65aa10638bcc1b390738e11f9bff213f61955a",
         "type": "github"
       },
       "original": {
@@ -99,11 +99,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1770328672,
-        "narHash": "sha256-L1YiqwropW/Uic0ggeoIajb3YxZTK9ZEWVQAvJs+j8k=",
+        "lastModified": 1770421243,
+        "narHash": "sha256-BcErQpkDLWetv/Tdi12zlHibHg2VsuCbnIlfrqBhpkY=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "236752ad9ab36029b648bfd94707944760242768",
+        "rev": "2cd88e7947b7382e045666abee790c7f55f669f3",
         "type": "github"
       },
       "original": {
@@ -210,11 +210,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1769077644,
-        "narHash": "sha256-Oa+DjyGuSrVqW+znC4V6zZvbJgogOO8+F/0E07ab6i0=",
+        "lastModified": 1770424683,
+        "narHash": "sha256-lCuZ3ET6/RvEltxkKwk3/RyoYRtJNTb4eYgNAgmsXVs=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "12268b09e8038360030850df61cd290ea1133191",
+        "rev": "9456f5d6e9ea1c9dd26b5856d18602da7a4891a7",
         "type": "github"
       },
       "original": {
