@@ -171,6 +171,7 @@
                 anthropic-skills
                 claude-code-workflows
                 claude-skills
+                jacobpevans-cc-plugins
                 ;
               inherit (nixpkgs) lib;
               config = { }; # Unused but required by signature
@@ -268,9 +269,20 @@
           ]
           (
             system:
-            import ./lib/checks.nix {
+            let
               pkgs = nixpkgs.legacyPackages.${system};
+            in
+            import ./lib/checks.nix {
+              inherit pkgs;
               src = ./.;
+            }
+            // {
+              # Validate CI settings JSON evaluates without errors
+              # Catches missing flake inputs in the CI code path (separate from darwin-rebuild)
+              ci-settings = pkgs.runCommand "check-ci-settings" { } ''
+                echo ${nixpkgs.lib.escapeShellArg (builtins.toJSON ciClaudeSettings)} | ${pkgs.lib.getExe pkgs.jq} . > /dev/null
+                touch $out
+              '';
             }
           );
 
