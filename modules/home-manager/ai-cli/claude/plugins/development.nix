@@ -1,9 +1,41 @@
 # Development Plugins - Terraform/Nix/Python/Shell + selected marketplace plugins
 
-_:
-
 {
-  enabledPlugins = {
+  lib,
+  jacobpevans-cc-plugins,
+  ...
+}:
+
+let
+  # ============================================================================
+  # JacobPEvans Personal Plugins - Auto-discovered from flake input
+  # ============================================================================
+  # Dynamically discovers all plugin directories from the jacobpevans-cc-plugins
+  # flake input using builtins.readDir. New plugins added to the repo are
+  # automatically enabled after `nix flake update jacobpevans-cc-plugins`.
+  #
+  # Known plugins (for reference, not used for enablement):
+  #   ai-delegation, codeql-resolver, config-management, git-permission-guard,
+  #   git-rebase-workflow, git-troubleshooting, git-workflows, github-workflows,
+  #   infra-orchestration, issue-limiter, main-branch-guard, markdown-validator,
+  #   pr-review-toolkit, token-validator, webfetch-guard
+  jacobpevansPlugins =
+    let
+      entries = builtins.readDir jacobpevans-cc-plugins;
+      # Plugin directories: exclude dotfiles, regular files, and known non-plugin dirs
+      nonPluginDirs = [
+        "docs"
+        ".claude-plugin"
+        ".github"
+      ];
+      isPluginDir =
+        name: type: type == "directory" && !(lib.hasPrefix "." name) && !(builtins.elem name nonPluginDirs);
+      pluginNames = builtins.attrNames (lib.filterAttrs isPluginDir entries);
+    in
+    lib.genAttrs (map (name: "${name}@jacobpevans-cc-plugins") pluginNames) (_: true);
+in
+{
+  enabledPlugins = jacobpevansPlugins // {
     # ========================================================================
     # Claude Code Workflows - Core Development Tools
     # ========================================================================
@@ -43,25 +75,6 @@ _:
     # We enable the plugin (e.g., backend-development), which loads all its skills.
     # Skills within plugins (like cqrs-implementation, event-store-design) cannot be
     # individually disabled - they come with the parent plugin.
-
-    # ========================================================================
-    # JacobPEvans Personal Plugins - ALL ENABLED
-    # ========================================================================
-    # Enable all plugins from user's custom marketplace (alphabetically sorted)
-    "ai-delegation@jacobpevans-cc-plugins" = true;
-    "codeql-resolver@jacobpevans-cc-plugins" = true;
-    "config-management@jacobpevans-cc-plugins" = true;
-    "git-permission-guard@jacobpevans-cc-plugins" = true;
-    "git-rebase-workflow@jacobpevans-cc-plugins" = true;
-    "git-troubleshooting@jacobpevans-cc-plugins" = true;
-    "git-workflows@jacobpevans-cc-plugins" = true;
-    "github-workflows@jacobpevans-cc-plugins" = true;
-    "infra-orchestration@jacobpevans-cc-plugins" = true;
-    "issue-limiter@jacobpevans-cc-plugins" = true;
-    "main-branch-guard@jacobpevans-cc-plugins" = true;
-    "markdown-validator@jacobpevans-cc-plugins" = true;
-    "token-validator@jacobpevans-cc-plugins" = true;
-    "webfetch-guard@jacobpevans-cc-plugins" = true;
 
     # ========================================================================
     # Claude Skills Marketplace - Individual Plugins

@@ -58,6 +58,7 @@ let
       anthropic-skills
       claude-code-workflows
       claude-skills
+      jacobpevans-cc-plugins
       ;
   };
 
