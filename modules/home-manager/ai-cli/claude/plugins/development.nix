@@ -60,6 +60,7 @@ _:
     "issue-limiter@jacobpevans-cc-plugins" = true;
     "main-branch-guard@jacobpevans-cc-plugins" = true;
     "markdown-validator@jacobpevans-cc-plugins" = true;
+    "pr-review-toolkit@jacobpevans-cc-plugins" = true;
     "token-validator@jacobpevans-cc-plugins" = true;
     "webfetch-guard@jacobpevans-cc-plugins" = true;
 
