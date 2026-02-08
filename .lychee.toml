@@ -5,10 +5,8 @@
 timeout = 30
 
 # Accept status codes that shouldn't fail the check
-accept = [
-  429,  # Too Many Requests (rate limiting)
-  503,  # Service Unavailable (temporary issue)
-]
+# Default is 100..=103,200..=299 - we extend it to include rate limiting and temporary errors
+accept = "100..=103,200..=299,429,503"
 
 # Retry configuration for transient network errors
 max_retries = 2

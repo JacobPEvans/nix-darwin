@@ -21,6 +21,7 @@
   claude-cookbooks,
   claude-code-workflows,
   claude-skills,
+  jacobpevans-cc-plugins,
   ...
 }:
 
@@ -32,6 +33,7 @@ let
       lib
       claude-code-workflows
       claude-skills
+      jacobpevans-cc-plugins
       ;
   };
 

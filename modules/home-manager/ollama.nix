@@ -176,7 +176,7 @@ in
   # - Models stay on /Volumes/Ollama (692GB+, symlinked via home-manager)
   # - Database: ~/Library/Application Support/Ollama/db.sqlite (not managed by Nix)
   # - History: ~/.ollama/history (not managed by Nix)
-  # - Nixpkgs version: 0.13.2 (replaces manual 0.12.10 install)
+  # - Nixpkgs version: latest (tracking nixpkgs, currently 0.15.x)
   # - LaunchAgent starts ollama serve on login (auto-restart if crashes)
   # - Logs: ~/Library/Logs/Ollama/ollama.log, ~/Library/Logs/Ollama/ollama.error.log
 }

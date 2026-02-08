@@ -52,4 +52,4 @@ if [ $ERRORS -gt 0 ]; then
   exit 1
 fi
 echo ""
-echo "All checks passed"
+echo "All symlink checks passed"

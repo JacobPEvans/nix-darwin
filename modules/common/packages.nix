@@ -73,6 +73,14 @@ with pkgs;
   aws-vault # Secure AWS credential storage (uses OS keychain)
 
   # ==========================================================================
+  # Terminal Multiplexer
+  # ==========================================================================
+  # Required for Claude Code agent teams split-pane mode.
+  # Ghostty does not natively support agent team split panes.
+  # See: https://code.claude.com/docs/en/agent-teams
+  tmux
+
+  # ==========================================================================
   # HTTP & API Tools
   # ==========================================================================
   # Tools for testing and working with HTTP APIs and web services.

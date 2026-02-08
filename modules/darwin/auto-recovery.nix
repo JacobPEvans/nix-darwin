@@ -1,14 +1,5 @@
-# Automatic Boot Failure Detection and Recovery
-#
-# Detects when nix-darwin LaunchDaemons failed to load at boot and automatically
-# attempts recovery. Provides VERY obvious visual feedback to the user.
-#
-# This module adds shell initialization code that:
-# 1. Checks if /run/current-system exists (indicates successful boot)
-# 2. If missing, attempts automatic bootstrap + activation
-# 3. Shows prominent success/failure messages
-#
-# Integration: Runs on every shell startup via /etc/zshenv
+# Boot failure detection via shell initialization
+# Checks for /run/current-system and provides nix-recover helper function
 
 {
   config,
@@ -18,17 +9,11 @@
 }:
 
 {
-  # Add auto-detection and recovery helper to shell initialization
   programs.zsh.interactiveShellInit = lib.mkBefore ''
-    # ============================================================
-    # BOOT FAILURE DETECTION & RECOVERY
-    # ============================================================
-    # Only check in interactive shells, once per session
     if [[ $- == *i* ]] && [[ -z "$NIX_BOOT_CHECK_DONE" ]]; then
       export NIX_BOOT_CHECK_DONE=1
 
       if [[ ! -L /run/current-system ]]; then
-        # Boot failure detected - show VERY prominent warning
         echo ""
         echo "╔══════════════════════════════════════════════════════════════════╗"
         echo "║                                                                  ║"
@@ -55,11 +40,9 @@
         echo "╚══════════════════════════════════════════════════════════════════╝"
         echo ""
 
-        # Define nix-recover helper function for this session (idiomatic zsh syntax)
         nix-recover() {
           echo "→ Bootstrapping nix-darwin LaunchDaemons..."
 
-          # darwin-store bootstrap with explicit feedback
           if [[ -f /Library/LaunchDaemons/org.nixos.darwin-store.plist ]]; then
             if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.darwin-store.plist 2>/dev/null; then
               echo "  ✓ darwin-store bootstrapped"
@@ -70,7 +53,6 @@
             echo "  ⚠ darwin-store plist not found, skipping"
           fi
 
-          # activate-system bootstrap with explicit feedback
           if [[ -f /Library/LaunchDaemons/org.nixos.activate-system.plist ]]; then
             if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.activate-system.plist 2>/dev/null; then
               echo "  ✓ activate-system bootstrapped"
@@ -81,7 +63,6 @@
             echo "  ⚠ activate-system plist not found, skipping"
           fi
 
-          # symlink-boot bootstrap with explicit feedback (creates /run/current-system)
           if [[ -f /Library/LaunchDaemons/org.nixos.symlink-boot.plist ]]; then
             if sudo /bin/launchctl bootstrap system /Library/LaunchDaemons/org.nixos.symlink-boot.plist 2>/dev/null; then
               echo "  ✓ symlink-boot bootstrapped"

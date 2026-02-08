@@ -43,6 +43,7 @@ let
   settings = {
     "$schema" = cfg.settings.schemaUrl;
     inherit (cfg.settings) alwaysThinkingEnabled cleanupPeriodDays;
+    inherit (cfg) teammateMode;
 
     # Permissions
     permissions = {

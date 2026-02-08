@@ -17,6 +17,7 @@
   lib,
   claude-code-workflows,
   claude-skills,
+  jacobpevans-cc-plugins,
   ...
 }:
 
@@ -34,7 +35,7 @@ let
   externalModule = import ./external.nix { };
   communityModule = import ./community.nix { };
   infrastructureModule = import ./infrastructure.nix { };
-  developmentModule = import ./development.nix { };
+  developmentModule = import ./development.nix { inherit lib jacobpevans-cc-plugins; };
   monitoringModule = import ./monitoring.nix { };
   experimentalModule = import ./experimental.nix { };
 

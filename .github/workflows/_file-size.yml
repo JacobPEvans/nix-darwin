@@ -10,6 +10,11 @@ on:
     # No inputs - config is read from file-size-config.sh
     # This prevents drift between pre-commit and CI
 
+# Performance: Cancel in-progress checks when new commits arrive
+concurrency:
+  group: file-size-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

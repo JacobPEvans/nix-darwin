@@ -8,6 +8,18 @@
 4. **Worktrees required**: Run `/init-worktree` before any work
 5. **No direct main commits**: Always use feature branches
 
+## Required Build Validation
+
+**Every `git push` and `gh pr create` MUST be immediately preceded by a passing build.**
+
+```bash
+nix flake check && sudo darwin-rebuild switch --flake .
+```
+
+- Run AFTER your final commit, BEFORE push/PR. If you commit again, re-run.
+- ANY warning or error is a build failure. Fix it, re-commit, re-run.
+- No exceptions. No skipping. No "CI will catch it."
+
 ## Worktree Workflow
 
 ```bash
@@ -17,25 +29,12 @@ git worktree add <branch> -b <branch> origin/main
 cd <branch>
 ```
 
-## Test & Deploy
-
-```bash
-nix flake check
-sudo darwin-rebuild switch --flake .
-```
-
 ## File References
 
 - **Permissions**: `ai-assistant-instructions` flake → `~/.claude/settings.json`
 - **Plugins**: `modules/home-manager/ai-cli/claude/plugins/`
 - **Rules**: `agentsmd/rules/` (worktrees, version-validation, skill-namespace-resolution, security-alert-triage)
 - **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
-
-## Skill and Agent Invocation Rules
-
-See the "Skill and Agent Invocation Rules" section below for complete instructions on
-invoking skills and agents correctly. This covers namespace format, common mistakes, and
-error resolution procedures.
 
 ## PR Rules
 

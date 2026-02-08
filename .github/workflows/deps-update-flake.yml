@@ -51,7 +51,6 @@ jobs:
         jacobpevans-cc-plugins
         anthropic-skills
         superpowers-marketplace
-        agent-os
     steps:
       - name: Generate GitHub App Token
         id: app-token

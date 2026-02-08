@@ -12,7 +12,7 @@
 repos:
   # Standard pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
@@ -27,7 +27,7 @@ repos:
   # Markdown linting (using markdownlint-cli2 which reads .markdownlint-cli2.jsonc)
   # Config file has "fix: true" to auto-fix issues
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.18.1
+    rev: v0.20.0
     hooks:
       - id: markdownlint-cli2
         files: \.md$
@@ -39,7 +39,7 @@ repos:
   # Config: .github/zizmor.yml for rule customization
   # See: https://docs.zizmor.sh/audits/
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.9.0
+    rev: v1.22.0
     hooks:
       - id: zizmor
         args: ['--persona=regular', '--min-severity=medium', '--min-confidence=medium']
@@ -49,7 +49,7 @@ repos:
   # Runs security-audit rules on all supported languages
   # See: https://semgrep.dev/docs/extensions/pre-commit
   - repo: https://github.com/semgrep/pre-commit
-    rev: v1.99.0
+    rev: v1.151.0
     hooks:
       - id: semgrep
         args: ['--config', 'p/security-audit', '--skip-unknown-extensions']
@@ -121,9 +121,10 @@ repos:
       # Lychee link checker - validates links in markdown and HTML
       # Runs automatically on every commit (not manual-stage)
       # Lychee is fast with async validation and caching, minimal slowdown impact
+      # Uses .lychee.toml for accept rules and .lycheeignore for exclusions
       - id: lychee
         name: Lychee link checker
-        entry: lychee
+        entry: lychee --config .lychee.toml
         language: system
         files: \.(md|html)$
         types: [file]
@@ -195,8 +196,8 @@ repos:
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs
-        name: Update flake inputs (nixpkgs, ai-assistant-instructions, agent-os, nix-config-main)
-        entry: nix flake update nixpkgs ai-assistant-instructions agent-os nix-config-main
+        name: Update flake inputs (nixpkgs, ai-assistant-instructions, nix-config-main)
+        entry: nix flake update nixpkgs ai-assistant-instructions nix-config-main
         language: system
         stages: [manual]
         pass_filenames: false

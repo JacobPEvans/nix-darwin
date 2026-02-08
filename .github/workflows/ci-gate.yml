@@ -87,16 +87,14 @@ jobs:
 
   # ==========================================================================
   # CONDITIONAL CHECKS (call reusable workflows)
+  # Performance: Jobs run in parallel when conditions are met
+  # Only dependency is 'changes' job, allowing max parallelization
   # ==========================================================================
   nix-build:
     name: Nix Build
     needs: changes
     if: needs.changes.outputs.nix == 'true' && needs.changes.outputs.is-deps-only == 'false'
     uses: ./.github/workflows/_nix-build.yml
-    with:
-      # Skip cache upload on PRs to speed up Merge Gate completion
-      # Cache is uploaded on push to main via ci-nix.yml
-      use-gha-cache: 'disabled'
 
   nix-validate:
     name: Nix Validate

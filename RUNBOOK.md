@@ -185,15 +185,53 @@ sudo darwin-rebuild switch --flake .
 
 ### Update Homebrew Packages
 
-Homebrew auto-update is disabled for faster rebuilds. To get latest versions:
+**Important**: Homebrew has NO native background auto-update mechanism. The "passive auto-update"
+is just a convenience feature that runs `brew update` if >5 minutes have passed when you invoke
+certain brew commands. There is no background daemon.
+
+**How homebrew packages stay current:**
+
+| Method | Trigger | What Happens |
+|--------|---------|--------------|
+| darwin-rebuild | `sudo darwin-rebuild switch --flake .` | Upgrades all packages (primary method) |
+| Manual update | `brew update && brew upgrade` | Immediate update when needed |
+| Passive auto-update | Running `brew install/upgrade/etc` | Index updated if >5 minutes stale |
+
+**Our configuration** in `modules/darwin/homebrew.nix`:
+
+- `autoUpdate = false` → Keeps rebuilds fast (no 45MB index download on every rebuild)
+- `upgrade = true` → Packages upgraded to latest when darwin-rebuild runs
+- Passive auto-update is enabled (Homebrew's default behavior)
+
+**Standard workflow** (recommended):
+
+```bash
+# Rebuild updates homebrew packages automatically
+sudo darwin-rebuild switch --flake ~/.config/nix
+```
+
+**Emergency/immediate update** (when you need latest versions now):
 
 ```bash
 # 1. Update Homebrew's package index
 brew update
 
-# 2. Rebuild (will upgrade packages based on new index)
+# 2. Upgrade all packages immediately
+brew upgrade
+
+# 3. Sync nix configuration (records the update)
 sudo darwin-rebuild switch --flake ~/.config/nix
 ```
+
+**Why Renovate doesn't track homebrew packages:**
+
+Renovate cannot automatically update homebrew packages because:
+
+1. nix-darwin's `homebrew.brews/casks` contain only package names, not versions
+2. Homebrew lacks declarative version pinning within configuration files
+3. Renovate's homebrew manager only works with Ruby Formula files
+
+The `darwin-rebuild switch` workflow is the correct approach for keeping homebrew packages current.
 
 ### If Something Breaks After Update
 
@@ -325,7 +363,7 @@ Renovate creates PRs on a schedule based on package criticality:
 | Package Group | Schedule | Auto-merge |
 |---------------|----------|------------|
 | Critical Infrastructure (nixpkgs, darwin, home-manager) | Mon/Thu 3am | No |
-| AI Tools (claude-code-plugins, agent-os, etc.) | Sun/Wed/Fri 10pm | Yes (patch/minor) |
+| AI Tools (claude-code-plugins, etc.) | Sun/Wed/Fri 10pm | Yes (patch/minor) |
 | npm Packages (cclint, chatgpt-cli, gh-copilot) | Monday 10pm | Yes (patch/minor) |
 
 **Auto-merge policy:**

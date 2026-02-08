@@ -5,6 +5,11 @@ name: _claude-settings
 on:
   workflow_call:
 
+# Performance: Cancel in-progress validation when new commits arrive
+concurrency:
+  group: claude-settings-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -16,8 +21,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Performance: Install Nix with built-in caching
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+
+      # Performance: Cache Nix store for faster evaluation
+      - name: Cache Nix Store
+        uses: actions/cache@v5
+        with:
+          path: |
+            /nix/store
+            ~/.cache/nix
+          key: nix-linux-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-linux-${{ runner.os }}-
 
       - name: Fetch schema
         run: |

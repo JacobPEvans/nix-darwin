@@ -267,7 +267,7 @@ pnpm
 ## References
 
 - [Nix Package Search](https://search.nixos.org/packages)
-- [Terraform Documentation](https://www.terraform.io/docs)
+- [Terraform Documentation](https://developer.hashicorp.com/terraform/docs)
 - [Terragrunt Documentation](https://terragrunt.gruntwork.io/)
 - [Ansible Documentation](https://docs.ansible.com/)
 - [Molecule Documentation](https://molecule.readthedocs.io/)

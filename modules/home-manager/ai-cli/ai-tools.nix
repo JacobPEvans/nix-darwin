@@ -13,7 +13,7 @@
 #    - Check: nix search nixpkgs <package>
 #    - Use if package exists and is reasonably up-to-date
 #    - Benefits: Binary cache, security updates, integration
-#    - Example: claude-code, claude-monitor, bun
+#    - Example: claude-code, claude-monitor, gemini-cli
 #
 # 2. **homebrew** (ONLY if not in nixpkgs)
 #    - Fallback for packages missing from nixpkgs
@@ -21,44 +21,36 @@
 #    - Add to modules/darwin/homebrew.nix with clear justification
 #    - Document WHY homebrew is needed (not in nixpkgs, severely outdated, etc.)
 #
-# 3. **bun** (buildBunPackage - preferred for npm packages)
-#    - For npm packages when #1 and #2 don't apply
-#    - Provides OFFLINE support (packages bundled in /nix/store)
-#    - Use buildBunPackage with locked dependencies
-#    - Benefits: Faster than npm, offline-first, deterministic builds
+# 3. **bunx wrapper** (for npm packages not in nixpkgs or homebrew)
+#    - Standard solution for npm/bun packages
+#    - Always pin to specific version: package@x.y.z
+#    - Downloads on first run, cached locally by bun
+#    - Benefits: Simple, minimal code, easy version updates
+#    - Pattern: writeShellScriptBin with bunx --bun
 #
-# 4. **npm** (buildNpmPackage - fallback if bun doesn't work)
-#    - Use ONLY if buildBunPackage fails for technical reasons
-#    - Still provides offline support via npmDepsHash
-#    - Slower than bun but more compatible
-#
-# 5. **bunx/npx wrapper** (ABSOLUTE LAST RESORT)
-#    - Online-only (downloads on every run)
-#    - No offline support, no determinism
-#    - Use ONLY as temporary solution until proper package is built
-#    - MUST include TODO comment with migration plan
+# 4. **pipx** (for Python packages not in nixpkgs)
+#    - Standard solution for Python CLI tools
+#    - Installed separately via: pipx install <package>
+#    - Benefits: Isolated environments, easy updates
 #
 # ============================================================================
 # CURRENT STATUS
 # ============================================================================
 #
-# DIRECT NIXPKGS PACKAGES (from pkgs):
-#   gemini-cli: 0.22.5 (via nixpkgs)
+# NIXPKGS PACKAGES:
+#   gemini-cli, github-mcp-server, terraform-mcp-server
 #
-# BUNX WRAPPER PACKAGES (online-only, should migrate to buildBunPackage):
+# BUNX WRAPPER PACKAGES (npm packages not in nixpkgs/homebrew):
 #   cclint: @felixgeelhaar/cclint@0.12.1
-#     - Status: TODO - migrate to buildBunPackage
-#   gh-copilot: @githubnext/github-copilot-cli@latest
-#     - Status: Waiting - nixpkgs 0.0.373 has broken package-lock
+#   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
-#     - Status: Not in nixpkgs
+#   claude-flow: claude-flow@2.0.0
 #
 # HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
-#   block-goose-cli: Block's AI agent
-#     - Status: Using homebrew - nixpkgs was >30 days old at time of addition; homebrew actively maintained
+#   block-goose-cli: Block's AI agent (nixpkgs outdated at time of addition)
 #
-# OTHER TOOLS (installed via other methods):
-#   aider: Via pipx (Python package, not available in nixpkgs)
+# PIPX PACKAGES (Python, installed separately):
+#   aider: aider-chat (AI pair programming)
 #
 # NOTE: These are home-manager packages, not system packages.
 # Imported in hosts/macbook-m4/home.nix via home.packages.
@@ -69,11 +61,6 @@
   # AI-specific development tools
   # Install via: home.packages = [ ... ] ++ (import ./ai-cli/ai-tools.nix { inherit pkgs; }).packages;
   #
-  # PACKAGING STRATEGY:
-  # - Direct nixpkgs packages: gemini-cli (available in nixpkgs)
-  # - Bunx wrappers: cclint, gh-copilot, chatgpt (not in nixpkgs or nixpkgs broken)
-  # - Python tools: aider via pipx (not available in nixpkgs)
-  #
   # See CURRENT STATUS section at the top of this file for package details.
   packages = with pkgs; [
     # ==========================================================================
@@ -82,9 +69,7 @@
 
     # CLAUDE.md linter - validates AI context files
     # Source: https://github.com/felixgeelhaar/cclint
-    # NPM: @felixgeelhaar/cclint
-    # SECURITY: Uses bunx wrapper with pinned version; not yet packaged in nixpkgs.
-    # TODO: Migrate to buildBunPackage for offline/reproducible builds.
+    # NPM: @felixgeelhaar/cclint (pinned version)
     (writeShellScriptBin "cclint" ''
       exec ${bun}/bin/bunx --bun @felixgeelhaar/cclint@0.12.1 "$@"
     '')
@@ -115,9 +100,7 @@
     # GitHub Copilot CLI
     # ==========================================================================
     # Source: https://github.com/github/gh-copilot
-    # NPM: @githubnext/github-copilot-cli
-    # SECURITY: Uses bunx wrapper (unversioned); nixpkgs 0.0.373 has broken package-lock
-    # TODO: Pin version and migrate to buildBunPackage once nixpkgs is fixed
+    # NPM: @githubnext/github-copilot-cli (using @latest - no stable versioning)
     (writeShellScriptBin "gh-copilot" ''
       exec ${bun}/bin/bunx --bun @githubnext/github-copilot-cli@latest "$@"
     '')
@@ -126,10 +109,18 @@
     # OpenAI ChatGPT CLI
     # ==========================================================================
     # Source: https://github.com/manno/chatgpt-cli
-    # NPM: chatgpt-cli
-    # SECURITY: Uses bunx wrapper with pinned version; not available in nixpkgs
+    # NPM: chatgpt-cli (pinned version)
     (writeShellScriptBin "chatgpt" ''
       exec ${bun}/bin/bunx --bun chatgpt-cli@3.3.0 "$@"
+    '')
+
+    # ==========================================================================
+    # Claude Flow - AI Agent Orchestration Platform
+    # ==========================================================================
+    # Source: https://github.com/ruvnet/claude-flow
+    # NPM: claude-flow (pinned version)
+    (writeShellScriptBin "claude-flow" ''
+      exec ${bun}/bin/bunx --bun claude-flow@2.0.0 "$@"
     '')
 
     # ==========================================================================

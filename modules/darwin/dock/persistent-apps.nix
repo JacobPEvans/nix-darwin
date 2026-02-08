@@ -33,26 +33,23 @@ in
       "/Applications/Toggl Track.app"
 
       # Communication
-      "/System/Applications/Messages.app"
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
       "/Applications/Slack.app"
+      "/System/Applications/Messages.app"
       "${homeDir}/Applications/zoom.us.app" # Manual install (Nix package was broken)
       "/Applications/Webex.app"
 
       # AI Assistants
-      "${homeDir}/Applications/Gemini.app" # Google Gemini AI assistant
       "/Applications/Claude.app" # Anthropic Claude desktop app (homebrew cask)
+      "${homeDir}/Applications/Gemini.app" # Google Gemini AI assistant
 
       # Knowledge & Notes
       "/Applications/Nix Apps/Obsidian.app"
       # Note: Additional note-taking apps may be installed locally
 
       # Development & Tools
-      "${homeDir}/Applications/Home Manager Apps/RapidAPI.app"
-      "${homeDir}/Applications/Home Manager Apps/Postman.app"
       "${homeDir}/Applications/Home Manager Apps/Visual Studio Code.app"
       "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
-      "/Applications/Nix Apps/Bitwarden.app"
       "/Applications/Nix Apps/OrbStack.app"
 
       # Browsers
@@ -62,6 +59,7 @@ in
       # NOTE: Ollama runs headless via LaunchAgent, no dock icon needed.
       # NOTE: Additional AI tools (Antigravity, ChatGPT, Cursor) can be found in
       # ~/Applications/Home Manager Apps/ but are not pinned to the Dock.
+      # NOTE: RapidAPI, Postman, and Bitwarden removed from dock per #438
     ];
 
     # ========================================================================

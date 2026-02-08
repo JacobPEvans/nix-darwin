@@ -72,6 +72,16 @@ rec {
         jupyter # Interactive notebooks
         matplotlib # Plotting
       ];
+
+    # Ansible/Configuration Management: SSH, JSON diffing, YAML
+    # Use for: Infrastructure automation, Ansible development, config validation
+    ansible =
+      ps: with ps; [
+        paramiko # SSH library for Ansible connections
+        jsondiff # JSON comparison for config validation
+        pyyaml # YAML processing
+        jinja2 # Template engine
+      ];
   };
 
   # ===========================================================================

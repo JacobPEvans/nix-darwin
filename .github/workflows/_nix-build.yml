@@ -1,19 +1,17 @@
 # Reusable: Nix Build (macOS)
 # Called by ci-gate.yml and ci-nix.yml
 #
-# Cache strategy: Download cache on all runs, upload only on push to main
-# This speeds up PR CI by skipping the slow cache upload post-action
+# Cache strategy: Restore-only on PRs (no upload), save on main push with GC
+# Uses actions/cache sub-actions for compatibility with existing cache entries
 name: _nix-build
 
 on:
   workflow_call:
-    inputs:
-      # Allow callers to disable cache upload (e.g., on PRs)
-      # Values: "enabled" (default), "disabled", "no-preference"
-      use-gha-cache:
-        description: 'GHA cache mode - set to "disabled" on PRs to skip slow upload'
-        type: string
-        default: 'enabled'
+
+# Performance: Cancel in-progress builds when new commits arrive
+concurrency:
+  group: nix-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -25,24 +23,52 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Performance: Install Nix with CI-optimized settings
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
-
-      - name: Determinate Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
         with:
-          use-flakehub: false
-          # Pass through caller's cache mode setting
-          # "disabled" on PRs skips slow upload, "enabled" on main keeps cache fresh
-          use-gha-cache: ${{ inputs.use-gha-cache }}
+          extra-conf: |
+            max-jobs = auto
+            cores = 0
+            http-connections = 50
+            connect-timeout = 5
+            stalled-download-timeout = 10
+            narinfo-cache-positive-ttl = 86400
+            fallback = true
 
-      - name: Nix quality checks (DRY via flake.nix)
-        # Single source of truth with pre-commit hooks
-        # Runs: formatting (nixfmt-rfc-style), linting (statix), dead code (deadnix)
-        run: nix flake check --print-build-logs
+      # Performance: Restore Nix store from cache (fast bulk tarball)
+      # Uses actions/cache/restore (no post-step upload) — PRs skip save entirely
+      - name: Restore Nix Store Cache
+        uses: actions/cache/restore@v5
+        id: nix-cache
+        with:
+          path: |
+            /nix/store
+            ~/.cache/nix
+          key: nix-macos-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-macos-${{ runner.os }}-
 
       - name: Build Home Manager
         run: ./scripts/workflows/build-hm.sh result-hm
 
       - name: Verify Nix Symlinks
         run: ./scripts/workflows/verify-symlinks.sh result-hm/home-files
+
+      # Performance: GC store before save to reduce cache size
+      - name: Garbage Collect Nix Store
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.nix-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Store size before GC: $(du -sh /nix/store | cut -f1)"
+          nix-collect-garbage --delete-older-than 1d
+          echo "Store size after GC: $(du -sh /nix/store | cut -f1)"
+
+      # Performance: Save cache only on main push when key misses
+      - name: Save Nix Store Cache
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.nix-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            /nix/store
+            ~/.cache/nix
+          key: nix-macos-${{ runner.os }}-${{ hashFiles('flake.lock') }}

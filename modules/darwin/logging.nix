@@ -26,6 +26,19 @@ let
   remoteServer = "${protocolPrefix}${userConfig.logging.syslog.server}:${toString userConfig.logging.syslog.port}";
 in
 {
+  # Auto-rename syslog.conf if it has unrecognized content (runs before etc check)
+  # This prevents "Unexpected files in /etc" errors during darwin-rebuild
+  # See: https://github.com/nix-darwin/nix-darwin/issues/149
+  system.activationScripts.preActivation.text = lib.mkBefore ''
+    if [[ -f /etc/syslog.conf ]] && [[ ! -L /etc/syslog.conf ]]; then
+      # File exists and is not a symlink - check if it's nix-managed
+      if ! grep -q "Managed by nix-darwin" /etc/syslog.conf 2>/dev/null; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Backing up /etc/syslog.conf to /etc/syslog.conf.before-nix-darwin"
+        /bin/mv /etc/syslog.conf /etc/syslog.conf.before-nix-darwin
+      fi
+    fi
+  '';
+
   # Create /etc/syslog.conf with remote forwarding configuration
   # The *.* selector matches all facilities and all priorities
   environment.etc."syslog.conf".text = ''
