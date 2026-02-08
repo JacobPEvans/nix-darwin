@@ -115,11 +115,11 @@
     "claude-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1769936350,
-        "narHash": "sha256-VYzTVZ0Cja0BQn8vJjtW9P47VqOAaYFIXhXBCaSusO4=",
+        "lastModified": 1770455284,
+        "narHash": "sha256-SwMxU2uy0iGmsUskx2c8tx/m8ZkpFiZIcJp3oEMcjw0=",
         "owner": "secondsky",
         "repo": "claude-skills",
-        "rev": "13b88d16a65961bb92b5913355b76f94f76aa2b8",
+        "rev": "ecf1fba8eb245074b39cdc567796c1465796ec4a",
         "type": "github"
       },
       "original": {
@@ -210,11 +210,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1770515290,
-        "narHash": "sha256-uKI+7zKdLyfieiidp4eaiHlZQi2EJ2OzornhBkq8WRs=",
+        "lastModified": 1770519300,
+        "narHash": "sha256-/KcQ3GQFrq+8RFZZULauNqLLJ7bc/9GEIEPNKUCBmgs=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "3368eaa20a3b82b39b6dff9c25a88144f66fa63a",
+        "rev": "103a108e38f530f6598b85cb51ebc3c2943bdd21",
         "type": "github"
       },
       "original": {
@@ -268,11 +268,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1770169770,
-        "narHash": "sha256-awR8qIwJxJJiOmcEGgP2KUqYmHG4v/z8XpL9z8FnT1A=",
+        "lastModified": 1770380644,
+        "narHash": "sha256-P7dWMHRUWG5m4G+06jDyThXO7kwSk46C1kgjEWcybkE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "aa290c9891fa4ebe88f8889e59633d20cc06a5f2",
+        "rev": "ae67888ff7ef9dff69b3cf0cc0fbfbcd3a722abe",
         "type": "github"
       },
       "original": {
