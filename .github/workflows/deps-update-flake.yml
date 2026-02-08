@@ -75,6 +75,16 @@ jobs:
                   echo "::error::flake_input_name not provided in client_payload"
                   exit 1
                 fi
+                # Validate flake input name: only allow safe characters
+                if [[ ! "$FLAKE_INPUT_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+                  echo "::error::Invalid flake_input_name '$FLAKE_INPUT_NAME'; only [a-zA-Z0-9._-] are allowed"
+                  exit 1
+                fi
+                # Restrict to known flake inputs (AI_INPUTS allowlist)
+                if ! grep -Eq "(^|[[:space:]])$FLAKE_INPUT_NAME([[:space:]]|$)" <<< "$AI_INPUTS"; then
+                  echo "::error::flake_input_name '$FLAKE_INPUT_NAME' is not in the allowed inputs list"
+                  exit 1
+                fi
                 echo "inputs=$FLAKE_INPUT_NAME" >> "$GITHUB_OUTPUT"
                 echo "::notice::Fast sync: updating $FLAKE_INPUT_NAME from $SOURCE_REPO"
                 ;;
