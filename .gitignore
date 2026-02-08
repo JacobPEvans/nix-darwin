@@ -10,6 +10,7 @@ backup/
 statusline.sh
 
 # Git worktrees (local working copies)
+.worktrees/
 worktrees/
 
 # Python
