@@ -111,6 +111,7 @@ with pkgs;
   # This ensures all modules can be imported in the same interpreter.
   # Using python3.withPackages instead of individual python3Packages.*
   (python3.withPackages (ps: [
+    ps.cryptography # Cryptographic recipes and primitives
     ps.grip # Preview GitHub Markdown files locally
     # DISABLED: langchain-ollama ultimately depends on python3.13-twisted,
     # which currently has failing tests (IPv6 TCP timeout errors) in nixpkgs.
