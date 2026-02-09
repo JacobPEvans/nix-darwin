@@ -21,6 +21,7 @@ let
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false;
     }))
+    ps.cryptography # Cryptographic recipes and primitives (system-wide requirement)
     ps.keyring
   ]);
 

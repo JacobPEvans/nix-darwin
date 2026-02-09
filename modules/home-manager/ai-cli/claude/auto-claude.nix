@@ -23,6 +23,7 @@ let
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false; # Disable tests - they fail in CI with connection/signal errors
     }))
+    ps.cryptography # Cryptographic recipes and primitives (system-wide requirement)
     ps.keyring # macOS Keychain access
     ps.pyyaml
   ]);
