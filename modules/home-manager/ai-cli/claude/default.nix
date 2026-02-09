@@ -7,7 +7,7 @@
 # - Declarative plugin management via flake inputs
 # - Hybrid mode: Nix-managed baseline + runtime /plugin install
 # - Cross-platform: Works on Darwin, NixOS, standalone home-manager
-# - Generates settings.json, known_marketplaces.json, installed_plugins.json
+# - Generates settings.json (known_marketplaces.json managed by Claude Code at runtime)
 #
 # Usage:
 #   programs.claude = {

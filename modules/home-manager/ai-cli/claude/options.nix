@@ -207,6 +207,27 @@ in
       '';
     };
 
+    # Auto-update channel for Claude Code binary
+    autoUpdatesChannel = mkOption {
+      type = types.enum [
+        "stable"
+        "latest"
+      ];
+      default = "latest";
+      description = ''
+        Release channel for Claude Code binary updates.
+        - "latest": newest releases immediately (default upstream)
+        - "stable": ~1 week delay, fewer regressions
+      '';
+    };
+
+    # Show turn duration in UI
+    showTurnDuration = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Show how long each turn takes in the Claude Code UI";
+    };
+
     # Settings
     settings = {
       # Extended thinking mode

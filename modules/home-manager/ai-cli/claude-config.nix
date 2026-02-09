@@ -88,6 +88,12 @@ in
   # Agent teams display mode (direct settings.json property)
   teammateMode = "auto";
 
+  # Release channel: "stable" delays ~1 week to avoid regressions
+  autoUpdatesChannel = "stable";
+
+  # Show turn duration in UI for performance visibility
+  showTurnDuration = true;
+
   # Auto-Claude: Scheduled autonomous maintenance
   # ENABLED - Uses Haiku model for cost-efficiency (via per-repo CLAUDE_MODEL env var)
   # Interactive sessions use the default model, autoClaude overrides to Haiku
