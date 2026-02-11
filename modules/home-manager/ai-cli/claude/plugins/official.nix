@@ -23,6 +23,9 @@ _:
 
 {
   enabledPlugins = {
+    # Anthropic Official Plugins
+    "xlsx@anthropic-agent-skills" = true;
+
     # Git Workflow (essential)
     "commit-commands@claude-plugins-official" = true;
 
@@ -45,12 +48,13 @@ _:
     "pyright-lsp@claude-plugins-official" = true;
 
     # Workflow
-    "ralph-loop@claude-plugins-official" = true;
+    # DISABLED - New Opus 4.6 and Agent Teams sort of handle this
+    "ralph-loop@claude-plugins-official" = false;
 
     # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
 
     # REMOVED - unused or token-heavy:
-    # document-skills - xlsx, docx, pptx, pdf not used
+    # document-skills - docx, pptx, pdf not used
     # agent-sdk-dev - not building SDKs
     # frontend-design - no frontend repos
     # explanatory-output-style - output fluff

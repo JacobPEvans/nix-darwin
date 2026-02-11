@@ -32,16 +32,15 @@ _:
 
     # GitHub - repository management, issues, PRs
     # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
-    # DISABLED: Use gh CLI instead (more reliable)
-    "github@claude-plugins-official" = false;
+    # Use gh CLI instead (more reliable)
+    "github@claude-plugins-official" = true;
 
     # GitLab - repository management, issues, merge requests
     # Requires: GitLab API token
     "gitlab@claude-plugins-official" = false;
 
     # Greptile - AI-powered codebase search
-    # DISABLED: Context bloat (MCP integration consumes tokens)
-    "greptile@claude-plugins-official" = false;
+    "greptile@claude-plugins-official" = true;
 
     # =========================================================================
     # Documentation & Context
@@ -73,7 +72,7 @@ _:
 
     # Playwright - browser automation and testing
     # Requires: Playwright installed
-    "playwright@claude-plugins-official" = false;
+    "playwright@claude-plugins-official" = true;
 
     # =========================================================================
     # Frameworks
@@ -89,7 +88,7 @@ _:
 
     # Slack - team communication integration
     # Requires: Slack OAuth authentication
-    "slack@claude-plugins-official" = false;
+    "slack@claude-plugins-official" = true;
 
     # =========================================================================
     # Other
