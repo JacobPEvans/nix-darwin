@@ -41,6 +41,7 @@ let
   # VS Code settings imports
   vscodeGeneralSettings = import ./vscode/settings.nix { inherit config; };
   vscodeGithubCopilotSettings = import ./vscode/copilot-settings.nix { };
+  vscodeExtensions = import ./vscode/extensions.nix { inherit pkgs; };
 
   # npm configuration (home.file entries)
   npmFiles = import ./npm/config.nix { inherit config; };
@@ -104,6 +105,7 @@ let
       ai-assistant-instructions
       ;
   };
+  codexFiles = import ./ai-cli/codex.nix { inherit pkgs; };
   geminiCommands = import ./ai-cli/gemini-commands.nix {
     inherit lib ai-assistant-instructions;
   };
@@ -137,6 +139,7 @@ in
       // awsFiles
       // linterFiles
       // geminiFiles
+      // codexFiles
       // geminiCommands
       // copilotFiles
       // agentsMdSymlinks
@@ -173,6 +176,9 @@ in
         }
         // vscodeGeneralSettings
         // vscodeGithubCopilotSettings;
+
+        # VS Code Extensions
+        extensions = vscodeExtensions;
       };
     };
 
