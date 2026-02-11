@@ -41,7 +41,7 @@ let
   # VS Code settings imports
   vscodeGeneralSettings = import ./vscode/settings.nix { inherit config; };
   vscodeGithubCopilotSettings = import ./vscode/copilot-settings.nix { };
-  vscodeExtensions = import ./vscode/extensions.nix { inherit pkgs; };
+  # vscodeExtensions = import ./vscode/extensions.nix { inherit pkgs; };
 
   # npm configuration (home.file entries)
   npmFiles = import ./npm/config.nix { inherit config; };
