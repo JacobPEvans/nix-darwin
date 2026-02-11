@@ -23,8 +23,8 @@ _:
 
 {
   enabledPlugins = {
-    # Anthropic Official Plugins
-    "xlsx@anthropic-agent-skills" = true;
+    # Anthropic Official Plugins - Document Skills (xlsx, docx, pptx, pdf)
+    "document-skills@anthropic-agent-skills" = true;
 
     # Git Workflow (essential)
     "commit-commands@claude-plugins-official" = true;
@@ -54,7 +54,6 @@ _:
     # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
 
     # REMOVED - unused or token-heavy:
-    # document-skills - docx, pptx, pdf not used
     # agent-sdk-dev - not building SDKs
     # frontend-design - no frontend repos
     # explanatory-output-style - output fluff
