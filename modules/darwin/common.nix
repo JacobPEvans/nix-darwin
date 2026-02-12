@@ -46,6 +46,7 @@ in
         code-cursor
         ghostty-bin
         obsidian
+        ollama
         postman
         rapidapi
         raycast
