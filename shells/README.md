@@ -32,6 +32,7 @@ The environment will now load automatically when you `cd` into the project.
 | `python-data/` | Data science / ML | Python, pandas, numpy, jupyter |
 | `js/` | Node.js development | Node.js, npm, yarn, pnpm |
 | `go/` | Go development | Go, gopls, delve |
+| `powershell/` | PowerShell scripting | PowerShell 7.x, .NET SDK, jq, yq |
 | `terraform/` | Infrastructure as Code | Terraform, Terragrunt, OpenTofu, tflint, checkov, tfsec, trivy, infracost |
 | `claude-sdk-python/` | Claude Agent SDK (Python) | Python 3.11, Anthropic SDK, pytest, black, mypy, ruff |
 | `claude-sdk-typescript/` | Claude Agent SDK (TypeScript) | Node.js 20, TypeScript, prettier, eslint |
@@ -83,6 +84,19 @@ OpenTofu is included as a fully open-source alternative.
 
 **Note:** `pre-commit` and `markdownlint-cli2` are already available system-wide
 via `modules/common/packages.nix` - no need to add them to project shells.
+
+### PowerShell Shell (`powershell/`)
+
+Cross-platform PowerShell 7.x development environment.
+
+**Tools:** PowerShell 7.5+, .NET SDK 9.0+, jq, yq, curl, git
+
+**Use cases:**
+
+- Cross-platform automation scripts
+- PowerShell module development
+- API integration scripting
+- File and data processing tasks
 
 ### Claude Agent SDK Shells (`claude-sdk-*/`)
 
