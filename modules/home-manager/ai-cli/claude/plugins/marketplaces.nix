@@ -184,6 +184,23 @@ let
         url = "Lucklyric/cc-dev-tools";
       };
     };
+
+    # --- Obsidian Skills ---
+    # Canonical Obsidian skills from kepano (markdown, bases, canvas, CLI, utilities)
+    "obsidian-skills" = {
+      source = {
+        type = "github";
+        url = "kepano/obsidian-skills";
+      };
+    };
+
+    # Independent visual diagram skills (Excalidraw, Mermaid, Canvas Creator)
+    "obsidian-visual-skills" = {
+      source = {
+        type = "github";
+        url = "axtonliu/axton-obsidian-visual-skills";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time
