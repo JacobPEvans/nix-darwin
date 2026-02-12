@@ -37,7 +37,7 @@ in
     (import ../../overlays/macos-apps.nix)
     # GUI apps from nixpkgs-unstable for faster version updates
     # Stable branches (25.11) only get security fixes, not version bumps
-    # This overlay ensures GUI apps stay current with upstream releases
+    # This overlay ensures GUI apps and fast-moving tools stay current with upstream releases
     (_final: _prev: {
       inherit (unstablePkgs)
         antigravity
@@ -46,6 +46,7 @@ in
         code-cursor
         ghostty-bin
         obsidian
+        ollama
         postman
         rapidapi
         raycast
