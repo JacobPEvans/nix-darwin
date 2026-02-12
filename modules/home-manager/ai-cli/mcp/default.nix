@@ -155,16 +155,11 @@ let
     # Decision: Not moving forward with REST API approach since official Obsidian CLI will be released soon.
     # Using Claude Skills plugins for Obsidian integration instead (see plugins/community.nix).
     #
-    # mcp-obsidian = mkServer {
-    #   enabled = false;
-    #   command = "uvx";
-    #   args = [ "mcp-obsidian" ];
-    #   env = {
-    #     OBSIDIAN_API_KEY = "";
-    #     OBSIDIAN_HOST = "127.0.0.1";
-    #     OBSIDIAN_PORT = "27124";
-    #   };
-    # };
+    # If revisited in the future:
+    # - Use `uvx mcp-obsidian` (PyPI package)
+    # - Requires Obsidian REST API plugin: https://github.com/coddingtonbear/obsidian-local-rest-api
+    # - IMPORTANT: Inject OBSIDIAN_API_KEY via secrets manager at runtime (never in Nix store)
+    # - Non-secret defaults: OBSIDIAN_HOST=127.0.0.1, OBSIDIAN_PORT=27124
 
     # ================================================================
     # Database (disabled by default)
