@@ -135,7 +135,7 @@ fi
 **Enhancement**: Add DNS resolution check and test message to activation script
 
 ```bash
-SYSLOG_HOST="haproxy.jacobpevans.com"
+SYSLOG_HOST="<your-syslog-host>"
 SYSLOG_PORT="1514"
 
 if host "$SYSLOG_HOST" >/dev/null 2>&1; then
