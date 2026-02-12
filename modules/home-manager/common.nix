@@ -104,6 +104,7 @@ let
       ai-assistant-instructions
       ;
   };
+  codexFiles = import ./ai-cli/codex.nix { inherit pkgs; };
   geminiCommands = import ./ai-cli/gemini-commands.nix {
     inherit lib ai-assistant-instructions;
   };
@@ -137,6 +138,7 @@ in
       // awsFiles
       // linterFiles
       // geminiFiles
+      // codexFiles
       // geminiCommands
       // copilotFiles
       // agentsMdSymlinks
