@@ -43,7 +43,12 @@ let
   settings = {
     "$schema" = cfg.settings.schemaUrl;
     inherit (cfg.settings) alwaysThinkingEnabled cleanupPeriodDays;
-    inherit (cfg) autoUpdatesChannel teammateMode showTurnDuration;
+    inherit (cfg)
+      autoUpdatesChannel
+      teammateMode
+      showTurnDuration
+      effortLevel
+      ;
 
     # Permissions
     permissions = {

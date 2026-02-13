@@ -94,6 +94,8 @@ in
   # Show turn duration in UI for performance visibility
   showTurnDuration = true;
 
+  effortLevel = "medium";
+
   # Auto-Claude: Scheduled autonomous maintenance
   # ENABLED - Uses Haiku model for cost-efficiency (via per-repo CLAUDE_MODEL env var)
   # Interactive sessions use the default model, autoClaude overrides to Haiku
@@ -238,18 +240,14 @@ in
       # See: https://code.claude.com/docs/en/agent-teams
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 
-      # DEFAULT VALUES - do not remove, reference only
-      # These are commented out because they match upstream defaults.
-      # Kept for reference in case adjustments are needed in the future.
-      # Extended thinking (enabled via alwaysThinkingEnabled setting)
-      # Note: reduces prompt caching efficiency
-      # MAX_THINKING_TOKENS = "16384";
-      # CLAUDE_CODE_MAX_OUTPUT_TOKENS = "16384";
-      # BASH_MAX_OUTPUT_LENGTH = "65536";
+      # DEFAULT VALUES (upstream) - reference only, do not uncomment unless tuning
+      # MAX_THINKING_TOKENS = "31999";
+      # CLAUDE_CODE_MAX_OUTPUT_TOKENS = "32000";
+      # BASH_MAX_OUTPUT_LENGTH = "30000";
       # MAX_MCP_OUTPUT_TOKENS = "25000";
       # SLASH_COMMAND_TOOL_CHAR_BUDGET = "16000";
-      # BASH_DEFAULT_TIMEOUT_MS = "300000";  # 5 minutes
-      # BASH_MAX_TIMEOUT_MS = "600000";  # 10 minutes
+      # BASH_DEFAULT_TIMEOUT_MS = "120000";  # 2 minutes
+      # BASH_MAX_TIMEOUT_MS = "600000";      # 10 minutes
     };
 
     # Permissions from unified ai-assistant-instructions system

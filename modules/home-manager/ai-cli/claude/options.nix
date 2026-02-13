@@ -228,6 +228,22 @@ in
       description = "Show how long each turn takes in the Claude Code UI";
     };
 
+    effortLevel = mkOption {
+      type = types.enum [
+        "low"
+        "medium"
+        "high"
+      ];
+      default = "high";
+      description = ''
+        Adaptive reasoning effort for Opus 4.6.
+        - "high": Full reasoning (upstream default)
+        - "medium": Balanced cost/quality for routine tasks
+        - "low": Minimal reasoning, fastest and cheapest
+        Override per-session via /model effort slider.
+      '';
+    };
+
     # Settings
     settings = {
       # Extended thinking mode
