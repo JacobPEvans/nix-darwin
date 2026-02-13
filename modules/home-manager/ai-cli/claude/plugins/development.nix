@@ -13,10 +13,6 @@ let
   # Dynamically discovers all plugin directories from the jacobpevans-cc-plugins
   # flake input using builtins.readDir. New plugins added to the repo are
   # automatically enabled after `nix flake update jacobpevans-cc-plugins`.
-  #
-  # Known plugins (8 consolidated from 15, for reference, not used for enablement):
-  #   ai-delegation, codeql-resolver, config-management, content-guards,
-  #   git-guards, git-workflows, github-workflows, infra-orchestration
   jacobpevansPlugins =
     let
       entries = builtins.readDir jacobpevans-cc-plugins;
