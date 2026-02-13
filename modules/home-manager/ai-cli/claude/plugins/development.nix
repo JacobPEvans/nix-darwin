@@ -23,6 +23,7 @@ let
       # Plugin directories: exclude dotfiles, regular files, and known non-plugin dirs
       nonPluginDirs = [
         "docs"
+        "schemas"
         ".claude-plugin"
         ".github"
       ];
