@@ -33,6 +33,7 @@ CRITICAL_PACKAGES=(
 # Add packages here that should never trigger staleness failures
 # Supports glob patterns: "prefix*" matches "prefix", "prefix_2", etc.
 EXEMPT_PACKAGES=(
+  "cl-nix-lite"   # Transitive dependency - cannot be directly updated
   "darwin"        # Pinned to nix-darwin-25.11 stable branch - infrequent backports
   "flake-compat"  # Compatibility shim - stable interface, infrequent updates needed
   "flake-utils"   # Utility library - stable helpers, infrequent updates needed
