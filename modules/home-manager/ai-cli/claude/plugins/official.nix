@@ -60,11 +60,5 @@ _:
     "example-plugin@claude-plugins-official" = false;
 
     # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
-
-    # REMOVED - unused or token-heavy:
-    # agent-sdk-dev - not building SDKs
-    # frontend-design - no frontend repos
-    # explanatory-output-style - output fluff
-    # learning-output-style - output fluff
   };
 }
