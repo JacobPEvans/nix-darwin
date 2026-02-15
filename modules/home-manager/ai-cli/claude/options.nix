@@ -228,6 +228,19 @@ in
       description = "Show how long each turn takes in the Claude Code UI";
     };
 
+    model = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Override the default model used by Claude Code.
+        Accepts model aliases ("opus", "sonnet", "haiku", "opusplan")
+        or full model names (e.g., "claude-opus-4-6").
+        - "opusplan": Uses Opus for planning, Sonnet for execution
+        - null: Uses the account-tier default (Opus 4.6 for Max/Pro/Teams)
+        See: https://code.claude.com/docs/en/model-config
+      '';
+    };
+
     effortLevel = mkOption {
       type = types.enum [
         "low"

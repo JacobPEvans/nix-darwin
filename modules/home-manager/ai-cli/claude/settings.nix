@@ -49,6 +49,9 @@ let
       showTurnDuration
       effortLevel
       ;
+  }
+  // lib.optionalAttrs (cfg.model != null) { inherit (cfg) model; }
+  // {
 
     # Permissions
     permissions = {
