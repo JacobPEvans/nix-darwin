@@ -49,6 +49,8 @@ let
       showTurnDuration
       effortLevel
       ;
+  }
+  // {
 
     # Permissions
     permissions = {
@@ -69,6 +71,7 @@ let
 
     # Environment variables (user-defined + apiKeyHelper if enabled)
   }
+  // lib.optionalAttrs (cfg.model != null) { inherit (cfg) model; }
   // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
 
   # Status line (only include if we have valid configuration)
