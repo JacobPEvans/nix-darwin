@@ -33,6 +33,9 @@
 
     # Activation recovery after login (fixes boot failures)
     ../../modules/home-manager/nix-activation-recovery.nix
+
+    # Raycast script scheduling (refresh-repos LaunchAgent)
+    ../../modules/home-manager/raycast-scripts.nix
   ];
 
   # ==========================================================================
@@ -51,6 +54,9 @@
   # Enable activation recovery after login (fixes boot failures)
   # See docs/boot-failure/root-cause.md for why this is needed
   programs.nix-activation-recovery.enable = true;
+
+  # Raycast refresh-repos scheduling (hourly, replaces manual plist)
+  programs.raycast-scripts.refreshRepos.enable = true;
 
   home = {
     # ========================================================================
