@@ -44,7 +44,7 @@ in
       "${homeDir}/Applications/Gemini.app" # Google Gemini AI assistant
 
       # Knowledge & Notes
-      "/Applications/Nix Apps/Obsidian.app"
+      "/Applications/Obsidian.app"
       # Note: Additional note-taking apps may be installed locally
 
       # Development & Tools
