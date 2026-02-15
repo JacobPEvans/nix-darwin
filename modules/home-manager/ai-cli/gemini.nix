@@ -144,34 +144,7 @@ in
   # - Nix config takes precedence for known keys
   # - Unknown runtime keys are preserved (e.g., auth tokens, cached data)
   # - Use jq for robust JSON merging
-  geminiSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SETTINGS_FILE="${config.home.homeDirectory}/.gemini/settings.json"
-    SETTINGS_DIR=$(dirname "$SETTINGS_FILE")
-
-    # Ensure .gemini directory exists
-    mkdir -p "$SETTINGS_DIR"
-
-    # Always merge when file exists (even if not writable/symlink),
-    # so runtime/auth keys are preserved. Write to temp file first
-    # for atomic replacement.
-    TMP_SETTINGS_FILE=$(mktemp "$SETTINGS_DIR/settings.json.XXXXXX")
-
-    if [ -f "$SETTINGS_FILE" ]; then
-      echo "Merging Nix configuration with existing Gemini settings..." >&2
-      # Deep merge: Nix settings take precedence, runtime keys preserved
-      # Use settingsJson directly to avoid shell escaping issues
-      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$SETTINGS_FILE" ${settingsJson} > "$TMP_SETTINGS_FILE"
-    else
-      echo "Creating new Gemini settings file..." >&2
-      cp ${settingsJson} "$TMP_SETTINGS_FILE"
-    fi
-
-    # Replace any existing file or symlink atomically
-    # Only move into place after jq/cp succeeds
-    rm -f "$SETTINGS_FILE"
-    mv "$TMP_SETTINGS_FILE" "$SETTINGS_FILE"
-
-    # Ensure file is writable for Gemini CLI but not world-readable
-    chmod 600 "$SETTINGS_FILE"
-  '';
+  geminiSettings =
+    lib.hm.dag.entryAfter [ "writeBoundary" ]
+      "${../scripts/merge-gemini-settings.sh} ${lib.escapeShellArg config.home.homeDirectory} ${lib.escapeShellArg settingsJson} ${lib.escapeShellArg "${pkgs.jq}/bin/jq"}";
 }
