@@ -116,6 +116,15 @@ let
       ai-assistant-instructions
       ;
   };
+
+  # GitHub CLI extensions (aggregated for modularity)
+  ghExtensions = import ./ai-cli/gh-extensions {
+    inherit
+      pkgs
+      lib
+      ;
+    inherit (pkgs) fetchFromGitHub;
+  };
 in
 {
   # ==========================================================================
@@ -260,6 +269,31 @@ in
     direnv = {
       enable = true;
       nix-direnv.enable = true; # Faster, cached nix-shell/flake loading
+    };
+
+    # ==========================================================================
+    # GitHub CLI
+    # ==========================================================================
+    # Declarative management of gh and extensions
+    # Extensions are linked to XDG data directory for gh discovery
+    gh = {
+      enable = true;
+      package = pkgs.gh; # GitHub CLI from nixpkgs
+
+      # Extensions installed declaratively
+      extensions = [
+        # GitHub Agentic Workflows - AI-powered workflows in markdown
+        # Source: https://github.com/github/gh-aw
+        # Docs: https://github.github.io/gh-aw/
+        # Requires: ANTHROPIC_API_KEY or COPILOT_GITHUB_TOKEN (set in env)
+        ghExtensions.gh-aw
+      ];
+
+      # gh configuration (written to ~/.config/gh/config.yml)
+      settings = {
+        git_protocol = "ssh";
+        prompt = "enabled";
+      };
     };
 
     # ==========================================================================

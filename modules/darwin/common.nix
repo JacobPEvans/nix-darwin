@@ -95,7 +95,6 @@ in
       yq # YAML parsing (like jq but for YAML/XML/TOML)
 
       # --- Development tools ---
-      gh # GitHub CLI
     ])
     ++ (with pkgs; [
       mas # Mac App Store CLI
