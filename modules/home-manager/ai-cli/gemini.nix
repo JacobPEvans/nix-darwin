@@ -151,22 +151,27 @@ in
     # Ensure .gemini directory exists
     mkdir -p "$SETTINGS_DIR"
 
-    # Read Nix-generated settings
-    NIX_SETTINGS=$(cat ${settingsJson})
+    # Always merge when file exists (even if not writable/symlink),
+    # so runtime/auth keys are preserved. Write to temp file first
+    # for atomic replacement.
+    TMP_SETTINGS_FILE=$(mktemp "$SETTINGS_DIR/settings.json.XXXXXX")
 
-    # If existing settings file exists and is writable, merge with it
-    if [ -f "$SETTINGS_FILE" ] && [ -w "$SETTINGS_FILE" ]; then
+    if [ -f "$SETTINGS_FILE" ]; then
       echo "Merging Nix configuration with existing Gemini settings..." >&2
-      # Deep merge: NIX_SETTINGS takes precedence, runtime keys preserved
-      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$SETTINGS_FILE" <(echo "$NIX_SETTINGS") > "$SETTINGS_FILE.tmp"
-      mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+      # Deep merge: Nix settings take precedence, runtime keys preserved
+      # Use settingsJson directly to avoid shell escaping issues
+      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$SETTINGS_FILE" ${settingsJson} > "$TMP_SETTINGS_FILE"
     else
-      # No existing file or not writable - write Nix settings directly
       echo "Creating new Gemini settings file..." >&2
-      echo "$NIX_SETTINGS" > "$SETTINGS_FILE"
+      cp ${settingsJson} "$TMP_SETTINGS_FILE"
     fi
 
-    # Ensure file is writable for Gemini CLI
-    chmod 644 "$SETTINGS_FILE"
+    # Replace any existing file or symlink atomically
+    # Only move into place after jq/cp succeeds
+    rm -f "$SETTINGS_FILE"
+    mv "$TMP_SETTINGS_FILE" "$SETTINGS_FILE"
+
+    # Ensure file is writable for Gemini CLI but not world-readable
+    chmod 600 "$SETTINGS_FILE"
   '';
 }

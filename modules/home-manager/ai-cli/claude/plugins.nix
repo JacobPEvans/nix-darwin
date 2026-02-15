@@ -78,8 +78,17 @@ in
           | while IFS= read -r ORPHAN; do
             ORPHAN_PATH="${config.home.homeDirectory}/.claude/plugins/marketplaces/$ORPHAN"
             if [ -e "$ORPHAN_PATH" ]; then
-              echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Removing orphaned marketplace directory: $ORPHAN" >&2
-              rm -rf "$ORPHAN_PATH"
+              BACKUP="$ORPHAN_PATH.backup"
+
+              # Remove old backup if it exists (only keep one)
+              if [ -e "$BACKUP" ]; then
+                rm -rf "$BACKUP"
+              fi
+
+              # Move orphaned directory to backup
+              mv "$ORPHAN_PATH" "$BACKUP"
+              echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Cleaned up orphaned marketplace directory: $ORPHAN" >&2
+              echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO]   Backup saved to: $BACKUP" >&2
             fi
           done
 
