@@ -2,10 +2,12 @@
 #
 # Manages LaunchAgents for Raycast helper scripts.
 # Replaces manual plist files with declarative Nix management.
+# Script at ~/.config/raycast/scripts/refresh-repos.sh is managed by Raycast.
 { config, lib, ... }:
 let
   homeDir = config.home.homeDirectory;
   scriptPath = "${homeDir}/.config/raycast/scripts/refresh-repos.sh";
+  logPath = "${homeDir}/Library/Logs/com.jacobpevans.refresh-smart-issue-repos.log";
 in
 {
   options.programs.raycast-scripts = {
@@ -22,9 +24,10 @@ in
         ProgramArguments = [ scriptPath ];
         RunAtLoad = true;
         StartInterval = 3600;
-        StandardOutPath = "/tmp/refresh-smart-issue-repos.log";
-        StandardErrorPath = "/tmp/refresh-smart-issue-repos.log";
+        StandardOutPath = logPath;
+        StandardErrorPath = logPath;
         EnvironmentVariables = {
+          HOME = homeDir;
           PATH = lib.concatStringsSep ":" [
             "/etc/profiles/per-user/${config.home.username}/bin"
             "/run/current-system/sw/bin"
