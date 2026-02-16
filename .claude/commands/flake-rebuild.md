@@ -56,28 +56,51 @@ else
 fi
 ```
 
-### 3. Update Flake Inputs
+### 3. Update ALL Flake Inputs
+
+**IMPORTANT**: Update the root flake AND all shell/module flakes throughout the repository.
+
+Use the centralized update script to avoid DRY violations:
 
 ```bash
-nix flake update
+./scripts/update-all-flakes.sh
 ```
+
+**Script reference**: See `scripts/update-all-flakes.sh` in the repository root.
+
+The script updates:
+
+- Root flake.lock (darwin, home-manager, nixpkgs, AI tools)
+- Shell environment flakes (shells/**/flake.lock)
+- Host-specific flakes (hosts/**/flake.lock)
 
 **On failure**: Report the error and stop.
 
 ### 4. Check for Changes
 
 ```bash
-git status
+git status --short
 ```
 
-- If flake.lock is **unchanged**: Report "All flake inputs already up to date" and **STOP**.
-- If flake.lock **changed**: Continue to step 5.
+- If **no changes**: Report "All flake inputs already up to date" and **STOP**.
+- If **changes detected**: Continue to step 5.
 
-### 5. Commit the Update
+### 5. Commit the Updates
 
 ```bash
-git add flake.lock
-git commit -m "chore(deps): update flake.lock"
+# Add all modified and new flake.lock files
+git add */flake.lock flake.lock 2>/dev/null || true
+git add shells/*/flake.lock hosts/*/flake.lock 2>/dev/null || true
+
+# Create a descriptive commit message
+git commit -m "chore(deps): update all flake inputs
+
+Updated nixpkgs and other inputs across:
+- Root flake
+- Shell environments
+- Host configurations
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```
 
 ### 6. Rebuild nix-darwin
