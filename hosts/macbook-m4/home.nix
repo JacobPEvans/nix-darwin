@@ -42,7 +42,7 @@
     # Raycast script scheduling (refresh-repos LaunchAgent)
     ../../modules/home-manager/raycast-scripts.nix
 
-    # tmux configuration (session persistence, agent teams, remote access)
+    # tmux configuration (session persistence, agent teams)
     ../../modules/home-manager/tmux.nix
   ];
 

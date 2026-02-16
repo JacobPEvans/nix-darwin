@@ -1,8 +1,7 @@
 # tmux Configuration
 #
-# Session persistence, vi keybindings, and mobile-friendly settings.
-# Enables Claude Code agent teams split-pane mode and remote attach
-# from iPhone (Termius over UniFi VPN via SSH/mosh).
+# Session persistence, vi keybindings, and remote-friendly settings.
+# Enables Claude Code agent teams split-pane mode and remote attach.
 
 { pkgs, ... }:
 
@@ -48,7 +47,7 @@
       # Renumber windows on close
       set -g renumber-windows on
 
-      # Aggressive resize (handles multi-client: Mac vs iPhone)
+      # Aggressive resize (handles mixed-size clients)
       setw -g aggressive-resize on
 
       # True color support (Tc is the tmux-specific true color flag)

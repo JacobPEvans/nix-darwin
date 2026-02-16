@@ -73,10 +73,9 @@ with pkgs;
   aws-vault # Secure AWS credential storage (uses OS keychain)
 
   # ==========================================================================
-  # Remote Shell (Mobile Access)
+  # Remote Shell
   # ==========================================================================
-  # Resilient mobile shell for iPhone access via UDP.
-  # Survives WiFi/cellular handoffs - used with Termius over UniFi VPN.
+  # Resilient mobile shell using UDP - survives network handoffs.
   mosh
 
   # ==========================================================================
