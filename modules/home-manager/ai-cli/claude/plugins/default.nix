@@ -15,22 +15,16 @@
 
 {
   lib,
-  claude-code-workflows,
-  claude-skills,
-  jacobpevans-cc-plugins,
+  marketplaceInputs,
   ...
 }:
 
 let
+  # Extract specific inputs needed by sub-modules
+  inherit (marketplaceInputs) jacobpevans-cc-plugins;
+
   # Import all plugin category modules
-  # Pass flake inputs to marketplaces.nix for DRY URL configuration
-  marketplacesModule = import ./marketplaces.nix {
-    inherit
-      lib
-      claude-code-workflows
-      claude-skills
-      ;
-  };
+  marketplacesModule = import ./marketplaces.nix { inherit lib; };
   officialModule = import ./official.nix { };
   externalModule = import ./external.nix { };
   communityModule = import ./community.nix { };

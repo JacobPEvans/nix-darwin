@@ -56,20 +56,6 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Official Anthropic plugin directory
-    # Curated collection of internal and external plugins
-    claude-plugins-official = {
-      url = "github:anthropics/claude-plugins-official";
-      flake = false; # Not a flake, just fetch the repo
-    };
-
-    # Anthropic public skills repository
-    # Document generation, analysis, and other reusable skills
-    anthropic-skills = {
-      url = "github:anthropics/skills";
-      flake = false; # Not a flake, just fetch the repo
-    };
-
     # AI Assistant Instructions - source of truth for AI agent configuration
     # Contains permissions, commands, and instruction files
     # Consumed by claude.nix to generate settings.json
@@ -79,31 +65,63 @@
       flake = false; # Not a flake, just fetch the repo
     };
 
-    # Superpowers - comprehensive software development workflow system
-    # Provides brainstorming, planning, execution, testing, and review skills
-    # https://github.com/obra/superpowers
-    superpowers-marketplace = {
-      url = "github:obra/superpowers-marketplace";
-      flake = false; # Not a flake, just fetch the repo
+    # Marketplace Inputs (14 total)
+    # Keys MUST match the `name` field in each repo's marketplace.json.
+    # Adding a new marketplace: add input here, add to marketplaceInputs below, done.
+    anthropic-agent-skills = {
+      url = "github:anthropics/skills";
+      flake = false;
     };
-
-    # User's personal Claude Code plugins
-    # Contains: git-rebase-workflow, webfetch-guard, markdown-validator, token-validator, issue-limiter
-    # https://github.com/JacobPEvans/claude-code-plugins
-    jacobpevans-cc-plugins = {
-      url = "github:JacobPEvans/claude-code-plugins";
-      flake = false; # Not a flake, just fetch the repo
+    bills-claude-skills = {
+      url = "github:BillChirico/bills-claude-skills";
+      flake = false;
     };
-
-    # Claude Code Workflows - Backend, testing, code quality
+    cc-dev-tools = {
+      url = "github:Lucklyric/cc-dev-tools";
+      flake = false;
+    };
+    cc-marketplace = {
+      url = "github:ananddtyagi/cc-marketplace";
+      flake = false;
+    };
+    claude-code-plugins-plus = {
+      url = "github:jeremylongshore/claude-code-plugins-plus";
+      flake = false;
+    };
     claude-code-workflows = {
       url = "github:wshobson/agents";
       flake = false;
     };
-
-    # Claude Skills Marketplace - 174 production-ready skills
+    claude-plugins-official = {
+      url = "github:anthropics/claude-plugins-official";
+      flake = false;
+    };
     claude-skills = {
       url = "github:secondsky/claude-skills";
+      flake = false;
+    };
+    jacobpevans-cc-plugins = {
+      url = "github:JacobPEvans/claude-code-plugins";
+      flake = false;
+    };
+    lunar-claude = {
+      url = "github:basher83/lunar-claude";
+      flake = false;
+    };
+    obsidian-skills = {
+      url = "github:kepano/obsidian-skills";
+      flake = false;
+    };
+    obsidian-visual-skills = {
+      url = "github:axtonliu/axton-obsidian-visual-skills";
+      flake = false;
+    };
+    superpowers-marketplace = {
+      url = "github:obra/superpowers-marketplace";
+      flake = false;
+    };
+    wakatime = {
+      url = "github:wakatime/claude-code-wakatime";
       flake = false;
     };
 
@@ -118,13 +136,22 @@
       mac-app-util,
       claude-code-plugins,
       claude-cookbooks,
-      claude-plugins-official,
-      anthropic-skills,
       ai-assistant-instructions,
-      superpowers-marketplace,
-      jacobpevans-cc-plugins,
+      # Marketplace inputs (all 14) - destructured individually for marketplaceInputs attrset
+      anthropic-agent-skills,
+      bills-claude-skills,
+      cc-dev-tools,
+      cc-marketplace,
+      claude-code-plugins-plus,
       claude-code-workflows,
+      claude-plugins-official,
       claude-skills,
+      jacobpevans-cc-plugins,
+      lunar-claude,
+      obsidian-skills,
+      obsidian-visual-skills,
+      superpowers-marketplace,
+      wakatime,
       ...
     }:
     let
@@ -135,6 +162,28 @@
       unstablePkgs = import nixpkgs-unstable {
         system = "aarch64-darwin";
         config.allowUnfree = true;
+      };
+
+      # All 14 marketplace flake inputs as a single attrset.
+      # Keys match manifest names in each repo's marketplace.json.
+      # Adding a new marketplace: add flake input above, add to this set, done.
+      marketplaceInputs = {
+        inherit
+          anthropic-agent-skills
+          bills-claude-skills
+          cc-dev-tools
+          cc-marketplace
+          claude-code-plugins-plus
+          claude-code-workflows
+          claude-plugins-official
+          claude-skills
+          jacobpevans-cc-plugins
+          lunar-claude
+          obsidian-skills
+          obsidian-visual-skills
+          superpowers-marketplace
+          wakatime
+          ;
       };
 
       # Pure settings generator for CI (no derivations, cross-platform)
@@ -164,17 +213,8 @@
           };
           plugins =
             (import ./modules/home-manager/ai-cli/claude-plugins.nix {
-              inherit
-                claude-code-plugins
-                claude-cookbooks
-                claude-plugins-official
-                anthropic-skills
-                claude-code-workflows
-                claude-skills
-                jacobpevans-cc-plugins
-                ;
               inherit (nixpkgs) lib;
-              config = { }; # Unused but required by signature
+              inherit marketplaceInputs claude-cookbooks;
             }).pluginConfig;
         };
 
@@ -182,15 +222,10 @@
       extraSpecialArgs = {
         inherit
           unstablePkgs
+          ai-assistant-instructions
+          marketplaceInputs
           claude-code-plugins
           claude-cookbooks
-          claude-plugins-official
-          anthropic-skills
-          ai-assistant-instructions
-          superpowers-marketplace
-          jacobpevans-cc-plugins
-          claude-code-workflows
-          claude-skills
           ;
       };
       # Define configuration once, assign to multiple names

@@ -2,15 +2,9 @@
   config,
   pkgs,
   lib,
-  claude-code-plugins,
-  claude-cookbooks,
-  claude-plugins-official,
-  anthropic-skills,
   ai-assistant-instructions,
-  superpowers-marketplace,
-  jacobpevans-cc-plugins,
-  claude-code-workflows,
-  claude-skills,
+  marketplaceInputs,
+  claude-cookbooks,
   ...
 }:
 
@@ -56,15 +50,9 @@ let
     inherit
       config
       lib
-      claude-code-plugins
-      claude-cookbooks
-      claude-plugins-official
-      anthropic-skills
       ai-assistant-instructions
-      superpowers-marketplace
-      jacobpevans-cc-plugins
-      claude-code-workflows
-      claude-skills
+      marketplaceInputs
+      claude-cookbooks
       ;
   };
 

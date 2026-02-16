@@ -18,23 +18,15 @@
 
 {
   lib,
+  marketplaceInputs,
   claude-cookbooks,
-  claude-code-workflows,
-  claude-skills,
-  jacobpevans-cc-plugins,
   ...
 }:
 
 let
   # Import modular plugin configuration
-  # Pass flake inputs to enable DRY marketplace URL configuration
   pluginModules = import ./claude/plugins/default.nix {
-    inherit
-      lib
-      claude-code-workflows
-      claude-skills
-      jacobpevans-cc-plugins
-      ;
+    inherit lib marketplaceInputs;
   };
 
   # Commands from claude-cookbooks to install globally

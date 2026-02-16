@@ -149,7 +149,7 @@ Updated daily at noon UTC:
 - `claude-code-plugins`
 - `claude-cookbooks`
 - `claude-plugins-official`
-- `anthropic-skills`
+- `anthropic-agent-skills`
 - `superpowers-marketplace`
 
 ### Full Updates (Tue/Fri)
