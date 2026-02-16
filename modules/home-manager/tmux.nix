@@ -23,6 +23,8 @@
     plugins = with pkgs.tmuxPlugins; [
       {
         plugin = resurrect;
+        # Persists pane scrollback to ~/.tmux/resurrect/ (may contain secrets).
+        # Acceptable on personal FileVault-encrypted machine for session persistence.
         extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
       }
       {
@@ -49,8 +51,8 @@
       # Aggressive resize (handles multi-client: Mac vs iPhone)
       setw -g aggressive-resize on
 
-      # True color support (Ghostty, xterm-256color)
-      set -ga terminal-overrides ",xterm-256color:RGB"
+      # True color support (Tc is the tmux-specific true color flag)
+      set -ga terminal-overrides ",*256color*:Tc"
 
       # Minimal status bar
       set -g status-left " [#S] "
