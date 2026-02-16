@@ -15,6 +15,12 @@ if [[ ! -f "$FLAKE_LOCK" ]]; then
   exit 1
 fi
 
+# Check for required tools
+if ! command -v jq &>/dev/null || ! command -v nix &>/dev/null; then
+  echo "ERROR: jq and nix are required. Please run this script within a Nix environment (e.g., 'nix develop')." >&2
+  exit 1
+fi
+
 # Package definitions: name:priority:channel
 # Priority: Security (security-critical) | AI Tool (AI tooling) | GUI App (desktop apps)
 # Channel: stable (nixpkgs-25.11-darwin) | unstable (nixpkgs-unstable)
@@ -44,35 +50,34 @@ MAJOR_UPDATES=0
 MINOR_UPDATES=0
 CURRENT=0
 
-# Map channel name to flake.lock node and branch ref
+# Pre-read locked revisions and branch refs from flake.lock (avoids repeated jq calls)
+STABLE_REV=$(jq -r '.nodes["nixpkgs"].locked.rev // empty' "$FLAKE_LOCK")
+UNSTABLE_REV=$(jq -r '.nodes["nixpkgs-unstable"].locked.rev // empty' "$FLAKE_LOCK")
+STABLE_BRANCH=$(jq -r '.nodes["nixpkgs"].original.ref // empty' "$FLAKE_LOCK")
+UNSTABLE_BRANCH=$(jq -r '.nodes["nixpkgs-unstable"].original.ref // empty' "$FLAKE_LOCK")
+
+# Map channel to pre-cached rev/branch
 get_locked_rev() {
-  local channel=$1
-  local node
-  case "$channel" in
-    stable) node="nixpkgs" ;;
-    unstable) node="nixpkgs-unstable" ;;
-    *) echo "unknown"; return 1 ;;
+  case "$1" in
+    stable) echo "$STABLE_REV" ;;
+    unstable) echo "$UNSTABLE_REV" ;;
+    *) echo "" ;;
   esac
-  jq -r ".nodes[\"$node\"].locked.rev // empty" "$FLAKE_LOCK"
 }
 
 get_branch_ref() {
-  local channel=$1
-  local node
-  case "$channel" in
-    stable) node="nixpkgs" ;;
-    unstable) node="nixpkgs-unstable" ;;
-    *) echo "unknown"; return 1 ;;
+  case "$1" in
+    stable) echo "$STABLE_BRANCH" ;;
+    unstable) echo "$UNSTABLE_BRANCH" ;;
+    *) echo "" ;;
   esac
-  jq -r ".nodes[\"$node\"].original.ref // empty" "$FLAKE_LOCK"
 }
 
 # Get version from our pinned nixpkgs revision (what we actually have installed)
 get_current_version() {
   local package=$1
-  local channel=$2
   local rev
-  rev=$(get_locked_rev "$channel")
+  rev=$(get_locked_rev "$2")
 
   if [[ -z "$rev" ]]; then
     echo "unknown"
@@ -85,9 +90,8 @@ get_current_version() {
 # Get version from latest nixpkgs branch HEAD (what's available if we update)
 get_latest_version() {
   local package=$1
-  local channel=$2
   local branch
-  branch=$(get_branch_ref "$channel")
+  branch=$(get_branch_ref "$2")
 
   if [[ -z "$branch" ]]; then
     echo "unknown"
@@ -150,6 +154,7 @@ main() {
 
     current_version=$(get_current_version "$package" "$channel")
     latest_version=$(get_latest_version "$package" "$channel")
+
     status=$(compare_versions "$current_version" "$latest_version")
     status_code=$?
 
