@@ -9,6 +9,7 @@ _:
 
 {
   imports = [
+    ./auto-update-prevention.nix
     ./orbstack.nix
     ./raycast.nix
   ];
