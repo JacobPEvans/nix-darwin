@@ -224,6 +224,7 @@
           unstablePkgs
           ai-assistant-instructions
           marketplaceInputs
+          claude-code-plugins
           claude-cookbooks
           ;
       };
