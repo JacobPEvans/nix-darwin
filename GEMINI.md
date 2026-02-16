@@ -2,7 +2,7 @@
 
 This file provides Gemini-specific guidance for conducting code reviews in this nix-darwin configuration repository.
 
-**General AI review guidelines** are in `AGENTS.md` - this file supplements those with Gemini-specific context.
+**General AI review guidelines** are in [AGENTS.md](./AGENTS.md) - this file supplements those with Gemini-specific context.
 
 ## Gemini's Review Strengths
 

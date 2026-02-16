@@ -1,7 +1,12 @@
 # Gemini CLI Configuration
 #
-# Returns home.file entries for Google Gemini Code Assist CLI.
-# Imported by home.nix for clean separation of AI CLI configs.
+# Returns { file, activation } attrsets for Google Gemini Code Assist CLI.
+# Imported by common.nix: file entries go into home.file, activation into home.activation.
+#
+# IMPORTANT: settings.json is NOT managed as a read-only symlink!
+# Gemini CLI writes auth tokens and runtime state to this file.
+# Instead, we use an activation script that deep-merges Nix config
+# with existing runtime state, preserving auth tokens across rebuilds.
 #
 # CRITICAL - tools.allowed vs tools.core:
 # =========================================
@@ -132,7 +137,20 @@ let
       ''
         jq '.' "$jsonPath" > $out
       '';
+
+  homeDir = config.home.homeDirectory;
 in
 {
-  ".gemini/settings.json".source = settingsJson;
+  # No home.file entries for settings.json - it must be writable at runtime
+  file = { };
+
+  # Activation script: deep-merges Nix config with existing runtime state
+  activation = {
+    mergeGeminiSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${./scripts/merge-gemini-settings.sh} \
+        "${settingsJson}" \
+        "${homeDir}/.gemini/settings.json" \
+        "${lib.getExe pkgs.jq}"
+    '';
+  };
 }
