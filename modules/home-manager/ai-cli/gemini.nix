@@ -147,7 +147,7 @@ in
   # Activation script: deep-merges Nix config with existing runtime state
   activation = {
     mergeGeminiSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD ${./scripts/merge-gemini-settings.sh} \
+      $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
         "${settingsJson}" \
         "${homeDir}/.gemini/settings.json" \
         "${lib.getExe pkgs.jq}"

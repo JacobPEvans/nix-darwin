@@ -32,9 +32,9 @@ let
   # Shell aliases (macOS - see file for sudo requirements)
   shellAliases = import ./zsh/aliases.nix;
 
-  # VS Code settings imports
-  vscodeGeneralSettings = import ./vscode/settings.nix { inherit config; };
-  vscodeGithubCopilotSettings = import ./vscode/copilot-settings.nix { };
+  # VS Code writable config (activation-based merge, not symlink)
+  # Settings are deep-merged into writable files on each rebuild
+  vscodeWritableConfig = import ./vscode/writable-config.nix { inherit config lib pkgs; };
 
   # npm configuration (home.file entries)
   npmFiles = import ./npm/config.nix { inherit config; };
@@ -144,16 +144,19 @@ in
       // gitMergeDrivers;
 
     # Activation scripts (run after home files are written)
-    activation = geminiFiles.activation // {
-      # Claude Code Settings Validation (post-rebuild)
-      # Validates settings.json against JSON Schema after home files are written
-      # Script extracted to scripts/validate-claude-settings.sh for maintainability
-      validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
-          "${config.home.homeDirectory}/.claude/settings.json" \
-          "${userConfig.ai.claudeSchemaUrl}"
-      '';
-    };
+    activation =
+      geminiFiles.activation
+      // vscodeWritableConfig.activation
+      // {
+        # Claude Code Settings Validation (post-rebuild)
+        # Validates settings.json against JSON Schema after home files are written
+        # Script extracted to scripts/validate-claude-settings.sh for maintainability
+        validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
+            "${config.home.homeDirectory}/.claude/settings.json" \
+            "${userConfig.ai.claudeSchemaUrl}"
+        '';
+      };
   };
 
   # ==========================================================================
@@ -163,20 +166,11 @@ in
     # ==========================================================================
     # VS Code
     # ==========================================================================
-    # Settings from vscode-settings.nix and vscode-copilot-settings.nix
-    # WARNING: Will overwrite local VS Code settings
+    # Settings managed via activation script (writable at runtime).
+    # See vscode/writable-config.nix for the deep-merge pattern.
+    # userSettings intentionally empty so HM doesn't create a read-only symlink.
     vscode = {
       enable = true;
-      profiles.default = {
-        # Disable VS Code's built-in update mechanism (Nix manages updates)
-        enableUpdateCheck = false; # Sets update.mode = "none"
-        enableExtensionUpdateCheck = false; # Sets extensions.autoCheckUpdates = false
-        userSettings = {
-          "editor.formatOnSave" = true;
-        }
-        // vscodeGeneralSettings
-        // vscodeGithubCopilotSettings;
-      };
     };
 
     # ==========================================================================

@@ -24,10 +24,10 @@ in
   # Disable all auto-update functionality (Nix manages VS Code updates via nixpkgs)
   # This prevents the "An update is ready to install" popup and helper tool prompts
   #
-  # NOTE: update.mode and extensions.autoCheckUpdates are set by home-manager module
-  # options (enableUpdateCheck/enableExtensionUpdateCheck) in common.nix
+  # NOTE: update.mode and extensions.autoCheckUpdates are set in writable-config.nix
+  # (previously injected by HM module options enableUpdateCheck/enableExtensionUpdateCheck)
   "update.showReleaseNotes" = false; # Don't show release notes after Nix updates
-  "extensions.autoUpdate" = false; # Don't auto-update extensions (not covered by HM)
+  "extensions.autoUpdate" = false; # Don't auto-update extensions
 
   # === GIT INTEGRATION ===
 
