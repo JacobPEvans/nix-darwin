@@ -58,18 +58,10 @@
 
 {
   lib,
-  claude-code-workflows,
-  claude-skills,
   ...
 }:
 
 let
-  # DRY: Extract GitHub URLs from flake input names
-  # These MUST match the URLs in flake.nix (validated at build time via flake input presence)
-  # The flake inputs themselves validate the URLs exist and are fetchable
-  claudeCodeWorkflowsUrl = "wshobson/agents";
-  claudeSkillsUrl = "secondsky/claude-skills";
-
   # Validate marketplace entry has correct nested structure
   # Claude Code schema: { "id": { source: { type: "git", url: "..." } } }
   validateMarketplace =
@@ -151,11 +143,10 @@ let
         url = "jeremylongshore/claude-code-plugins-plus";
       };
     };
-    # DRY: URL derived from flake input (validated at build time)
     "claude-code-workflows" = {
       source = {
         type = "github";
-        url = claudeCodeWorkflowsUrl;
+        url = "wshobson/agents";
       };
     };
 
@@ -168,11 +159,10 @@ let
     };
 
     # --- Claude Skills Marketplace ---
-    # DRY: URL derived from flake input (validated at build time)
     "claude-skills" = {
       source = {
         type = "github";
-        url = claudeSkillsUrl;
+        url = "secondsky/claude-skills";
       };
     };
 

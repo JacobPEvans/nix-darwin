@@ -64,8 +64,8 @@ inputs = {
     flake = false;
   };
 
-  # Skills system
-  anthropic-skills = {
+  # Skills system (manifest name: anthropic-agent-skills)
+  anthropic-agent-skills = {
     url = "github:anthropics/skills";
     flake = false;
   };
@@ -509,7 +509,7 @@ Update specific repository:
 nix flake update claude-code-plugins
 nix flake update claude-cookbooks
 nix flake update claude-plugins-official
-nix flake update anthropic-skills
+nix flake update anthropic-agent-skills
 ```
 
 ### Testing Changes

@@ -21,7 +21,7 @@ The following inputs update daily:
 - `claude-cookbooks` (Anthropic cookbooks)
 - `claude-plugins-official` (official plugin directory)
 - `jacobpevans-cc-plugins` (personal custom plugins)
-- `anthropic-skills` (Anthropic reusable skills)
+- `anthropic-agent-skills` (Anthropic reusable skills)
 - `superpowers-marketplace` (superpowers development system)
 
 ## Claude Code Update Philosophy

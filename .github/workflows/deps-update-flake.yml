@@ -49,7 +49,7 @@ jobs:
         claude-cookbooks
         claude-plugins-official
         jacobpevans-cc-plugins
-        anthropic-skills
+        anthropic-agent-skills
         superpowers-marketplace
     steps:
       - name: Generate GitHub App Token

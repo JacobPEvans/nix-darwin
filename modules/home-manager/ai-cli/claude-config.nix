@@ -5,15 +5,9 @@
 {
   config,
   lib,
-  claude-code-plugins,
-  claude-cookbooks,
-  claude-plugins-official,
-  anthropic-skills,
   ai-assistant-instructions,
-  superpowers-marketplace,
-  jacobpevans-cc-plugins,
-  claude-code-workflows,
-  claude-skills,
+  marketplaceInputs,
+  claude-cookbooks,
   ...
 }:
 
@@ -43,17 +37,7 @@ let
   # Plugin configuration moved to claude-plugins.nix and organized by category
   # See: modules/home-manager/ai-cli/claude/plugins/*.nix
   claudePlugins = import ./claude-plugins.nix {
-    inherit
-      config
-      lib
-      claude-code-plugins
-      claude-cookbooks
-      claude-plugins-official
-      anthropic-skills
-      claude-code-workflows
-      claude-skills
-      jacobpevans-cc-plugins
-      ;
+    inherit lib marketplaceInputs claude-cookbooks;
   };
 
   # Extract enabled plugins from modular configuration
@@ -105,25 +89,10 @@ in
     # Marketplaces from modular configuration with flakeInput for Nix symlinks
     # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
     # Adding flakeInput enables Nix to create immutable symlinks instead of runtime downloads
-    marketplaces =
-      let
-        # Map marketplace names to flake inputs for Nix-managed symlinks
-        # Using a lookup table for better maintainability and readability
-        # Keys MUST match marketplace.nix keys exactly
-        flakeInputMap = {
-          "jacobpevans-cc-plugins" = jacobpevans-cc-plugins; # User's personal plugins (listed first in marketplaces.nix)
-          "claude-plugins-official" = claude-plugins-official;
-          "superpowers-marketplace" = superpowers-marketplace;
-          "anthropic-agent-skills" = anthropic-skills;
-        };
-      in
-      lib.mapAttrs (
-        name: marketplace:
-        let
-          flakeInput = flakeInputMap.${name} or null;
-        in
-        marketplace // lib.optionalAttrs (flakeInput != null) { inherit flakeInput; }
-      ) claudePlugins.pluginConfig.marketplaces;
+    # All marketplace names match flake input names -- zero special cases
+    marketplaces = lib.mapAttrs (
+      name: marketplace: marketplace // { flakeInput = marketplaceInputs.${name}; }
+    ) claudePlugins.pluginConfig.marketplaces;
 
     enabled = enabledPlugins;
     # Enable runtime plugin installation from community marketplaces.
