@@ -52,9 +52,9 @@
   # ===========================================================================
   # Archive (macOS-friendly tar)
   # ===========================================================================
-  # --disable-copyfile: don't include macOS resource forks
+  # COPYFILE_DISABLE=1: don't include macOS resource forks (portable across BSD/GNU tar)
   # --exclude='.DS_Store': skip Finder metadata files
-  tgz = "tar --disable-copyfile --exclude='.DS_Store' -czf";
+  tgz = "COPYFILE_DISABLE=1 tar --exclude='.DS_Store' -czf";
 
   # ===========================================================================
   # AWS (aws-vault for credential management)
