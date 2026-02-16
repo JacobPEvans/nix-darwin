@@ -86,4 +86,11 @@
   #   d-claude -p "prompt" # Non-interactive with prompt
   #
   d-claude = "doppler run -p ai-ci-automation -c prd -- claude";
+
+  # ===========================================================================
+  # tmux (session management)
+  # ===========================================================================
+  ta = "tmux attach -t"; # Attach to named session
+  tl = "tmux list-sessions"; # List active sessions
+  tn = "tmux new -s"; # Create named session
 }
