@@ -54,6 +54,10 @@
               tfsec
               trivy
 
+              # === Secrets Management ===
+              sops
+              age
+
               # === Cloud & Development ===
               awscli2
               git
@@ -65,7 +69,7 @@
             ];
 
             shellHook = ''
-              {
+              if [ -z "''${DIRENV_IN_ENVRC:-}" ]; then
                 echo "═══════════════════════════════════════════════════════════════"
                 echo "Terraform/Terragrunt Infrastructure as Code Environment"
                 echo "═══════════════════════════════════════════════════════════════"
@@ -79,6 +83,10 @@
                 echo "  - checkov: $(checkov --version 2>/dev/null)"
                 echo "  - tfsec: $(tfsec --version 2>/dev/null)"
                 echo ""
+                echo "Secrets Management:"
+                echo "  - sops: $(sops --version 2>/dev/null)"
+                echo "  - age: $(age --version 2>/dev/null)"
+                echo ""
                 echo "Cloud:"
                 echo "  - aws-cli: $(aws --version 2>/dev/null)"
                 echo ""
@@ -88,7 +96,7 @@
                 echo "  3. Initialize Terraform: terragrunt init"
                 echo "  4. Setup pre-commit hooks: pre-commit install"
                 echo ""
-              }
+              fi
             '';
           };
         }
