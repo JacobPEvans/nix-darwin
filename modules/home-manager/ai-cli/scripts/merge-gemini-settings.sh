@@ -28,22 +28,22 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
     # If merge fails (e.g., invalid JSON in target), just use Nix settings
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge existing settings, using Nix config" >&2
     cp "$NIX_SETTINGS" "$TARGET"
-    chmod 644 "$TARGET"
+    chmod 600 "$TARGET"
     exit 0
   }
-  echo "$MERGED" | "$JQ" '.' > "${TARGET}.tmp"
+  printf '%s\n' "$MERGED" | "$JQ" '.' > "${TARGET}.tmp"
   mv "${TARGET}.tmp" "$TARGET"
-  chmod 644 "$TARGET"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Merged Gemini settings (preserved runtime state)" >&2
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Merged Gemini settings (preserved runtime state)"
 elif [[ -L "$TARGET" ]]; then
   # It's a symlink (old Nix-managed) - remove and create real file
   rm "$TARGET"
   cp "$NIX_SETTINGS" "$TARGET"
-  chmod 644 "$TARGET"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Replaced Nix symlink with writable Gemini settings" >&2
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Replaced Nix symlink with writable Gemini settings"
 else
   # No existing file - just copy
   cp "$NIX_SETTINGS" "$TARGET"
-  chmod 644 "$TARGET"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Created initial Gemini settings" >&2
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Created initial Gemini settings"
 fi
