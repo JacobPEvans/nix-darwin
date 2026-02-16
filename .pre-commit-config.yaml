@@ -27,7 +27,7 @@ repos:
   # Markdown linting (using markdownlint-cli2 which reads .markdownlint-cli2.jsonc)
   # Config file has "fix: true" to auto-fix issues
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.20.0
+    rev: v0.21.0
     hooks:
       - id: markdownlint-cli2
         files: \.md$
