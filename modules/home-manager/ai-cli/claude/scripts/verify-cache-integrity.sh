@@ -10,7 +10,7 @@ HOME_DIR="$1"
 COREUTILS_BIN="$2"
 shift 2
 
-for path in "$@"; do
+printf '%s\n' "$@" | while IFS= read -r path; do
   [ ! -L "$path" ] && continue
 
   MARKETPLACE_NAME=$("$COREUTILS_BIN/basename" "$path")

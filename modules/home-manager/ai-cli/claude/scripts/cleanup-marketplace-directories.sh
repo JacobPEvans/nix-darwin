@@ -24,12 +24,12 @@ backup_if_exists() {
 }
 
 # Backup deprecated/orphaned marketplaces
-for orphan in awesome-claude-code-plugins claudeforge-marketplace skills agents local claude-code-plugins; do
+printf '%s\n' awesome-claude-code-plugins claudeforge-marketplace skills agents local claude-code-plugins | while IFS= read -r orphan; do
   backup_if_exists "$HOME_DIR/.claude/plugins/marketplaces/$orphan"
 done
 
 # Backup real directories that conflict with Nix-managed symlinks
-for path in "${MARKETPLACE_PATHS[@]}"; do
+printf '%s\n' "${MARKETPLACE_PATHS[@]}" | while IFS= read -r path; do
   if [ -d "$path" ] && [ ! -L "$path" ]; then
     backup_if_exists "$path"
   fi

@@ -64,7 +64,7 @@ in
         # MUST run before linkGeneration to prevent "cannot overwrite directory" errors
         cleanupMarketplaceDirectories =
           lib.hm.dag.entryBefore [ "linkGeneration" ]
-            "${./scripts/cleanup-marketplace-directories.sh} ${lib.escapeShellArg config.home.homeDirectory} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
+            "$DRY_RUN_CMD ${./scripts/cleanup-marketplace-directories.sh} ${lib.escapeShellArg config.home.homeDirectory} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
 
         # Cache integrity verification and cleanup
         # Addresses upstream bug where stale cache prevents updated plugins from loading
@@ -72,12 +72,12 @@ in
         # MUST run after linkGeneration to ensure symlinks are created first
         verifyCacheIntegrity =
           lib.hm.dag.entryAfter [ "linkGeneration" ]
-            "${./scripts/verify-cache-integrity.sh} ${lib.escapeShellArg config.home.homeDirectory} ${lib.escapeShellArg "${pkgs.coreutils}/bin"} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
+            "$DRY_RUN_CMD ${./scripts/verify-cache-integrity.sh} ${lib.escapeShellArg config.home.homeDirectory} ${lib.escapeShellArg "${pkgs.coreutils}/bin"} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
 
         # Post-activation script to show diffs for manual review
         reportMarketplaceDiffs =
           lib.hm.dag.entryAfter [ "linkGeneration" ]
-            "${./scripts/report-marketplace-diffs.sh} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
+            "$DRY_RUN_CMD ${./scripts/report-marketplace-diffs.sh} ${lib.escapeShellArg "${pkgs.coreutils}/bin"} ${lib.concatStringsSep " " (map lib.escapeShellArg marketplacePaths)}";
       };
     };
   };
