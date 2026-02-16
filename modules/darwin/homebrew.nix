@@ -64,6 +64,7 @@ _:
       # not symlinks to /nix/store), so macOS TCC permissions (camera, mic, screen
       # recording) persist across darwin-rebuild. This is different from nixpkgs
       # apps which require copyApps workaround in home-manager.
+      "obsidian" # Knowledge base / note-taking - brew for faster beta updates
       "shortwave" # AI-powered email client
       "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
       "claude-code" # Anthropic Claude Code CLI (version 2.1.3)

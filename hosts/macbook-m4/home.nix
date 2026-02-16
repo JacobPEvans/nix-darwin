@@ -3,7 +3,12 @@
 # User environment for macbook-m4 host.
 # Imports common home-manager modules with host-specific overrides.
 
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ==========================================================================
@@ -33,7 +38,22 @@
 
     # Activation recovery after login (fixes boot failures)
     ../../modules/home-manager/nix-activation-recovery.nix
+
+    # Raycast script scheduling (refresh-repos LaunchAgent)
+    ../../modules/home-manager/raycast-scripts.nix
   ];
+
+  # ==========================================================================
+  # Auto-Update Cache Cleanup (for Nix-managed apps)
+  # ==========================================================================
+  # Clean Squirrel/ShipIt and Sparkle updater caches on every rebuild.
+  # This complements the auto-update-prevention.nix module by removing
+  # leftover updater state that could interfere with Nix-managed versions.
+  home.activation.cleanAutoUpdateCaches = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # Clean Squirrel/ShipIt and Sparkle updater caches
+    $DRY_RUN_CMD rm -rf "$HOME/Library/Caches/com.postmanlabs.mac.ShipIt" 2>/dev/null || true
+    $DRY_RUN_CMD rm -rf "$HOME/Library/Caches/com.luckymarmot.Paw/org.sparkle-project.Sparkle" 2>/dev/null || true
+  '';
 
   # ==========================================================================
   # Host-Specific Home Settings
@@ -51,6 +71,9 @@
   # Enable activation recovery after login (fixes boot failures)
   # See docs/boot-failure/root-cause.md for why this is needed
   programs.nix-activation-recovery.enable = true;
+
+  # Raycast refresh-repos scheduling (hourly, replaces manual plist)
+  programs.raycast-scripts.refreshRepos.enable = true;
 
   home = {
     # ========================================================================
@@ -76,8 +99,8 @@
       (with pkgs; [
         # Terminal & Development
         ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
-        postman # API development environment
-        rapidapi # Full-featured HTTP client for testing and describing APIs
+        postman # API development environment - auto-updates disabled (see auto-update-prevention.nix)
+        rapidapi # Full-featured HTTP client for testing and describing APIs - auto-updates disabled (see auto-update-prevention.nix)
 
         # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
         antigravity # Google's AI-powered IDE (Gemini 3)

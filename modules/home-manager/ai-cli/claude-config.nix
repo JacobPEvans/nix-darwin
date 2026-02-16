@@ -108,15 +108,12 @@ in
 
   effortLevel = "medium";
 
-  # Auto-Claude: Scheduled autonomous maintenance
-  # Extracted to claude-auto-config.nix for better modularity
-  autoClaude = import ./claude-auto-config.nix { inherit config lib; };
+  # Auto-Claude: DISABLED - migrating to ai-workflows repo
+  # Module files preserved (guarded by mkIf), will be extracted later
+  autoClaude.enable = false;
 
-  # Menu bar status indicator via SwiftBar
-  menubar = {
-    enable = true;
-    refreshInterval = 30; # Update every 30 seconds
-  };
+  # Menu bar: disabled (depends on auto-claude)
+  menubar.enable = false;
 
   plugins = {
     # Marketplaces from modular configuration with flakeInput for Nix symlinks

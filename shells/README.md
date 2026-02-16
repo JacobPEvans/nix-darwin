@@ -33,7 +33,9 @@ The environment will now load automatically when you `cd` into the project.
 | `js/` | Node.js development | Node.js, npm, yarn, pnpm |
 | `go/` | Go development | Go, gopls, delve |
 | `powershell/` | PowerShell scripting | PowerShell 7.x, .NET SDK, jq, yq |
+| `ansible/` | Ansible automation | Ansible, Python, ansible-lint |
 | `terraform/` | Infrastructure as Code | Terraform, Terragrunt, etc. |
+| `infrastructure-automation/` | Complete IaC toolkit | Ansible, Terraform, AWS, Packer |
 | `claude-sdk-python/` | Claude Agent SDK (Python) | Python 3.11, SDK, testing |
 | `claude-sdk-typescript/` | Claude SDK (TypeScript) | Node.js, TypeScript |
 

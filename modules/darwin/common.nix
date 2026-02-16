@@ -45,7 +45,6 @@ in
         chatgpt
         code-cursor
         ghostty-bin
-        obsidian
         ollama
         postman
         rapidapi
@@ -105,7 +104,7 @@ in
       bitwarden-desktop # Password manager desktop app
       # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
       # See hosts/macbook-m4/home.nix for details
-      obsidian # Knowledge base / note-taking (Markdown)
+      # NOTE: Obsidian moved to homebrew cask for faster beta updates (user pays for beta)
       # NOTE: OrbStack managed via programs.orbstack module for system-level
       # installation. See modules/darwin/apps/orbstack.nix and
       # hosts/macbook-m4/default.nix for configuration.
