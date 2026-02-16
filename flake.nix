@@ -6,7 +6,7 @@
     # Using stable nixpkgs-25.11 for reliability
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
 
-    # Using unstable nixpkgs for faster updates to GUI apps
+    # Using unstable nixpkgs for fast-moving packages (select GUI apps and AI CLI tools)
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     # Consolidated systems input for darwin-only configuration
@@ -158,7 +158,7 @@
       userConfig = import ./lib/user-config.nix;
       hmDefaults = import ./lib/home-manager-defaults.nix;
 
-      # Import nixpkgs-unstable for faster updates to GUI applications
+      # Import nixpkgs-unstable for fast-moving packages (select GUI apps and AI CLI tools)
       unstablePkgs = import nixpkgs-unstable {
         system = "aarch64-darwin";
         config.allowUnfree = true;

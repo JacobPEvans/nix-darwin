@@ -35,21 +35,24 @@ in
   nixpkgs.overlays = [
     (import ../../overlays/python-packages.nix)
     (import ../../overlays/macos-apps.nix)
-    # GUI apps from nixpkgs-unstable for faster version updates
+    # Fast-moving packages from nixpkgs-unstable for version currency
     # Stable branches (25.11) only get security fixes, not version bumps
-    # This overlay ensures GUI apps and fast-moving tools stay current with upstream releases
+    # Policy: Add packages here that release faster than the stable branch updates
+    #
+    # GUI apps on STABLE (intentional): bitwarden-desktop, chatgpt, code-cursor,
+    # postman, rapidapi, raycast, swiftbar
     (_final: _prev: {
       inherit (unstablePkgs)
+        # GUI applications (need unstable for fast upstream releases)
         antigravity
-        bitwarden-desktop
-        chatgpt
-        code-cursor
         ghostty-bin
         ollama
-        postman
-        rapidapi
-        raycast
-        swiftbar
+
+        # AI CLI tools (fast-moving, stable lags behind upstream)
+        codex
+        gemini-cli
+        github-mcp-server
+        terraform-mcp-server
         ;
     })
   ];
