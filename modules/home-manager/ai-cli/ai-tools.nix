@@ -13,7 +13,7 @@
 #    - Check: nix search nixpkgs <package>
 #    - Use if package exists and is reasonably up-to-date
 #    - Benefits: Binary cache, security updates, integration
-#    - Example: claude-code, claude-monitor, gemini-cli
+#    - Example: gemini-cli, codex, github-mcp-server
 #
 # 2. **homebrew** (ONLY if not in nixpkgs)
 #    - Fallback for packages missing from nixpkgs
@@ -37,8 +37,8 @@
 # CURRENT STATUS
 # ============================================================================
 #
-# NIXPKGS PACKAGES:
-#   gemini-cli, github-mcp-server, terraform-mcp-server
+# NIXPKGS PACKAGES (sourced via unstable overlay in modules/darwin/common.nix):
+#   codex, gemini-cli, github-mcp-server, terraform-mcp-server
 #
 # BUNX WRAPPER PACKAGES (npm packages not in nixpkgs/homebrew):
 #   cclint: @felixgeelhaar/cclint@0.12.1
@@ -54,6 +54,16 @@
 #
 # NOTE: These are home-manager packages, not system packages.
 # Imported in hosts/macbook-m4/home.nix via home.packages.
+#
+# ============================================================================
+# UNSTABLE OVERLAY POLICY
+# ============================================================================
+#
+# AI CLI tools are fast-moving and stable nixpkgs lags behind upstream.
+# To add a new nixpkgs AI tool:
+#   1. Add to packages list below
+#   2. Add to unstable overlay in modules/darwin/common.nix
+#   3. Add to version check script (scripts/workflows/check-package-versions.sh)
 
 { pkgs, ... }:
 
@@ -92,7 +102,7 @@
     # ==========================================================================
     # Google Gemini CLI
     # ==========================================================================
-    # Available in nixpkgs (0.22.5)
+    # Sourced from unstable overlay (modules/darwin/common.nix)
     # Source: https://github.com/google-gemini/gemini-cli
     gemini-cli
 
@@ -100,7 +110,7 @@
     # OpenAI Codex CLI
     # ==========================================================================
     # Lightweight coding agent that runs in your terminal
-    # Available in nixpkgs (0.92.0)
+    # Sourced from unstable overlay (modules/darwin/common.nix)
     codex
 
     # ==========================================================================

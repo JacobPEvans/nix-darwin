@@ -1,31 +1,48 @@
 #!/usr/bin/env bash
 # Package Version Monitoring Script
-# Compares current package versions with latest available in nixpkgs
+# Compares pinned package versions (from flake.lock) with latest on their branch
 # Outputs markdown table for GitHub issue
 
 set -uo pipefail
 
-# Package definitions: name, priority
-# Priority: Security (security-critical) | AI Tool (AI tooling) | GUI App (desktop apps from unstable)
+# Locate flake.lock relative to script (repo root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+FLAKE_LOCK="$REPO_ROOT/flake.lock"
+
+if [[ ! -f "$FLAKE_LOCK" ]]; then
+  echo "ERROR: flake.lock not found at $FLAKE_LOCK" >&2
+  exit 1
+fi
+
+# Check for required tools
+if ! command -v jq &>/dev/null || ! command -v nix &>/dev/null; then
+  echo "ERROR: jq and nix are required. Please run this script within a Nix environment (e.g., 'nix develop')." >&2
+  exit 1
+fi
+
+# Package definitions: name:priority:channel
+# Priority: Security (security-critical) | AI Tool (AI tooling) | GUI App (desktop apps)
+# Channel: stable (nixpkgs-25.11-darwin) | unstable (nixpkgs-unstable)
 PACKAGES=(
-  "git:Security"
-  "gnupg:Security"
-  "gh:Security"
-  "nodejs:Security"
-  "claude-code:AI Tool"
-  "claude-monitor:AI Tool"
-  "gemini-cli:AI Tool"
-  "ollama:AI Tool"
-  "antigravity:GUI App"
-  "bitwarden-desktop:GUI App"
-  "chatgpt:GUI App"
-  "code-cursor:GUI App"
-  "ghostty-bin:GUI App"
-  "obsidian:GUI App"
-  "postman:GUI App"
-  "rapidapi:GUI App"
-  "raycast:GUI App"
-  "swiftbar:GUI App"
+  "git:Security:stable"
+  "gnupg:Security:stable"
+  "gh:Security:stable"
+  "nodejs:Security:stable"
+  "codex:AI Tool:unstable"
+  "gemini-cli:AI Tool:unstable"
+  "github-mcp-server:AI Tool:unstable"
+  "ollama:AI Tool:unstable"
+  "terraform-mcp-server:AI Tool:unstable"
+  "antigravity:GUI App:unstable"
+  "ghostty-bin:GUI App:unstable"
+  "bitwarden-desktop:GUI App:stable"
+  "chatgpt:GUI App:stable"
+  "code-cursor:GUI App:stable"
+  "postman:GUI App:stable"
+  "rapidapi:GUI App:stable"
+  "raycast:GUI App:stable"
+  "swiftbar:GUI App:stable"
 )
 
 # Global counters for exit status
@@ -33,37 +50,55 @@ MAJOR_UPDATES=0
 MINOR_UPDATES=0
 CURRENT=0
 
-# Function to extract version from nix package
-# Returns version string via stdout, or "unknown" if unable to determine
-get_current_version() {
-  local package=$1
+# Pre-read locked revisions and branch refs from flake.lock (avoids repeated jq calls)
+STABLE_REV=$(jq -r '.nodes["nixpkgs"].locked.rev // empty' "$FLAKE_LOCK")
+UNSTABLE_REV=$(jq -r '.nodes["nixpkgs-unstable"].locked.rev // empty' "$FLAKE_LOCK")
+STABLE_BRANCH=$(jq -r '.nodes["nixpkgs"].original.ref // empty' "$FLAKE_LOCK")
+UNSTABLE_BRANCH=$(jq -r '.nodes["nixpkgs-unstable"].original.ref // empty' "$FLAKE_LOCK")
 
-  # Try to get version from nix eval
-  if nix eval "nixpkgs#${package}.version" --raw 2>/dev/null; then
-    return
-  fi
-
-  # Fallback: try to find installed version
-  if command -v "$package" &>/dev/null; then
-    case "$package" in
-      git) git --version | awk '{print $3}' ;;
-      gnupg) gpg --version | head -n1 | awk '{print $3}' ;;
-      gh) gh --version | head -n1 | awk '{print $3}' ;;
-      nodejs) node --version | sed 's/v//' ;;
-      *) echo "unknown" ;;
-    esac
-    return
-  fi
-
-  echo "unknown"
+# Map channel to pre-cached rev/branch
+get_locked_rev() {
+  case "$1" in
+    stable) echo "$STABLE_REV" ;;
+    unstable) echo "$UNSTABLE_REV" ;;
+    *) echo "" ;;
+  esac
 }
 
-# Function to get latest version from nixpkgs
+get_branch_ref() {
+  case "$1" in
+    stable) echo "$STABLE_BRANCH" ;;
+    unstable) echo "$UNSTABLE_BRANCH" ;;
+    *) echo "" ;;
+  esac
+}
+
+# Get version from our pinned nixpkgs revision (what we actually have installed)
+get_current_version() {
+  local package=$1
+  local rev
+  rev=$(get_locked_rev "$2")
+
+  if [[ -z "$rev" ]]; then
+    echo "unknown"
+    return
+  fi
+
+  nix eval "github:NixOS/nixpkgs/${rev}#${package}.version" --raw 2>/dev/null || echo "unknown"
+}
+
+# Get version from latest nixpkgs branch HEAD (what's available if we update)
 get_latest_version() {
   local package=$1
+  local branch
+  branch=$(get_branch_ref "$2")
 
-  # Query nixpkgs for latest version using nix eval (much faster than nix search)
-  nix eval "nixpkgs#${package}.version" --raw 2>/dev/null || echo "unknown"
+  if [[ -z "$branch" ]]; then
+    echo "unknown"
+    return
+  fi
+
+  nix eval "github:NixOS/nixpkgs/${branch}#${package}.version" --raw 2>/dev/null || echo "unknown"
 }
 
 # Function to compare versions and determine status
@@ -111,14 +146,15 @@ compare_versions() {
 main() {
   echo "# Package Version Report - $(date -u +"%Y-%m-%d %H:%M UTC")"
   echo ""
-  echo "| Package | Current | Latest | Status | Priority |"
-  echo "|---------|---------|--------|--------|----------|"
+  echo "| Package | Current | Latest | Status | Priority | Channel |"
+  echo "|---------|---------|--------|--------|----------|---------|"
 
   for package_def in "${PACKAGES[@]}"; do
-    IFS=':' read -r package priority <<< "$package_def"
+    IFS=':' read -r package priority channel <<< "$package_def"
 
-    current_version=$(get_current_version "$package")
-    latest_version=$(get_latest_version "$package")
+    current_version=$(get_current_version "$package" "$channel")
+    latest_version=$(get_latest_version "$package" "$channel")
+
     status=$(compare_versions "$current_version" "$latest_version")
     status_code=$?
 
@@ -129,7 +165,7 @@ main() {
       3) ((MAJOR_UPDATES++)) ;;
     esac
 
-    echo "| $package | $current_version | $latest_version | $status | $priority |"
+    echo "| $package | $current_version | $latest_version | $status | $priority | $channel |"
   done
 
   echo ""
