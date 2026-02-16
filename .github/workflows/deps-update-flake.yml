@@ -59,49 +59,14 @@ jobs:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
       - name: Determine inputs to update
         id: inputs
-        run: |
-          # repository_dispatch = fast sync for specific input
-          if [[ "$EVENT_NAME" == "repository_dispatch" ]]; then
-            case "$DISPATCH_ACTION" in
-              ai-instructions-updated)
-                echo "inputs=ai-assistant-instructions" >> "$GITHUB_OUTPUT"
-                echo "::notice::Fast sync: updating ai-assistant-instructions only"
-                ;;
-              upstream-repo-updated)
-                # Extract flake input name from client_payload
-                if [[ -z "$FLAKE_INPUT_NAME" ]]; then
-                  echo "::error::flake_input_name not provided in client_payload"
-                  exit 1
-                fi
-                # Validate flake input name: only allow safe characters
-                if [[ ! "$FLAKE_INPUT_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
-                  echo "::error::Invalid flake_input_name '$FLAKE_INPUT_NAME'; only [a-zA-Z0-9._-] are allowed"
-                  exit 1
-                fi
-                # Restrict to known flake inputs (AI_INPUTS allowlist)
-                if ! grep -Eq "(^|[[:space:]])$FLAKE_INPUT_NAME([[:space:]]|$)" <<< "$AI_INPUTS"; then
-                  echo "::error::flake_input_name '$FLAKE_INPUT_NAME' is not in the allowed inputs list"
-                  exit 1
-                fi
-                echo "inputs=$FLAKE_INPUT_NAME" >> "$GITHUB_OUTPUT"
-                echo "::notice::Fast sync: updating $FLAKE_INPUT_NAME from $SOURCE_REPO"
-                ;;
-              *)
-                echo "::error::Unknown dispatch type: $DISPATCH_ACTION"
-                exit 1
-                ;;
-            esac
-          # Tue/Fri or manual override = all inputs
-          elif [[ "$(date -u +%u)" == "2" || "$(date -u +%u)" == "5" || "$UPDATE_ALL" == "true" ]]; then
-            echo "inputs=" >> "$GITHUB_OUTPUT"
-            echo "::notice::Updating ALL flake inputs"
-          # Other days = AI-focused inputs
-          else
-            echo "inputs=$AI_INPUTS" >> "$GITHUB_OUTPUT"
-            echo "::notice::Updating AI-focused inputs only"
-          fi
+        run: ./scripts/workflows/determine-flake-inputs.sh
         env:
           EVENT_NAME: ${{ github.event_name }}
           UPDATE_ALL: ${{ inputs.update_all }}
@@ -109,33 +74,11 @@ jobs:
           FLAKE_INPUT_NAME: ${{ github.event.client_payload.flake_input_name }}
           SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-
       - name: Check for existing Renovate PR
         id: check-renovate
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          # Check if Renovate bot has an open PR that modifies flake.lock
-          # SECURITY: Only extracts PR number (integer) from JSON - safe from injection
-          RENOVATE_PR=$(gh pr list \
-            --search "author:app/renovate is:open" \
-            --state open \
-            --json number,files \
-            --jq '[.[] | select(any(.files[].path; . == "flake.lock"))][0].number // ""')
-
-          if [[ -n "$RENOVATE_PR" ]]; then
-            # SECURITY: RENOVATE_PR is always a number (from --json number field)
-            # Using printf with %s format to avoid any potential expansion issues
-            printf "::notice::Renovate PR #%s already exists for flake.lock updates\n" "$RENOVATE_PR"
-            echo "::notice::Skipping custom workflow to avoid conflicts"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
+        run: ./scripts/workflows/check-renovate-pr.sh
 
       - name: Install Nix
         if: steps.check-renovate.outputs.skip == 'false'
@@ -146,38 +89,9 @@ jobs:
         env:
           FLAKE_INPUTS: ${{ steps.inputs.outputs.inputs }}
         run: |
-          # Use centralized update script to maintain DRY principle
-          # See: scripts/update-all-flakes.sh
-
           if [ -n "$FLAKE_INPUTS" ]; then
-            # Selective update: update only specified inputs in root flake
-            echo "=== Updating ROOT flake (selective inputs) ==="
-            # Use array expansion for safe variable handling of space-separated inputs
-            # SECURITY: FLAKE_INPUTS is from controlled GitHub Actions output, properly quoted
-            read -ra INPUTS_ARRAY <<< "$FLAKE_INPUTS"
-            nix flake update "${INPUTS_ARRAY[@]}"
-
-            # Shell and host flakes always get full updates (no selective update support)
-            echo ""
-            echo "=== Updating SHELL and HOST flakes (full update) ==="
-            # Run only the shell/host update portions
-            # SECURITY: Iterating over repository directories only - no untrusted input
-            for dir in shells/*/; do
-              if [ -f "${dir}flake.nix" ]; then
-                echo "Updating: $dir"
-                (cd "$dir" && nix flake update 2>&1 | tail -3) || true
-              fi
-            done
-            for dir in hosts/*/; do
-              if [ -f "${dir}flake.lock" ]; then
-                echo "Updating: $dir"
-                (cd "$dir" && nix flake update 2>&1 | tail -3) || true
-              fi
-            done
+            ./scripts/update-all-flakes.sh --inputs "$FLAKE_INPUTS"
           else
-            # Full update: use centralized script
-            echo "=== Running full flake update ==="
-            chmod +x scripts/update-all-flakes.sh
             ./scripts/update-all-flakes.sh
           fi
 
