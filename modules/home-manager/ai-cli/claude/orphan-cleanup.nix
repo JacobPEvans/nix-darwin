@@ -1,6 +1,6 @@
 # Orphan Cleanup Module
 #
-# Two-phase cleanup for Nix-managed directories:
+# Three-phase cleanup for Nix-managed directories:
 #
 # Phase 1 (BEFORE linkGeneration):
 # - Removes directory symlinks that conflict with individual file symlinks
@@ -10,6 +10,11 @@
 # Phase 2 (AFTER linkGeneration):
 # - Removes broken symlinks (targets that don't exist)
 # - This handles commands/agents/skills removed from the Nix configuration
+#
+# Phase 3 (AFTER linkGeneration):
+# - Verifies marketplace plugin cache integrity
+# - Purges stale cache entries when Nix updates marketplace symlinks
+# - See: https://github.com/anthropics/claude-code/issues/17361
 #
 { config, lib, ... }:
 
@@ -51,6 +56,9 @@ let
       fi
     fi
   '';
+
+  # Path to the cache integrity verification script
+  verifyCacheIntegrityScript = ./scripts/verify-cache-integrity.sh;
 
   # Post-cleanup: Remove broken symlinks (targets that don't exist)
   cleanupBrokenSymlinks = dir: type: ''
@@ -118,6 +126,16 @@ in
         # NOTE: Root-level files (CLAUDE.md, GEMINI.md, AGENTS.md, agentsmd) are
         # NOT cleaned up here. They use force = true in home.file and Home Manager
         # handles their lifecycle. We only handle the pre-cleanup of stale symlinks.
+      '';
+
+      # Phase 3: Verify plugin cache integrity AFTER linkGeneration
+      # When Nix updates marketplace symlinks to new store paths,
+      # Claude Code's cached plugin data becomes stale.
+      # See: https://github.com/anthropics/claude-code/issues/17361
+      verifyCacheIntegrity = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        ${logHelper}
+        log_info "Verifying marketplace cache integrity..."
+        $DRY_RUN_CMD ${verifyCacheIntegrityScript} "${homeDir}"
       '';
     };
   };
