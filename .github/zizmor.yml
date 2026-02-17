@@ -19,6 +19,7 @@ rules:
       - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
+      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml
@@ -54,6 +55,7 @@ rules:
       - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
+      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml
