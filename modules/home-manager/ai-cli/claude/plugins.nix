@@ -108,7 +108,9 @@ in
 
                   # Show directory structure comparison
                   # diff exit codes: 0=identical, 1=different, 2+=error
-                  diff_output=$(diff -r "$BACKUP" "${path}" 2>&1 | head -20)
+                  # NOTE: || true prevents set -e/pipefail from aborting the
+                  # activation script when diff finds differences (exit 1)
+                  diff_output=$(diff -r "$BACKUP" "${path}" 2>&1 | head -20 || true)
                   diff_exit=''${PIPESTATUS[0]}
 
                   if [ $diff_exit -eq 0 ]; then

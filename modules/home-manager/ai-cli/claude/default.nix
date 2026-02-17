@@ -38,6 +38,7 @@ in
     ./auto-claude-reporting.nix
     ./menubar.nix
     ./orphan-cleanup.nix
+    ./granola-watcher.nix
   ];
 
   config = lib.mkIf cfg.enable {
