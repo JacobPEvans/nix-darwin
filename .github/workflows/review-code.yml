@@ -25,7 +25,10 @@ jobs:
   # Automatic PR review on open/sync
   review:
     name: Claude Code Review
-    if: false
+    if: >-
+      github.event_name == 'pull_request' &&
+      !contains(github.event.pull_request.labels.*.name, 'skip-claude') &&
+      !contains(github.event.pull_request.labels.*.name, 'dependencies')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,7 +45,7 @@ jobs:
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
@@ -83,4 +86,4 @@ jobs:
       - name: Run Claude Interactive
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
