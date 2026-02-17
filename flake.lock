@@ -99,11 +99,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1771040350,
-        "narHash": "sha256-0202Vv0NEtGsYUWbKnsXmYUoBVEumVXrg7HdqL+0b60=",
+        "lastModified": 1771277655,
+        "narHash": "sha256-yI/DfDumvdeEjxZ/6nx2h4qF2QptDGpywBLv9Zfj4Zk=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "8c09097e8c2565c4c9c107cb9ad1cfcb87366368",
+        "rev": "d787369919b749ec4d910fb48dea3f06fc33866a",
         "type": "github"
       },
       "original": {
@@ -115,11 +115,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1771017827,
-        "narHash": "sha256-l31JNKxKSDgYN32hQunoztd/lujs9IpniCzhzTR2vdE=",
+        "lastModified": 1771291075,
+        "narHash": "sha256-yDwi9itOhcKcIqIU0CJkCya0EhevLKtplzS50cmEA8E=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "d055c6e1662e8f1b6b9576d198231b2bd50a4c1f",
+        "rev": "d67ff59d908512a5cb2939c88efa395cf3dd7838",
         "type": "github"
       },
       "original": {
@@ -475,11 +475,11 @@
     "wakatime": {
       "flake": false,
       "locked": {
-        "lastModified": 1769738408,
-        "narHash": "sha256-FegElDyN8JCaicu+H8teE3ug3qvzO3NT8EutPYTyJo0=",
+        "lastModified": 1771304265,
+        "narHash": "sha256-i+t78VSlJ931kNIEQLptlvqJnJ5qneXmLNy/cMjiPGs=",
         "owner": "wakatime",
         "repo": "claude-code-wakatime",
-        "rev": "825c0a6635db29d44e81d57cfefbd855736678ee",
+        "rev": "9de34cbac2447cd6ffc5bc7cc797457f76de1e35",
         "type": "github"
       },
       "original": {
