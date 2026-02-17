@@ -29,6 +29,11 @@
     linkApps.enable = false;
   };
 
+  # WORKAROUND: Disable manpage generation to suppress options.json derivation context warning
+  # Upstream: https://github.com/nix-community/home-manager/issues/7935
+  # TODO: Re-enable when upstream fixes options.json context in manual.nix
+  manual.manpages.enable = false;
+
   imports = [
     # Common home-manager configuration
     ../../modules/home-manager/common.nix

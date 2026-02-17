@@ -106,7 +106,7 @@ duti -x spl
 2. **Rebuild Launch Services database manually**:
 
    ```bash
-   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
+   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -domain user
    ```
 
 3. **Check for errors in activation logs**:
@@ -137,7 +137,7 @@ The module uses:
 
 - **duti**: For declarative file association management
 - **PlistBuddy**: For plist manipulation (if needed)
-- **lsregister**: For rebuilding the Launch Services database
+- **lsregister**: For refreshing the Launch Services database (user domain only)
 - **System activation scripts**: For applying configuration during rebuild
 
 The implementation follows the nix-darwin module pattern and integrates with the existing system activation workflow.
