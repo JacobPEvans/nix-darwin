@@ -66,10 +66,10 @@ in
       if ${pkgs.duti}/bin/duti "$DUTI_CONFIG" 2>/dev/null; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Successfully registered ${toString (lib.length (lib.attrNames cfg.customMappings))} file extension(s)"
 
-        if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user 2>"$LS_ERROR_LOG" >/dev/null; then
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Launch Services database rebuilt"
+        if /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -domain user 2>"$LS_ERROR_LOG" >/dev/null; then
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Launch Services database refreshed (user domain)"
         else
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to rebuild Launch Services database" >&2
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Launch Services refresh failed - associations may require re-login" >&2
           failures=$((failures + 1))
         fi
       else
