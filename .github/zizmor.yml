@@ -19,6 +19,7 @@ rules:
       - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
+      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml
@@ -33,6 +34,15 @@ rules:
       - review-code.yml
       - review-deps.yml
 
+  # ACCEPTED: workflow_run is the only trigger for reacting to CI completions.
+  # ci-fix-claude.yml is safe because:
+  # - It only reads logs via the GitHub API (not fork PR code).
+  # - It does not execute untrusted fork code.
+  # - The should-fix job validates the PR exists and belongs to this repo.
+  dangerous-triggers:
+    ignore:
+      - ci-fix-claude.yml
+
   # IGNORED: Low-confidence credential persistence warnings
   # Most checkouts don't need persist-credentials: false unless
   # the workflow later runs untrusted code with git access
@@ -45,6 +55,7 @@ rules:
       - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
+      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml

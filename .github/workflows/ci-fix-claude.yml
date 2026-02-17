@@ -1,0 +1,158 @@
+# CI Failure Auto-Fix
+#
+# Monitors CI Gate for failures on PR branches.
+# Claude analyzes failure logs and pushes fixes (max 2 attempts per PR).
+#
+# Uses workflow_run trigger which is required to access CI failure logs
+# from the completed workflow. This is safe because we only read logs via
+# the GitHub API and do not execute code from the triggering workflow.
+
+name: CI Fix (Claude)
+
+on:
+  workflow_run:
+    workflows: ["CI Gate"]
+    types: [completed]
+
+concurrency:
+  group: ci-fix-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+# Minimal workflow-level permissions; jobs declare what they need
+permissions: {}
+
+jobs:
+  should-fix:
+    name: Check if fix needed
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_branch != 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      issues: read
+    outputs:
+      pr_number: ${{ steps.find-pr.outputs.pr_number }}
+      should_run: ${{ steps.check-attempts.outputs.should_run }}
+      attempt: ${{ steps.check-attempts.outputs.attempt }}
+    steps:
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Find associated PR
+        id: find-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = require('./.github/scripts/ci-fix/find-pr.js');
+            await run({ github, context, core });
+
+      - name: Check attempt count
+        id: check-attempts
+        if: steps.find-pr.outputs.pr_number != ''
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.find-pr.outputs.pr_number }}
+        with:
+          script: |
+            const run = require('./.github/scripts/ci-fix/check-attempts.js');
+            await run({ github, context, core });
+
+  post-attempt-comment:
+    name: Post attempt marker
+    needs: should-fix
+    if: needs.should-fix.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Post tracking comment
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ needs.should-fix.outputs.pr_number }}
+          ATTEMPT: ${{ needs.should-fix.outputs.attempt }}
+        with:
+          script: |
+            const run = require('./.github/scripts/ci-fix/post-attempt-comment.js');
+            await run({ github, context, core });
+
+  get-failure-details:
+    name: Get failure logs
+    needs: should-fix
+    if: needs.should-fix.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      failure_logs: ${{ steps.get-logs.outputs.logs }}
+    steps:
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Download failure logs
+        id: get-logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = require('./.github/scripts/ci-fix/get-failure-logs.js');
+            await run({ github, context, core });
+
+  fix:
+    name: Claude Fix
+    needs: [should-fix, get-failure-details, post-attempt-comment]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    timeout-minutes: 15
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+          token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            ## CI Failure Auto-Fix
+
+            You are fixing a CI failure in the nix-config repository. This is a Nix flake-based
+            macOS/Linux system configuration repo.
+
+            ### CI Structure
+            The "CI Gate" workflow calls reusable workflows:
+            - `_nix-build.yml` - Builds nix packages (runs `nix build`)
+            - `_nix-validate.yml` - Validates nix expressions (runs `nix flake check`)
+            - `_markdown-lint.yml` - Lints markdown files
+            - `_file-size.yml` - Checks file size limits
+            - `_claude-settings.yml` - Validates Claude settings files
+
+            ### Failure Logs
+            ```
+            ${{ needs.get-failure-details.outputs.failure_logs }}
+            ```
+
+            ### Instructions
+            1. Analyze the failure logs to identify the root cause
+            2. Fix the issue in the source files
+            3. Commit the fix with message: "fix: resolve CI failure (auto-fix attempt ${{ needs.should-fix.outputs.attempt }})"
+            4. Push to the PR branch
+
+            Only fix what the CI is complaining about. Do not refactor or improve unrelated code.
+            If the failure is in a nix expression, validate your fix with `nix flake check` before committing.
+
+          allowed_tools: "Edit,MultiEdit,Write,Read,Glob,Grep,LS,Bash(git:*),Bash(nix:*),Bash(nix-shell:*)"
