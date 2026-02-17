@@ -80,7 +80,8 @@ module.exports = async ({ github, context, core }) => {
   const failedChecks = relevantChecks.filter(c =>
     c.conclusion !== 'success' &&
     c.conclusion !== 'skipped' &&
-    c.conclusion !== 'neutral'
+    c.conclusion !== 'neutral' &&
+    c.conclusion !== 'action_required'
   );
 
   if (failedChecks.length > 0) {
