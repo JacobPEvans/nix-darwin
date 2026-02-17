@@ -58,13 +58,10 @@ Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## What's Managed
 
-| Category | Examples |
-|----------|----------|
-| CLI Tools | bat, delta, eza, fd, fzf, ripgrep, jq, htop |
-| Development | nodejs, gh, claude-code, gemini-cli |
-| GUI Apps | VS Code, Obsidian, Raycast, Bitwarden |
-| macOS Settings | Dock, Finder, keyboard, trackpad, hot corners |
-| AI CLI Permissions | 280+ auto-approved commands with security tiers |
+80+ packages, 14 Claude Code plugin sources, 10+ dev shells, and comprehensive macOS
+system settings -- all declared in Nix.
+
+See **[MANIFEST.md](MANIFEST.md)** for the complete inventory.
 
 ## Dev Shells
 
@@ -86,6 +83,7 @@ See [shells/README.md](shells/README.md) for all available shells.
 |------|---------|
 | [RUNBOOK.md](RUNBOOK.md) | Step-by-step operational procedures |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed structure and module relationships |
+| [MANIFEST.md](MANIFEST.md) | Complete inventory of installed packages and settings |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
 | [CLAUDE.md](CLAUDE.md) | AI agent instructions |
 | [docs/ANTHROPIC-ECOSYSTEM.md](docs/ANTHROPIC-ECOSYSTEM.md) | Claude Code integration reference |

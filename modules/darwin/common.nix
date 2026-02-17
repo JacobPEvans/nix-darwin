@@ -94,6 +94,7 @@ in
       ripgrep # Fast grep alternative (rg) - essential for AI agents
       tldr # Simplified, community-driven man pages
       tree # Directory tree visualization
+      watchexec # File watcher that re-executes commands on changes
       yq # YAML parsing (like jq but for YAML/XML/TOML)
 
       # --- Development tools ---

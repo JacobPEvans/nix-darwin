@@ -35,6 +35,7 @@ cd <branch>
 - **Plugins**: `modules/home-manager/ai-cli/claude/plugins/`
 - **Rules**: `agentsmd/rules/` (worktrees, version-validation, skill-namespace-resolution, security-alert-triage)
 - **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
+- **Inventory**: `MANIFEST.md` — update when adding/removing packages
 
 ## PR Rules
 

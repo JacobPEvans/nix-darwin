@@ -134,3 +134,5 @@ flake.nix
 | Host | Machine-specific | `hosts/<name>/` | Both |
 | Shared | Variables, policies | `lib/` | Imported |
 | Dev | Temporary environments | `shells/` | `nix develop` |
+
+For a complete list of installed packages and managed settings, see [MANIFEST.md](MANIFEST.md).
