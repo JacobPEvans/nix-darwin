@@ -70,6 +70,7 @@ in
           echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Launch Services database refreshed (user domain)"
         else
           echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Launch Services refresh failed - associations may require re-login" >&2
+          cat "$LS_ERROR_LOG" >&2
           failures=$((failures + 1))
         fi
       else
