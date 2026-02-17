@@ -33,6 +33,7 @@ rules:
       - nixos-release-check.yml
       - review-code.yml
       - review-deps.yml
+      - final-pr-review.yml
 
   # ACCEPTED: workflow_run is the only trigger for reacting to CI completions.
   # ci-fix-claude.yml is safe because:
@@ -69,3 +70,4 @@ rules:
       - nixos-release-check.yml
       - review-code.yml
       - review-deps.yml
+      - final-pr-review.yml
