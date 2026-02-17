@@ -40,19 +40,38 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { data } = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'review-code.yml',
-              event: 'pull_request',
-              branch: context.payload.pull_request.head.ref,
-            });
-            const prior = data.workflow_runs.filter(r =>
-              r.conclusion === 'success' && r.id !== context.runId
-            );
+            const prNumber = context.payload.pull_request.number;
+            const perPage = 100;
+            let page = 1;
+            let prior = [];
+
+            while (true) {
+              const { data } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'review-code.yml',
+                event: 'pull_request',
+                branch: context.payload.pull_request.head.ref,
+                per_page: perPage,
+                page,
+              });
+
+              const runs = data.workflow_runs || [];
+              const matched = runs.filter(r =>
+                r.conclusion === 'success' &&
+                r.id !== context.runId &&
+                Array.isArray(r.pull_requests) &&
+                r.pull_requests.some(pr => pr.number === prNumber)
+              );
+              prior = prior.concat(matched);
+
+              if (prior.length >= 2 || runs.length < perPage) break;
+              page += 1;
+            }
+
             const skip = prior.length >= 2;
             core.setOutput('skip', skip.toString());
-            console.log(`Prior successful reviews: ${prior.length}, skip: ${skip}`);
+            console.log(`PR #${prNumber} prior successful reviews: ${prior.length}, skip: ${skip}`);
 
       - name: Checkout repository
         if: steps.review-limit.outputs.skip != 'true'
