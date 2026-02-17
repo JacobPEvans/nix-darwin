@@ -108,10 +108,10 @@ in
 
                   # Show directory structure comparison
                   # diff exit codes: 0=identical, 1=different, 2+=error
-                  # NOTE: || true prevents set -e/pipefail from aborting the
-                  # activation script when diff finds differences (exit 1)
-                  diff_output=$(diff -r "$BACKUP" "${path}" 2>&1 | head -20 || true)
-                  diff_exit=''${PIPESTATUS[0]}
+                  # Run diff directly (no pipeline) to capture its exit code reliably
+                  diff -r "$BACKUP" "${path}" > "$BACKUP.diff_tmp" 2>&1 && diff_exit=0 || diff_exit=$?
+                  diff_output=$(head -20 "$BACKUP.diff_tmp")
+                  rm -f "$BACKUP.diff_tmp"
 
                   if [ $diff_exit -eq 0 ]; then
                     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO]   Directories are identical"

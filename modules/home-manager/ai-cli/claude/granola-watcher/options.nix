@@ -14,7 +14,7 @@
     vaultPath = lib.mkOption {
       type = lib.types.str;
       description = "Absolute path to the Obsidian vault containing granola/ folder";
-      example = "/Users/jevans/obsidian/obsidian-visicore";
+      example = "/Users/<username>/obsidian/<vault-name>";
     };
 
     maxBudgetPerRun = lib.mkOption {

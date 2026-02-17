@@ -89,7 +89,7 @@ in
   # Granola Watcher: auto-migrate Granola meeting notes via Claude headless
   granolaWatcher = {
     enable = true;
-    vaultPath = "/Users/jevans/obsidian/obsidian-visicore";
+    vaultPath = "${config.home.homeDirectory}/obsidian/obsidian-visicore";
     model = "sonnet";
     maxBudgetPerRun = 3.0;
     dailyBudgetCap = 10.0;

@@ -57,7 +57,12 @@ let
     MAX_BUDGET = toString wCfg.maxBudgetPerRun;
     DAILY_CAP = toString wCfg.dailyBudgetCap;
     LOG_DIR = logDir;
-    PATH = "/etc/profiles/per-user/${username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+    PATH = "${
+      lib.makeBinPath [
+        pkgs.jq
+        pkgs.bc
+      ]
+    }:/etc/profiles/per-user/${username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
   }
   // lib.optionalAttrs cfg.apiKeyHelper.enable {
     API_KEY_HELPER = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
@@ -99,7 +104,8 @@ in
             ''
               # Granola watcher enabled: install/update LaunchAgent
               PLIST_SRC="${plistFile}"
-              mkdir -p "$(dirname "$PLIST_DST")"
+              $DRY_RUN_CMD mkdir -p "$(dirname "$PLIST_DST")"
+              $DRY_RUN_CMD mkdir -p "${logDir}"
 
               if ! cmp -s "$PLIST_SRC" "$PLIST_DST" 2>/dev/null; then
                 $DRY_RUN_CMD launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
