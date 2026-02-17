@@ -58,7 +58,7 @@ Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## What's Managed
 
-80+ packages, 14 Claude Code plugin sources, 10+ dev shells, and comprehensive macOS
+80+ packages, 14 Claude Code plugin sources, 16 dev shells, and comprehensive macOS
 system settings -- all declared in Nix.
 
 See **[MANIFEST.md](MANIFEST.md)** for the complete inventory.

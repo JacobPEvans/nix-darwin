@@ -265,13 +265,19 @@ Source: `shells/` (see [shells/README.md](shells/README.md) for details)
 
 | Shell | Description |
 |-------|-------------|
-| python | Basic Python development |
-| python-data | Data science / ML (pandas, numpy, jupyter) |
-| js | Node.js (npm, yarn, pnpm) |
-| go | Go development (gopls, delve) |
-| powershell | PowerShell 7.x scripting |
 | ansible | Ansible automation |
-| terraform | Infrastructure as Code (Terraform, Terragrunt, OpenTofu) |
-| infrastructure-automation | Complete IaC toolkit (Ansible + Terraform + AWS + Packer) |
 | claude-sdk-python | Claude Agent SDK (Python) |
 | claude-sdk-typescript | Claude SDK (TypeScript) |
+| containers | Container ecosystem (Docker, registry tools, K8s orchestration) |
+| go | Go development (gopls, delve) |
+| image-building | Packer with Ansible for multi-platform image builds |
+| infrastructure-automation | Complete IaC toolkit (Ansible + Terraform + AWS + Packer) |
+| js | Node.js (npm, yarn, pnpm) |
+| powershell | PowerShell 7.x scripting |
+| python | Basic Python development |
+| python-data | Data science / ML (pandas, numpy, jupyter) |
+| python310 | Python 3.10 (older compatibility testing) |
+| python312 | Python 3.12 (full dev environment) |
+| python314 | Python 3.14 (bleeding edge) |
+| splunk-dev | Splunk development (Python 3.9 via uv) |
+| terraform | Infrastructure as Code (Terraform, Terragrunt, OpenTofu) |
