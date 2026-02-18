@@ -72,7 +72,15 @@
   monitoring = {
     enable = true;
     kubernetes.enable = true;
-    otel.enable = true;
+    otel = {
+      enable = true;
+      # endpoint defaults to http://localhost:30317 (NodePort gRPC)
+      logPrompts = true;
+      logToolDetails = true;
+      resourceAttributes = {
+        "host.name" = "macbook-m4";
+      };
+    };
     cribl.enable = true;
   };
 
