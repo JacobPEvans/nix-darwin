@@ -34,6 +34,8 @@ The environment will now load automatically when you `cd` into the project.
 | `go/` | Go development | Go, gopls, delve |
 | `powershell/` | PowerShell scripting | PowerShell 7.x, .NET SDK, jq, yq |
 | `ansible/` | Ansible automation | Ansible, Python, ansible-lint |
+| `containers/` | Docker, BuildKit, registry tools | docker, crane, skopeo |
+| `kubernetes/` | Kubernetes validation and orchestration | kubeconform, kube-linter, kubectl, helm, kind |
 | `terraform/` | Infrastructure as Code | Terraform, Terragrunt, etc. |
 | `infrastructure-automation/` | Complete IaC toolkit | Ansible, Terraform, AWS, Packer |
 | `claude-sdk-python/` | Claude Agent SDK (Python) | Python 3.11, SDK, testing |
@@ -67,6 +69,36 @@ nix develop ~/myproject -c python --version
 ```
 
 ## Template Details
+
+### Kubernetes (`kubernetes/`)
+
+Complete Kubernetes development and validation environment:
+
+| Category | Tools |
+| -------- | ----- |
+| Core CLI | kubectl, kubectx, kubens |
+| Package Management | helm, helmfile, kustomize, helm-docs |
+| Validation | kubeconform (schema validation), kube-linter (best practices), conftest (OPA policies), pluto (deprecated APIs) |
+| Terminal UI | k9s, stern (multi-pod log tailing) |
+| Local Testing | kind (Kubernetes IN Docker) |
+
+**Workflow:**
+
+```bash
+# Validate manifests against schema
+kubeconform -summary manifests/
+
+# Lint for best practices
+kube-linter lint .
+
+# Check for deprecated API versions
+pluto detect-files -d .
+
+# Local cluster for testing
+kind create cluster --name dev
+kubectl apply -f manifests/
+k9s
+```
 
 ### Terraform/Terragrunt (`terraform/`)
 
