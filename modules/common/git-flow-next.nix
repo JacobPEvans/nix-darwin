@@ -26,6 +26,5 @@ pkgs.buildGoModule rec {
     license = licenses.asl20;
     maintainers = [ ];
     platforms = platforms.darwin ++ platforms.linux;
-    mainProgram = "git-flow-next";
   };
 }
