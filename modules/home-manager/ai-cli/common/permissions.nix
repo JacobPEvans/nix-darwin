@@ -141,7 +141,6 @@ in
         "Grep"
         "WebSearch"
         "TodoWrite"
-        "SlashCommand"
       ];
 
       # WebFetch with allowed domains (dynamically generated from ai-assistant-instructions)
