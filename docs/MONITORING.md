@@ -172,29 +172,18 @@ auto-claude-ctl run ai-assistant-instructions
 
 ## Kubernetes Infrastructure
 
-### Initial Setup
+Kubernetes manifests have been extracted to a standalone repository:
+**[kubernetes-monitoring](https://github.com/JacobPEvans/kubernetes-monitoring)**
 
-Before deploying, create the required secrets:
+### Quick Deploy
 
 ```bash
-# Create namespace first
-kubectl apply -f ~/.config/monitoring/k8s/namespace.yaml
-
-# Create Cribl Cloud config secret (copy full URL from Cribl Cloud console)
-kubectl -n monitoring create secret generic cribl-cloud-config \
-  --from-literal=master-url='tls://YOUR_AUTH_TOKEN@YOUR_ORG.cribl.cloud?group=YOUR_FLEET'
+monitoring-deploy    # Deploy full stack (uses sops if secrets.enc.yaml exists)
+monitoring-status    # Check pod status
+monitoring-logs      # Tail all pod logs
 ```
 
-### Components
-
-| Component | Ports | Deploy | Verify |
-|-----------|-------|--------|--------|
-| OTEL Collector | 4317 (gRPC), 4318 (HTTP) | `kubectl apply -f modules/monitoring/k8s/otel-collector/` | `kubectl -n monitoring logs -l app=otel-collector` |
-| Cribl Edge | 9420 (OTEL), 9000 (UI) | `kubectl apply -f modules/monitoring/k8s/cribl-edge/` | Check Cribl Cloud console |
-
-**Cribl Edge volumes:** `~/.claude/logs/`, `~/Library/Logs/Ollama/`, `~/logs/`
-
-**Note:** Splunk is no longer deployed to Kubernetes. All logs are shipped to Cribl Cloud for analysis and long-term storage.
+See the [kubernetes-monitoring README](https://github.com/JacobPEvans/kubernetes-monitoring#readme) for full setup and configuration.
 
 ---
 
