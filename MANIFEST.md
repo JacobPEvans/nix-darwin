@@ -268,11 +268,12 @@ Source: `shells/` (see [shells/README.md](shells/README.md) for details)
 | ansible | Ansible automation |
 | claude-sdk-python | Claude Agent SDK (Python) |
 | claude-sdk-typescript | Claude SDK (TypeScript) |
-| containers | Container ecosystem (Docker, registry tools, K8s orchestration) |
+| containers | Container ecosystem (Docker, BuildKit, registry tools) |
 | go | Go development (gopls, delve) |
 | image-building | Packer with Ansible for multi-platform image builds |
 | infrastructure-automation | Complete IaC toolkit (Ansible + Terraform + AWS + Packer) |
 | js | Node.js (npm, yarn, pnpm) |
+| kubernetes | Kubernetes validation, linting, orchestration, and local testing |
 | powershell | PowerShell 7.x scripting |
 | python | Basic Python development |
 | python-data | Data science / ML (pandas, numpy, jupyter) |
