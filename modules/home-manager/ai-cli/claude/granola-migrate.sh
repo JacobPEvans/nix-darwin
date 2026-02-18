@@ -77,23 +77,18 @@ printf '  %s\n' "${UNPROCESSED[@]}"
 
 # --- Invoke Claude headless ---
 
-FILE_LIST=""
-for f in "${UNPROCESSED[@]}"; do
-  FILE_LIST="${FILE_LIST}\n- ${f}"
-done
+FILE_LIST=$(printf '\n- %s' "${UNPROCESSED[@]}")
 
-PROMPT="You are running as an automated Granola migration agent. This is headless - NEVER prompt for user input.
+PROMPT="You are running as an automated Granola migration agent. Headless mode - NEVER prompt for user input.
 
-Read .claude/skills/granola-merger/SKILL.md and execute the workflow for these unprocessed files:
+Read .claude/skills/granola-merger/SKILL.md and process these files:
 ${FILE_LIST}
 
 CONSTRAINTS:
 1. Process ONLY the listed files
-2. Skip ambiguous files (unknown company) - log why
-3. Skip duplicate audit phase and ambiguity resolution (no user available)
-4. Create person pages only when company is auto-detectable
-5. Commit to main and push
-6. If nothing can be processed, exit cleanly"
+2. Skip ambiguous files and phases requiring user input
+3. Create person pages only when company is auto-detectable
+4. Commit to main and push"
 
 # Effective budget: min(per-run max, remaining daily budget)
 remaining=$(echo "$DAILY_CAP - $spent" | bc)
