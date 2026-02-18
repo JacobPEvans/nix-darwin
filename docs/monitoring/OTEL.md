@@ -16,15 +16,16 @@ Claude Code --OTLP/gRPC--> OTEL Collector (:30317 NodePort)
       --HEC--> Splunk (:8088)
 ```
 
-A secondary path: the OTEL Collector `filelog` receiver tails `~/.claude/logs/*.jsonl`
-directly, providing raw log ingestion in parallel.
+A secondary path: the OTEL Collector `filelog` receiver tails `/home/claude-user/.claude/logs/*.jsonl`
+on the host (mounted into the collector via a `hostPath` volume or equivalent bind mount),
+providing raw log ingestion in parallel.
 
 ## Claude Code OTEL
 
 ### Configuration
 
-OTEL environment variables are set by `modules/monitoring/default.nix` when
-`monitoring.otel.enable = true`.
+OTEL environment variables are set by `modules/monitoring/default.nix` when both
+`monitoring.enable = true` and `monitoring.otel.enable = true`.
 
 ### Environment Variables
 
@@ -101,7 +102,9 @@ env | grep -E 'OTEL|TELEMETRY'
 # 2. Verify OTEL Collector pod is running
 kubectl --context orbstack -n monitoring get pods -l app=otel-collector
 
-# 3. Verify NodePort is reachable (expect 200 or 405)
+# 3. Verify NodePort is reachable via HTTP OTLP endpoint (30318)
+# Note: curl cannot speak gRPC, so we check the HTTP endpoint (30318) as a proxy
+# for overall collector reachability. Claude Code uses the gRPC endpoint (30317).
 curl -s -o /dev/null -w '%{http_code}' http://localhost:30318/v1/logs
 
 # 4. After a Claude session, check collector received data
@@ -179,10 +182,10 @@ service:
    kubectl --context orbstack -n monitoring get pods -l app=otel-collector
    ```
 
-4. Check NodePort connectivity:
+4. Check NodePort connectivity (HTTP OTLP endpoint; gRPC on 30317 cannot be tested with curl):
 
    ```bash
-   curl -v http://localhost:30317
+   curl -v http://localhost:30318/v1/logs
    ```
 
 5. Check collector logs for incoming data:
@@ -199,7 +202,7 @@ service:
 ### Missing Attributes
 
 1. Verify `OTEL_RESOURCE_ATTRIBUTES` is set with `env | grep OTEL`
-2. Check span processors aren't dropping attributes
+2. Check processors (metric/log processors) aren't dropping attributes
 3. Ensure exporters preserve all fields
 
 ## Related Documentation

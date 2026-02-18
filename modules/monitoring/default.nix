@@ -48,7 +48,7 @@ in
       endpoint = lib.mkOption {
         type = lib.types.str;
         default = "http://localhost:30317";
-        description = "OTEL Collector gRPC endpoint (NodePort for OrbStack K8s)";
+        description = "OTLP endpoint (defaults to gRPC NodePort for OrbStack K8s; use :30318 for http/* protocols)";
       };
 
       protocol = lib.mkOption {
@@ -64,7 +64,11 @@ in
       logPrompts = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Include user prompt content in OTEL events (privacy-sensitive)";
+        description = ''
+          Include user prompt content in OTEL events (privacy-sensitive).
+          WARNING: This logs full conversation content including potentially sensitive data.
+          Only enable in trusted environments where you control the OTEL pipeline.
+        '';
       };
 
       logToolDetails = lib.mkOption {
@@ -76,7 +80,7 @@ in
       resourceAttributes = lib.mkOption {
         type = lib.types.attrsOf lib.types.str;
         default = { };
-        description = "OTEL resource attributes (key=value pairs)";
+        description = "OTEL resource attributes (key=value pairs). Values must not contain commas.";
       };
     };
 
