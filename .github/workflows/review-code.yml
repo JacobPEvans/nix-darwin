@@ -10,13 +10,13 @@ name: Claude Code
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
   issue_comment:
     types: [created]
 
 # Cancel in-progress runs when a new run is triggered
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -28,18 +28,59 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'ai:skip-review')
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       pull-requests: write
       issues: read
       id-token: write
     timeout-minutes: 10
     steps:
+      - name: Check review limit
+        id: review-limit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const perPage = 100;
+            let page = 1;
+            let prior = [];
+
+            while (true) {
+              const { data } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'review-code.yml',
+                event: 'pull_request',
+                branch: context.payload.pull_request.head.ref,
+                per_page: perPage,
+                page,
+              });
+
+              const runs = data.workflow_runs || [];
+              const matched = runs.filter(r =>
+                r.conclusion === 'success' &&
+                r.id !== context.runId &&
+                Array.isArray(r.pull_requests) &&
+                r.pull_requests.some(pr => pr.number === prNumber)
+              );
+              prior = prior.concat(matched);
+
+              if (prior.length >= 2 || runs.length < perPage) break;
+              page += 1;
+            }
+
+            const skip = prior.length >= 2;
+            core.setOutput('skip', skip.toString());
+            console.log(`PR #${prNumber} prior successful reviews: ${prior.length}, skip: ${skip}`);
+
       - name: Checkout repository
+        if: steps.review-limit.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - name: Run Claude Code Review
+        if: steps.review-limit.outputs.skip != 'true'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
