@@ -86,6 +86,12 @@ in
   # Menu bar: disabled (depends on auto-claude)
   menubar.enable = false;
 
+  # Granola Watcher: auto-migrate Granola meeting notes via Claude headless
+  granolaWatcher = {
+    enable = true;
+    vaultPath = "${config.home.homeDirectory}/obsidian/obsidian-visicore";
+  };
+
   plugins = {
     # Marketplaces from modular configuration with flakeInput for Nix symlinks
     # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
