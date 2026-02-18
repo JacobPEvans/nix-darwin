@@ -18,31 +18,57 @@ rules:
       - _nix-build.yml
       - _nix-validate.yml
       - ai-openhands.yml
+      - best-practices.yml
       - ci-auto-claude.yml
-      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
+      - ci-fix.yml
       - ci-gate.yml
       - ci-markdownlint.yml
       - ci-nix.yml
       - ci-package-staleness.yml
       - ci-validate-settings.yml
       - ci-validate.yml
+      - claude-review.yml
+      - code-simplifier.yml
       - deps-monitor-packages.yml
       - deps-update-flake.yml
-      - nixos-release-check.yml
-      - review-code.yml
-      - review-deps.yml
       - final-pr-review.yml
+      - issue-hygiene.yml
+      - issue-sweeper.yml
+      - issue-triage.yml
+      - next-steps.yml
+      - nixos-release-check.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml
+      - review-deps.yml
 
   # ACCEPTED: workflow_run is the only trigger for reacting to CI completions.
-  # ci-fix-claude.yml is safe because:
+  # ci-fix.yml is safe because:
   # - It only reads logs via the GitHub API (not fork PR code).
   # - It does not execute untrusted fork code.
   # - The should-fix job validates the PR exists and belongs to this repo.
   dangerous-triggers:
     ignore:
-      - ci-fix-claude.yml
+      - ci-fix.yml
+
+  # ACCEPTED: secrets: inherit is required for reusable workflow callers.
+  # These thin callers delegate to JacobPEvans/ai-workflows reusable workflows
+  # which need CLAUDE_CODE_OAUTH_TOKEN and other repo secrets at runtime.
+  # The reusable workflows are owned by the same org and are trusted.
+  secrets-inherit:
+    ignore:
+      - best-practices.yml
+      - ci-fix.yml
+      - claude-review.yml
+      - code-simplifier.yml
+      - final-pr-review.yml
+      - issue-hygiene.yml
+      - issue-sweeper.yml
+      - issue-triage.yml
+      - next-steps.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml
 
   # IGNORED: Low-confidence credential persistence warnings
   # Most checkouts don't need persist-credentials: false unless
@@ -56,7 +82,6 @@ rules:
       - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
-      - ci-fix-claude.yml
       - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml
@@ -68,6 +93,4 @@ rules:
       - deps-monitor-packages.yml
       - deps-update-flake.yml
       - nixos-release-check.yml
-      - review-code.yml
       - review-deps.yml
-      - final-pr-review.yml
