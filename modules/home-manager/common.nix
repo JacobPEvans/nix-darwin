@@ -143,6 +143,12 @@ in
       // gitHooks
       // gitMergeDrivers;
 
+    sessionVariables = {
+      EDITOR = "vim";
+      # SOPS: age key file for secrets decryption
+      SOPS_AGE_KEY_FILE = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+    };
+
     # Activation scripts (run after home files are written)
     activation =
       geminiFiles.activation
