@@ -52,6 +52,11 @@ let
   }
   // {
 
+    # Minimal commit attribution (no verbose Co-Authored-By trailer)
+    attribution = {
+      commit = "(claude)";
+    };
+
     # Permissions
     permissions = {
       inherit (cfg.settings.permissions) allow deny ask;
