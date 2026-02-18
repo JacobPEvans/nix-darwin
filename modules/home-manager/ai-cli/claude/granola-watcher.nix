@@ -51,7 +51,7 @@ let
         pkgs.jq
         pkgs.bc
       ]
-    }:/etc/profiles/per-user/${username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+    }:/opt/homebrew/bin:/etc/profiles/per-user/${username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
   }
   // lib.optionalAttrs cfg.apiKeyHelper.enable {
     API_KEY_HELPER = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
