@@ -47,8 +47,36 @@ in
 
       endpoint = lib.mkOption {
         type = lib.types.str;
-        default = "http://localhost:4317";
-        description = "OTEL Collector gRPC endpoint";
+        default = "http://localhost:30317";
+        description = "OTEL Collector gRPC endpoint (NodePort for OrbStack K8s)";
+      };
+
+      protocol = lib.mkOption {
+        type = lib.types.enum [
+          "grpc"
+          "http/protobuf"
+          "http/json"
+        ];
+        default = "grpc";
+        description = "OTLP exporter protocol";
+      };
+
+      logPrompts = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Include user prompt content in OTEL events (privacy-sensitive)";
+      };
+
+      logToolDetails = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Include MCP server/tool names in OTEL events";
+      };
+
+      resourceAttributes = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = { };
+        description = "OTEL resource attributes (key=value pairs)";
       };
     };
 
@@ -124,10 +152,26 @@ in
       ];
 
       # Set OTEL environment variables for Claude Code
-      sessionVariables = lib.mkIf cfg.otel.enable {
-        OTEL_EXPORTER_OTLP_ENDPOINT = cfg.otel.endpoint;
-        OTEL_SERVICE_NAME = "claude-code";
-      };
+      sessionVariables = lib.mkIf cfg.otel.enable (
+        {
+          CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+          OTEL_EXPORTER_OTLP_ENDPOINT = cfg.otel.endpoint;
+          OTEL_EXPORTER_OTLP_PROTOCOL = cfg.otel.protocol;
+          OTEL_METRICS_EXPORTER = "otlp";
+          OTEL_LOGS_EXPORTER = "otlp";
+          OTEL_SERVICE_NAME = "claude-code";
+          OTEL_METRICS_INCLUDE_SESSION_ID = "true";
+          OTEL_METRICS_INCLUDE_VERSION = "true";
+          OTEL_METRICS_INCLUDE_ACCOUNT_UUID = "true";
+        }
+        // lib.optionalAttrs cfg.otel.logPrompts { OTEL_LOG_USER_PROMPTS = "1"; }
+        // lib.optionalAttrs cfg.otel.logToolDetails { OTEL_LOG_TOOL_DETAILS = "1"; }
+        // lib.optionalAttrs (cfg.otel.resourceAttributes != { }) {
+          OTEL_RESOURCE_ATTRIBUTES = lib.concatStringsSep "," (
+            lib.mapAttrsToList (k: v: "${k}=${v}") cfg.otel.resourceAttributes
+          );
+        }
+      );
     };
   };
 }
