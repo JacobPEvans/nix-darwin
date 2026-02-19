@@ -137,7 +137,7 @@ Source: `modules/darwin/common.nix`
 | raycast | Productivity launcher (replaces Spotlight) |
 | swiftbar | Menu bar customization (auto-claude status) |
 
-Note: OrbStack managed via `programs.orbstack` module (`modules/darwin/apps/orbstack.nix`).
+Note: OrbStack installed via Homebrew cask (`greedy = true`) in `modules/darwin/homebrew.nix` for TCC permission stability. The `programs.orbstack` module (`modules/darwin/apps/orbstack.nix`) still manages the APFS data volume via launchd.
 
 ---
 
@@ -189,29 +189,32 @@ Source: `modules/darwin/homebrew.nix`
 
 ### Casks
 
-| Package | Description |
-|---------|-------------|
-| obsidian | Knowledge base / note-taking |
-| shortwave | AI-powered email client |
-| claude | Anthropic Claude desktop app |
-| claude-code | Anthropic Claude Code CLI |
-| wispr-flow | AI-powered voice dictation |
-| microsoft-teams (greedy) | Microsoft Teams - standalone app for multi-account support |
-| microsoft-outlook (greedy) | Microsoft Outlook - cask for faster updates than App Store |
+All casks that ship a built-in auto-updater use `greedy = true` so that `brew upgrade` (triggered by `onActivation.upgrade = true` on `darwin-rebuild switch`) always installs the latest version rather than deferring to the app's own updater.
 
-Note: `greedy = true` forces `brew upgrade` to update these apps even when Microsoft AutoUpdate is present, ensuring updates land within hours of upstream release rather than after Apple's App Store review.
+| Package | greedy | Description |
+|---------|--------|-------------|
+| obsidian | yes | Knowledge base / note-taking |
+| shortwave | yes | AI-powered email client |
+| wispr-flow | yes | AI-powered voice dictation |
+| claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
+| claude-code | yes | Anthropic Claude Code CLI |
+| orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
+| microsoft-teams | yes | Standalone app for multi-account support |
+| microsoft-outlook | yes | Email/calendar |
+| microsoft-word | yes | Word processor |
+| microsoft-excel | yes | Spreadsheet |
+| microsoft-powerpoint | yes | Presentation |
+| microsoft-onenote | yes | Notes |
+| onedrive | yes | Cloud storage sync |
 
 ### Mac App Store
+
+Only for apps with no Homebrew cask (App Store exclusives).
 
 | App | ID |
 |-----|-----|
 | Toggl Track | 1291898086 |
 | Monarch Money Tweaks | 6753774259 |
-| Microsoft Word | 462054704 |
-| Microsoft Excel | 462058435 |
-| Microsoft PowerPoint | 462062816 |
-| Microsoft OneNote | 784801555 |
-| OneDrive | 823766827 |
 
 ---
 

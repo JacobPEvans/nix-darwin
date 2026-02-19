@@ -64,47 +64,59 @@ _:
       # not symlinks to /nix/store), so macOS TCC permissions (camera, mic, screen
       # recording) persist across darwin-rebuild. This is different from nixpkgs
       # apps which require copyApps workaround in home-manager.
-      "obsidian" # Knowledge base / note-taking - brew for faster beta updates
-      "shortwave" # AI-powered email client
-      "claude" # Anthropic Claude desktop app (not in nixpkgs for Darwin)
-      "claude-code" # Anthropic Claude Code CLI (version 2.1.3)
-      "wispr-flow" # AI-powered voice dictation app
+      #
+      # greedy = true: required for any app that ships a built-in auto-updater.
+      # Without this flag, `brew upgrade` silently skips the app because Homebrew
+      # assumes the app will update itself. In practice, built-in updaters are
+      # unreliable (require the app to be open, can be dismissed, etc.), so greedy
+      # ensures updates land deterministically on every `darwin-rebuild switch`.
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
 
-      # Microsoft apps as Homebrew casks (not masApps) for fastest updates.
+      # --- Productivity / Communication ---
+      { name = "obsidian"; greedy = true; } # Knowledge base / note-taking
+      { name = "shortwave"; greedy = true; } # AI-powered email client
+      { name = "wispr-flow"; greedy = true; } # AI-powered voice dictation
+
+      # --- Anthropic ---
+      { name = "claude"; greedy = true; } # Claude desktop app (not in nixpkgs for Darwin)
+      { name = "claude-code"; greedy = true; } # Claude Code CLI
+
+      # --- OrbStack ---
+      # Installed as a Homebrew cask rather than nixpkgs so that:
+      #   1. TCC permissions (Docker socket, Linux VM) persist across rebuilds
+      #      (nixpkgs installs symlink to /nix/store path which changes on rebuild)
+      #   2. greedy = true keeps it current without relying on its built-in updater
+      # The programs.orbstack module still manages the APFS data volume; only
+      # package.enable is set to false to avoid a conflicting nixpkgs install.
+      { name = "orbstack"; greedy = true; }
+
+      # --- Microsoft Suite ---
+      # All Microsoft apps as Homebrew casks (not masApps) for fastest updates.
+      # App Store review delays can lag upstream by days/weeks; Homebrew picks up
+      # new versions within hours of release.
+      # greedy = true: overrides Microsoft AutoUpdate so brew upgrades on rebuild
+      # rather than deferring to the in-app updater.
       #
-      # App Store updates require Apple review, which can lag days/weeks behind
-      # upstream releases. Homebrew casks pick up new versions within hours.
-      #
-      # greedy = true: force upgrade even though these apps have a built-in
-      # Microsoft AutoUpdate mechanism. Without this flag, `brew upgrade` skips
-      # apps that report their own updater, leaving them stale between rebuilds.
-      #
-      # Microsoft Teams: standalone desktop app is required for running multiple
-      # accounts simultaneously - the App Store (PWA-based) version does not
-      # support proper account isolation across sessions.
+      # Teams: standalone desktop app required for multi-account support — the App
+      # Store PWA-based version lacks proper session isolation across tenants.
       { name = "microsoft-teams"; greedy = true; }
       { name = "microsoft-outlook"; greedy = true; }
+      { name = "microsoft-word"; greedy = true; }
+      { name = "microsoft-excel"; greedy = true; }
+      { name = "microsoft-powerpoint"; greedy = true; }
+      { name = "microsoft-onenote"; greedy = true; }
+      { name = "onedrive"; greedy = true; }
     ];
 
     # Mac App Store apps (requires signed into App Store)
     # Find app IDs: mas search <name> or https://github.com/mas-cli/mas
     # Format: "App Name" = app_id;
+    # NOTE: Only use masApps for apps with no Homebrew cask (App Store exclusives).
     masApps = {
-      "Toggl Track" = 1291898086; # Time tracking
-      "Monarch Money Tweaks" = 6753774259; # Personal finance enhancements
+      "Toggl Track" = 1291898086; # Time tracking - no cask available
+      "Monarch Money Tweaks" = 6753774259; # Personal finance - App Store exclusive
       # NOTE: GoPro Quik (561350520) removed - no longer needed
-
-      # Microsoft 365 bundle (https://apps.apple.com/us/app-bundle/microsoft-365/id1450038993)
-      # NOTE: First-time install requires `sudo mas install <id>` due to TTY/sudo constraints
-      # Individual apps from the bundle - replaces any non-App Store versions
-      "Microsoft Word" = 462054704;
-      "Microsoft Excel" = 462058435;
-      "Microsoft PowerPoint" = 462062816;
-      # NOTE: Microsoft Outlook and Teams are in casks (greedy = true) above for
-      # fastest updates - App Store review delays can lag upstream by days/weeks.
-      "Microsoft OneNote" = 784801555;
-      "OneDrive" = 823766827;
+      # NOTE: All Microsoft 365 apps moved to casks (greedy = true) above
     };
   };
 }

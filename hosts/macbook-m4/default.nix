@@ -48,7 +48,12 @@ in
 
   programs.orbstack = {
     enable = true;
-    package.enable = true; # Install system-wide (machine-level service)
+    # package.enable = false: OrbStack is installed via Homebrew cask (greedy = true)
+    # in modules/darwin/homebrew.nix. Homebrew installs to /Applications/ as a real
+    # copy, so TCC permissions (Docker socket, Linux VM) persist across darwin-rebuild.
+    # Previously, nixpkgs installed a symlink to a /nix/store path that changes on
+    # every rebuild, forcing TCC re-granting each time.
+    package.enable = false;
     dataVolume = {
       enable = true;
       name = "ContainerData";
