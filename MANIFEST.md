@@ -312,8 +312,8 @@ Wired via: `modules/home-manager/common.nix` initContent
 
 ### Layer 2: Claude Code stop Hook (Defense-in-Depth)
 
-Source: `modules/home-manager/ai-cli/claude/hooks/session-cleanup.sh`
-Wired via: `modules/home-manager/ai-cli/claude-config.nix` hooks.stop → `~/.claude/hooks/stop.sh`
+Source: `process-cleanup@jacobpevans-cc-plugins`
+Wired via: `jacobpevans-cc-plugins` flake input → auto-discovered by `development.nix`
 
 | Property | Detail |
 |----------|--------|

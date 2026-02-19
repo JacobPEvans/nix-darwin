@@ -224,9 +224,5 @@ in
     # Can be read by statusline, tmux, or other display tools
     postToolUse = ./claude/hooks/last-output.sh;
 
-    # Cleanup orphaned MCP processes on session exit (defense-in-depth)
-    # Sweeps system-wide for ppid=1 orphans after zshexit() primary cleanup.
-    # Fires only on explicit /exit or Ctrl+C — not during mid-session tool use.
-    stop = ./claude/hooks/session-cleanup.sh;
   };
 }
