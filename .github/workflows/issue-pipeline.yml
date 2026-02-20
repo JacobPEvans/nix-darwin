@@ -10,12 +10,13 @@ on:
 
 permissions:
   contents: write
+  id-token: write
   issues: write
   pull-requests: write
 
 jobs:
   resolve-issue:
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.5
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.6
     secrets: inherit
     with:
       repo_context: "NixOS/nix-darwin system configuration using flakes"
