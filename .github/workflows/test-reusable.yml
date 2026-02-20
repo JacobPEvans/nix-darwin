@@ -3,9 +3,11 @@ name: Test Reusable Workflow Call
 on:
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   test:
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@c7aaa12e4abe024ae6a951cba932e52c5373bc52
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.2.0
     secrets: inherit
