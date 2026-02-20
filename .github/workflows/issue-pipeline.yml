@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  resolve:
+  resolve-issue:
     uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.4
     secrets: inherit
     with:
