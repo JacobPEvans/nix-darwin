@@ -36,7 +36,7 @@ rules:
       - final-pr-review.yml
       - issue-hygiene.yml
       - issue-sweeper.yml
-      - issue-triage.yml
+      - issue-pipeline.yml
       - next-steps.yml
       - nixos-release-check.yml
       - post-merge-docs-review.yml
@@ -65,7 +65,7 @@ rules:
       - final-pr-review.yml
       - issue-hygiene.yml
       - issue-sweeper.yml
-      - issue-triage.yml
+      - issue-pipeline.yml
       - next-steps.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
