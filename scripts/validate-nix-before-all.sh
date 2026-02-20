@@ -16,6 +16,7 @@ EXCLUSIONS=(
   "claude:Not available for aarch64-darwin (only x86_64-linux)"
   "claude-code:Intentionally using homebrew due to recent nixpkgs version instability"
   "shortwave:Different apps - nixpkgs=radio client, homebrew=email client"
+  "orbstack:Cask preferred over nixpkgs for TCC permission stability (nixpkgs symlink changes on rebuild, forcing TCC re-grant)"
 )
 
 HOMEBREW_FILE="modules/darwin/homebrew.nix"

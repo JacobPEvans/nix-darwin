@@ -202,22 +202,20 @@ deferring to the app's own updater.
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
-| microsoft-teams | yes | Standalone app for multi-account support |
-| microsoft-outlook | yes | Email/calendar |
-| microsoft-word | yes | Word processor |
-| microsoft-excel | yes | Spreadsheet |
-| microsoft-powerpoint | yes | Presentation |
-| microsoft-onenote | yes | Notes |
-| onedrive | yes | Cloud storage sync |
+| microsoft-teams | yes | Teams desktop app (not available on Mac App Store) |
 
 ### Mac App Store
-
-Only for apps with no Homebrew cask (App Store exclusives).
 
 | App | ID |
 |-----|-----|
 | Toggl Track | 1291898086 |
 | Monarch Money Tweaks | 6753774259 |
+| Microsoft Word | 462054704 |
+| Microsoft Excel | 462058435 |
+| Microsoft PowerPoint | 462062816 |
+| Microsoft Outlook | 985367838 |
+| Microsoft OneNote | 784801555 |
+| OneDrive | 823766827 |
 
 ---
 

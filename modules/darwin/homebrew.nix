@@ -73,13 +73,28 @@ _:
       # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
 
       # --- Productivity / Communication ---
-      { name = "obsidian"; greedy = true; } # Knowledge base / note-taking
-      { name = "shortwave"; greedy = true; } # AI-powered email client
-      { name = "wispr-flow"; greedy = true; } # AI-powered voice dictation
+      {
+        name = "obsidian";
+        greedy = true;
+      } # Knowledge base / note-taking
+      {
+        name = "shortwave";
+        greedy = true;
+      } # AI-powered email client
+      {
+        name = "wispr-flow";
+        greedy = true;
+      } # AI-powered voice dictation
 
       # --- Anthropic ---
-      { name = "claude"; greedy = true; } # Claude desktop app (not in nixpkgs for Darwin)
-      { name = "claude-code"; greedy = true; } # Claude Code CLI
+      {
+        name = "claude";
+        greedy = true;
+      } # Claude desktop app (not in nixpkgs for Darwin)
+      {
+        name = "claude-code";
+        greedy = true;
+      } # Claude Code CLI
 
       # --- OrbStack ---
       # Installed as a Homebrew cask rather than nixpkgs so that:
@@ -88,35 +103,37 @@ _:
       #   2. greedy = true keeps it current without relying on its built-in updater
       # The programs.orbstack module still manages the APFS data volume; only
       # package.enable is set to false to avoid a conflicting nixpkgs install.
-      { name = "orbstack"; greedy = true; }
+      {
+        name = "orbstack";
+        greedy = true;
+      }
 
-      # --- Microsoft Suite ---
-      # All Microsoft apps as Homebrew casks (not masApps) for fastest updates.
-      # App Store review delays can lag upstream by days/weeks; Homebrew picks up
-      # new versions within hours of release.
-      # greedy = true: overrides Microsoft AutoUpdate so brew upgrades on rebuild
-      # rather than deferring to the in-app updater.
-      #
-      # Teams: standalone desktop app required for multi-account support — the App
-      # Store PWA-based version lacks proper session isolation across tenants.
-      { name = "microsoft-teams"; greedy = true; }
-      { name = "microsoft-outlook"; greedy = true; }
-      { name = "microsoft-word"; greedy = true; }
-      { name = "microsoft-excel"; greedy = true; }
-      { name = "microsoft-powerpoint"; greedy = true; }
-      { name = "microsoft-onenote"; greedy = true; }
-      { name = "onedrive"; greedy = true; }
+      # --- Microsoft ---
+      # Teams is only distributed via Homebrew (not available on Mac App Store).
+      # greedy = true: overrides Microsoft AutoUpdate so brew upgrades on rebuild.
+      {
+        name = "microsoft-teams";
+        greedy = true;
+      }
     ];
 
     # Mac App Store apps (requires signed into App Store)
     # Find app IDs: mas search <name> or https://github.com/mas-cli/mas
     # Format: "App Name" = app_id;
-    # NOTE: Only use masApps for apps with no Homebrew cask (App Store exclusives).
     masApps = {
-      "Toggl Track" = 1291898086; # Time tracking - no cask available
-      "Monarch Money Tweaks" = 6753774259; # Personal finance - App Store exclusive
+      "Toggl Track" = 1291898086; # Time tracking
+      "Monarch Money Tweaks" = 6753774259; # Personal finance enhancements
       # NOTE: GoPro Quik (561350520) removed - no longer needed
-      # NOTE: All Microsoft 365 apps moved to casks (greedy = true) above
+
+      # Microsoft 365 bundle (https://apps.apple.com/us/app-bundle/microsoft-365/id1450038993)
+      # NOTE: First-time install requires `sudo mas install <id>` due to TTY/sudo constraints
+      # Individual apps from the bundle - replaces any non-App Store versions
+      "Microsoft Word" = 462054704;
+      "Microsoft Excel" = 462058435;
+      "Microsoft PowerPoint" = 462062816;
+      "Microsoft Outlook" = 985367838;
+      "Microsoft OneNote" = 784801555;
+      "OneDrive" = 823766827;
     };
   };
 }
