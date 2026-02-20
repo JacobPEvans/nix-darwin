@@ -110,11 +110,8 @@ _:
 
       # --- Microsoft ---
       # Teams is only distributed via Homebrew (not available on Mac App Store).
-      # greedy = true: overrides Microsoft AutoUpdate so brew upgrades on rebuild.
-      {
-        name = "microsoft-teams";
-        greedy = true;
-      }
+      # No greedy flag: Microsoft AutoUpdate handles updates reliably when the app runs.
+      "microsoft-teams"
     ];
 
     # Mac App Store apps (requires signed into App Store)

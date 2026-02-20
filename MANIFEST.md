@@ -202,7 +202,7 @@ deferring to the app's own updater.
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
-| microsoft-teams | yes | Teams desktop app (not available on Mac App Store) |
+| microsoft-teams | no | Teams desktop app (not available on Mac App Store; MAU handles updates) |
 
 ### Mac App Store
 
