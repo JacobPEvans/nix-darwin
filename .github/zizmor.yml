@@ -39,6 +39,7 @@ rules:
       - issue-pipeline.yml
       - next-steps.yml
       - nixos-release-check.yml
+      - test-reusable.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
       - review-deps.yml
@@ -68,6 +69,7 @@ rules:
       - issue-pipeline.yml
       - next-steps.yml
       - post-merge-docs-review.yml
+      - test-reusable.yml
       - post-merge-tests.yml
 
   # IGNORED: Low-confidence credential persistence warnings
