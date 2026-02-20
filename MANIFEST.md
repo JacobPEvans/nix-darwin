@@ -137,7 +137,8 @@ Source: `modules/darwin/common.nix`
 | raycast | Productivity launcher (replaces Spotlight) |
 | swiftbar | Menu bar customization (auto-claude status) |
 
-Note: OrbStack installed via Homebrew cask (`greedy = true`) in `modules/darwin/homebrew.nix` for TCC permission stability. The `programs.orbstack` module (`modules/darwin/apps/orbstack.nix`) still manages the APFS data volume via launchd.
+Note: OrbStack installed via Homebrew cask (`greedy = true`) in `modules/darwin/homebrew.nix` for TCC permission stability.
+The `programs.orbstack` module (`modules/darwin/apps/orbstack.nix`) still manages the APFS data volume via launchd.
 
 ---
 
@@ -189,7 +190,9 @@ Source: `modules/darwin/homebrew.nix`
 
 ### Casks
 
-All casks that ship a built-in auto-updater use `greedy = true` so that `brew upgrade` (triggered by `onActivation.upgrade = true` on `darwin-rebuild switch`) always installs the latest version rather than deferring to the app's own updater.
+All casks that ship a built-in auto-updater use `greedy = true` so that `brew upgrade` (triggered by
+`onActivation.upgrade = true` on `darwin-rebuild switch`) always installs the latest version rather than
+deferring to the app's own updater.
 
 | Package | greedy | Description |
 |---------|--------|-------------|
