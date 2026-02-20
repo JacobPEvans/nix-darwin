@@ -86,7 +86,9 @@ in
       fzf # Fuzzy finder for interactive selection
       gnugrep # GNU grep with zgrep for compressed files
       gnutar # GNU tar as 'gtar' (Mac-safe tar without ._* files)
+      btop # Modern process monitor with graphs (replaces htop for daily use)
       htop # Interactive process viewer (better top)
+      mactop # Real-time Apple Silicon CPU/GPU/ANE/thermal monitoring
       jq # JSON parsing for config files and API responses
       ncdu # NCurses disk usage analyzer
       ngrep # Network packet grep (useful for debugging)

@@ -243,6 +243,7 @@ in
         source ${./zsh/git-functions.zsh}
         source ${./zsh/docker-functions.zsh}
         source ${./zsh/macos-setup.zsh}
+        source ${./zsh/process-cleanup.zsh}
         source ${./zsh/session-logging.zsh}
       '';
     };

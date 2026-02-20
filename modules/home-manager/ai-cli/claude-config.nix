@@ -223,5 +223,6 @@ in
     # Writes compact summary of last tool execution to ~/.cache/claude-last-output.txt
     # Can be read by statusline, tmux, or other display tools
     postToolUse = ./claude/hooks/last-output.sh;
+
   };
 }

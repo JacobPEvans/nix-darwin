@@ -30,7 +30,9 @@ Source: `modules/darwin/common.nix`
 | fzf | Fuzzy finder for interactive selection |
 | gnugrep | GNU grep with zgrep for compressed files |
 | gnutar | GNU tar as gtar (Mac-safe tar without .\_ files) |
+| btop | Modern process monitor with graphs (daily use) |
 | htop | Interactive process viewer |
+| mactop | Real-time Apple Silicon CPU/GPU/ANE/thermal monitoring |
 | jq | JSON parsing |
 | ncdu | NCurses disk usage analyzer |
 | ngrep | Network packet grep |
@@ -288,3 +290,34 @@ Source: `shells/` (see [shells/README.md](shells/README.md) for details)
 | python314 | Python 3.14 (bleeding edge) |
 | splunk-dev | Splunk development (Python 3.9 via uv) |
 | terraform | Infrastructure as Code (Terraform, Terragrunt, OpenTofu) |
+
+---
+
+## Process Cleanup Mechanisms
+
+Event-based cleanup to prevent orphaned MCP server and subagent processes from
+accumulating across Claude Code sessions (workaround for upstream bug [anthropics/claude-code#1935](https://github.com/anthropics/claude-code/issues/1935)).
+
+### Layer 1: zsh zshexit() Hook (Primary)
+
+Source: `modules/home-manager/zsh/process-cleanup.zsh`
+Wired via: `modules/home-manager/common.nix` initContent
+
+| Property | Detail |
+|----------|--------|
+| Trigger | Shell exit — including SIGHUP from Ghostty tab close |
+| Scope | Descendants of the current shell PID only (safe: no cross-tab impact) |
+| Condition | Inner shell only (SCRIPT_SESSION set by session-logging.zsh) |
+| Method | BFS process tree walk via pgrep -P; SIGTERM then SIGKILL after 1s |
+
+### Layer 2: Claude Code stop Hook (Defense-in-Depth)
+
+Source: `process-cleanup@jacobpevans-cc-plugins`
+Wired via: `jacobpevans-cc-plugins` flake input → auto-discovered by `development.nix`
+
+| Property | Detail |
+|----------|--------|
+| Trigger | Claude session exit via /exit or Ctrl+C |
+| Scope | System-wide orphans with ppid=1 (reparented to launchd) |
+| Targets | terraform-mcp-server, context7-mcp, orphaned node MCP processes |
+| Logs | ~/Library/Logs/claude-process-cleanup/cleanup-YYYY-MM-DD.log |
