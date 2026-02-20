@@ -10,13 +10,13 @@ permissions:
   pull-requests: write
 
 jobs:
-  triage:
+  run-triage:
     if: github.event.sender.type != 'Bot'
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.2.3
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.2.4
     secrets: inherit
 
-  resolve:
-    needs: triage
+  resolve-issue:
+    needs: run-triage
     if: github.event.sender.type != 'Bot'
     uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.4
     secrets: inherit
