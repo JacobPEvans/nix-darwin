@@ -18,7 +18,7 @@ jobs:
   resolve:
     needs: triage
     if: github.event.sender.type != 'Bot'
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.3
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.4
     secrets: inherit
     with:
       repo_context: "NixOS/nix-darwin system configuration using flakes"
