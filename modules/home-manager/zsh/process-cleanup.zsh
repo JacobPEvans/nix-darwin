@@ -23,18 +23,17 @@ zshexit() {
 
   while [[ ${#queue[@]} -gt 0 ]]; do
     pid=${queue[1]}
-    queue=(${queue[2,-1]})  # Remove first element and re-index
+    shift queue  # Remove first element and re-index safely
 
     pgrep_out=$(pgrep -P "$pid" 2>/dev/null) || true
     [[ -z "$pgrep_out" ]] && continue
 
     local -a children=("${(f)pgrep_out}")
-    local child
-    for child in "${children[@]}"; do
+    foreach child ("${children[@]}")
       [[ -n "$child" ]] || continue
       descendants+=("$child")
       queue+=("$child")
-    done
+    end
   done
 
   [[ ${#descendants[@]} -eq 0 ]] && return 0
@@ -47,9 +46,9 @@ zshexit() {
 
   # SIGKILL any survivors
   local -a survivors=()
-  for pid in "${descendants[@]}"; do
+  foreach pid ("${descendants[@]}")
     kill -0 "$pid" 2>/dev/null && survivors+=("$pid")
-  done
+  end
 
   [[ ${#survivors[@]} -gt 0 ]] && kill -KILL "${survivors[@]}" 2>/dev/null || true
 }

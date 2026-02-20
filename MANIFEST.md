@@ -296,7 +296,7 @@ Source: `shells/` (see [shells/README.md](shells/README.md) for details)
 ## Process Cleanup Mechanisms
 
 Event-based cleanup to prevent orphaned MCP server and subagent processes from
-accumulating across Claude Code sessions (workaround for upstream bug #1935).
+accumulating across Claude Code sessions (workaround for upstream bug [anthropics/claude-code#1935](https://github.com/anthropics/claude-code/issues/1935)).
 
 ### Layer 1: zsh zshexit() Hook (Primary)
 
