@@ -18,7 +18,7 @@ permissions:
 jobs:
   triage:
     if: github.event_name == 'issues' && github.event.sender.type != 'Bot'
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.2.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.2.2
     secrets: inherit
 
   # Bridge job: always() on reusable workflow jobs with needs on another
@@ -34,7 +34,7 @@ jobs:
 
   resolve:
     needs: gate
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.2
     secrets: inherit
     with:
       repo_context: "NixOS/nix-darwin system configuration using flakes"
