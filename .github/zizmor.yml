@@ -36,6 +36,7 @@ rules:
       - final-pr-review.yml
       - issue-hygiene.yml
       - issue-sweeper.yml
+      - issue-auto-resolve.yml
       - issue-pipeline.yml
       - next-steps.yml
       - nixos-release-check.yml
@@ -65,6 +66,7 @@ rules:
       - final-pr-review.yml
       - issue-hygiene.yml
       - issue-sweeper.yml
+      - issue-auto-resolve.yml
       - issue-pipeline.yml
       - next-steps.yml
       - post-merge-docs-review.yml
@@ -75,6 +77,7 @@ rules:
   # reusable workflows need the caller to provide sufficient GITHUB_TOKEN scope.
   excessive-permissions:
     ignore:
+      - issue-auto-resolve.yml
       - issue-pipeline.yml
 
   # IGNORED: Low-confidence credential persistence warnings
