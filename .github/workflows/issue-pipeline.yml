@@ -34,6 +34,10 @@ jobs:
 
   resolve:
     needs: gate
+    # success() checks the ENTIRE needs graph (triage→gate→resolve).
+    # Triage is skipped on workflow_dispatch, so success() returns false.
+    # Explicitly check only the direct dependency.
+    if: always() && needs.gate.result == 'success'
     uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.2.2
     secrets: inherit
     with:
