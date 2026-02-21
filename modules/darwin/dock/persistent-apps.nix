@@ -36,7 +36,7 @@ in
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
       "/Applications/Slack.app"
       "/System/Applications/Messages.app"
-      "${homeDir}/Applications/zoom.us.app" # Manual install (Nix package was broken)
+      "/Applications/zoom.us.app" # Manual install - now at system level
       "/Applications/Webex.app"
 
       # AI Assistants
@@ -50,15 +50,16 @@ in
       # Development & Tools
       "${homeDir}/Applications/Home Manager Apps/Visual Studio Code.app"
       "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
-      "/Applications/Nix Apps/OrbStack.app"
+      "/Applications/OrbStack.app"
 
       # Browsers
       "/Applications/Safari.app"
       "/Applications/Brave Browser.app"
 
       # NOTE: Ollama runs headless via LaunchAgent, no dock icon needed.
-      # NOTE: Additional AI tools (Antigravity, ChatGPT, Cursor) can be found in
-      # ~/Applications/Home Manager Apps/ but are not pinned to the Dock.
+      # NOTE: Additional AI tools (ChatGPT, Cursor) can be found in
+      # ~/Applications/Home Manager Apps/, and Antigravity in /Applications/,
+      # but they are not pinned to the Dock.
       # NOTE: RapidAPI, Postman, and Bitwarden removed from dock per #438
     ];
 
