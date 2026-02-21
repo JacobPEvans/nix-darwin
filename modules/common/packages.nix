@@ -21,6 +21,7 @@ with pkgs;
 
   # Git Workflow
   (pkgs.callPackage ./git-flow-next.nix { }) # git-flow workflow tool (not in nixpkgs)
+  git-bug # Distributed bug tracker embedded in git (git bug command)
 
   # ==========================================================================
   # Node.js and Bun Runtimes
