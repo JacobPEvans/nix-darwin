@@ -11,5 +11,5 @@ permissions:
 
 jobs:
   simplify:
-    uses: JacobPEvans/ai-workflows/.github/workflows/code-simplifier.yml@v0.2.7
+    uses: JacobPEvans/ai-workflows/.github/workflows/code-simplifier.yml@v0.2.8
     secrets: inherit
