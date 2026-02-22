@@ -332,11 +332,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1771585808,
-        "narHash": "sha256-EDkrYQCP3O5dB8UdJZsMxgriJsq9n/nnQ97Pr7ASMCc=",
+        "lastModified": 1771648058,
+        "narHash": "sha256-Gw8jXVDZr7/X9mx6DwUMxTDYWIpta5Mb8oQBkhPur+g=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "53584140326059f7d044f3812f7ca37b4e1fad68",
+        "rev": "fef5f9900448b65d254ab378d6b107e9dec4dd56",
         "type": "github"
       },
       "original": {
@@ -424,11 +424,11 @@
     "superpowers-marketplace": {
       "flake": false,
       "locked": {
-        "lastModified": 1770936098,
-        "narHash": "sha256-5wjeygJ9amt0IBb4UZFbSFADr+/f1WFjnrSB15EzgcY=",
+        "lastModified": 1771700961,
+        "narHash": "sha256-QCqrY6DsoVoDm2ir8wJTvWoY+hGe/nPwYkykbR40uYM=",
         "owner": "obra",
         "repo": "superpowers-marketplace",
-        "rev": "d3cd73cc329a011007373189258b653c33c96bdc",
+        "rev": "43794314cce9732699b6fa195f9abf1ec684c6a2",
         "type": "github"
       },
       "original": {
