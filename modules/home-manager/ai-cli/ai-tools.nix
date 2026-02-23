@@ -38,7 +38,7 @@
 # ============================================================================
 #
 # NIXPKGS PACKAGES (sourced via unstable overlay in modules/darwin/common.nix):
-#   codex, gemini-cli, github-mcp-server, terraform-mcp-server
+#   codex, github-mcp-server, terraform-mcp-server
 #
 # BUNX WRAPPER PACKAGES (npm packages not in nixpkgs/homebrew):
 #   cclint: @felixgeelhaar/cclint@0.12.1
@@ -48,6 +48,7 @@
 #
 # HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
 #   block-goose-cli: Block's AI agent (nixpkgs outdated at time of addition)
+#   gemini-cli: Google Gemini CLI (moved from nixpkgs due to severe version lag)
 #
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
@@ -98,13 +99,6 @@
     # Terraform MCP Server - Terraform/OpenTofu integration
     # Source: https://github.com/hashicorp/terraform-mcp-server
     terraform-mcp-server
-
-    # ==========================================================================
-    # Google Gemini CLI
-    # ==========================================================================
-    # Sourced from unstable overlay (modules/darwin/common.nix)
-    # Source: https://github.com/google-gemini/gemini-cli
-    gemini-cli
 
     # ==========================================================================
     # OpenAI Codex CLI

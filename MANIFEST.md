@@ -154,7 +154,6 @@ Source: `hosts/macbook-m4/home.nix`
 | ghostty-bin | Terminal emulator (unstable overlay) |
 | postman | API development environment |
 | rapidapi | Full-featured HTTP client |
-| antigravity | Google AI-powered IDE (unstable overlay) |
 | code-cursor | Cursor AI IDE (VS Code fork) |
 | chatgpt | OpenAI ChatGPT desktop app |
 | claudebar | Menu bar AI coding assistant quota monitoring |
@@ -171,7 +170,6 @@ Source: `modules/home-manager/ai-cli/ai-tools.nix`
 | cclint | bunx wrapper | CLAUDE.md linter |
 | github-mcp-server | nixpkgs (unstable) | GitHub API MCP server |
 | terraform-mcp-server | nixpkgs (unstable) | Terraform/OpenTofu MCP server |
-| gemini-cli | nixpkgs (unstable) | Google Gemini CLI |
 | codex | nixpkgs (unstable) | OpenAI Codex CLI |
 | gh-copilot | bunx wrapper | GitHub Copilot CLI |
 | chatgpt (CLI) | bunx wrapper | OpenAI ChatGPT CLI |
@@ -190,6 +188,7 @@ Source: `modules/darwin/homebrew.nix`
 |---------|-------------|
 | ccusage | Claude Code usage analyzer |
 | block-goose-cli | Block's Goose AI agent |
+| gemini-cli | Google Gemini CLI (moved from nixpkgs) |
 
 ### Casks
 
@@ -204,6 +203,7 @@ deferring to the app's own updater.
 | wispr-flow | yes | AI-powered voice dictation |
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
+| antigravity | yes | Google AI-powered IDE (Gemini 3) |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
 | microsoft-teams | no | Teams desktop app (not available on Mac App Store; MAU handles updates) |
 
@@ -265,11 +265,9 @@ Source: `modules/darwin/common.nix` (overlay block)
 
 | Package | Reason |
 |---------|--------|
-| antigravity | GUI app - fast upstream releases |
 | ghostty-bin | GUI app - fast upstream releases |
 | ollama | LLM runtime - fast upstream releases |
 | codex | AI CLI - stable lags behind upstream |
-| gemini-cli | AI CLI - stable lags behind upstream |
 | github-mcp-server | AI CLI - stable lags behind upstream |
 | terraform-mcp-server | AI CLI - stable lags behind upstream |
 

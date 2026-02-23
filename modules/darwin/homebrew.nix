@@ -52,6 +52,11 @@ _:
       # CLI tools (only if not available in nixpkgs)
       "ccusage" # Claude Code usage analyzer - not in nixpkgs
 
+      # Gemini CLI (Google Gemini AI assistant)
+      # - Moved from nixpkgs due to severe version lag (v0.23 vs v0.29 upstream)
+      # - Homebrew version is required for Gemini 3.1 Pro support
+      "gemini-cli"
+
       # Block Goose AI agent (https://github.com/block/goose)
       # - Using homebrew as nixpkgs version was >30 days old at time of addition; homebrew actively maintained
       # - Named 'block-goose-cli' to avoid conflict with nixpkgs 'goose' (database migration tool)
@@ -70,7 +75,8 @@ _:
       # assumes the app will update itself. In practice, built-in updaters are
       # unreliable (require the app to be open, can be dismissed, etc.), so greedy
       # ensures updates land deterministically on every `darwin-rebuild switch`.
-      # NOTE: ChatGPT, Cursor, Antigravity are in nixpkgs - see home.packages
+      # NOTE: ChatGPT and Cursor are in nixpkgs - see home.packages.
+      # NOTE: Antigravity and gemini-cli are in homebrew (above).
 
       # --- Productivity / Communication ---
       {
@@ -95,6 +101,12 @@ _:
         name = "claude-code";
         greedy = true;
       } # Claude Code CLI
+
+      # --- Google Gemini ---
+      {
+        name = "antigravity";
+        greedy = true;
+      } # Google's AI-powered IDE (Gemini 3) - moved from nixpkgs for Gemini 3.1 Pro support
 
       # --- OrbStack ---
       # Installed as a Homebrew cask rather than nixpkgs so that:
