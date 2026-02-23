@@ -58,8 +58,18 @@ let
       fi
 
       if [ "$remote_sha" = "$z40" ]; then
-        # New branch: compare against the empty tree
-        from=$(git hash-object -t tree /dev/null)
+        # New branch: compare against merge-base with the remote's default branch
+        # so we check only files changed in this branch, not the entire repo history.
+        # Detect the actual default branch, then fall back to common names.
+        default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+        if [ -n "$default_branch" ]; then
+          from=$(git merge-base "$local_sha" "origin/$default_branch" 2>/dev/null \
+                 || git hash-object -t tree /dev/null)
+        else
+          from=$(git merge-base "$local_sha" origin/main 2>/dev/null \
+                 || git merge-base "$local_sha" origin/master 2>/dev/null \
+                 || git hash-object -t tree /dev/null)
+        fi
       else
         from="$remote_sha"
       fi
