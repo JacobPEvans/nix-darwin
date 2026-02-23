@@ -115,11 +115,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1771546668,
-        "narHash": "sha256-7sQDFzwbuukU7Y5CMP58H923s3S9Bf3dQGjyHsTbFBc=",
+        "lastModified": 1771777195,
+        "narHash": "sha256-qB/TwSNEEa2XC5S3E/SR8XvCrFhdslmgqfL2gA3FX8g=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "30378f7aa2be9ecc921956ea7336a0486dbe1519",
+        "rev": "3b59e873e2dd7eb6346f15e892f6599fb2c16c8d",
         "type": "github"
       },
       "original": {
@@ -131,11 +131,11 @@
     "claude-code-workflows": {
       "flake": false,
       "locked": {
-        "lastModified": 1771636241,
-        "narHash": "sha256-vA0ye9RfBPBKjsRCZ8v5jYEAy4GII9tLO9nbgwnb+Vc=",
+        "lastModified": 1771678070,
+        "narHash": "sha256-RTgjKk4m1Oq8SoC6VUy4lujhvtOFEgGzbC8D+brUlpY=",
         "owner": "wshobson",
         "repo": "agents",
-        "rev": "5140d2020499db4b32a6a204f23286ae9462fc5f",
+        "rev": "ade0c7a211d04fa1354d10359737cace5c6fc5b0",
         "type": "github"
       },
       "original": {
@@ -179,11 +179,11 @@
     "claude-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1770675170,
-        "narHash": "sha256-dia5XNYHH1s6kj8YtMSQbKZNuq479XMTuGHUtT//1IY=",
+        "lastModified": 1771748657,
+        "narHash": "sha256-5ZfmFvWXxg5c/PnKjoi9iKQza+l6g45gG883JrYTFBw=",
         "owner": "secondsky",
         "repo": "claude-skills",
-        "rev": "d2a737e450966951c3213d82d4bbb8a28a5ae806",
+        "rev": "6ebd12ce868f83fcb95c226e4c12f136a6e9af4f",
         "type": "github"
       },
       "original": {
@@ -257,11 +257,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770260404,
-        "narHash": "sha256-3iVX1+7YUIt23hBx1WZsUllhbmP2EnXrV8tCRbLxHc8=",
+        "lastModified": 1771744638,
+        "narHash": "sha256-EDLi+YAsEEAmMeZe1v6GccuGRbCkpSZp/+A6g+pivR8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "0d782ee42c86b196acff08acfbf41bb7d13eed5b",
+        "rev": "cb6c151f5c9db4df0b69d06894dc8484de1f16a0",
         "type": "github"
       },
       "original": {
@@ -290,11 +290,11 @@
     "lunar-claude": {
       "flake": false,
       "locked": {
-        "lastModified": 1771478724,
-        "narHash": "sha256-AqhqBLXHhHpGcpRcKHBfg2P9xz50ZL+6RfXXw3wLyr4=",
+        "lastModified": 1771815750,
+        "narHash": "sha256-18XTJGRa4bXn60kaLPVKwyP/3dRH3TBXVyvpimX+E44=",
         "owner": "basher83",
         "repo": "lunar-claude",
-        "rev": "7e1d95499458aec7dc44a96602e8eed38b6fe65f",
+        "rev": "92a0afc0220634ca415d07b7b8123a5853aceb51",
         "type": "github"
       },
       "original": {
@@ -348,11 +348,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1771207753,
-        "narHash": "sha256-b9uG8yN50DRQ6A7JdZBfzq718ryYrlmGgqkRm9OOwCE=",
+        "lastModified": 1771423170,
+        "narHash": "sha256-K7Dg9TQ0mOcAtWTO/FX/FaprtWQ8BmEXTpLIaNRhEwU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+        "rev": "bcc4a9d9533c033d806a46b37dc444f9b0da49dd",
         "type": "github"
       },
       "original": {

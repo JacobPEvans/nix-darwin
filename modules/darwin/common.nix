@@ -44,13 +44,11 @@ in
     (_final: _prev: {
       inherit (unstablePkgs)
         # GUI applications (need unstable for fast upstream releases)
-        antigravity
         ghostty-bin
         ollama
 
         # AI CLI tools (fast-moving, stable lags behind upstream)
         codex
-        gemini-cli
         github-mcp-server
         terraform-mcp-server
         ;

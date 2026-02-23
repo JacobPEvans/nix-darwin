@@ -19,7 +19,7 @@ External documentation and resources for this nix configuration.
 |----------|-----|
 | Nix Manual | <https://nix.dev/manual/nix/stable/> |
 | Nix Pills | <https://nixos.org/guides/nix-pills/> |
-| Nix Flakes Wiki | <https://nixos.wiki/wiki/Flakes> |
+| Nix Flakes Wiki | <https://wiki.nixos.org/wiki/Flakes> |
 | Determinate Nix | <https://determinate.systems/> |
 
 ## nix-darwin
