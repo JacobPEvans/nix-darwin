@@ -45,8 +45,22 @@ let
       exit 0
     fi
 
-    # Run all pre-commit hooks on all files
-    exec pre-commit run --all-files --hook-stage push
+    # Run pre-commit hooks only on files changed in the push (not all files).
+    # Using --from-ref/--to-ref prevents heavy hooks (e.g. terragrunt-plan)
+    # from running when only unrelated files (e.g. YAML) are pushed.
+    # Reads the ref pairs from stdin as per the git pre-push hook protocol.
+    exit_code=0
+    while read local_ref local_sha remote_ref remote_sha; do
+      if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch: compare against the empty tree
+        from=$(git hash-object -t tree /dev/null)
+      else
+        from="$remote_sha"
+      fi
+      to="$local_sha"
+      pre-commit run --from-ref "$from" --to-ref "$to" --hook-stage push || exit_code=$?
+    done
+    exit $exit_code
   '';
   # Return file definitions directly (merged into home.file in common.nix)
 in
