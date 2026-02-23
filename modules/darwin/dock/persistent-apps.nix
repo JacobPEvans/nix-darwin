@@ -31,6 +31,7 @@ in
       "/System/Applications/Reminders.app"
       "/System/Applications/Calendar.app"
       "/Applications/Toggl Track.app"
+      "/Applications/Microsoft Outlook.app"
 
       # Communication
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
