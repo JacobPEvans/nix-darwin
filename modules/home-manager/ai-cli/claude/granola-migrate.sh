@@ -4,6 +4,9 @@
 # Required environment variables (set by launchd):
 #   VAULT_PATH, CLAUDE_MODEL, CLAUDE_MAX_TURNS, MAX_BUDGET, DAILY_CAP, LOG_DIR
 
+# Restore homebrew PATH stripped by nix-darwin /etc/zshenv
+export PATH="/opt/homebrew/bin:$PATH"
+
 set -euo pipefail
 
 log() { echo "$(date -Iseconds) $*"; }
@@ -116,6 +119,11 @@ log "Claude exited with code ${CLAUDE_EXIT}"
 # Claude's --max-budget-usd caps actual spending, so charge the full effective budget.
 # This is conservative (may overcount) but simple and safe.
 
-new_spent=$(echo "$spent + $effective_budget" | bc)
-echo "{\"date\":\"${TODAY}\",\"spent\":${new_spent}}" > "$BUDGET_FILE"
-log "Budget: \$${new_spent}/\$${DAILY_CAP} (charged \$${effective_budget})"
+# Only charge budget on successful runs (not command-not-found failures)
+if (( CLAUDE_EXIT == 0 )); then
+  new_spent=$(echo "$spent + $effective_budget" | bc)
+  echo "{\"date\":\"${TODAY}\",\"spent\":${new_spent}}" > "$BUDGET_FILE"
+  log "Budget: \$${new_spent}/\$${DAILY_CAP} (charged \$${effective_budget})"
+else
+  log "Claude failed (exit ${CLAUDE_EXIT}), not charging budget"
+fi
