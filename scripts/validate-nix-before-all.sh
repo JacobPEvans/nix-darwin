@@ -13,6 +13,7 @@ fi
 # Known false positives: Same name, different apps, or intentional overrides
 # Format: "package-name:reason"
 EXCLUSIONS=(
+  "antigravity:Intentionally using homebrew due to nixpkgs version lag (requires Gemini 3.1 Pro support)"
   "claude:Not available for aarch64-darwin (only x86_64-linux)"
   "claude-code:Intentionally using homebrew due to recent nixpkgs latency on latest packages"
   "gemini-cli:Intentionally using homebrew due to recent nixpkgs latency on latest packages"
