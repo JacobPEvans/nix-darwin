@@ -201,38 +201,13 @@ in
     ];
 
     home.file = {
-      ".claude/settings.json".source = settingsJson;
+      ".claude/settings.json" = {
+        source = settingsJson;
+        force = true;
+      };
     }
     // statusLineScript
     // hookFiles;
 
-    # Cleanup activation script: Remove blocking regular files before symlink creation
-    # This handles the case where settings.json exists as a regular file (e.g., created by Claude Code)
-    # which would prevent home-manager from creating the Nix-managed symlink
-    #
-    # Note: Uses .backup suffix (same as home-manager's backup mechanism) for consistency.
-    # Timestamped backups would create accumulating files; single .backup is cleaner.
-    # Log format: YYYY-MM-DD HH:MM:SS [LOG_LEVEL] message
-    home.activation.cleanupClaudeSettings = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
-      SETTINGS="${homeDir}/.claude/settings.json"
-      if [ -e "$SETTINGS" ] && [ ! -L "$SETTINGS" ]; then
-        BACKUP="$SETTINGS.backup"
-        if ! $DRY_RUN_CMD mv "$SETTINGS" "$BACKUP"; then
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Failed to back up existing settings.json from $SETTINGS to $BACKUP" >&2
-          exit 1
-        fi
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Backed up existing settings.json to $BACKUP" >&2
-      fi
-
-      # Also clean up broken statusline symlink
-      OLD_STATUSLINE="${homeDir}/.claude/statusline/Config.toml"
-      if [ -L "$OLD_STATUSLINE" ] && [ ! -e "$OLD_STATUSLINE" ]; then
-        if ! $DRY_RUN_CMD rm "$OLD_STATUSLINE"; then
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Failed to remove broken statusline symlink at $OLD_STATUSLINE" >&2
-          exit 1
-        fi
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Removed broken statusline symlink" >&2
-      fi
-    '';
   };
 }

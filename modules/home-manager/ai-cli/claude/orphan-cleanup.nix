@@ -14,10 +14,6 @@
 # Phase 3 (AFTER linkGeneration):
 # - Verifies plugin cache integrity when marketplace symlinks change
 #
-# Phase 4 (AFTER reportMarketplaceDiffs):
-# - Removes .backup directories for Nix-managed marketplaces
-# - Removes known deprecated/orphan marketplace directories
-#
 { config, lib, ... }:
 
 let
@@ -34,21 +30,6 @@ let
       echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] $1" >&2
     }
   '';
-
-  marketplacesDir = "${homeDir}/.claude/plugins/marketplaces";
-
-  # Known deprecated marketplace directories to remove
-  # These were previously used but are no longer needed
-  deprecatedMarketplaceDirs = [
-    "awesome-claude-code-plugins"
-    "claudeforge-marketplace"
-    "axton-obsidian-visual-skills" # Old name; Nix manages obsidian-visual-skills
-  ];
-
-  # Get names of Nix-managed marketplaces (those with flakeInput set)
-  nixManagedMarketplaceNames = lib.mapAttrsToList (name: _: lib.last (lib.splitString "/" name)) (
-    lib.filterAttrs (_: m: m.flakeInput != null) cfg.plugins.marketplaces
-  );
 
   # Component directories that are managed as individual files (not directory symlinks)
   componentDirs = [
@@ -155,43 +136,6 @@ in
         $DRY_RUN_CMD ${verifyCacheIntegrityScript} "${homeDir}"
       '';
 
-      # Phase 4: Clean up orphan marketplace directories AFTER reportMarketplaceDiffs
-      # Removes .backup directories and known deprecated marketplace directories
-      # Must run after reportMarketplaceDiffs to allow diff viewing before deletion
-      cleanupOrphanMarketplaces = lib.hm.dag.entryAfter [ "reportMarketplaceDiffs" ] ''
-        ${logHelper}
-
-        # Remove .backup directories for Nix-managed marketplaces (older than 14 days only)
-        # These are created by plugins.nix when converting runtime dirs to symlinks
-        # The 14-day threshold allows users to review/recover runtime content before deletion
-        ${lib.concatMapStringsSep "\n" (name: ''
-          BACKUP="${marketplacesDir}/${name}.backup"
-          if [ -d "$BACKUP" ]; then
-            # Only delete backups older than 14 days to reduce data loss risk
-            if find "$BACKUP" -maxdepth 0 -mtime +14 >/dev/null 2>&1; then
-              if $DRY_RUN_CMD rm -rf "$BACKUP"; then
-                log_info "Removed marketplace backup (older than 14 days): ${name}.backup"
-              else
-                log_warn "Failed to remove marketplace backup: ${name}.backup"
-              fi
-            else
-              log_info "Skipping recent marketplace backup (you may still need it for review): ${name}.backup"
-            fi
-          fi
-        '') nixManagedMarketplaceNames}
-
-        # Remove known deprecated marketplace directories
-        ${lib.concatMapStringsSep "\n" (name: ''
-          DEPRECATED="${marketplacesDir}/${name}"
-          if [ -d "$DEPRECATED" ] && [ ! -L "$DEPRECATED" ]; then
-            if $DRY_RUN_CMD rm -rf "$DEPRECATED"; then
-              log_info "Removed deprecated marketplace: ${name}"
-            else
-              log_warn "Failed to remove deprecated marketplace: ${name}"
-            fi
-          fi
-        '') deprecatedMarketplaceDirs}
-      '';
     };
   };
 }
