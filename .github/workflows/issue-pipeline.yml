@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   resolve-issue:
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.3.0
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.3.1
     secrets: inherit
     with:
       repo_context: "NixOS/nix-darwin system configuration using flakes"
