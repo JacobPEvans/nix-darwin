@@ -75,10 +75,18 @@ rules:
   # ACCEPTED: Workflow-level write permissions are required for cross-repo
   # reusable workflow calls. permissions: {} causes startup_failure because
   # reusable workflows need the caller to provide sufficient GITHUB_TOKEN scope.
+  #
+  # post-merge-docs-review.yml and post-merge-tests.yml use the dispatch pattern:
+  # a 'dispatch' job (needs actions: write) re-triggers the workflow on push, then
+  # a 'review' job (needs contents/id-token/pull-requests: write) calls the reusable
+  # workflow. GitHub requires workflow-level to hold the union of all job needs.
+  # The dispatch job explicitly restricts its own access via job-level permissions.
   excessive-permissions:
     ignore:
       - issue-auto-resolve.yml
       - issue-pipeline.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml
 
   # IGNORED: Low-confidence credential persistence warnings
   # Most checkouts don't need persist-credentials: false unless
