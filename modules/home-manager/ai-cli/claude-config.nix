@@ -76,7 +76,7 @@ in
   # Show turn duration in UI for performance visibility
   showTurnDuration = true;
 
-  # effortLevel = "medium";  # Uncomment to override (default: high)
+  effortLevel = "medium";
 
   # Auto-Claude: DISABLED - migrating to ai-workflows repo
   # Module files preserved (guarded by mkIf), will be extracted later
@@ -145,6 +145,10 @@ in
       # Experimental: Agent teams - coordinate multiple Claude Code instances
       # See: https://code.claude.com/docs/en/agent-teams
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+
+      # Disable 1M token context window models from model picker
+      # No native settings.json key exists; env var removes only 1M variants
+      CLAUDE_CODE_DISABLE_1M_CONTEXT = "1";
 
       # DEFAULT VALUES (upstream) - reference only, do not uncomment unless tuning
       # MAX_THINKING_TOKENS = "31999";

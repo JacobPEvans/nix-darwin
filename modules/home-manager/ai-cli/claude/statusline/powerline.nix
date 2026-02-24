@@ -25,9 +25,8 @@ in
       enable = true;
       script = ''
         #!/usr/bin/env bash
-        # Claude Powerline statusline
-        # Uses bunx for runtime execution (no build-time hash maintenance)
-        exec ${pkgs.bun}/bin/bunx @owloops/claude-powerline --config=${configFile} "$@"
+        # Claude Powerline statusline (semver-pinned for stability)
+        exec ${pkgs.bun}/bin/bunx @owloops/claude-powerline@'^1' --config=${configFile} "$@"
       '';
     };
   };
