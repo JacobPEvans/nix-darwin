@@ -31,10 +31,23 @@ if [[ -f "$HASH_FILE" ]]; then
 fi
 
 # Build new hashes, purge stale caches
+# Marketplaces are real directories containing per-file symlinks to /nix/store/
+# (after transition from whole-directory symlinks via recursive=true in plugins.nix)
 declare -A new_hashes
-find "$MARKETPLACES_DIR" -maxdepth 1 -type l -print0 | while IFS= read -d $'\0' -r entry; do
+for entry in "$MARKETPLACES_DIR"/*/; do
+  [[ -d "$entry" ]] || continue
   name=$(basename "$entry")
-  target=$(readlink "$entry")
+
+  # Find the first Nix store symlink inside this marketplace directory
+  target=""
+  while IFS= read -r -d '' link; do
+    t=$(readlink "$link")
+    if [[ "$t" == /nix/store/* ]]; then
+      target="$t"
+      break
+    fi
+  done < <(find "$entry" -maxdepth 3 -type l -print0 2>/dev/null)
+  [[ -n "$target" ]] || continue
 
   # Hash the store path string (not file contents - that's what matters for staleness)
   hash=$(printf '%s' "$target" | shasum -a 256 | cut -d' ' -f1)

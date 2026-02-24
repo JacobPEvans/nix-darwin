@@ -39,6 +39,13 @@ let
     "${homeDir}/.gemini/commands"
   ];
 
+  # Marketplace directories that need pre-cleanup (same logic as plugins.nix)
+  getMarketplaceName = name: lib.last (lib.splitString "/" name);
+  nixManagedMarketplaces = lib.filterAttrs (_: m: m.flakeInput != null) cfg.plugins.marketplaces;
+  marketplaceDirs = lib.mapAttrsToList (
+    name: _: "${homeDir}/.claude/plugins/marketplaces/${getMarketplaceName name}"
+  ) nixManagedMarketplaces;
+
   # Pre-cleanup: Remove directory symlinks that point to nix store
   # This is needed when switching from directory symlinks to individual file symlinks
   preCleanupDir = dir: ''
@@ -88,6 +95,10 @@ in
         # These conflict with individual file symlinks
         ${lib.concatMapStringsSep "\n" preCleanupDir componentDirs}
 
+        # Remove whole-directory symlinks for Nix-managed marketplaces
+        # Needed for transition from directory symlinks to per-file symlinks (recursive=true)
+        ${lib.concatMapStringsSep "\n" preCleanupDir marketplaceDirs}
+
         # Also clean up root-level directory symlinks if they conflict
         printf '%s\n' \
           "${homeDir}/CLAUDE.md" \
@@ -120,6 +131,10 @@ in
 
         # Clean up Gemini commands - only broken symlinks inside this dir
         ${cleanupBrokenSymlinks "${homeDir}/.gemini/commands" "gemini command"}
+
+        # Clean up broken symlinks in Nix-managed marketplace directories
+        # Handles files removed from upstream marketplace repos after nix flake update
+        ${lib.concatMapStringsSep "\n" (dir: cleanupBrokenSymlinks dir "marketplace file") marketplaceDirs}
 
         # NOTE: Root-level files (CLAUDE.md, GEMINI.md, AGENTS.md, agentsmd) are
         # NOT cleaned up here. They use force = true in home.file and Home Manager
