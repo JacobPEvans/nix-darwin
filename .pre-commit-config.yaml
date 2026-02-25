@@ -193,6 +193,24 @@ repos:
         types: [file]
         pass_filenames: false
 
+      # Nix darwin build validation - REQUIRED before every push
+      # Enforces CLAUDE.md: "Every git push and gh pr create MUST be immediately
+      # preceded by a passing build." Runs nix flake check then full darwin-rebuild.
+      # Requires sudo (caches for ~5 min after first prompt in a session).
+      - id: nix-darwin-build-check
+        name: Nix darwin build check (nix flake check + darwin-rebuild switch)
+        entry: >
+          bash -c '
+            echo "→ nix flake check..." &&
+            nix flake check &&
+            echo "→ sudo darwin-rebuild switch..." &&
+            sudo darwin-rebuild switch --flake . 2>&1
+          '
+        language: system
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs

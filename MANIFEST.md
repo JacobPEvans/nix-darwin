@@ -42,6 +42,8 @@ Source: `modules/darwin/common.nix`
 | tree | Directory tree visualization |
 | watchexec | File watcher that re-executes commands on changes |
 | yq | YAML/XML/TOML parsing (like jq) |
+| sox | Audio recording, conversion, and effects (Sound eXchange) |
+| portaudio | Cross-platform audio I/O library |
 
 ### Development Tools
 
@@ -52,6 +54,8 @@ Source: `modules/darwin/common.nix`
 | mas | Mac App Store CLI |
 | nodejs | Node.js LTS |
 | ollama | LLM runtime (models on /Volumes/Ollama/models) |
+| whisper-cpp | Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal) |
+| openai-whisper | Original OpenAI Whisper (Python, GPU/CPU, broader model support) |
 
 ---
 
@@ -163,7 +167,7 @@ Source: `hosts/macbook-m4/home.nix`
 
 ## AI CLI Tools
 
-Source: `modules/home-manager/ai-cli/ai-tools.nix`
+Source: `modules/home-manager/ai-cli/ai-tools.nix`, `modules/home-manager/common.nix`
 
 | Package | Method | Description |
 |---------|--------|-------------|
@@ -175,6 +179,7 @@ Source: `modules/home-manager/ai-cli/ai-tools.nix`
 | chatgpt (CLI) | bunx wrapper | OpenAI ChatGPT CLI |
 | claude-flow | bunx wrapper | AI agent orchestration |
 | aider | pipx | AI pair programming |
+| open-webui | uv tool (home activation) | Browser-based Ollama chat UI (run: open-webui serve) |
 
 ---
 
@@ -189,6 +194,7 @@ Source: `modules/darwin/homebrew.nix`
 | ccusage | Claude Code usage analyzer |
 | block-goose-cli | Block's Goose AI agent |
 | gemini-cli | Google Gemini CLI (moved from nixpkgs) |
+| whisperkit-cli | Swift native on-device speech recognition (Apple Silicon) |
 
 ### Casks
 
@@ -201,6 +207,7 @@ deferring to the app's own updater.
 | obsidian | yes | Knowledge base / note-taking |
 | shortwave | yes | AI-powered email client |
 | wispr-flow | yes | AI-powered voice dictation |
+| voiceink | yes | Voice-to-text app (local whisper) |
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
 | antigravity | yes | Google AI-powered IDE (Gemini 3) |
@@ -270,6 +277,7 @@ Source: `modules/darwin/common.nix` (overlay block)
 | codex | AI CLI - stable lags behind upstream |
 | github-mcp-server | AI CLI - stable lags behind upstream |
 | terraform-mcp-server | AI CLI - stable lags behind upstream |
+| whisper-cpp | Speech-to-text - fast-moving (CoreML/Metal support) |
 
 ---
 

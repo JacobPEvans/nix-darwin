@@ -51,6 +51,12 @@ in
         codex
         github-mcp-server
         terraform-mcp-server
+
+        # Speech-to-text / AI tools (fast-moving releases)
+        whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+        # NOTE: open-webui intentionally omitted — broken on darwin:
+        #   open-webui → pgvector → postgresql-test-hook (marked broken on darwin)
+        #   Installed via pipx in home-manager activation (see modules/home-manager/common.nix)
         ;
     })
   ];
@@ -96,6 +102,8 @@ in
       tree # Directory tree visualization
       watchexec # File watcher that re-executes commands on changes
       yq # YAML parsing (like jq but for YAML/XML/TOML)
+      sox # Audio recording, conversion, and effects (Sound eXchange)
+      portaudio # Cross-platform audio I/O library
 
       # --- Development tools ---
     ])
@@ -103,6 +111,10 @@ in
       mas # Mac App Store CLI
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
       ollama # LLM runtime (models on /Volumes/Ollama/models)
+      whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+      openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
+      # NOTE: open-webui omitted — broken on darwin (pgvector → postgresql-test-hook)
+      # Installed via pipx in home-manager activation (see modules/home-manager/common.nix)
 
       # --- GUI applications ---
       bitwarden-desktop # Password manager desktop app
