@@ -32,8 +32,6 @@ Target repository: $MAESTRO_CURRENT_REPO
 <type>: <description>
 
 Fixes #<issue_number>
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ## Output

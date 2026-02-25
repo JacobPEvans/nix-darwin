@@ -78,6 +78,12 @@ in
 
   effortLevel = "medium";
 
+  # Minimal commit attribution — replaces verbose Co-Authored-By trailer
+  # Claude Code appends this string to every commit message automatically
+  attribution = {
+    commit = "(claude)";
+  };
+
   # Auto-Claude: DISABLED - migrating to ai-workflows repo
   # Module files preserved (guarded by mkIf), will be extracted later
   autoClaude.enable = false;

@@ -33,11 +33,6 @@ in
   # Enable extended thinking mode
   alwaysThinkingEnabled = true;
 
-  # Minimal commit attribution (no verbose Co-Authored-By trailer)
-  attribution = {
-    commit = "(claude)";
-  };
-
   # Plugin marketplace configuration - transformed to Claude's expected format
   extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat plugins.marketplaces;
 

@@ -257,6 +257,12 @@ in
       '';
     };
 
+    attribution = mkOption {
+      type = types.attrsOf types.str;
+      default = { };
+      description = "Commit attribution trailer. Set commit = \"(claude)\" for minimal attribution.";
+    };
+
     # Settings
     settings = {
       # Extended thinking mode

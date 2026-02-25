@@ -50,12 +50,8 @@ let
       effortLevel
       ;
   }
+  // lib.optionalAttrs (cfg.attribution != { }) { inherit (cfg) attribution; }
   // {
-
-    # Minimal commit attribution (no verbose Co-Authored-By trailer)
-    attribution = {
-      commit = "(claude)";
-    };
 
     # Permissions
     permissions = {

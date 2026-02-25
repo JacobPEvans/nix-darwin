@@ -98,9 +98,7 @@ git commit -m "chore(deps): update all flake inputs
 Updated nixpkgs and other inputs across:
 - Root flake
 - Shell environments
-- Host configurations
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+- Host configurations"
 ```
 
 ### 6. Rebuild nix-darwin
