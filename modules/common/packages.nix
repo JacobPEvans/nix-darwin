@@ -43,6 +43,7 @@ with pkgs;
   bats # Bash Automated Testing System for shell script testing
 
   # Documentation
+  cspell # Spell checker for code and documentation
   lychee # Link checker for markdown and HTML (validates URLs in docs)
   markdownlint-cli2 # Markdown linter (README, docs exist everywhere)
 
