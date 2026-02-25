@@ -8,17 +8,20 @@
 4. **Worktrees required**: Run `/init-worktree` before any work
 5. **No direct main commits**: Always use feature branches
 
-## Required Build Validation
+## Build Validation
 
-**Every `git push` and `gh pr create` MUST be immediately preceded by a passing build.**
+Build validation is enforced by **GitHub Actions CI** (`ci-gate.yml`) on every PR — not by a local pre-push hook.
+
+Local quick checks (formatting, linting, dead code) run automatically on every commit via pre-commit hooks:
 
 ```bash
-nix flake check && sudo darwin-rebuild switch --flake .
+nix fmt         # fix formatting
+statix check    # lint
+deadnix         # dead code
 ```
 
-- Run AFTER your final commit, BEFORE push/PR. If you commit again, re-run.
-- ANY warning or error is a build failure. Fix it, re-commit, re-run.
-- No exceptions. No skipping. No "CI will catch it."
+A full `nix flake check && sudo darwin-rebuild switch --flake .` is run by CI on macOS runners and must
+pass before merge. You may run it locally to verify before pushing, but it is not required locally.
 
 ## Worktree Workflow
 
