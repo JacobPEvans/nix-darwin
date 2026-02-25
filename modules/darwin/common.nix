@@ -51,6 +51,10 @@ in
         codex
         github-mcp-server
         terraform-mcp-server
+
+        # Speech-to-text / AI tools (fast-moving releases)
+        whisper-cpp # C++ Whisper port (CoreML/Metal on Apple Silicon)
+        open-webui # Browser-based Ollama chat UI
         ;
     })
   ];
@@ -96,6 +100,8 @@ in
       tree # Directory tree visualization
       watchexec # File watcher that re-executes commands on changes
       yq # YAML parsing (like jq but for YAML/XML/TOML)
+      sox # Audio recording, conversion, and effects (Sound eXchange)
+      portaudio # Cross-platform audio I/O library
 
       # --- Development tools ---
     ])
@@ -103,6 +109,9 @@ in
       mas # Mac App Store CLI
       nodejs # Node.js LTS (nixpkgs default tracks current LTS)
       ollama # LLM runtime (models on /Volumes/Ollama/models)
+      whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+      openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
+      open-webui # Browser-based Ollama chat UI (run: open-webui serve)
 
       # --- GUI applications ---
       bitwarden-desktop # Password manager desktop app

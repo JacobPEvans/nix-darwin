@@ -61,6 +61,9 @@ _:
       # - Using homebrew as nixpkgs version was >30 days old at time of addition; homebrew actively maintained
       # - Named 'block-goose-cli' to avoid conflict with nixpkgs 'goose' (database migration tool)
       "block-goose-cli"
+
+      # Swift native on-device speech recognition (Apple Silicon, requires Xcode build - not in nixpkgs)
+      "whisperkit-cli"
     ];
     casks = [
       # GUI applications (only if not available in nixpkgs)
@@ -91,6 +94,10 @@ _:
         name = "wispr-flow";
         greedy = true;
       } # AI-powered voice dictation
+      {
+        name = "voiceink";
+        greedy = true;
+      } # Voice-to-text app (local whisper)
 
       # --- Anthropic ---
       {
