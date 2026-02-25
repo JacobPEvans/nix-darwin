@@ -49,8 +49,10 @@
               tflint
 
               # === Security & Compliance ===
-              checkov
-              terrascan
+              # checkov and terrascan removed: checkov is broken in nixpkgs-unstable
+              # (pycep-parser fails to build with uv_build backend). Both hooks are
+              # also disabled in terraform-proxmox .pre-commit-config.yaml. Re-add
+              # when the upstream nixpkgs pycep-parser derivation is fixed.
               tfsec
               trivy
 
@@ -80,7 +82,6 @@
                 echo "  - opentofu: $(tofu version 2>/dev/null | head -1)"
                 echo ""
                 echo "Security & Compliance:"
-                echo "  - checkov: $(checkov --version 2>/dev/null)"
                 echo "  - tfsec: $(tfsec --version 2>/dev/null)"
                 echo ""
                 echo "Secrets Management:"
