@@ -162,6 +162,15 @@ in
             "${config.home.homeDirectory}/.claude/settings.json" \
             "${userConfig.ai.claudeSchemaUrl}"
         '';
+
+        # open-webui: installed via uv (nixpkgs broken: pgvector→postgresql-test-hook on darwin)
+        # Python 3.12 required: open-webui PyPI has Requires-Python <3.13
+        installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
+            echo "→ Installing open-webui via uv (Python 3.12)..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.12
+          fi
+        '';
       };
   };
 
@@ -227,6 +236,9 @@ in
         # are placed in ~/.npm-packages and available in PATH
         export PATH="$HOME/.npm-packages/bin:$PATH"
         export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
+
+        # uv tool installs (e.g. open-webui installed via home-manager activation)
+        export PATH="$HOME/.local/bin:$PATH"
 
         # MCP Server API keys (from macOS Keychain)
         # GitHub - for github@claude-plugins-official MCP server

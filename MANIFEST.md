@@ -167,7 +167,7 @@ Source: `hosts/macbook-m4/home.nix`
 
 ## AI CLI Tools
 
-Source: `modules/home-manager/ai-cli/ai-tools.nix`
+Source: `modules/home-manager/ai-cli/ai-tools.nix`, `modules/home-manager/common.nix`
 
 | Package | Method | Description |
 |---------|--------|-------------|
@@ -179,6 +179,7 @@ Source: `modules/home-manager/ai-cli/ai-tools.nix`
 | chatgpt (CLI) | bunx wrapper | OpenAI ChatGPT CLI |
 | claude-flow | bunx wrapper | AI agent orchestration |
 | aider | pipx | AI pair programming |
+| open-webui | uv tool (home activation) | Browser-based Ollama chat UI (run: open-webui serve) |
 
 ---
 

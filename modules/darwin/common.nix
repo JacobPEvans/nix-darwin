@@ -54,9 +54,9 @@ in
 
         # Speech-to-text / AI tools (fast-moving releases)
         whisper-cpp # C++ Whisper port (CoreML/Metal on Apple Silicon)
-        # NOTE: open-webui intentionally omitted from overlay — broken on darwin:
+        # NOTE: open-webui intentionally omitted — broken on darwin:
         #   open-webui → pgvector → postgresql-test-hook (marked broken on darwin)
-        #   Install via: pipx install open-webui && open-webui serve
+        #   Installed via pipx in home-manager activation (see modules/home-manager/common.nix)
         ;
     })
   ];
@@ -114,7 +114,7 @@ in
       whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
       openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
       # NOTE: open-webui omitted — broken on darwin (pgvector → postgresql-test-hook)
-      # Use instead: pipx install open-webui && open-webui serve
+      # Installed via pipx in home-manager activation (see modules/home-manager/common.nix)
 
       # --- GUI applications ---
       bitwarden-desktop # Password manager desktop app

@@ -207,7 +207,7 @@ repos:
             sudo darwin-rebuild switch --flake . 2>&1
           '
         language: system
-        stages: [push]
+        stages: [pre-push]
         pass_filenames: false
         always_run: true
 
