@@ -188,23 +188,9 @@ in
     # used directly (the file is runtime-mutable). jq merges only this key idempotently.
     home.activation = lib.mkIf (cfg.remoteControlAtStartup != null) {
       claudeRemoteControlAtStartup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        CLAUDE_JSON="$HOME/.claude.json"
+        export PATH="${pkgs.jq}/bin:$PATH"
         RC_VALUE=${if cfg.remoteControlAtStartup then "true" else "false"}
-        if [ -f "$CLAUDE_JSON" ]; then
-          TMP=$(mktemp)
-          trap 'rm -f "$TMP"' EXIT
-          if ${pkgs.jq}/bin/jq --argjson v "$RC_VALUE" '.remoteControlAtStartup = $v' \
-            "$CLAUDE_JSON" > "$TMP"; then
-            $DRY_RUN_CMD mv "$TMP" "$CLAUDE_JSON"
-            trap - EXIT
-          else
-            echo "warning: Failed to update \"$CLAUDE_JSON\"; existing file may contain invalid JSON. Fix or remove it to apply remoteControlAtStartup setting." >&2
-            rm -f "$TMP"
-          fi
-        else
-          $DRY_RUN_CMD printf '{"remoteControlAtStartup": %s}\n' "$RC_VALUE" > "$CLAUDE_JSON"
-        fi
-        $DRY_RUN_CMD chmod 600 "$CLAUDE_JSON"
+        . ${./scripts/remote-control-startup.sh}
       '';
     };
 

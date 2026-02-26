@@ -68,24 +68,11 @@ in
     # NOTE: "local" marketplace setup removed - Claude Code doesn't use it by default.
     # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
     home.activation = {
-      # WakaTime config file - created once with placeholder API key
-      # User must edit ~/.wakatime.cfg and replace waka_YOUR-API-KEY-HERE with real key
+      # WakaTime config file - created once with placeholder API key.
       # See: https://wakatime.com/settings/account
       wakatimeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-                WAKATIME_CFG="${config.home.homeDirectory}/.wakatime.cfg"
-
-                if [ ! -f "$WAKATIME_CFG" ]; then
-                  $DRY_RUN_CMD cat > "$WAKATIME_CFG" <<'EOF'
-        [settings]
-        api_key = waka_YOUR-API-KEY-HERE
-        EOF
-                  $DRY_RUN_CMD chmod 600 "$WAKATIME_CFG"
-                  echo "Created $WAKATIME_CFG with placeholder API key"
-                  echo "Edit this file and replace waka_YOUR-API-KEY-HERE with your real key"
-                  echo "Get your API key from: https://wakatime.com/settings/account"
-                else
-                  echo "WakaTime config already exists at $WAKATIME_CFG (not overwriting)"
-                fi
+        WAKATIME_CFG="${config.home.homeDirectory}/.wakatime.cfg"
+        . ${./scripts/wakatime-config.sh}
       '';
     };
   };
