@@ -51,11 +51,11 @@
     "cc-dev-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1771893117,
-        "narHash": "sha256-QHIa/UunDncqsQctgqiCLL+fbEjfEz8hau6hZP/QbSA=",
+        "lastModified": 1772030703,
+        "narHash": "sha256-LObfBQTFExInqe6EZBJzx8EheSbHCPQ7l2+YezTLEMQ=",
         "owner": "Lucklyric",
         "repo": "cc-dev-tools",
-        "rev": "c512ab4315d119b0203c58d177bb77dc2dda38fe",
+        "rev": "d8b3b6435eb0d5c44f2598c325c44371b029c2cb",
         "type": "github"
       },
       "original": {
@@ -99,11 +99,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1772078324,
-        "narHash": "sha256-vUUOVX0ATQEkN0p4Sb38TN5Y3JcEuWrs84iW/x+IGTc=",
+        "lastModified": 1772118628,
+        "narHash": "sha256-/QJekdOgea2vwaSDbAX8fqSnAR99fWZwWirkK6G3MuQ=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "016734047deab59c7ad8bc2ab8aad9f052ae5e61",
+        "rev": "644d6eb37ff0d62adfae0e6c1a831464a03122e5",
         "type": "github"
       },
       "original": {
@@ -257,11 +257,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1771744638,
-        "narHash": "sha256-EDLi+YAsEEAmMeZe1v6GccuGRbCkpSZp/+A6g+pivR8=",
+        "lastModified": 1772020340,
+        "narHash": "sha256-aqBl3GNpCadMoJ/hVkWTijM1Aeilc278MjM+LA3jK6g=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "cb6c151f5c9db4df0b69d06894dc8484de1f16a0",
+        "rev": "36e38ca0d9afe4c55405fdf22179a5212243eecc",
         "type": "github"
       },
       "original": {
