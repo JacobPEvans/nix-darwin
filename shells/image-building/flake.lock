@@ -99,11 +99,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1772000823,
-        "narHash": "sha256-IdnfV88YjgsUqzHsNlZcwtc/Td9yKQYohYsL5ANuJTc=",
+        "lastModified": 1772078324,
+        "narHash": "sha256-vUUOVX0ATQEkN0p4Sb38TN5Y3JcEuWrs84iW/x+IGTc=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "db3858a5589c8e6ffeb4cf765edc23cd4dbf900a",
+        "rev": "016734047deab59c7ad8bc2ab8aad9f052ae5e61",
         "type": "github"
       },
       "original": {
@@ -147,11 +147,11 @@
     "claude-cookbooks": {
       "flake": false,
       "locked": {
-        "lastModified": 1771977324,
-        "narHash": "sha256-K+BbkpbnTAGCzHfYxpsOEMinmg2hs7YurDGtZMqv4io=",
+        "lastModified": 1772040211,
+        "narHash": "sha256-so4ceNOENK4ECzAj6qcTX6kBk4s5DksEzAww/yTy/G8=",
         "owner": "anthropics",
         "repo": "claude-cookbooks",
-        "rev": "112611bacad67a1e1947f35e1672d5f9f6a3ee93",
+        "rev": "0e8a6bfd65cbaa8f8b02f151bbf54f6e385bc5a5",
         "type": "github"
       },
       "original": {
@@ -460,11 +460,11 @@
     "superpowers-marketplace": {
       "flake": false,
       "locked": {
-        "lastModified": 1771830534,
-        "narHash": "sha256-SmaDAcYID4rzuFz1k4C/yo/c9+ZBDyrPPaYemJAs1LI=",
+        "lastModified": 1772062092,
+        "narHash": "sha256-WYBDGBT7dEEc8vjW3bnbvSGbG+wtsx4U25Z1Y5Z1Peg=",
         "owner": "obra",
         "repo": "superpowers-marketplace",
-        "rev": "ae5f0bb6ac23ba796a3a4956f86bdd170e500303",
+        "rev": "6934cf9addf96fff83ba25aeeb25b3cda7651958",
         "type": "github"
       },
       "original": {
