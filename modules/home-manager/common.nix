@@ -225,38 +225,40 @@ in
         ];
       };
 
-      # Source modular shell functions
-      # NOTE: session-logging.zsh MUST be last (takes over terminal)
+      # Shell initialisation - loaded by every interactive shell.
+      # NOTE: session-logging.zsh MUST be sourced last (it takes over the terminal).
       initContent = ''
-        # GPG: Required for pinentry to prompt for passphrase in terminal
+        # --- Environment ---
+
+        # GPG: required for pinentry to prompt for passphrase in terminal
         export GPG_TTY=$(tty)
 
+        # --- PATH ---
+
         # npm global packages (managed via ~/.npmrc prefix)
-        # Packages installed with: npm install -g <package>
-        # are placed in ~/.npm-packages and available in PATH
         export PATH="$HOME/.npm-packages/bin:$PATH"
         export NODE_PATH="$HOME/.npm-packages/lib/node_modules"
 
         # uv tool installs (e.g. open-webui installed via home-manager activation)
         export PATH="$HOME/.local/bin:$PATH"
 
-        # MCP Server API keys (from macOS Keychain)
+        # --- API Keys (from macOS Keychain) ---
+
         # GitHub - for github@claude-plugins-official MCP server
         export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(security find-generic-password \
           -s "github-pat" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+
         # Context7 - for context7@claude-plugins-official MCP server
         export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(security find-generic-password \
           -s "CONTEXT7_API_KEY" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
 
-
-        # Claude statusline SSH detection (disabled - enhanced statusline unavailable)
-        # source ${./zsh/claude-statusline-switch.zsh}
+        # --- Shell modules ---
 
         source ${./zsh/git-functions.zsh}
         source ${./zsh/docker-functions.zsh}
         source ${./zsh/macos-setup.zsh}
         source ${./zsh/process-cleanup.zsh}
-        source ${./zsh/session-logging.zsh}
+        source ${./zsh/session-logging.zsh}  # MUST be last
       '';
     };
 
