@@ -228,6 +228,22 @@ in
       description = "Show how long each turn takes in the Claude Code UI";
     };
 
+    # Remote Control auto-start (Feb 2026 feature)
+    # Stored in ~/.claude.json (global config), not settings.json
+    # Key: remoteControlAtStartup — discovered in claude binary v2.1.59
+    # See: https://code.claude.com/docs/en/remote-control
+    remoteControlAtStartup = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable Remote Control for all sessions automatically.
+        When true, claude remote-control starts with every session so
+        you can monitor/control it from claude.ai or the mobile app.
+        Stored in ~/.claude.json (global config) via home.activation.
+        null = leave unmanaged (Claude Code default is false).
+      '';
+    };
+
     model = mkOption {
       type = types.nullOr types.str;
       default = null;

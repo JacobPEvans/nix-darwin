@@ -76,6 +76,12 @@ in
   # Show turn duration in UI for performance visibility
   showTurnDuration = true;
 
+  # Enable Remote Control for all sessions (Feb 2026 feature).
+  # Writes remoteControlAtStartup = true into ~/.claude.json via home.activation.
+  # Allows monitoring/controlling sessions from claude.ai or the mobile app.
+  # Requires a Claude Max subscription; no-op if not logged in.
+  remoteControlAtStartup = true;
+
   effortLevel = "medium";
 
   # Minimal commit attribution — replaces verbose Co-Authored-By trailer

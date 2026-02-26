@@ -182,6 +182,23 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    # Merge remoteControlAtStartup into ~/.claude.json (global config) at activation time.
+    # This key lives in the global config file, not settings.json, so home.file cannot be
+    # used directly (the file is runtime-mutable). jq merges only this key idempotently.
+    home.activation = lib.mkIf (cfg.remoteControlAtStartup != null) {
+      claudeRemoteControlAtStartup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        CLAUDE_JSON="$HOME/.claude.json"
+        RC_VALUE=${lib.boolToString cfg.remoteControlAtStartup}
+        if [ -f "$CLAUDE_JSON" ]; then
+          TMP=$(mktemp)
+          ${pkgs.jq}/bin/jq --argjson v "$RC_VALUE" '.remoteControlAtStartup = $v' \
+            "$CLAUDE_JSON" > "$TMP" && mv "$TMP" "$CLAUDE_JSON"
+        else
+          printf '{"remoteControlAtStartup": %s}\n' "$RC_VALUE" > "$CLAUDE_JSON"
+        fi
+      '';
+    };
+
     # Validate environment variable names before generating settings.json
     assertions = [
       {
