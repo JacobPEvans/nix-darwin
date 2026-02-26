@@ -73,6 +73,7 @@ let
     # Environment variables (user-defined + apiKeyHelper if enabled)
   }
   // lib.optionalAttrs (cfg.model != null) { inherit (cfg) model; }
+  // lib.optionalAttrs (cfg.remoteControlAtStartup != null) { inherit (cfg) remoteControlAtStartup; }
   // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
 
   # Status line (only include if we have valid configuration)
