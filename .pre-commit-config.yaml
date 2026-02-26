@@ -87,8 +87,7 @@ repos:
         exclude: ^worktrees/
         pass_filenames: false
 
-      # Private identifier scanning - prevent vault names and company identifiers
-      # from being committed to this public repo
+      # Keyword scanning - prevent configured keywords from being committed
       # Patterns: SOPS-encrypted in private-patterns.sops.json
       - id: check-private-identifiers
         name: Check for private identifiers
