@@ -21,6 +21,7 @@ rules:
       - best-practices.yml
       - ci-auto-claude.yml
       - ci-eol-check.yml
+      - ci-fail-issue.yml
       - ci-file-length.yml
       - ci-fix.yml
       - ci-gate.yml
@@ -31,6 +32,7 @@ rules:
       - ci-validate.yml
       - claude-review.yml
       - code-simplifier.yml
+      - copilot-setup-steps.yml
       - deps-monitor-packages.yml
       - deps-update-flake.yml
       - final-pr-review.yml
@@ -45,12 +47,14 @@ rules:
       - review-deps.yml
 
   # ACCEPTED: workflow_run is the only trigger for reacting to CI completions.
-  # ci-fix.yml is safe because:
-  # - It only reads logs via the GitHub API (not fork PR code).
-  # - It does not execute untrusted fork code.
-  # - The should-fix job validates the PR exists and belongs to this repo.
+  # ci-fix.yml and ci-fail-issue.yml are safe because:
+  # - They only read logs via the GitHub API (not fork PR code).
+  # - They do not execute untrusted fork code.
+  # - ci-fix.yml: the should-fix job validates the PR exists and belongs to this repo.
+  # - ci-fail-issue.yml: only triggers on main branch CI Gate failures.
   dangerous-triggers:
     ignore:
+      - ci-fail-issue.yml
       - ci-fix.yml
 
   # ACCEPTED: secrets: inherit is required for reusable workflow callers.
@@ -60,6 +64,7 @@ rules:
   secrets-inherit:
     ignore:
       - best-practices.yml
+      - ci-fail-issue.yml
       - ci-fix.yml
       - claude-review.yml
       - code-simplifier.yml
