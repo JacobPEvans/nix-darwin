@@ -10,18 +10,18 @@ automatically on every `darwin-rebuild switch` via a `home.activation` script.
 
 ### stdio (local processes)
 
-Run a local command as the MCP server. Use `mkServer` or `officialServer` helpers:
+Run a local command as the MCP server. Use the `official` helper for Anthropic servers,
+or write inline attribute sets for custom servers:
 
 ```nix
 # Official Anthropic server via bunx
-fetch = officialServer { name = "fetch"; enabled = true; };
+fetch = official "fetch";
 
 # nixpkgs binary (resolved via PATH)
-github = mkServer { enabled = true; command = "github-mcp-server"; };
+github = { command = "github-mcp-server"; };
 
 # npm package via bunx
-context7 = mkServer {
-  enabled = true;
+context7 = {
   command = "bunx";
   args = [ "@context7/mcp-server" ];
 };
@@ -29,28 +29,39 @@ context7 = mkServer {
 
 ### SSE / HTTP (remote servers)
 
-Connect to a running HTTP server using SSE or HTTP transport. Use `mkRemoteServer`:
+Connect to a running HTTP server using SSE or HTTP transport:
 
 ```nix
-# SSE server (default type)
-cribl = mkRemoteServer {
-  enabled = true;
+# SSE server
+cribl = {
+  type = "sse";
   url = "http://localhost:30030/mcp";
 };
 
 # HTTP server with custom headers
-my-server = mkRemoteServer {
-  enabled = true;
+my-server = {
   type = "http";
   url = "http://localhost:8080/mcp";
   headers = { Authorization = "Bearer \${TOKEN}"; };
 };
 ```
 
-## Enabling Servers
+## Enabling / Disabling Servers
 
-Edit `modules/home-manager/ai-cli/mcp/default.nix` and set `enabled = true`.
-Then run `darwin-rebuild switch --flake .` to deploy.
+All servers are enabled by default (`disabled = false` is the module system default).
+To disable a server, set `disabled = true`:
+
+```nix
+postgresql = official "postgres" // { disabled = true; };
+```
+
+To enable a disabled server without editing `default.nix`, override via the module system.
+Because the catalog uses plain assignments (priority 100), the override must use `lib.mkForce`
+to win the merge:
+
+```nix
+programs.claude.mcpServers.postgresql.disabled = lib.mkForce false;
+```
 
 ## Secrets Management
 
@@ -62,20 +73,23 @@ Use your secrets manager (Doppler, Keychain, 1Password, etc.) to inject env vars
 Required env vars are documented in comments above each server definition.
 The config does NOT store any secrets — it only references commands and URLs.
 
-### Doppler injection via `withDoppler`
+### Doppler injection via `doppler-mcp`
 
 For servers whose secrets live in Doppler (project `ai-ci-automation`, config `prd`),
-wrap the server definition with `withDoppler`:
+set `command = "doppler-mcp"` and shift the original command into `args[0]`:
 
 ```nix
-pal = withDoppler (mkServer {
-  enabled = true;
-  command = "uvx";
-  args = [ "--from" "git+https://..." "pal-mcp-server" ];
-});
+pal = {
+  command = "doppler-mcp";
+  args = [ "uvx" "--from" "git+https://..." "pal-mcp-server" ];
+  env = {
+    DISABLED_TOOLS = "";   # non-secret config → Nix
+    LOG_LEVEL = "INFO";    # non-secret config → Nix
+    # GEMINI_API_KEY, OLLAMA_HOST → injected by Doppler at runtime
+  };
+};
 ```
 
-This sets `command = "doppler-mcp"` and shifts the original command into `args[0]`.
 The `doppler-mcp` script (defined in `ai-tools.nix`) runs:
 
 ```bash
@@ -85,35 +99,8 @@ doppler run -p ai-ci-automation -c prd -- <original-command> [args...]
 Secrets are fetched at subprocess launch time and injected as environment variables.
 They are never written to `~/.claude.json` or any other file Claude Code can read.
 
-**Non-secret config belongs in Nix, not Doppler.** Use the `env` attr on `mkServer` for
-configuration values that are not sensitive (feature flags, timeouts, log levels). `withDoppler`
-preserves all attrs from the original server — `env` is merged into the deployed config unchanged:
-
-```nix
-pal = withDoppler (mkServer {
-  enabled = true;
-  command = "uvx";
-  args = [ "--from" "git+https://..." "pal-mcp-server" ];
-  env = {
-    DISABLED_TOOLS = "";         # non-secret config → Nix
-    LOG_LEVEL = "INFO";          # non-secret config → Nix
-    # GEMINI_API_KEY, OLLAMA_HOST → injected by Doppler at runtime
-  };
-});
-```
-
-**Adding a new Doppler-wrapped server:**
-
-```nix
-my-server = withDoppler (mkServer {
-  enabled = true;
-  command = "uvx";
-  args = [ "my-mcp-server" ];
-});
-
-# Or with an official server:
-exa = withDoppler (officialServer { name = "exa"; enabled = true; });
-```
+**Non-secret config belongs in `env`, not Doppler.** Values like feature flags, timeouts,
+and log levels are not sensitive and belong in the Nix-managed `env` attribute.
 
 ## PAL MCP Tools
 
@@ -179,7 +166,7 @@ this automatically:
 | Ollama name | model_name sent to API | Aliases |
 |-------------|------------------------|---------|
 | `glm-5:cloud` | `glm-5:cloud` | `glm-5`, `glm-5-cloud` |
-| `qwen3-coder:30b` | `qwen3-coder:30b` | `qwen3-coder`, `qwen3-coder-30b` |
+| `qwen3-coder:30b` | `qwen3-coder:30b` | `qwen3-coder-30b` |
 | `qwen3-next:latest` | `qwen3-next` | `qwen3-next` |
 
 When PAL sees `glm-5`, it strips the (absent) colon-suffix, looks up `glm-5` in the registry,
@@ -201,12 +188,12 @@ Scores are estimated from model file size. Adjust if needed by editing
 
 ## Adding New Servers
 
-1. Choose the right helper:
-   - Local stdio process → `mkServer` or `officialServer`
-   - Local stdio with Doppler secrets → wrap with `withDoppler`
-   - Remote SSE/HTTP endpoint → `mkRemoteServer`
+1. Choose the transport:
+   - Local stdio process → inline attribute set with `command` (and optionally `args`)
+   - Local stdio with Doppler secrets → set `command = "doppler-mcp"`, shift original command to `args[0]`
+   - Remote SSE/HTTP endpoint → inline attribute set with `type` and `url`
 
-2. Set `enabled = false` initially, test, then enable.
+2. New servers are enabled by default. Add `// { disabled = true; }` to start disabled.
 
 3. Run `darwin-rebuild switch --flake .` to deploy.
 
@@ -216,7 +203,7 @@ Scores are estimated from model file size. Adjust if needed by editing
 
 ### Server not appearing in Claude Code
 
-1. Check `enabled = true` in `mcp/default.nix`
+1. Check `disabled` is not set to `true` in `mcp/default.nix`
 2. Run `darwin-rebuild switch --flake .`
 3. Restart Claude Code
 4. Check `~/.claude.json` contains the server: `jq .mcpServers ~/.claude.json`
