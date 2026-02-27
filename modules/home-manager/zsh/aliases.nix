@@ -76,10 +76,10 @@
   # ===========================================================================
   # AI CLI Tools (Doppler for secrets injection)
   # ===========================================================================
-  # Doppler injects API keys from 'ai-ci-automation' project:
+  # Doppler injects secrets from 'ai-ci-automation' project (prd config):
   #   - GEMINI_API_KEY (Google Gemini - used by PAL MCP)
   #   - OPENROUTER_API_KEY (OpenRouter - unified model access)
-  #   - OLLAMA_HOST (local Ollama server URL)
+  #   - OLLAMA_HOST (Ollama server URL - used by PAL MCP for local models)
   #
   # Usage:
   #   d-claude             # Interactive Claude Code with injected secrets

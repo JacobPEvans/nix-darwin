@@ -109,6 +109,14 @@ _:
         greedy = true;
       } # Claude Code CLI
 
+      # --- OpenAI ---
+      # OpenAI Codex CLI (AI coding agent) - migrated from homebrew/core to cask
+      # Moved from nixpkgs to match claude/gemini installation pattern
+      {
+        name = "codex";
+        greedy = true;
+      }
+
       # --- Google Gemini ---
       {
         name = "antigravity";

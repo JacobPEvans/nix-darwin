@@ -48,7 +48,6 @@ in
         ollama
 
         # AI CLI tools (fast-moving, stable lags behind upstream)
-        codex
         github-mcp-server
         terraform-mcp-server
 

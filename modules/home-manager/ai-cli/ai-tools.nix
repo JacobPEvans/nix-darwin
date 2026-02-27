@@ -13,7 +13,7 @@
 #    - Check: nix search nixpkgs <package>
 #    - Use if package exists and is reasonably up-to-date
 #    - Benefits: Binary cache, security updates, integration
-#    - Example: gemini-cli, codex, github-mcp-server
+#    - Example: github-mcp-server, terraform-mcp-server
 #
 # 2. **homebrew** (ONLY if not in nixpkgs)
 #    - Fallback for packages missing from nixpkgs
@@ -38,17 +38,18 @@
 # ============================================================================
 #
 # NIXPKGS PACKAGES (sourced via unstable overlay in modules/darwin/common.nix):
-#   codex, github-mcp-server, terraform-mcp-server
+#   github-mcp-server, terraform-mcp-server
+#
+# HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
+#   codex: OpenAI Codex CLI (moved from nixpkgs to match claude/gemini pattern)
+#   block-goose-cli: Block's AI agent (nixpkgs outdated at time of addition)
+#   gemini-cli: Google Gemini CLI (moved from nixpkgs due to severe version lag)
 #
 # BUNX WRAPPER PACKAGES (npm packages not in nixpkgs/homebrew):
 #   cclint: @felixgeelhaar/cclint@0.12.1
 #   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
 #   claude-flow: claude-flow@2.0.0
-#
-# HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
-#   block-goose-cli: Block's AI agent (nixpkgs outdated at time of addition)
-#   gemini-cli: Google Gemini CLI (moved from nixpkgs due to severe version lag)
 #
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
@@ -101,13 +102,6 @@
     terraform-mcp-server
 
     # ==========================================================================
-    # OpenAI Codex CLI
-    # ==========================================================================
-    # Lightweight coding agent that runs in your terminal
-    # Sourced from unstable overlay (modules/darwin/common.nix)
-    codex
-
-    # ==========================================================================
     # GitHub Copilot CLI
     # ==========================================================================
     # Source: https://github.com/github/gh-copilot
@@ -132,6 +126,38 @@
     # NPM: claude-flow (pinned version)
     (writeShellScriptBin "claude-flow" ''
       exec ${bun}/bin/bunx --bun claude-flow@2.7.47 "$@"
+    '')
+
+    # ==========================================================================
+    # Doppler MCP Wrapper
+    # ==========================================================================
+    # Wraps any MCP server command with Doppler secret injection.
+    # Fetches secrets from the ai-ci-automation project at subprocess launch time.
+    # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
+    # Usage: doppler-mcp <command> [args...]
+    (writeShellScriptBin "doppler-mcp" ''
+      set -euo pipefail
+      if [ "$#" -lt 1 ]; then
+        echo "Usage: doppler-mcp <command> [args...]" >&2
+        echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
+        exit 1
+      fi
+      exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
+    '')
+
+    # ==========================================================================
+    # Sync PAL Ollama Models
+    # ==========================================================================
+    # Refreshes ~/.config/pal-mcp/custom_models.json from `ollama list`.
+    # Run after `ollama pull <model>` to make new models available in PAL
+    # without a full darwin-rebuild switch.
+    (writeShellScriptBin "sync-ollama-models" ''
+      set -euo pipefail
+      mkdir -p "$HOME/.config/pal-mcp"
+      ${pkgs.curl}/bin/curl -sf http://localhost:11434/api/tags \
+        | ${pkgs.jq}/bin/jq --from-file ${./mcp/scripts/pal-models.jq} \
+        > "$HOME/.config/pal-mcp/custom_models.json"
+      echo "PAL custom models updated. Restart Claude Code to pick up changes."
     '')
 
     # ==========================================================================

@@ -174,10 +174,11 @@ Source: `modules/home-manager/ai-cli/ai-tools.nix`, `modules/home-manager/common
 | cclint | bunx wrapper | CLAUDE.md linter |
 | github-mcp-server | nixpkgs (unstable) | GitHub API MCP server |
 | terraform-mcp-server | nixpkgs (unstable) | Terraform/OpenTofu MCP server |
-| codex | nixpkgs (unstable) | OpenAI Codex CLI |
+| codex | homebrew cask | OpenAI Codex CLI (moved from nixpkgs) |
 | gh-copilot | bunx wrapper | GitHub Copilot CLI |
 | chatgpt (CLI) | bunx wrapper | OpenAI ChatGPT CLI |
 | claude-flow | bunx wrapper | AI agent orchestration |
+| sync-ollama-models | writeShellScriptBin | Regenerate PAL Ollama model registry |
 | aider | pipx | AI pair programming |
 | open-webui | uv tool (home activation) | Browser-based Ollama chat UI (run: open-webui serve) |
 
@@ -210,6 +211,7 @@ deferring to the app's own updater.
 | voiceink | yes | Voice-to-text app (local whisper) |
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
+| codex | yes | OpenAI Codex CLI (moved from nixpkgs; migrated from homebrew/core to cask) |
 | antigravity | yes | Google AI-powered IDE (Gemini 3) |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
 | microsoft-teams | no | Teams desktop app (not available on Mac App Store; MAU handles updates) |
@@ -274,7 +276,6 @@ Source: `modules/darwin/common.nix` (overlay block)
 |---------|--------|
 | ghostty-bin | GUI app - fast upstream releases |
 | ollama | LLM runtime - fast upstream releases |
-| codex | AI CLI - stable lags behind upstream |
 | github-mcp-server | AI CLI - stable lags behind upstream |
 | terraform-mcp-server | AI CLI - stable lags behind upstream |
 | whisper-cpp | Speech-to-text - fast-moving (CoreML/Metal support) |
