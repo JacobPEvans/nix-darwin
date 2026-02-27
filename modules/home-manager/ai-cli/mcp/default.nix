@@ -228,16 +228,10 @@ let
     };
   };
 
-  # Filter to enabled servers, remove the enabled flag for output.
-  # Outputs option-compatible format (type defaults applied by module system).
+  # Filter to enabled servers, strip the internal `enabled` flag.
+  # settings.nix handles the final transformation to Claude Code JSON format.
   enabledServers = lib.filterAttrs (_: v: v.enabled) allServers;
-  mcpServersForClaude = lib.mapAttrs (
-    _: v:
-    if (v.type or "stdio") == "stdio" then
-      { inherit (v) command args; } // lib.optionalAttrs (v.env or { } != { }) { inherit (v) env; }
-    else
-      { inherit (v) type url; } // lib.optionalAttrs (v.headers or { } != { }) { inherit (v) headers; }
-  ) enabledServers;
+  mcpServersForClaude = lib.mapAttrs (_: v: builtins.removeAttrs v [ "enabled" ]) enabledServers;
 
 in
 {
