@@ -55,10 +55,12 @@ To disable a server, set `disabled = true`:
 postgresql = official "postgres" // { disabled = true; };
 ```
 
-To enable a disabled server without editing `default.nix`, override via the module system:
+To enable a disabled server without editing `default.nix`, override via the module system.
+Because the catalog uses plain assignments (priority 100), the override must use `lib.mkForce`
+to win the merge:
 
 ```nix
-programs.claude.mcpServers.postgresql.disabled = false;
+programs.claude.mcpServers.postgresql.disabled = lib.mkForce false;
 ```
 
 ## Secrets Management

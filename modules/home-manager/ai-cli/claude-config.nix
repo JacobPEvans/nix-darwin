@@ -199,7 +199,7 @@ in
   # MCP Servers - deployed to ~/.claude.json via home.activation (see claude/settings.nix).
   # Nix is the sole manager of user-scoped MCP servers; manual `claude mcp add --scope user`
   # entries will be overwritten on next darwin-rebuild switch.
-  mcpServers = import ./mcp { inherit lib; };
+  mcpServers = import ./mcp;
 
   statusLine = {
     enable = true;

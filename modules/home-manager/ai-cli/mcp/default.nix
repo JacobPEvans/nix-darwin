@@ -81,6 +81,9 @@ in
   #   - OLLAMA_HOST (for local Ollama models)
   #   - LOG_LEVEL (logging verbosity)
 
+  # TODO: Pin to a specific commit once the project publishes tagged releases.
+  # Pulling from HEAD on every invocation means a compromised upstream can execute
+  # arbitrary code with access to AI provider API keys and other secrets.
   pal = {
     command = "uvx";
     args = [
