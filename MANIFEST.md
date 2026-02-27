@@ -174,7 +174,7 @@ Source: `modules/home-manager/ai-cli/ai-tools.nix`, `modules/home-manager/common
 | cclint | bunx wrapper | CLAUDE.md linter |
 | github-mcp-server | nixpkgs (unstable) | GitHub API MCP server |
 | terraform-mcp-server | nixpkgs (unstable) | Terraform/OpenTofu MCP server |
-| codex | homebrew | OpenAI Codex CLI (moved from nixpkgs) |
+| codex | homebrew cask | OpenAI Codex CLI (moved from nixpkgs) |
 | gh-copilot | bunx wrapper | GitHub Copilot CLI |
 | chatgpt (CLI) | bunx wrapper | OpenAI ChatGPT CLI |
 | claude-flow | bunx wrapper | AI agent orchestration |
@@ -192,7 +192,6 @@ Source: `modules/darwin/homebrew.nix`
 | Package | Description |
 |---------|-------------|
 | ccusage | Claude Code usage analyzer |
-| codex | OpenAI Codex CLI (moved from nixpkgs) |
 | block-goose-cli | Block's Goose AI agent |
 | gemini-cli | Google Gemini CLI (moved from nixpkgs) |
 | whisperkit-cli | Swift native on-device speech recognition (Apple Silicon) |
@@ -211,6 +210,7 @@ deferring to the app's own updater.
 | voiceink | yes | Voice-to-text app (local whisper) |
 | claude | yes | Anthropic Claude desktop app (not in nixpkgs for Darwin) |
 | claude-code | yes | Anthropic Claude Code CLI |
+| codex | yes | OpenAI Codex CLI (moved from nixpkgs; migrated from homebrew/core to cask) |
 | antigravity | yes | Google AI-powered IDE (Gemini 3) |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
 | microsoft-teams | no | Teams desktop app (not available on Mac App Store; MAU handles updates) |
