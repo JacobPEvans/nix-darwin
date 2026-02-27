@@ -4,7 +4,6 @@
 # Imported by common.nix to keep it clean and high-level.
 {
   config,
-  pkgs,
   lib,
   ai-assistant-instructions,
   marketplaceInputs,
@@ -200,11 +199,7 @@ in
   # MCP Servers - deployed to ~/.claude.json via home.activation (see claude/settings.nix).
   # Nix is the sole manager of user-scoped MCP servers; manual `claude mcp add --scope user`
   # entries will be overwritten on next darwin-rebuild switch.
-  mcpServers =
-    let
-      mcpCatalog = import ./mcp/default.nix { inherit pkgs lib; };
-    in
-    mcpCatalog.mcpServers;
+  mcpServers = import ./mcp { inherit lib; };
 
   statusLine = {
     enable = true;

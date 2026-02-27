@@ -10,18 +10,18 @@ automatically on every `darwin-rebuild switch` via a `home.activation` script.
 
 ### stdio (local processes)
 
-Run a local command as the MCP server. Use `mkServer` or `officialServer` helpers:
+Run a local command as the MCP server. Use the `official` helper for Anthropic servers,
+or write inline attribute sets for custom servers:
 
 ```nix
 # Official Anthropic server via bunx
-fetch = officialServer { name = "fetch"; enabled = true; };
+fetch = official "fetch";
 
 # nixpkgs binary (resolved via PATH)
-github = mkServer { enabled = true; command = "github-mcp-server"; };
+github = { command = "github-mcp-server"; };
 
 # npm package via bunx
-context7 = mkServer {
-  enabled = true;
+context7 = {
   command = "bunx";
   args = [ "@context7/mcp-server" ];
 };
@@ -29,28 +29,37 @@ context7 = mkServer {
 
 ### SSE / HTTP (remote servers)
 
-Connect to a running HTTP server using SSE or HTTP transport. Use `mkRemoteServer`:
+Connect to a running HTTP server using SSE or HTTP transport:
 
 ```nix
-# SSE server (default type)
-cribl = mkRemoteServer {
-  enabled = true;
+# SSE server
+cribl = {
+  type = "sse";
   url = "http://localhost:30030/mcp";
 };
 
 # HTTP server with custom headers
-my-server = mkRemoteServer {
-  enabled = true;
+my-server = {
   type = "http";
   url = "http://localhost:8080/mcp";
   headers = { Authorization = "Bearer \${TOKEN}"; };
 };
 ```
 
-## Enabling Servers
+## Enabling / Disabling Servers
 
-Edit `modules/home-manager/ai-cli/mcp/default.nix` and set `enabled = true`.
-Then run `darwin-rebuild switch --flake .` to deploy.
+All servers are enabled by default (`disabled = false` is the module system default).
+To disable a server, set `disabled = true`:
+
+```nix
+postgresql = official "postgres" // { disabled = true; };
+```
+
+To enable a disabled server without editing `default.nix`, override via the module system:
+
+```nix
+programs.claude.mcpServers.postgresql.disabled = false;
+```
 
 ## Secrets Management
 
@@ -62,11 +71,11 @@ The config does NOT store any secrets — it only references commands and URLs.
 
 ## Adding New Servers
 
-1. Choose the right helper:
-   - Local stdio process → `mkServer` or `officialServer`
-   - Remote SSE/HTTP endpoint → `mkRemoteServer`
+1. Choose the transport:
+   - Local stdio process → inline attribute set with `command` (and optionally `args`)
+   - Remote SSE/HTTP endpoint → inline attribute set with `type` and `url`
 
-2. Set `enabled = false` initially, test, then enable.
+2. New servers are enabled by default. Add `// { disabled = true; }` to start disabled.
 
 3. Run `darwin-rebuild switch --flake .` to deploy.
 
@@ -76,7 +85,7 @@ The config does NOT store any secrets — it only references commands and URLs.
 
 ### Server not appearing in Claude Code
 
-1. Check `enabled = true` in `mcp/default.nix`
+1. Check `disabled` is not set to `true` in `mcp/default.nix`
 2. Run `darwin-rebuild switch --flake .`
 3. Restart Claude Code
 4. Check `~/.claude.json` contains the server: `jq .mcpServers ~/.claude.json`
