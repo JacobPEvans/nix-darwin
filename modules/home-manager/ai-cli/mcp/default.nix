@@ -52,14 +52,18 @@ let
 
   # Wrap an MCP server command with Doppler secret injection.
   # The doppler-mcp script is defined in ai-tools.nix.
-  # Usage: withDoppler { command = "uvx"; args = [...]; enabled = true; }
+  # Usage: withDoppler (mkServer { command = "uvx"; args = [...]; enabled = true; })
   # Produces: { command = "doppler-mcp"; args = ["uvx" ...]; enabled = true; }
+  #
+  # Note: always pass the result of mkServer/officialServer, not a raw attrset.
+  # mkServer guarantees command and args are present; withDoppler uses `or []`
+  # as a safety net for args in case a caller omits it.
   withDoppler =
     server:
     server
     // {
       command = "doppler-mcp";
-      args = [ server.command ] ++ server.args;
+      args = [ server.command ] ++ (server.args or [ ]);
     };
 
   # All server definitions

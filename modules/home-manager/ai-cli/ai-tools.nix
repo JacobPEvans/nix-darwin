@@ -137,6 +137,11 @@
     # Usage: doppler-mcp <command> [args...]
     (writeShellScriptBin "doppler-mcp" ''
       set -euo pipefail
+      if [ "$#" -lt 1 ]; then
+        echo "Usage: doppler-mcp <command> [args...]" >&2
+        echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
+        exit 1
+      fi
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
