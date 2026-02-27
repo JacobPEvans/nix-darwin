@@ -67,8 +67,6 @@ jobs:
               - '.markdownlint.yml'
             claude:
               - '.claude/**'
-              - 'modules/home-manager/ai-cli/**'
-              - 'modules/home-manager/permissions/**'
 
       - name: Detect Dependency-Only Commits
         id: detect-deps

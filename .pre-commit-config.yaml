@@ -104,18 +104,6 @@ repos:
         files: '\.claude/settings(\.local)?\.json$'
         types: [json]
 
-      # Validate no double-wildcard patterns in permissions
-      # Prevents :*:* patterns that result from incorrect source format
-      # Uses default configuration if specific host is not available
-      - id: validate-permission-wildcards
-        name: Check for invalid :*:* permission patterns
-        entry: >
-          bash -c 'nix eval --json ".#darwinConfigurations.default.config.home-manager.users.\${HM_USER:-\${USER}}.programs.claude.settings.permissions" 2>/dev/null | grep -q ":\*:\*" && echo "ERROR: Found :*:* pattern in permissions. Source files should not have :* suffix." && exit 1 || exit 0'
-        language: system
-        files: 'modules/home-manager/ai-cli/(common/(formatters|permissions)|claude-config)\.nix$'
-        types: [file]
-        pass_filenames: false
-
       # File size check - DRY with GitHub Actions via shared config
       # Config: scripts/workflows/file-size-config.sh (single source of truth)
       # Limits: 6KB recommended, 12KB hard, 32KB extended
@@ -138,47 +126,6 @@ repos:
         files: \.(md|html)$
         types: [file]
         pass_filenames: true
-
-      # Auto-Claude shell script validation
-      # Validates syntax of all auto-claude shell scripts
-      - id: validate-auto-claude-scripts
-        name: Validate auto-claude shell scripts
-        entry: bash -c 'find modules/home-manager/ai-cli/claude -name "auto-claude*.sh" -exec zsh -n {} \; || exit 1'
-        language: system
-        files: '^modules/home-manager/ai-cli/claude/auto-claude.*\.sh$'
-        types: [file]
-        pass_filenames: false
-
-      # Orchestrator prompt validation
-      # Ensures prompt file exists and contains required sections
-      - id: validate-orchestrator-prompt
-        name: Validate orchestrator prompt
-        entry: bash -c 'f="modules/home-manager/ai-cli/claude/orchestrator-prompt.txt"; test -s "$f" && grep -q "CORE LOOP" "$f" && grep -q "IDENTITY" "$f"'
-        language: system
-        files: '^modules/home-manager/ai-cli/claude/orchestrator-prompt\.txt$'
-        types: [file]
-        pass_filenames: false
-
-      # NPM package URL validation
-      # Validates that npm package URLs in ai-tools.nix actually exist (no 404s)
-      - id: validate-npm-urls
-        name: Validate npm package URLs
-        entry: scripts/validate-npm-urls.sh
-        language: system
-        files: '^modules/home-manager/ai-cli/ai-tools\.nix$'
-        types: [file]
-        pass_filenames: false
-
-      # Homebrew package hierarchy validation
-      # HARD FAIL if any npm/bunx packages are available in homebrew
-      # Enforces: nixpkgs → homebrew → bun → npm → bunx
-      - id: validate-brew-before-npm
-        name: Check homebrew before npm/bunx (hierarchy)
-        entry: scripts/validate-brew-before-npm.sh
-        language: system
-        files: '^modules/home-manager/ai-cli/ai-tools\.nix$'
-        types: [file]
-        pass_filenames: false
 
       # Nixpkgs package hierarchy validation
       # HARD FAIL if any homebrew packages are available in nixpkgs
@@ -205,8 +152,8 @@ repos:
       # Flake input updates - run manually to update critical inputs
       # Use: pre-commit run --hook-stage manual update-flake-inputs
       - id: update-flake-inputs
-        name: Update flake inputs (nixpkgs, ai-assistant-instructions, nix-config-main)
-        entry: nix flake update nixpkgs ai-assistant-instructions nix-config-main
+        name: Update flake inputs (nixpkgs, nix-ai, nix-home)
+        entry: nix flake update nixpkgs nix-ai nix-home
         language: system
         stages: [manual]
         pass_filenames: false

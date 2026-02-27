@@ -112,16 +112,14 @@ jobs:
             Automated Nix flake dependency update across **all flakes** in the repository.
 
             ## What Changed
-            - Root flake.lock (darwin, home-manager, nixpkgs, AI tools)
-            - Shell environment flakes (shells/**/flake.lock)
-            - Host-specific flakes (hosts/**/flake.lock)
+            - Root flake.lock (darwin, home-manager, nixpkgs, nix-ai, nix-home)
 
             See the flake.lock diffs below for specific version bumps.
 
             ## Review Notes
             - CI validates flake structure and build
-            - AI tool updates (including claude-code) run daily
-            - Claude Code philosophy: Always accept updates, manually validate, revert only if issues found
+            - AI tool updates managed in nix-ai repo
+            - Always accept updates, manually validate, revert only if issues found
             - Full dependency updates (darwin, home-manager) run Tue/Fri
             - Shell environments updated to ensure consistency across development environments
 

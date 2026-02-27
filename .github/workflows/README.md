@@ -25,7 +25,6 @@ CI/CD workflows for this nix-darwin configuration repository.
 │ • Detects file changes  │     │ ci-nix.yml              │
 │ • Calls reusable flows  │     │ ci-validate.yml         │
 │ • Merge Gate aggregates │     │ ci-markdownlint.yml     │
-│ • ONLY required check   │     │ ci-validate-settings.yml│
 └─────────────────────────┘     │ ci-file-length.yml      │
                                 └─────────────────────────┘
 ```
@@ -144,7 +143,7 @@ jobs:
 | Nix Build | `**.nix`, `flake.lock`, `modules/**`, `scripts/**` |
 | Nix Validate | `**.nix`, `flake.lock`, `modules/**`, `scripts/**` |
 | Markdown Lint | `**.md`, `.markdownlint.*` |
-| Claude Settings | `.claude/**`, `modules/home-manager/ai-cli/**` |
+| Claude Settings | `.claude/**` |
 | File Size | `**.nix`, `**.md` |
 
 ### Other Workflows
@@ -155,7 +154,6 @@ jobs:
 | `review-deps.yml` | Dependency update reviews |
 | `deps-update-flake.yml` | Unified flake.lock updates (schedule + instant sync) |
 | `deps-monitor-packages.yml` | Package version monitoring |
-| `nixos-release-check.yml` | NixOS release tracking |
 
 ## Configuration
 

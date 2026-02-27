@@ -330,6 +330,69 @@
         "type": "github"
       }
     },
+    "nix-ai": {
+      "inputs": {
+        "ai-assistant-instructions": "ai-assistant-instructions",
+        "anthropic-agent-skills": "anthropic-agent-skills",
+        "bills-claude-skills": "bills-claude-skills",
+        "cc-dev-tools": "cc-dev-tools",
+        "cc-marketplace": "cc-marketplace",
+        "claude-code-plugins": "claude-code-plugins",
+        "claude-code-plugins-plus": "claude-code-plugins-plus",
+        "claude-code-workflows": "claude-code-workflows",
+        "claude-cookbooks": "claude-cookbooks",
+        "claude-plugins-official": "claude-plugins-official",
+        "claude-skills": "claude-skills",
+        "home-manager": [
+          "home-manager"
+        ],
+        "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
+        "lunar-claude": "lunar-claude",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "obsidian-skills": "obsidian-skills",
+        "obsidian-visual-skills": "obsidian-visual-skills",
+        "superpowers-marketplace": "superpowers-marketplace",
+        "wakatime": "wakatime"
+      },
+      "locked": {
+        "lastModified": 1772184174,
+        "narHash": "sha256-LvkDqomnlc/P3Oax/r50EpqSAgJhM9pZrXjlhPjWrnY=",
+        "owner": "JacobPEvans",
+        "repo": "nix-ai",
+        "rev": "5a2273efb075c03db1b9ec711e5d572c93139994",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "nix-ai",
+        "type": "github"
+      }
+    },
+    "nix-home": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772184181,
+        "narHash": "sha256-72GrOoLqKXPGov1ixalk7mW0lE92fVdN/2mpsACiy+E=",
+        "owner": "JacobPEvans",
+        "repo": "nix-home",
+        "rev": "9088cfe724e675cde2f82d8d5cdf1f16d0f25e5b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "nix-home",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1772068791,
@@ -396,29 +459,14 @@
     },
     "root": {
       "inputs": {
-        "ai-assistant-instructions": "ai-assistant-instructions",
-        "anthropic-agent-skills": "anthropic-agent-skills",
-        "bills-claude-skills": "bills-claude-skills",
-        "cc-dev-tools": "cc-dev-tools",
-        "cc-marketplace": "cc-marketplace",
-        "claude-code-plugins": "claude-code-plugins",
-        "claude-code-plugins-plus": "claude-code-plugins-plus",
-        "claude-code-workflows": "claude-code-workflows",
-        "claude-cookbooks": "claude-cookbooks",
-        "claude-plugins-official": "claude-plugins-official",
-        "claude-skills": "claude-skills",
         "darwin": "darwin",
         "home-manager": "home-manager",
-        "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
-        "lunar-claude": "lunar-claude",
         "mac-app-util": "mac-app-util",
+        "nix-ai": "nix-ai",
+        "nix-home": "nix-home",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "obsidian-skills": "obsidian-skills",
-        "obsidian-visual-skills": "obsidian-visual-skills",
-        "superpowers-marketplace": "superpowers-marketplace",
-        "systems": "systems",
-        "wakatime": "wakatime"
+        "systems": "systems"
       }
     },
     "superpowers-marketplace": {
