@@ -98,13 +98,19 @@
       initContent = lib.mkAfter ''
         # --- API Keys (from macOS Keychain) ---
 
+        _get_keychain_secret() {
+          # Fetch a secret from the macOS Keychain by service name.
+          # Usage: _get_keychain_secret <service> <account>
+          security find-generic-password -s "$1" -a "$2" -w 2>/dev/null || echo ""
+        }
+
         # GitHub - for github@claude-plugins-official MCP server
-        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(security find-generic-password \
-          -s "github-pat" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(_get_keychain_secret 'github-pat' '${userConfig.user.name}')"}
 
         # Context7 - for context7@claude-plugins-official MCP server
-        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(security find-generic-password \
-          -s "CONTEXT7_API_KEY" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' '${userConfig.user.name}')"}
+
+        unset -f _get_keychain_secret
 
         # --- macOS setup ---
         source ${./macos-setup.zsh}
