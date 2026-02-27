@@ -1,9 +1,9 @@
-# GitHub Copilot Instructions — nix-config
+# Nix Configuration - AI Agent Instructions
 
 ## Repository Purpose
 
-macOS/Linux system configuration managed with Nix flakes (Determinate Nix).
-Covers home-manager, Darwin, NixOS, and shared modules.
+macOS system configuration managed with nix-darwin and Nix flakes (Determinate Nix).
+Orchestrates system packages, networking, security, and home-manager via two companion repos (nix-ai, nix-home).
 
 ## Critical Constraints
 
@@ -49,7 +49,7 @@ pass before merge. You may run it locally to verify before pushing, but it is no
 ## Worktree Workflow
 
 ```bash
-cd ~/git/nix-config
+cd ~/git/nix-darwin
 git fetch origin
 git worktree add <branch> -b <branch> origin/main
 cd <branch>
@@ -57,11 +57,17 @@ cd <branch>
 
 ## File References
 
-- **Permissions**: `ai-assistant-instructions` flake → `~/.claude/settings.json`
-- **Plugins**: `modules/home-manager/ai-cli/claude/plugins/`
 - **Rules**: `agentsmd/rules/` (worktrees, version-validation, skill-namespace-resolution, security-alert-triage)
 - **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
 - **Inventory**: `MANIFEST.md` — update when adding/removing packages
+
+## Part of a Trio
+
+| Repo | Purpose |
+| ---- | ------- |
+| **nix-darwin** (this repo) | macOS system config |
+| [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI coding tools (Claude, Gemini, Copilot, MCP) |
+| [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
 
 ## PR Rules
 
