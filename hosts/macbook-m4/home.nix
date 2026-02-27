@@ -1,12 +1,15 @@
 # macbook-m4 Home Configuration
 #
 # User environment for macbook-m4 host.
-# Imports common home-manager modules with host-specific overrides.
+# Cross-platform settings provided by nix-home (sharedModule).
+# AI CLI settings provided by nix-ai (sharedModule).
+# This file adds macOS-specific overrides and host-specific settings.
 
 {
   config,
   pkgs,
   lib,
+  userConfig,
   ...
 }:
 
@@ -35,20 +38,11 @@
   manual.manpages.enable = false;
 
   imports = [
-    # Common home-manager configuration
-    ../../modules/home-manager/common.nix
-
-    # Ollama configuration (models on /Volumes/Ollama)
-    ../../modules/home-manager/ollama.nix
-
     # Activation recovery after login (fixes boot failures)
     ../../modules/home-manager/nix-activation-recovery.nix
 
     # Raycast script scheduling (refresh-repos LaunchAgent)
     ../../modules/home-manager/raycast-scripts.nix
-
-    # tmux configuration (session persistence, agent teams)
-    ../../modules/home-manager/tmux.nix
   ];
 
   # ==========================================================================
@@ -84,12 +78,39 @@
     cribl.enable = true;
   };
 
-  # Enable activation recovery after login (fixes boot failures)
-  # See docs/boot-failure/root-cause.md for why this is needed
-  programs.nix-activation-recovery.enable = true;
+  programs = {
+    # Enable activation recovery after login (fixes boot failures)
+    # See docs/boot-failure/root-cause.md for why this is needed
+    nix-activation-recovery.enable = true;
 
-  # Raycast refresh-repos scheduling (hourly, replaces manual plist)
-  programs.raycast-scripts.refreshRepos.enable = true;
+    # Raycast refresh-repos scheduling (hourly, replaces manual plist)
+    raycast-scripts.refreshRepos.enable = true;
+
+    # macOS-specific zsh overrides
+    # Base zsh config provided by nix-home (sharedModule).
+    # These additions are macOS-specific and merge via NixOS module system.
+    zsh = {
+      oh-my-zsh.plugins = [
+        "macos" # macOS utilities (ofd, cdf, etc.)
+      ];
+
+      # macOS-specific shell init (appended after cross-platform initContent from nix-home)
+      initContent = lib.mkAfter ''
+        # --- API Keys (from macOS Keychain) ---
+
+        # GitHub - for github@claude-plugins-official MCP server
+        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(security find-generic-password \
+          -s "github-pat" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+
+        # Context7 - for context7@claude-plugins-official MCP server
+        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(security find-generic-password \
+          -s "CONTEXT7_API_KEY" -a "${userConfig.user.name}" -w 2>/dev/null || echo "")"}
+
+        # --- macOS setup ---
+        source ${./macos-setup.zsh}
+      '';
+    };
+  };
 
   home = {
     # ========================================================================
@@ -111,28 +132,23 @@
     #
     # NOTE: OrbStack managed via programs.orbstack module at system-level.
     # See hosts/macbook-m4/default.nix for OrbStack configuration.
-    packages =
-      (with pkgs; [
-        # Terminal & Development
-        ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
-        postman # API development environment - auto-updates disabled (see auto-update-prevention.nix)
-        rapidapi # Full-featured HTTP client for testing and describing APIs - auto-updates disabled (see auto-update-prevention.nix)
+    packages = with pkgs; [
+      # Terminal & Development
+      ghostty-bin # Terminal emulator - needs Full Disk Access for darwin-rebuild
+      postman # API development environment - auto-updates disabled (see auto-update-prevention.nix)
+      rapidapi # Full-featured HTTP client for testing and describing APIs - auto-updates disabled (see auto-update-prevention.nix)
 
-        # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
-        code-cursor # Cursor AI IDE (VS Code fork)
-        chatgpt # OpenAI ChatGPT desktop app
-        claudebar # Menu bar app for AI coding assistant quota monitoring
+      # AI IDEs & Tools (nixpkgs - stable TCC paths via copyApps)
+      code-cursor # Cursor AI IDE (VS Code fork)
+      chatgpt # OpenAI ChatGPT desktop app
+      claudebar # Menu bar app for AI coding assistant quota monitoring
 
-        # Communication
-        # zoom-us # DISABLED - no longer using Zoom
-      ])
+      # Communication
+      # zoom-us # DISABLED - no longer using Zoom
+
       # CLI / Media tools (non-GUI, no .app bundle)
-      ++ (with pkgs; [
-        ffmpeg # Complete solution to record, convert and stream audio and video
-      ])
-      # AI Development Tools (linters, formatters, analyzers)
-      # See modules/home-manager/ai-cli/ai-tools.nix for package definitions
-      ++ (import ../../modules/home-manager/ai-cli/ai-tools.nix { inherit pkgs; }).packages;
+      ffmpeg # Complete solution to record, convert and stream audio and video
+    ];
 
     # ========================================================================
     # Host-specific symlinks for external volumes
@@ -140,7 +156,7 @@
     # NOTE: These symlinks point to data on external volumes.
     # Nix does NOT manage the volume contents - only creates symlinks.
     file = {
-      # Ollama models symlink managed by modules/home-manager/ollama.nix
+      # Ollama models symlink managed by nix-ai (ollama.nix module)
 
       # OrbStack data on dedicated APFS volume
       # Symlinks entire Group Container so ALL OrbStack data lives on volume
