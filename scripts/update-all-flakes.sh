@@ -3,15 +3,13 @@
 #
 # Usage: ./scripts/update-all-flakes.sh [--verbose] [--inputs "input1 input2 ..."]
 #
-# Updates:
-# - Root flake.lock (darwin, home-manager, nixpkgs, AI tools)
-# - Shell environment flakes (shells/**/flake.lock)
-# - Host-specific flakes (hosts/**/flake.lock)
+# Dynamically discovers ALL flake.nix files in the repository and updates them.
+# The root flake is updated first, then all sub-flakes are updated in sorted order.
 #
 # Options:
 #   --verbose                Show full nix flake update output
 #   --inputs "i1 i2 ..."    Selective root update (only specified inputs);
-#                            shell/host flakes still get full updates
+#                            sub-flakes still get full updates
 #
 # Exit codes:
 #   0 - Success (flakes updated or already up to date)
@@ -39,7 +37,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Update root flake
+run_update() {
+  local dir="$1"
+  if [[ "$VERBOSE" == "true" ]]; then
+    (cd "$dir" && nix flake update --refresh) || true
+  else
+    (cd "$dir" && nix flake update --refresh 2>&1 | tail -5) || true
+  fi
+}
+
+# Update root flake first
 if [[ -n "$SELECTIVE_INPUTS" ]]; then
   echo "=== Updating ROOT flake (selective inputs) ==="
   read -ra INPUTS_ARRAY <<< "$SELECTIVE_INPUTS"
@@ -57,35 +64,15 @@ else
   fi
 fi
 
-# Update all shell environment flakes
+# Discover and update ALL sub-flakes dynamically
 echo ""
-echo "=== Updating SHELL flakes ==="
-for dir in shells/*/; do
-  if [[ -f "${dir}flake.nix" ]]; then
-    echo "Updating: $dir"
-    if [[ "$VERBOSE" == "true" ]]; then
-      (cd "$dir" && nix flake update --refresh) || true
-    else
-      (cd "$dir" && nix flake update --refresh 2>&1 | tail -3) || true
-    fi
-  fi
-done
-
-# Update host-specific flakes if they have locks
-if ls hosts/*/flake.lock 1> /dev/null 2>&1; then
-  echo ""
-  echo "=== Updating HOST flakes ==="
-  for dir in hosts/*/; do
-    if [[ -f "${dir}flake.lock" ]]; then
-      echo "Updating: $dir"
-      if [[ "$VERBOSE" == "true" ]]; then
-        (cd "$dir" && nix flake update --refresh) || true
-      else
-        (cd "$dir" && nix flake update --refresh 2>&1 | tail -3) || true
-      fi
-    fi
-  done
-fi
+echo "=== Updating SUB-FLAKES ==="
+while IFS= read -r flake_nix; do
+  dir="$(dirname "$flake_nix")"
+  [[ "$dir" == "." ]] && continue  # skip root (already updated)
+  echo "Updating: $dir/"
+  run_update "$dir"
+done < <(find . -name 'flake.nix' -not -path './.git/*' | sort)
 
 echo ""
 echo "=== Update complete ==="
