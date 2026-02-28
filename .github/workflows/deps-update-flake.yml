@@ -51,6 +51,7 @@ jobs:
         jacobpevans-cc-plugins
         anthropic-agent-skills
         superpowers-marketplace
+        nix-ai
     steps:
       - name: Generate GitHub App Token
         id: app-token
