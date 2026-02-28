@@ -86,6 +86,43 @@
     # Raycast refresh-repos scheduling (hourly, replaces manual plist)
     raycast-scripts.refreshRepos.enable = true;
 
+    claude = {
+      # Disable playwright plugin globally — only useful in specific projects.
+      # playwright@claude-skills (skills-only, no MCP) stays enabled.
+      plugins.enabled."playwright@claude-plugins-official" = lib.mkForce false;
+
+      # Disable MCP servers that duplicate built-in tools, are demo/test, or are project-specific.
+      # Servers remain defined (for type validation) but disabled = true excludes them from ~/.claude.json.
+      # Project-specific servers (cribl, terraform, aws) are re-enabled via per-project .mcp.json.
+      mcpServers = {
+        # Demo/test — not useful in production
+        everything.disabled = true;
+
+        # Duplicates built-in Read/Write/Glob/Edit tools
+        filesystem.disabled = true;
+
+        # Duplicates built-in WebFetch tool
+        fetch.disabled = true;
+
+        # Duplicates built-in git via Bash(git:*)
+        git.disabled = true;
+
+        # Duplicates github@claude-plugins-official plugin
+        github.disabled = true;
+
+        # Project-specific — available via per-project .mcp.json
+        cribl.disabled = true;
+        aws.disabled = true;
+        terraform.disabled = true;
+
+        # Not actively used — disable until needed
+        cloudflare.disabled = true;
+        exa.disabled = true;
+        firecrawl.disabled = true;
+        docker.disabled = true;
+      };
+    };
+
     # macOS-specific zsh overrides
     # Base zsh config provided by nix-home (sharedModule).
     # These additions are macOS-specific and merge via NixOS module system.
