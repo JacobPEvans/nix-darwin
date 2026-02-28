@@ -71,7 +71,7 @@ Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 | --------- | ------------ |
 | **Determinate Nix** | Manages Nix itself -- daemon, updates, core config |
 | **nix-darwin** | macOS packages, system settings, Homebrew integration |
-| **home-manager** | Activation recovery and Nix config symlinks |
+| **home-manager** | Activation recovery, config symlinks, and Raycast scripts |
 | **mac-app-util** | Stable app trampolines to preserve TCC permissions |
 
 **Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.

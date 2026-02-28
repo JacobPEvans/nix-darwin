@@ -119,7 +119,7 @@ flake.nix
 | Layer | Scope | Location | Managed By |
 |-------|-------|----------|------------|
 | System | macOS settings, packages | `modules/darwin/` | nix-darwin |
-| User | Activation helpers | `modules/home-manager/` | home-manager |
+| User | Activation helpers & Raycast scripts | `modules/home-manager/` | home-manager |
 | Host | Machine-specific | `hosts/<name>/` | Both |
 | Shared | Variables, defaults | `lib/` | Imported |
 

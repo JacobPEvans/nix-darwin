@@ -527,7 +527,7 @@ Error: Access token is not in a valid format: Doesn't contain a decryption key
 
 ### Configuration File Became Empty
 
-**Problem**: A `.nix` configuration file truncated to 0 bytes.
+**Problem**: A `.nix` configuration file was truncated to 0 bytes.
 
 **Solution**:
 
