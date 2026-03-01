@@ -108,7 +108,7 @@ in
     ])
     ++ (with pkgs; [
       mas # Mac App Store CLI
-      nodejs # Node.js LTS (nixpkgs default tracks current LTS)
+      # nodejs available per-repo via devShells
       ollama # LLM runtime (models on /Volumes/Ollama/models)
       whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
       openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)

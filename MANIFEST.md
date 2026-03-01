@@ -57,7 +57,6 @@ Source: `modules/darwin/common.nix`
 | Package | Description |
 |---------|-------------|
 | mas | Mac App Store CLI |
-| nodejs | Node.js LTS |
 | ollama | LLM runtime (models on /Volumes/Ollama/models) |
 | whisper-cpp | Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal) |
 | openai-whisper | Original OpenAI Whisper (Python, GPU/CPU, broader model support) |
@@ -72,7 +71,6 @@ Source: `modules/common/packages.nix`
 
 | Package | Description |
 |---------|-------------|
-| nodejs | Provides npm and npx |
 | bun | Fast all-in-one JavaScript runtime (provides bunx) |
 
 ### Git Workflow
@@ -133,7 +131,6 @@ Source: `modules/common/packages.nix`
 | pyright | Static type checker for Python |
 | python314 | Python 3.14 (bleeding edge) |
 | python312 | Python 3.12 (general development) |
-| python310 | Python 3.10 (compatibility testing) |
 | uv | Fast Python package manager (also runs EOL versions) |
 | python3.withPackages | Unified env: cryptography, grip, ollama, pipx, pygithub |
 
