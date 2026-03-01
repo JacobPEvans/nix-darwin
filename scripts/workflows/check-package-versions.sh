@@ -28,7 +28,6 @@ PACKAGES=(
   "git:Security:stable"
   "gnupg:Security:stable"
   "gh:Security:stable"
-  "nodejs:Security:stable"
   "codex:AI Tool:unstable"
   "github-mcp-server:AI Tool:unstable"
   "ollama:AI Tool:unstable"
