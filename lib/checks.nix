@@ -3,6 +3,7 @@
 {
   pkgs,
   src,
+  darwinConfigurations ? { },
 }:
 {
   # Check Nix formatting with nixfmt-rfc-style
@@ -82,6 +83,17 @@
         fi
       done
     ' bash
+    touch $out
+  '';
+
+}
+// pkgs.lib.optionalAttrs (darwinConfigurations != { }) {
+  # Evaluate darwinConfigurations to catch import errors, type errors, and assertion failures
+  # Uses .system.drvPath for eval-only (no full build)
+  module-eval = pkgs.runCommand "check-module-eval" { } ''
+    ${pkgs.lib.concatStringsSep "\n" (
+      pkgs.lib.mapAttrsToList (name: cfg: "echo \"${name}: ${cfg.system.drvPath}\"") darwinConfigurations
+    )}
     touch $out
   '';
 }
