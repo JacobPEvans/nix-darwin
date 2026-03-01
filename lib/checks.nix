@@ -38,6 +38,22 @@
     touch $out
   '';
 
+  # Run the BATS (Bash Automated Testing System) test suite
+  # Executes tests/run-shell-tests.sh which runs all shell integration tests
+  shell-tests =
+    pkgs.runCommand "check-shell-tests"
+      {
+        nativeBuildInputs = with pkgs; [
+          bats
+          bash
+        ];
+      }
+      ''
+        cd ${src}
+        bash tests/run-shell-tests.sh
+        touch $out
+      '';
+
   # Lint shell scripts with shellcheck
   # Catches common bugs: unquoted variables, undefined vars, useless use of cat, etc.
   # Excludes .git directories and nix store paths

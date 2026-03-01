@@ -161,11 +161,17 @@
             system:
             let
               pkgs = nixpkgs.legacyPackages.${system};
+              baseChecks = import ./lib/checks.nix {
+                inherit pkgs;
+                src = ./.;
+              };
             in
-            import ./lib/checks.nix {
-              inherit pkgs;
-              src = ./.;
-            }
+            baseChecks
+            // (nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
+              # Verify the Darwin configuration evaluates without errors
+              # Catches: broken imports, missing args, type errors, assertion failures
+              module-eval = darwinConfig.system;
+            })
           );
 
       # Development shell for CI and local nix tooling

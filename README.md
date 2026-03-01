@@ -19,11 +19,34 @@ packages, macOS settings, services, and LaunchAgents -- all declaratively.
 | [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI coding tools (Claude, Gemini, Copilot, MCP) |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
 
+## Prerequisites
+
+- **macOS on Apple Silicon** (aarch64-darwin only -- x86 Mac is not supported)
+- **Determinate Nix** installer: <https://install.determinate.systems>
+- **git**
+
 ## Quick Start
 
+### First-Time Setup
+
 ```bash
-# Rebuild after config changes (use the sa-drs alias)
-sa-drs
+# 1. Clone as a bare repo (worktree convention used throughout ~/git/)
+git clone --bare https://github.com/JacobPEvans/nix-darwin.git ~/git/nix-darwin
+cd ~/git/nix-darwin
+
+# 2. Create the main worktree
+git worktree add main main
+
+# 3. Build and activate for the first time
+cd ~/git/nix-darwin/main
+sudo darwin-rebuild switch --flake .
+```
+
+### Subsequent Rebuilds
+
+```bash
+# Rebuild after config changes
+d-r
 
 # Search for a package
 nix search nixpkgs <name>
@@ -32,7 +55,27 @@ nix search nixpkgs <name>
 sudo darwin-rebuild --rollback
 ```
 
-The `sa-drs` alias handles system activation automatically. See [RUNBOOK.md](RUNBOOK.md) for detailed procedures.
+The `d-r` alias (defined in nix-home) expands to `sudo darwin-rebuild switch --flake .`
+and handles full system + home-manager activation in one step.
+See [RUNBOOK.md](RUNBOOK.md) for detailed operational procedures.
+
+## Supported Platforms
+
+**aarch64-darwin only.** This configuration targets Apple Silicon Macs.
+The quality checks (`nix flake check`) run cross-platform (Linux/x86 too),
+but the Darwin configuration itself only builds and activates on aarch64-darwin.
+
+## Pre-Commit Hooks
+
+Formatting and linting run automatically on every commit via pre-commit hooks
+(nixfmt, statix, deadnix, shellcheck, BATS shell tests).
+
+To install the hooks locally:
+
+```bash
+nix develop
+pre-commit install
+```
 
 ## What It Manages
 
@@ -73,6 +116,12 @@ Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 | **nix-darwin** | macOS packages, system settings, Homebrew integration |
 | **home-manager** | Activation recovery, config symlinks, and Raycast scripts |
 | **mac-app-util** | Stable app trampolines to preserve TCC permissions |
+| **[nix-ai](https://github.com/JacobPEvans/nix-ai)** | Shared home-manager modules for AI tools (Claude, Gemini, Copilot, MCP) |
+| **[nix-home](https://github.com/JacobPEvans/nix-home)** | Shared home-manager modules for dev environment (git, zsh, VS Code, tmux) |
+
+This repo is the **orchestrator**: it pulls in `nix-ai` and `nix-home` as flake inputs
+and wires their `homeManagerModules.default` into the shared home-manager configuration.
+Changes to AI tools or dev environment settings belong in those repos, not here.
 
 **Key Rule**: Use nixpkgs for everything. Homebrew is fallback only.
 
