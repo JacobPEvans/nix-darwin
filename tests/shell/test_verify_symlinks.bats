@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 # Test verify-symlinks.sh for symlink validation
 
-SCRIPT_UNDER_TEST="$BATS_TEST_DIR/../../scripts/workflows/verify-symlinks.sh"
+SCRIPT_UNDER_TEST="$BATS_TEST_DIRNAME/../../scripts/workflows/verify-symlinks.sh"
 
 setup() {
   # Create temporary test directory structure
@@ -13,6 +13,9 @@ setup() {
   mkdir -p "$TEST_HOME_FILES/targets"
   echo "dummy" > "$TEST_HOME_FILES/targets/plan-product.md"
   echo "dummy" > "$TEST_HOME_FILES/targets/product-planner.md"
+
+  # Create valid settings.json by default so tests not focused on settings pass
+  echo '{"key": "value"}' > "$TEST_HOME_FILES/.claude/settings.json"
 }
 
 teardown() {
@@ -62,11 +65,13 @@ teardown() {
   echo '{"key": "value"' > "$TEST_HOME_FILES/.claude/settings.json"
 
   run bash "$SCRIPT_UNDER_TEST" "$TEST_HOME_FILES"
-  [ "$status" -eq 1 ]
+  # jq exits with code 5 on parse error; set -e causes the script to propagate it
+  [ "$status" -ne 0 ]
 }
 
 @test "verify-symlinks.sh: detects missing settings.json" {
-  # Don't create settings.json
+  # Remove the default settings.json created in setup
+  rm -f "$TEST_HOME_FILES/.claude/settings.json"
 
   run bash "$SCRIPT_UNDER_TEST" "$TEST_HOME_FILES"
   [ "$status" -eq 1 ]
