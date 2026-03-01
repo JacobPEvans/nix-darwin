@@ -42,6 +42,7 @@ rules:
       - nixos-release-check.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
+      - release-please.yml
       - review-deps.yml
 
   # ACCEPTED: workflow_run is the only trigger for reacting to CI completions.
