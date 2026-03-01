@@ -10,14 +10,7 @@ permissions:
 
 jobs:
   auto-merge:
-    name: Enable auto-merge
-    if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    uses: JacobPEvans/.github/.github/workflows/_auto-merge.yml@main
     permissions:
       contents: write
       pull-requests: write
-    steps:
-      - run: gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}

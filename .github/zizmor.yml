@@ -13,11 +13,9 @@ rules:
   unpinned-uses:
     ignore:
       - _claude-settings.yml
-      - _file-size.yml
-      - _markdown-lint.yml
       - _nix-build.yml
-      - _nix-validate.yml
       - ai-openhands.yml
+      - auto-merge.yml
       - best-practices.yml
       - ci-auto-claude.yml
       - ci-eol-check.yml
@@ -99,10 +97,7 @@ rules:
   artipacked:
     ignore:
       - _claude-settings.yml
-      - _file-size.yml
-      - _markdown-lint.yml
       - _nix-build.yml
-      - _nix-validate.yml
       - ai-openhands.yml
       - ci-auto-claude.yml
       - ci-eol-check.yml

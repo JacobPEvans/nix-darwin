@@ -98,13 +98,13 @@ jobs:
     name: Nix Validate
     needs: changes
     if: needs.changes.outputs.nix == 'true'
-    uses: ./.github/workflows/_nix-validate.yml
+    uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@main
 
   markdown-lint:
     name: Markdown Lint
     needs: changes
     if: needs.changes.outputs.markdown == 'true'
-    uses: ./.github/workflows/_markdown-lint.yml
+    uses: JacobPEvans/.github/.github/workflows/_markdown-lint.yml@main
 
   claude-settings:
     name: Claude Settings
@@ -116,7 +116,7 @@ jobs:
     name: File Size
     needs: changes
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
-    uses: ./.github/workflows/_file-size.yml
+    uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
