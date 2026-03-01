@@ -2,7 +2,7 @@
 # Test auto-claude.sh argument parsing
 
 # Define script path relative to test directory for portability
-SCRIPT_UNDER_TEST="$BATS_TEST_DIR/../../modules/home-manager/ai-cli/claude/auto-claude.sh"
+SCRIPT_UNDER_TEST="$BATS_TEST_DIRNAME/../../modules/home-manager/ai-cli/claude/auto-claude.sh"
 
 @test "auto-claude.sh: requires 2 arguments" {
   run bash "$SCRIPT_UNDER_TEST"

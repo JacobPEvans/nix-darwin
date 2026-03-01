@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 # Test check-file-sizes.sh functionality
 
-SCRIPT_UNDER_TEST="$BATS_TEST_DIR/../../scripts/workflows/check-file-sizes.sh"
+SCRIPT_UNDER_TEST="$BATS_TEST_DIRNAME/../../scripts/workflows/check-file-sizes.sh"
 
 setup() {
   # Create temporary test directory
