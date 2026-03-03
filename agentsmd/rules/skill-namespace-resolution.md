@@ -3,8 +3,8 @@
 ## Problem
 
 Claude was repeatedly calling skills with incorrect namespaces (e.g.,
-`pr-review-toolkit:code-simplifier` when the correct namespace was
-`code-simplifier:code-simplifier`). This happened across multiple
+`superpowers:code-reviewer` when the correct namespace was
+`pr-review-toolkit:code-reviewer`). This happened across multiple
 skills and sessions.
 
 Root cause: Claude made assumptions about namespacing instead of reading exact strings from error output.
@@ -21,8 +21,8 @@ Root cause: Claude made assumptions about namespacing instead of reading exact s
 Skill tool parameter: "namespace:skill-name"
 
 Examples (EXACT):
-  - code-simplifier:code-simplifier
   - pr-review-toolkit:code-reviewer
+  - superpowers:finishing-a-development-branch
   - backend-development:backend-architect
 ```
 
@@ -32,7 +32,7 @@ Examples (EXACT):
 subagent_type parameter: "namespace:skill-name"
 
 Examples (EXACT):
-  - code-simplifier:code-simplifier
+  - pr-review-toolkit:code-reviewer
   - backend-development:backend-architect
   - Explore (no namespace - built-in)
 ```
@@ -64,17 +64,17 @@ Copy the EXACT string from the list - do NOT:
 
 ```text
 Error output shows:
-"... Available agents: ... code-simplifier:code-simplifier, pr-review-toolkit:code-reviewer, ..."
+"... Available agents: ... pr-review-toolkit:code-reviewer, superpowers:finishing-a-development-branch, ..."
 
-Action: Copy "code-simplifier:code-simplifier" exactly
+Action: Copy "pr-review-toolkit:code-reviewer" exactly
 ```
 
 #### Example WRONG Behavior (NEVER DO THIS)
 
 ```text
-Error shows: code-simplifier:code-simplifier
-Claude thought: "It's a code tool, pr-review-toolkit probably has code skills too"
-Claude tried: pr-review-toolkit:code-simplifier
+Error shows: pr-review-toolkit:code-reviewer
+Claude thought: "It's a review tool, superpowers probably has review skills too"
+Claude tried: superpowers:code-reviewer
 Result: WRONG - Error again
 ```
 
@@ -82,7 +82,7 @@ Result: WRONG - Error again
 
 | Situation | ❌ Wrong | ✓ Correct | Why |
 |-----------|----------|-----------|-----|
-| Error shows `code-simplifier:code-simplifier` | `pr-review-toolkit:code-simplifier` | Copy exact string | Trust system output |
+| Error shows `pr-review-toolkit:code-reviewer` | `superpowers:code-reviewer` | Copy exact string | Trust system output |
 | Unsure of full namespace | Use only the skill name without namespace | Use `namespace:skill-name` | Exact format required |
 | Want to guess based on task type | Assume a namespace | Copy from error list | Error lists are authoritative |
 | Multiple similar namespaces | Pick what seems right | Ask user or copy exact | Never guess |
@@ -111,4 +111,4 @@ Result: WRONG - Error again
 ## Related
 
 - See AGENTS.md and CLAUDE.md "Skill and Agent Invocation Rules" for user instructions in this repo
-- See pr-review-toolkit, code-simplifier, and other skill namespaces for examples
+- See pr-review-toolkit, superpowers, and other skill namespaces for examples
