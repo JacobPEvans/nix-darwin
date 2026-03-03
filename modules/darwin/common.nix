@@ -7,9 +7,6 @@
 
 let
   userConfig = import ../../lib/user-config.nix;
-
-  # Universal packages (pre-commit, linters) shared across all systems
-  commonPackages = import ../common/packages.nix { inherit pkgs; };
 in
 {
   imports = [
@@ -33,7 +30,6 @@ in
   # --- Nixpkgs Configuration ---
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [
-    (import ../../overlays/python-packages.nix)
     (import ../../overlays/macos-apps.nix)
     # Fast-moving packages from nixpkgs-unstable for version currency
     # Stable branches (25.11) only get security fixes, not version bumps
@@ -68,67 +64,47 @@ in
 
   # System packages from nixpkgs
   # All packages should come from nixpkgs - homebrew is fallback only
-  environment.systemPackages =
-    commonPackages
-    ++ (with pkgs; [
-      # ========================================================================
-      # Core CLI tools
-      # ========================================================================
-      git
-      gnupg
-      vim
+  # NOTE: User dev tools (bat, ripgrep, jq, etc.) provided by nix-home via home.packages
+  environment.systemPackages = with pkgs; [
+    # ========================================================================
+    # Core CLI tools (bootstrapping - needed before home-manager)
+    # ========================================================================
+    git
+    gnupg
+    vim
 
-      # ========================================================================
-      # Modern CLI tools (popular alternatives, also useful for AI CLI agents)
-      # These enhance productivity for both humans and AI assistants
-      # ========================================================================
-      bat # Better cat with syntax highlighting
-      delta # Better git diff viewer with syntax highlighting
-      eza # Modern ls replacement with git integration
-      fd # Faster, user-friendly find alternative
-      fzf # Fuzzy finder for interactive selection
-      gnugrep # GNU grep with zgrep for compressed files
-      gnutar # GNU tar as 'gtar' (Mac-safe tar without ._* files)
-      btop # Modern process monitor with graphs (replaces htop for daily use)
-      htop # Interactive process viewer (better top)
-      mactop # Real-time Apple Silicon CPU/GPU/ANE/thermal monitoring
-      jq # JSON parsing for config files and API responses
-      ncdu # NCurses disk usage analyzer
-      ngrep # Network packet grep (useful for debugging)
-      procps # Process utilities including pgrep, pkill
-      ripgrep # Fast grep alternative (rg) - essential for AI agents
-      tldr # Simplified, community-driven man pages
-      tree # Directory tree visualization
-      watchexec # File watcher that re-executes commands on changes
-      yq # YAML parsing (like jq but for YAML/XML/TOML)
-      sox # Audio recording, conversion, and effects (Sound eXchange)
-      portaudio # Cross-platform audio I/O library
+    # ========================================================================
+    # macOS-specific system tools
+    # ========================================================================
+    mas # Mac App Store CLI
+    mactop # Real-time Apple Silicon CPU/GPU/ANE/thermal monitoring
 
-      # --- Development tools ---
-    ])
-    ++ (with pkgs; [
-      mas # Mac App Store CLI
-      # nodejs available per-repo via devShells
-      ollama # LLM runtime (models on /Volumes/Ollama/models)
-      whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
-      openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
-      # NOTE: open-webui omitted — broken on darwin (pgvector → postgresql-test-hook)
-      # Installed via pipx in home-manager activation (see modules/home-manager/common.nix)
+    # ========================================================================
+    # Network & process tools
+    # ========================================================================
+    ngrep # Network packet grep (useful for debugging)
+    procps # Process utilities including pgrep, pkill
 
-      # --- GUI applications ---
-      bitwarden-desktop # Password manager desktop app
-      # NOTE: ghostty-bin moved to home.packages for TCC permission persistence
-      # See hosts/macbook-m4/home.nix for details
-      # NOTE: Obsidian moved to homebrew cask for faster beta updates (user pays for beta)
-      # NOTE: OrbStack managed via programs.orbstack module for system-level
-      # installation. See modules/darwin/apps/orbstack.nix and
-      # hosts/macbook-m4/default.nix for configuration.
-      # NOTE: Zoom was in home.packages but is now DISABLED.
-      # See hosts/macbook-m4/home.nix for TCC-sensitive app configuration.
-      raycast # Productivity launcher (replaces Spotlight)
-      swiftbar # Menu bar customization (auto-claude status)
-      # NOTE: VS Code managed via programs.vscode in home-manager (with copyApps)
-    ]);
+    # ========================================================================
+    # Audio libraries (system-level dependencies)
+    # ========================================================================
+    sox # Audio recording, conversion, and effects (Sound eXchange)
+    portaudio # Cross-platform audio I/O library
+
+    # ========================================================================
+    # AI/ML system services
+    # ========================================================================
+    ollama # LLM runtime (models on /Volumes/Ollama/models)
+    whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+    openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
+
+    # ========================================================================
+    # GUI applications (system-level, in /Applications/Nix Apps/)
+    # ========================================================================
+    bitwarden-desktop # Password manager desktop app
+    raycast # Productivity launcher (replaces Spotlight)
+    swiftbar # Menu bar customization (auto-claude status)
+  ];
 
   # --- Homebrew Configuration ---
   # See ./homebrew.nix for casks, brews, and masApps

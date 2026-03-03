@@ -37,14 +37,6 @@
   # TODO: Re-enable when upstream fixes options.json context in manual.nix
   manual.manpages.enable = false;
 
-  imports = [
-    # Activation recovery after login (fixes boot failures)
-    ../../modules/home-manager/nix-activation-recovery.nix
-
-    # Raycast script scheduling (refresh-repos LaunchAgent)
-    ../../modules/home-manager/raycast-scripts.nix
-  ];
-
   # ==========================================================================
   # Auto-Update Cache Cleanup (for Nix-managed apps)
   # ==========================================================================

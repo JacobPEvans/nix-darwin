@@ -8,16 +8,19 @@
 
 ## What Is This?
 
-A flakes-only nix-darwin configuration for M4 Max MacBook Pro. Manages system
-packages, macOS settings, services, and LaunchAgents -- all declaratively.
+A flakes-only nix-darwin configuration for M4 Max MacBook Pro. Manages macOS
+system-level settings: system packages, Dock, Finder, keyboard, security,
+Homebrew, and LaunchDaemons -- all declaratively. User-level configuration
+(dotfiles, dev tools, LaunchAgents) is managed by nix-home and nix-ai,
+imported as flake inputs.
 
 **Part of a trio:**
 
-| Repo | Purpose |
-| ---- | ------- |
-| **nix-darwin** (this repo) | macOS system config |
-| [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI coding tools (Claude, Gemini, Copilot, MCP) |
-| [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
+| Repo | Scope | Installs via |
+| ---- | ----- | ------------ |
+| **nix-darwin** (this repo) | macOS system config (Dock, Finder, Homebrew, security) | nix-darwin |
+| [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI CLI ecosystem (Claude, Gemini, Copilot, MCP) | home-manager |
+| [nix-home](https://github.com/JacobPEvans/nix-home) | User environment (dotfiles, dev tools, LaunchAgents) | home-manager |
 
 ## Prerequisites
 
@@ -96,10 +99,7 @@ See **[MANIFEST.md](MANIFEST.md)** for the complete package inventory.
 ├── hosts/                     # Host-specific configurations
 │   └── macbook-m4/            # Active M4 Max MacBook Pro
 ├── modules/                   # Reusable configuration modules
-│   ├── common/                # Cross-platform packages
-│   ├── darwin/                # macOS system settings
-│   ├── home-manager/          # Activation and recovery
-│   └── linux/                 # Linux-specific config
+│   └── darwin/                # macOS system settings
 ├── overlays/                  # Nixpkgs overlays
 ├── scripts/                   # Build and CI scripts
 ├── lib/                       # Shared configuration variables

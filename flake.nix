@@ -99,6 +99,9 @@
           # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
           mac-app-util.darwinModules.default
 
+          # Python package overlay from nix-home (replaces local overlays/python-packages.nix)
+          { nixpkgs.overlays = [ nix-home.overlays.default ]; }
+
           home-manager.darwinModules.home-manager
           {
             home-manager = hmDefaults // {
