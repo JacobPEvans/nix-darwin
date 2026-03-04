@@ -85,10 +85,17 @@ rules:
   # a 'review' job (needs contents/id-token/pull-requests: write) calls the reusable
   # workflow. GitHub requires workflow-level to hold the union of all job needs.
   # The dispatch job explicitly restricts its own access via job-level permissions.
+  #
+  # best-practices.yml, code-simplifier.yml, and next-steps.yml use the same
+  # schedule→dispatch pattern: a 'dispatch' job (needs actions: write) re-triggers
+  # the workflow on schedule, then the main job calls the reusable workflow.
   excessive-permissions:
     ignore:
+      - best-practices.yml
+      - code-simplifier.yml
       - issue-auto-resolve.yml
       - issue-pipeline.yml
+      - next-steps.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
 
