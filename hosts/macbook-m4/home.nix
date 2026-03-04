@@ -71,13 +71,6 @@
   };
 
   programs = {
-    # Enable activation recovery after login (fixes boot failures)
-    # See docs/boot-failure/root-cause.md for why this is needed
-    nix-activation-recovery.enable = true;
-
-    # Raycast refresh-repos scheduling (hourly, replaces manual plist)
-    raycast-scripts.refreshRepos.enable = true;
-
     claude = {
       # Disable playwright plugin globally — only useful in specific projects.
       # playwright@claude-skills (skills-only, no MCP) stays enabled.
