@@ -48,7 +48,6 @@ jobs:
         claude-code-plugins
         claude-cookbooks
         claude-plugins-official
-        jacobpevans-cc-plugins
         anthropic-agent-skills
         superpowers-marketplace
         nix-ai
