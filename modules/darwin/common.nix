@@ -49,9 +49,10 @@ in
 
         # Speech-to-text / AI tools (fast-moving releases)
         whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
-        # NOTE: open-webui intentionally omitted — broken on darwin:
-        #   open-webui → pgvector → postgresql-test-hook (marked broken on darwin)
-        #   Installed via pipx in home-manager activation (see nix-home)
+        # NOTE: open-webui intentionally omitted — still broken on darwin via nixpkgs:
+        #   stable: open-webui → pgvector → postgresql-test-hook (badPlatforms = darwin)
+        #   unstable: open-webui has unfree license, blocked by allowUnfree = false
+        #   Installed via uv tool install in home-manager activation (see nix-ai)
         ;
     })
   ];
