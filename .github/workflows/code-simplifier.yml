@@ -6,11 +6,25 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   id-token: write
   pull-requests: write
 
 jobs:
+  dispatch:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Re-trigger as workflow_dispatch
+        env:
+          WORKFLOW_NAME: ${{ github.workflow }}
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run "$WORKFLOW_NAME" --repo "${{ github.repository }}"
+
   simplify:
+    if: github.event_name != 'schedule'
     uses: JacobPEvans/ai-workflows/.github/workflows/code-simplifier.yml@v0.7.0
     secrets: inherit
