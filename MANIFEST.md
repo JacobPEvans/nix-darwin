@@ -65,7 +65,7 @@ Source: `modules/darwin/common.nix`
 
 ## Cross-Platform Packages
 
-Source: `modules/common/packages.nix`
+Source: nix-home (`home.packages` via flake input)
 
 ### Runtimes
 

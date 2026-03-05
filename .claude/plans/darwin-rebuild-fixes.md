@@ -1,5 +1,8 @@
 # Darwin-Rebuild Issues Resolution Plan
 
+> **Note**: Some file paths in this plan reference `modules/home-manager/` which
+> has been moved to nix-ai and nix-home repos. This plan is historical.
+
 ## Summary
 
 Fix all warnings and errors from `darwin-rebuild switch --flake .` output, standardize log formatting, and add regression prevention.

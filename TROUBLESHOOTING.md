@@ -318,7 +318,7 @@ ln: ~/.claude/plugins/marketplaces/superpowers-marketplace: cannot overwrite dir
 `~/.claude/plugins/marketplaces/*`, but Nix tries to create symlinks at the same paths. This
 creates a conflict that blocks home-manager's `linkGeneration` phase.
 
-**Solution**: Fixed in `modules/home-manager/ai-cli/claude/plugins.nix` (PR #298):
+**Solution**: Fixed in nix-ai `modules/home-manager/ai-cli/claude/plugins.nix` (PR #298):
 
 1. **Pre-linkGeneration Cleanup**: `cleanupMarketplaceDirectories` activation script runs BEFORE
    `linkGeneration` to detect and move conflicting directories to `.backup` files

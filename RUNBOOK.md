@@ -36,7 +36,7 @@ sudo darwin-rebuild --list-generations
 
 ## Shell Aliases
 
-Configured shell aliases make common tasks faster. All aliases are defined in `modules/home-manager/zsh/aliases.nix`.
+Configured shell aliases make common tasks faster. All aliases are defined in nix-home (see [nix-home](https://github.com/JacobPEvans/nix-home) `modules/home-manager/zsh/aliases.nix`).
 
 ### Directory Listing
 
@@ -760,11 +760,8 @@ sudo darwin-rebuild switch --flake ~/.config/nix
    ```nix
    { ... }:
    {
-     imports = [
-       ../../modules/home-manager/common.nix
-     ];
-
-     # Host-specific user settings
+     # User-level config is provided by nix-ai and nix-home flake inputs.
+     # Host-specific user settings (e.g., Ollama, APFS volumes) go here.
    }
    ```
 
@@ -774,26 +771,16 @@ sudo darwin-rebuild switch --flake ~/.config/nix
 
 - **System settings**: `hosts/<hostname>/default.nix`
 - **User settings**: `hosts/<hostname>/home.nix`
-- **Shared settings**: `modules/darwin/common.nix` or `modules/home-manager/common.nix`
+- **Shared darwin settings**: `modules/darwin/common.nix`
+- **User dev tools**: nix-home (see [nix-home](https://github.com/JacobPEvans/nix-home))
+- **AI tools**: nix-ai (see [nix-ai](https://github.com/JacobPEvans/nix-ai))
 
 ---
 
 ## AI CLI Permissions
 
-### Add a Command to Claude Code Allow List
-
-1. **Edit** `modules/home-manager/permissions/claude-permissions-allow.nix`
-
-2. **Add command** to appropriate category:
-
-   ```nix
-   gitCommands = [
-     "Bash(git status:*)"
-     "Bash(git new-command:*)"  # Add new command
-   ];
-   ```
-
-3. **Commit and rebuild**
+AI CLI permissions (Claude, Gemini, Copilot) are now managed in nix-ai.
+See [nix-ai](https://github.com/JacobPEvans/nix-ai) for permission configuration.
 
 ### Quick Permission Approval
 
@@ -801,11 +788,3 @@ For one-off approvals without editing Nix:
 
 - Click "Accept indefinitely" in Claude UI
 - Saves to `~/.claude/settings.local.json` (not Nix-managed)
-
-### Permission Files Reference
-
-| Tool | Allow List | Deny List |
-|------|------------|-----------|
-| Claude | `claude-permissions-allow.nix` | `claude-permissions-deny.nix` |
-| Gemini | `gemini-permissions-allow.nix` | `gemini-permissions-deny.nix` |
-| Copilot | `copilot-permissions-allow.nix` | `copilot-permissions-deny.nix` |

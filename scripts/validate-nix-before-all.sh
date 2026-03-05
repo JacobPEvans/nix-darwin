@@ -144,8 +144,8 @@ if [[ $failed -gt 0 ]]; then
   echo "REQUIRED ACTION:"
   echo "1. Remove package from modules/darwin/homebrew.nix"
   echo "2. Add package to appropriate nixpkgs module"
-  echo "   - System: modules/common/packages.nix"
-  echo "   - User: modules/home-manager/*/packages.nix"
+  echo "   - System: modules/darwin/common.nix"
+  echo "   - User: nix-home (home.packages via flake input)"
   echo ""
   echo "Package hierarchy (STRICT): nixpkgs → homebrew → bun → npm → bunx"
   exit 1

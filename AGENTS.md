@@ -61,13 +61,41 @@ cd <branch>
 - **Security**: See SECURITY.md and `agentsmd/rules/security-alert-triage.md` for alert policies
 - **Inventory**: `MANIFEST.md` — update when adding/removing packages
 
+## Separation Guidelines
+
+### What belongs here (nix-darwin)
+
+- macOS system defaults (Dock, Finder, keyboard, trackpad, energy)
+- Homebrew configuration (casks and brews not in nixpkgs)
+- System-level packages (`environment.systemPackages`): core bootstrapping (git, gnupg, vim),
+  macOS-only tools (mas, mactop), system services (ollama), audio libs, GUI apps
+- Security settings (firewall, Gatekeeper)
+- LaunchDaemons (system-level services)
+- Activation scripts and boot recovery
+- Networking configuration
+
+### What does NOT belong here
+
+- User dev tools (bat, ripgrep, jq, etc.) -> nix-home (`home.packages`)
+- Shell config (zsh, git aliases) -> nix-home
+- Editor settings -> nix-home
+- Linters and formatters -> nix-home
+- AI tools (Claude, Gemini, Copilot, MCP) -> nix-ai
+- User-level LaunchAgents -> nix-home
+
+### Package placement
+
+- **`environment.systemPackages`**: Core bootstrapping (git, gnupg, vim), macOS-only tools, system services, GUI apps
+- **`home.packages`** (nix-home): User dev tools, linters, CLIs, language runtimes
+- **AI packages** (nix-ai): Claude Code, Gemini, Copilot, MCP servers
+
 ## Part of a Trio
 
-| Repo | Purpose |
-| ---- | ------- |
-| **nix-darwin** (this repo) | macOS system config |
-| [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI coding tools (Claude, Gemini, Copilot, MCP) |
-| [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
+| Repo | Scope | Installs via |
+| ---- | ----- | ------------ |
+| **nix-darwin** (this repo) | macOS system config (Dock, Finder, Homebrew, security) | nix-darwin |
+| [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI CLI ecosystem (Claude, Gemini, Copilot, MCP) | home-manager |
+| [nix-home](https://github.com/JacobPEvans/nix-home) | User environment (dotfiles, dev tools, LaunchAgents) | home-manager |
 
 ## PR Rules
 

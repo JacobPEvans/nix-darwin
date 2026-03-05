@@ -60,7 +60,8 @@ The worktree is created at `~/git/nix-darwin/feat/add-<pkg-name>/`.
 **For nixpkgs packages**, search the codebase to find where similar packages are installed:
 
 - **macOS-specific tools**: `modules/darwin/common.nix` in `environment.systemPackages`
-- **Cross-platform tools**: `modules/common/packages.nix`
+- **User dev tools**: nix-home (`home.packages`) — not in this repo
+- **AI tools**: nix-ai — not in this repo
 - **Claude-specific tools**: Next to `claude-code` in `modules/darwin/common.nix` (Development tools section)
 
 **For Homebrew packages** (when not in nixpkgs):

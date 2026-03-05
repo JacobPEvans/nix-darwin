@@ -42,8 +42,8 @@
   # Run the BATS (Bash Automated Testing System) test suite
   # Runs specific shell integration tests from tests/shell/
   # Note: test_auto_claude_args.bats is excluded here because it tests
-  # modules/home-manager/ai-cli/claude/auto-claude.sh which lives in nix-ai,
-  # not in this repo. Running it would fail in the Nix sandbox.
+  # auto-claude.sh which lives in nix-ai, not in this repo.
+  # Running it would fail in the Nix sandbox.
   shell-tests =
     pkgs.runCommand "check-shell-tests"
       {

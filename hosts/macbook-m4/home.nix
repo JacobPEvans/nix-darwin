@@ -37,14 +37,6 @@
   # TODO: Re-enable when upstream fixes options.json context in manual.nix
   manual.manpages.enable = false;
 
-  imports = [
-    # Activation recovery after login (fixes boot failures)
-    ../../modules/home-manager/nix-activation-recovery.nix
-
-    # Raycast script scheduling (refresh-repos LaunchAgent)
-    ../../modules/home-manager/raycast-scripts.nix
-  ];
-
   # ==========================================================================
   # Auto-Update Cache Cleanup (for Nix-managed apps)
   # ==========================================================================
@@ -79,13 +71,6 @@
   };
 
   programs = {
-    # Enable activation recovery after login (fixes boot failures)
-    # See docs/boot-failure/root-cause.md for why this is needed
-    nix-activation-recovery.enable = true;
-
-    # Raycast refresh-repos scheduling (hourly, replaces manual plist)
-    raycast-scripts.refreshRepos.enable = true;
-
     claude = {
       # Disable playwright plugin globally — only useful in specific projects.
       # playwright@claude-skills (skills-only, no MCP) stays enabled.

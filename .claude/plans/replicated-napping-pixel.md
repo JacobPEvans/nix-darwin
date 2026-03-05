@@ -1,5 +1,9 @@
 # Plan: Add Python Packages and Modularization Strategy
 
+> **Note**: Some file paths in this plan reference `modules/home-manager/` and
+> `overlays/python-packages.nix` which have been moved to nix-ai and nix-home repos.
+> This plan is historical.
+
 ## Part 1: Package Additions
 
 ### 1.1 Add jsondiff to Global Dev Package Set

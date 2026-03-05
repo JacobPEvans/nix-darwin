@@ -23,52 +23,36 @@ Detailed structure of the nix-darwin configuration.
 ├── flake.lock                     # Locked dependency versions
 │
 ├── hosts/                         # Host-specific configurations
-│   ├── macbook-m4/                # Active: M4 Max MacBook Pro
-│   │   ├── default.nix            # Darwin system settings
-│   │   └── home.nix               # User environment (Ollama, volumes)
-│   ├── ubuntu-server/             # Template: Ubuntu server
-│   │   ├── flake.nix              # Standalone flake for this host
-│   │   ├── default.nix            # System notes (apt-managed)
-│   │   └── home.nix               # home-manager config
-│   ├── proxmox/                   # Template: Proxmox server
-│   │   └── ...                    # Same structure as ubuntu-server
-│   └── windows-workstation/       # Placeholder: awaiting Windows Nix
-│       └── ...
+│   └── macbook-m4/                # Active: M4 Max MacBook Pro
+│       ├── default.nix            # Darwin system settings
+│       └── home.nix               # User environment (Ollama, volumes)
 │
 ├── modules/                       # Reusable configuration modules
-│   ├── common/
-│   │   ├── packages.nix           # System-level packages for ALL platforms
-│   │   └── git-flow-next.nix      # git-flow-next custom derivation
-│   ├── darwin/
-│   │   ├── common.nix             # macOS system packages, homebrew, settings
-│   │   ├── apps/                  # Application-specific modules
-│   │   │   ├── default.nix        # App module aggregator
-│   │   │   ├── orbstack.nix       # OrbStack APFS volume management
-│   │   │   ├── raycast.nix        # Raycast configuration
-│   │   │   ├── auto-update-prevention.nix # Prevent unwanted app updates
-│   │   │   └── scripts/           # App support scripts
-│   │   ├── dock/                  # Dock configuration
-│   │   │   ├── default.nix        # Dock behavior, appearance, hot corners
-│   │   │   └── persistent-apps.nix # Dock app order (left & right sides)
-│   │   ├── finder.nix             # Finder preferences
-│   │   ├── keyboard.nix           # Keyboard settings
-│   │   ├── trackpad.nix           # Trackpad gestures
-│   │   ├── system-ui.nix          # Menu bar, control center, login window
-│   │   ├── security.nix           # System security policies
-│   │   ├── energy.nix             # Power management
-│   │   ├── logging.nix            # Syslog forwarding
-│   │   ├── boot-activation.nix    # Creates /run/current-system at boot
-│   │   ├── launchd-bootstrap.nix  # LaunchDaemon bootstrap
-│   │   ├── file-extensions.nix    # File type associations
-│   │   ├── file-associations.nix  # File association helpers
-│   │   ├── auto-recovery.nix      # Activation error recovery
-│   │   ├── activation-error-tracking.nix # Track activation errors
-│   │   └── homebrew.nix           # Homebrew casks and formulas
-│   ├── linux/
-│   │   └── common.nix             # Linux home-manager settings (XDG, packages)
-│   └── home-manager/
-│       ├── nix-activation-recovery.nix  # Activation recovery helper
-│       └── raycast-scripts.nix          # Raycast script extensions
+│   └── darwin/
+│       ├── common.nix             # macOS system packages, homebrew, settings
+│       ├── apps/                  # Application-specific modules
+│       │   ├── default.nix        # App module aggregator
+│       │   ├── orbstack.nix       # OrbStack APFS volume management
+│       │   ├── raycast.nix        # Raycast configuration
+│       │   ├── auto-update-prevention.nix # Prevent unwanted app updates
+│       │   └── scripts/           # App support scripts
+│       ├── dock/                  # Dock configuration
+│       │   ├── default.nix        # Dock behavior, appearance, hot corners
+│       │   └── persistent-apps.nix # Dock app order (left & right sides)
+│       ├── finder.nix             # Finder preferences
+│       ├── keyboard.nix           # Keyboard settings
+│       ├── trackpad.nix           # Trackpad gestures
+│       ├── system-ui.nix          # Menu bar, control center, login window
+│       ├── security.nix           # System security policies
+│       ├── energy.nix             # Power management
+│       ├── logging.nix            # Syslog forwarding
+│       ├── boot-activation.nix    # Creates /run/current-system at boot
+│       ├── launchd-bootstrap.nix  # LaunchDaemon bootstrap
+│       ├── file-extensions.nix    # File type associations
+│       ├── file-associations.nix  # File association helpers
+│       ├── auto-recovery.nix      # Activation error recovery
+│       ├── activation-error-tracking.nix # Track activation errors
+│       └── homebrew.nix           # Homebrew casks and formulas
 │
 ├── lib/                           # Shared configuration variables
 │   ├── user-config.nix            # User info (name, email, GPG key)
@@ -105,7 +89,6 @@ flake.nix
     │       │
     │       └── home-manager
     │               └── hosts/macbook-m4/home.nix
-    │                       └── imports: modules/home-manager/
     │                           (AI tools via nix-ai, dev env via nix-home)
     │
     └── inputs
@@ -118,7 +101,7 @@ flake.nix
 | Layer | Scope | Location | Managed By |
 |-------|-------|----------|------------|
 | System | macOS settings, packages | `modules/darwin/` | nix-darwin |
-| User | Activation helpers & Raycast scripts | `modules/home-manager/` | home-manager |
+| User | AI tools, dev env, activation helpers | nix-ai, nix-home (flake inputs) | home-manager |
 | Host | Machine-specific | `hosts/<name>/` | Both |
 | Shared | Variables, defaults | `lib/` | Imported |
 

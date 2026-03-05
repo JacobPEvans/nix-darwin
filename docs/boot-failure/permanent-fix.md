@@ -86,7 +86,7 @@ App Management permission checks. Boot-time services can start as soon as this c
 
 This LaunchAgent runs after user login and runs full activation if needed.
 
-**File**: `modules/home-manager/nix-activation-recovery.nix`
+**File**: nix-home `modules/home-manager/nix-activation-recovery.nix` (moved from this repo)
 
 ```nix
 # See the actual file for full implementation
@@ -116,7 +116,7 @@ This LaunchAgent runs after user login and runs full activation if needed.
 {
   imports = [
     # ... other imports ...
-    ../../modules/home-manager/nix-activation-recovery.nix
+    # nix-activation-recovery.nix is now provided by nix-home flake input
   ];
 
   programs.nix-activation-recovery.enable = true;

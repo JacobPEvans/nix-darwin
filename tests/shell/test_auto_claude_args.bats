@@ -1,7 +1,10 @@
 #!/usr/bin/env bats
 # Test auto-claude.sh argument parsing
+# NOTE: auto-claude.sh has moved to nix-ai. This test file is retained for
+# reference but is excluded from the BATS test run in lib/checks.nix.
 
-# Define script path relative to test directory for portability
+# Define script path — this script now lives in nix-ai, not in this repo.
+# The path below will not resolve locally; tests are skipped in CI.
 SCRIPT_UNDER_TEST="$BATS_TEST_DIRNAME/../../modules/home-manager/ai-cli/claude/auto-claude.sh"
 
 @test "auto-claude.sh: requires 2 arguments" {
