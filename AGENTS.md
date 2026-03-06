@@ -8,7 +8,9 @@ Orchestrates system packages, networking, security, and home-manager via two com
 ## Critical Constraints
 
 1. **Flakes-only**: Never use `nix-env`, `nix-channels`, or imperative commands
-2. **Determinate Nix**: Keep `nix.enable = false` in darwin config; use `nix` (Determinate), not `nix-env` or `nix-channel`
+2. **Determinate Nix**: Use `determinateNix.enable = true` via the official module
+   (`modules/darwin/nix-storage.nix`) — do not manually set `nix.enable = false`,
+   the module handles this automatically; use `nix` (Determinate), not `nix-env` or `nix-channel`
 3. **Nixpkgs first**: Use homebrew only when nixpkgs unavailable; prefer `pkgs.*` over overlays or custom derivations
 4. **Worktrees required**: Run `/init-worktree` before any work
 5. **No direct main commits**: Always use feature branches via PRs
