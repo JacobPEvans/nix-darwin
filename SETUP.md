@@ -37,13 +37,14 @@ See [CLAUDE.md](CLAUDE.md) for complete directory structure with all files and d
 
 **Problem**: nix-darwin's Nix management conflicts with Determinate Nix installer.
 
-**Solution**: Disabled nix-darwin's Nix management in `darwin/configuration.nix`:
+**Solution**: Use the official `determinateNix` module in `modules/darwin/nix-storage.nix`:
 
 ```nix
-nix.enable = false;
+determinateNix.enable = true;
 ```
 
-**Why**: Determinate Nix manages its own daemon. Setting `nix.enable = false` allows nix-darwin to manage everything except Nix itself.
+**Why**: Determinate Nix manages its own daemon. The official module automatically sets `nix.enable = false`
+and manages `/etc/nix/nix.custom.conf` declaratively — no manual override needed.
 
 ### 2. Documentation Build Warnings
 
@@ -138,7 +139,7 @@ home-manager --version
 
 ## Lessons Learned
 
-1. **Determinate Nix conflicts** with nix-darwin's Nix management - disable with `nix.enable = false`
+1. **Determinate Nix conflicts** with nix-darwin's Nix management - use `determinateNix.enable = true` (official module handles `nix.enable = false` automatically)
 2. **Always backup files** - home-manager and nix-darwin can clobber existing configs
 3. **Unknown setting warnings are harmless** - forward compatibility doesn't break functionality
 4. **Flakes require git tracking** - all files must be `git add`ed before building
