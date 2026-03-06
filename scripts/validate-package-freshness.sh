@@ -22,9 +22,21 @@ CRITICAL_THRESHOLD_DAYS=30
 GENERAL_THRESHOLD_DAYS=90
 FLAKE_LOCK="flake.lock"
 
+# Check if jq is available (must precede any jq usage)
+if ! command -v jq &> /dev/null; then
+  echo -e "${RED}✗ ERROR: jq is required but not installed${NC}"
+  echo "Install: nix-shell -p jq or brew install jq"
+  exit 1
+fi
+
+# Dynamically determine root's nixpkgs node name.
+# When transitive deps (e.g. determinate) bring their own nixpkgs, Nix renames
+# ours to nixpkgs_2, nixpkgs_3, etc. This resolves the actual node the root uses.
+ROOT_NIXPKGS_NODE=$(jq -r '.nodes.root.inputs.nixpkgs // "nixpkgs"' "$FLAKE_LOCK" 2>/dev/null || echo "nixpkgs")
+
 # Critical packages that must be <30 days old
 CRITICAL_PACKAGES=(
-  "nixpkgs"
+  "$ROOT_NIXPKGS_NODE"
   "home-manager"
   "ai-assistant-instructions"
 )
@@ -35,23 +47,25 @@ CRITICAL_PACKAGES=(
 EXEMPT_PACKAGES=(
   "cl-nix-lite"   # Transitive dependency - cannot be directly updated
   "darwin"        # Pinned to nix-darwin-25.11 stable branch - infrequent backports
-  "flake-compat"  # Compatibility shim - stable interface, infrequent updates needed
+  "flake-compat*" # Compatibility shim and suffixed variants (flake-compat_2 etc)
   "flake-utils"   # Utility library - stable helpers, infrequent updates needed
   "systems"       # nix-systems/default-darwin - system architectures, rarely updated
-  "cl-nix-lite"   # WORKAROUND: Pinned to url-fix branch for Anubis anti-bot (mac-app-util dep)
+
+  # Transitive dependencies from DeterminateSystems/determinate — pinned upstream,
+  # we cannot update these independently of the determinate flake input.
+  "nixpkgs"            # Determinate's internal nixpkgs (root uses nixpkgs_N instead)
+  "nixpkgs_2"          # Determinate's nixpkgs renamed by Nix (determinate->nixpkgs maps here)
+  "nix"                # DeterminateSystems/nix-src — pinned by determinate, not directly updatable
+  "flake-parts"        # Pinned by determinate/nix build system
+  "git-hooks-nix"      # Pinned by determinate/nix for pre-commit hooks
+  "nixpkgs-23-11"      # Pinned regression test nixpkgs in determinate/nix
+  "nixpkgs-regression" # Pinned regression test nixpkgs in determinate/nix
 )
 
 # Check if flake.lock exists
 if [[ ! -f "$FLAKE_LOCK" ]]; then
   echo -e "${YELLOW}⚠  No flake.lock found, skipping freshness check${NC}"
   exit 0
-fi
-
-# Check if jq is available
-if ! command -v jq &> /dev/null; then
-  echo -e "${RED}✗ ERROR: jq is required but not installed${NC}"
-  echo "Install: nix-shell -p jq or brew install jq"
-  exit 1
 fi
 
 # Function: Extract lastModified timestamp from flake.lock

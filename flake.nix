@@ -59,6 +59,11 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    # Official Determinate Nix module for nix-darwin
+    # Manages nix.conf, determinate-nixd config, and GC automatically
+    # Updates tracked by deps-update-flake.yml (daily nix flake update) + Renovate
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+
   };
 
   outputs =
@@ -70,6 +75,7 @@
       mac-app-util,
       nix-ai,
       nix-home,
+      determinate,
       ...
     }:
     let
@@ -95,6 +101,9 @@
         specialArgs = { inherit unstablePkgs; };
         modules = [
           ./hosts/macbook-m4/default.nix
+
+          # Determinate Nix: official module for nix.conf, GC, and determinate-nixd config
+          determinate.darwinModules.default
 
           # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
           mac-app-util.darwinModules.default

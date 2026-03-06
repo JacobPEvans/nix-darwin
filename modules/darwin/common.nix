@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   unstablePkgs,
   ...
 }:
@@ -25,6 +24,7 @@ in
     ./trackpad.nix
     ./system-ui.nix
     ./activation-error-tracking.nix
+    ./nix-storage.nix
   ];
 
   # --- Nixpkgs Configuration ---
@@ -115,22 +115,6 @@ in
     zsh.enable = true;
     raycast.enable = true;
   };
-
-  # --- Nix Configuration (Determinate Nix compatibility) ---
-  # Disable nix-darwin's Nix management - Determinate Nix manages daemon and nix itself
-  # Workaround: home-manager's darwin module accesses nix.package even when enable=false
-  # Using mkForce bypasses the throw in nix-darwin's managedDefault
-  # See: https://github.com/nix-community/home-manager/issues/4026
-  nix = {
-    enable = false;
-    package = lib.mkForce pkgs.nix;
-    # Note: nix.gc cannot be configured when nix.enable = false
-    # Determinate Nix manages garbage collection via its own mechanisms
-    # For manual GC, use: nix-collect-garbage --delete-older-than 30d
-  };
-
-  # Add Nix settings via conf.d snippet, as nix.settings is ignored when nix.enable = false.
-  environment.etc."nix/conf.d/gc.conf".text = "auto-optimise-store = true";
 
   documentation.enable = false;
 
