@@ -11,7 +11,8 @@
     "config:recommended",
     ":dependencyDashboard",
     ":semanticCommits",
-    ":enablePreCommit"
+    ":enablePreCommit",
+    "local>JacobPEvans/.github:renovate-presets"
   ],
 
   // Repository settings
@@ -20,11 +21,6 @@
   "labels": ["dependencies", "renovate"],
   "assignees": ["@JacobPEvans"],
   "reviewers": ["@JacobPEvans"],
-
-  // Global automerge defaults (inherited by all packageRules except where overridden)
-  "automerge": true,
-  "automergeType": "pr",
-  "automergeStrategy": "squash",
 
   // Nix flake support (native manager)
   "nix": {
@@ -55,15 +51,18 @@
     },
 
     // GROUP 2: AI tools (Daily 7am)
-    // Note: matchPackagePatterns uses GitHub repo patterns, not flake input names
+    // Note: matchPackageNames uses GitHub repo paths (owner/repo), not flake input names
     {
       "description": "AI-focused flake inputs - daily updates at 7am",
-      "matchPackagePatterns": [
-        "anthropics/",
+      "matchDatasources": ["git-refs"],
+      "matchPackageNames": [
+        "anthropics/**",
         "obra/superpowers-marketplace",
-        "JacobPEvans/claude-code-plugins"
+        "JacobPEvans/claude-code-plugins",
+        "JacobPEvans/nix-ai"
       ],
       "groupName": "ai-tools",
+      "automerge": true,
       "schedule": ["after 7am every day"]
     },
 
