@@ -55,7 +55,7 @@
       }
       ''
         cd ${src}
-        for f in test_bats_framework.bats test_check_file_sizes.bats test_verify_symlinks.bats; do
+        for f in test_bats_framework.bats test_check_file_sizes.bats test_verify_symlinks.bats test_determine_flake_inputs.bats test_check_package_versions.bats; do
           bats tests/shell/$f
         done
         touch $out
