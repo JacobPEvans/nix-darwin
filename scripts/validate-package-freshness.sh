@@ -22,6 +22,13 @@ CRITICAL_THRESHOLD_DAYS=30
 GENERAL_THRESHOLD_DAYS=90
 FLAKE_LOCK="flake.lock"
 
+# Check if jq is available (must precede any jq usage)
+if ! command -v jq &> /dev/null; then
+  echo -e "${RED}✗ ERROR: jq is required but not installed${NC}"
+  echo "Install: nix-shell -p jq or brew install jq"
+  exit 1
+fi
+
 # Dynamically determine root's nixpkgs node name.
 # When transitive deps (e.g. determinate) bring their own nixpkgs, Nix renames
 # ours to nixpkgs_2, nixpkgs_3, etc. This resolves the actual node the root uses.
@@ -47,6 +54,8 @@ EXEMPT_PACKAGES=(
   # Transitive dependencies from DeterminateSystems/determinate — pinned upstream,
   # we cannot update these independently of the determinate flake input.
   "nixpkgs"            # Determinate's internal nixpkgs (root uses nixpkgs_N instead)
+  "nixpkgs_2"          # Determinate's nixpkgs renamed by Nix (determinate->nixpkgs maps here)
+  "nix"                # DeterminateSystems/nix-src — pinned by determinate, not directly updatable
   "flake-parts"        # Pinned by determinate/nix build system
   "git-hooks-nix"      # Pinned by determinate/nix for pre-commit hooks
   "nixpkgs-23-11"      # Pinned regression test nixpkgs in determinate/nix
@@ -57,13 +66,6 @@ EXEMPT_PACKAGES=(
 if [[ ! -f "$FLAKE_LOCK" ]]; then
   echo -e "${YELLOW}⚠  No flake.lock found, skipping freshness check${NC}"
   exit 0
-fi
-
-# Check if jq is available
-if ! command -v jq &> /dev/null; then
-  echo -e "${RED}✗ ERROR: jq is required but not installed${NC}"
-  echo "Install: nix-shell -p jq or brew install jq"
-  exit 1
 fi
 
 # Function: Extract lastModified timestamp from flake.lock
