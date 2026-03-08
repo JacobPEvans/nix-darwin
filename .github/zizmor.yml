@@ -83,7 +83,6 @@ rules:
       - ci-package-staleness.yml
       - ci-validate-settings.yml
       - ci-validate.yml
-      - deps-monitor-packages.yml
       - deps-update-flake.yml
       - nixos-release-check.yml
       - review-deps.yml

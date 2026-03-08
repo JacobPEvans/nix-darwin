@@ -1,0 +1,8 @@
+# README validator config for .github/ subdirectories.
+# Workflow documentation uses different sections than project READMEs.
+required_sections:
+  - Architecture
+  - Workflow Reference
+optional_sections:
+  - Configuration
+  - Contributing

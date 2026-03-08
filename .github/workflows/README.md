@@ -153,7 +153,6 @@ jobs:
 | `review-code.yml` | Claude Code PR review |
 | `review-deps.yml` | Dependency update reviews |
 | `deps-update-flake.yml` | Unified flake.lock updates (schedule + instant sync) |
-| `deps-monitor-packages.yml` | Package version monitoring |
 
 ## Configuration
 
