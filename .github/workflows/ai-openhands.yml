@@ -17,8 +17,11 @@
 name: OpenHands AI Agent
 
 on:
-  issues:
-    types: [labeled]
+  workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # issues:
+  #   types: [labeled]
+  # --- END DISABLED ---
 
 jobs:
   openhands-agent:

@@ -3,10 +3,13 @@
 name: Review Flake Update
 
 on:
-  pull_request:
-    types: [opened, synchronize, labeled]
-    paths:
-      - "flake.lock"
+  workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # pull_request:
+  #   types: [opened, synchronize, labeled]
+  #   paths:
+  #     - "flake.lock"
+  # --- END DISABLED ---
 
 jobs:
   review:
