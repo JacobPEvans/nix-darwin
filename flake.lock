@@ -510,15 +510,16 @@
           "nixpkgs"
         ],
         "obsidian-skills": "obsidian-skills",
+        "pal-mcp-server": "pal-mcp-server",
         "superpowers-marketplace": "superpowers-marketplace",
         "wakatime": "wakatime"
       },
       "locked": {
-        "lastModified": 1772847333,
-        "narHash": "sha256-Agxd0fgCL/PX+r3DceCAiAq44yA+Xu++wPEuxpruICY=",
+        "lastModified": 1772910072,
+        "narHash": "sha256-cfDFm5oIOG0zMFJia2+4FjDVMjIpAWGl880qEjg3kkg=",
         "owner": "JacobPEvans",
         "repo": "nix-ai",
-        "rev": "989f893827d2acdee273e7d4b3ce6ad8de7154bb",
+        "rev": "dc15d441f55dd28eb6d8214170d43b7fe462ec0e",
         "type": "github"
       },
       "original": {
@@ -537,11 +538,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772851494,
-        "narHash": "sha256-xl6DIGxdiG4vjsC2YBAUJ6S2j01ifts2QWykpZRL/6A=",
+        "lastModified": 1772905819,
+        "narHash": "sha256-BMYSbP2q5nKh2Nef3FPARxLY6nDRzF6OE5N2kosMQmU=",
         "owner": "JacobPEvans",
         "repo": "nix-home",
-        "rev": "a2cbb40ea00e36c4b2e6c22551a391461021d904",
+        "rev": "23804aa9d684ab1e0a98026e3b159b80955ca22a",
         "type": "github"
       },
       "original": {
@@ -628,11 +629,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1772598333,
-        "narHash": "sha256-YaHht/C35INEX3DeJQNWjNaTcPjYmBwwjFJ2jdtr+5U=",
+        "lastModified": 1772880540,
+        "narHash": "sha256-iZNfrAQfIciv/F4oXpkjH+ajr3N+Sh42zY8VYV01dXw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "fabb8c9deee281e50b1065002c9828f2cf7b2239",
+        "rev": "e3dc44fc3cfc7f5e8d96f6cfc87eeb26a324164a",
         "type": "github"
       },
       "original": {
@@ -655,6 +656,22 @@
       "original": {
         "owner": "kepano",
         "repo": "obsidian-skills",
+        "type": "github"
+      }
+    },
+    "pal-mcp-server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765818451,
+        "narHash": "sha256-N10TLndisNT48NVT8OZs7hZFf4D6j8ekPU7RfqwkqY0=",
+        "owner": "BeehiveInnovations",
+        "repo": "pal-mcp-server",
+        "rev": "7afc7c1cc96e23992c8f105f960132c657883bb1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BeehiveInnovations",
+        "repo": "pal-mcp-server",
         "type": "github"
       }
     },
