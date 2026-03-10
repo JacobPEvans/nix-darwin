@@ -8,12 +8,7 @@
 # Configuration is centralized in lib/user-config.nix under logging.syslog
 # to allow easy modification of the syslog server without editing this module.
 
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ lib, ... }:
 
 let
   userConfig = import ../../lib/user-config.nix;

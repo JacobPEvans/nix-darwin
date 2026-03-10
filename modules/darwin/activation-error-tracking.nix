@@ -18,7 +18,7 @@
 #   * TREAT ALL ERRORS AS WARNINGS, not fatal failures
 #   * Symlink update is the CRITICAL phase - must never abort before it
 
-{ lib, config, ... }:
+{ lib, ... }:
 
 {
   # Post-activation script that wraps home-manager activation
