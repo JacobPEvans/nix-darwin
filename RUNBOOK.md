@@ -553,7 +553,7 @@ gh issue list --search "Dependency Dashboard in:title"
 1. Check if Renovate App is installed:
 
    ```bash
-   gh api repos/JacobPEvans/nix/collaborators | jq '.[] | select(.login == "renovate[bot]")'
+   gh api --paginate repos/:owner/:repo/collaborators | jq '.[] | select(.login == "renovate[bot]")'
    ```
 
 2. Check Dependency Dashboard for errors or rate limits
