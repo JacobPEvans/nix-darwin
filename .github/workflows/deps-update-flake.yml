@@ -98,7 +98,7 @@ jobs:
 
       - name: Update custom packages
         if: steps.check-renovate.outputs.skip == 'false'
-        run: nix run nixpkgs#nix-update -- --flake claudebar
+        run: nix run nixpkgs#nix-update -- --flake --system aarch64-darwin claudebar
 
       - name: Create Pull Request
         if: steps.check-renovate.outputs.skip == 'false'
