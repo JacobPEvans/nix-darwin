@@ -96,6 +96,10 @@ jobs:
             ./scripts/update-all-flakes.sh
           fi
 
+      - name: Update custom packages
+        if: steps.check-renovate.outputs.skip == 'false'
+        run: nix run nixpkgs#nix-update -- --flake claudebar
+
       - name: Create Pull Request
         if: steps.check-renovate.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v8
