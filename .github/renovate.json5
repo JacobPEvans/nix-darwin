@@ -27,11 +27,6 @@
     "enabled": true
   },
 
-  // Custom regex managers for bunx wrappers in .nix files
-  // NOTE: ai-tools.nix has moved to nix-ai repo. This manager is retained
-  // but its fileMatch will not match any files in this repo.
-  "customManagers": [],
-
   // Package grouping and scheduling strategy
   "packageRules": [
     // GROUP 1: Critical infrastructure (Daily 7am with automerge)
@@ -65,17 +60,6 @@
       "automerge": true,
       "matchUpdateTypes": ["minor", "patch"],
       "schedule": ["after 7am every day"]
-    },
-
-    // GROUP 3: npm packages (bunx wrappers) - Weekly Monday 7am
-    {
-      "description": "Bunx wrapper npm packages - weekly updates at 7am Monday",
-      "matchDatasources": ["npm"],
-      // NOTE: ai-tools.nix has moved to nix-ai repo. This rule is inactive.
-      "matchFileNames": [],
-      "groupName": "npm-wrappers",
-      "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days" // Let npm packages stabilize before merging
     },
 
     // GROUP 4: GitHub Actions - Weekly Monday 7am
