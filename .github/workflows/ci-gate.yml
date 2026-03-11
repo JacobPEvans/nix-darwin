@@ -92,9 +92,6 @@ jobs:
     name: Nix Build
     needs: changes
     if: needs.changes.outputs.nix == 'true' && needs.changes.outputs.is-deps-only == 'false'
-    permissions:
-      contents: read
-      id-token: write
     uses: ./.github/workflows/_nix-build.yml
 
   nix-validate:
@@ -113,9 +110,6 @@ jobs:
     name: Claude Settings
     needs: changes
     if: needs.changes.outputs.claude == 'true'
-    permissions:
-      contents: read
-      id-token: write
     uses: ./.github/workflows/_claude-settings.yml
 
   file-size:

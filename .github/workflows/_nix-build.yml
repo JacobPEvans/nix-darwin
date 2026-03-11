@@ -16,7 +16,6 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: read
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -33,11 +32,19 @@ jobs:
             stalled-download-timeout = 10
             narinfo-cache-positive-ttl = 86400
             fallback = true
+            auto-optimise-store = false
 
-      # Caching: Free, zero-config Nix store cache via GitHub Actions cache
-      # DO NOT replace with flakehub-cache-action (PAID) or raw actions/cache (breaks on /nix/store)
+      # Caching: Nix-aware cache with restore-only on PRs, save on main only
+      # DO NOT replace with magic-nix-cache-action (uploads every run, 2.5x wall-time regression)
+      # DO NOT replace with flakehub-cache-action (PAID) or raw actions/cache (tar errors)
       - name: Cache Nix Store
-        uses: DeterminateSystems/magic-nix-cache-action@v13
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-prefixes-first-match: |
+            nix-${{ runner.os }}-
+          gc-max-store-size-macos: 5G
+          save: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Start Build Timer
         id: build-timer
