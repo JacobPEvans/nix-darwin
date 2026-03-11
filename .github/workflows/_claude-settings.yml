@@ -12,12 +12,14 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -69,5 +71,8 @@ jobs:
       - name: Validation Timing
         if: always()
         run: |
-          elapsed=$(( $(date +%s) - ${{ steps.validation-timer.outputs.start }} ))
-          echo "::notice::Settings validation completed in ${elapsed}s"
+          start="${{ steps.validation-timer.outputs.start }}"
+          if [ -n "$start" ]; then
+            elapsed=$(( $(date +%s) - start ))
+            echo "::notice::Settings validation completed in ${elapsed}s"
+          fi
