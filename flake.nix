@@ -1,6 +1,5 @@
 {
   # Nix-darwin flake configuration
-  # ci: trigger nix-build to validate magic-nix-cache-action timing
   description = "nix-darwin configuration for M4 Max MacBook Pro";
 
   inputs = {
