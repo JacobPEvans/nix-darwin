@@ -29,6 +29,7 @@ jobs:
     # Only run when 'ai:openhands' label is added
     if: github.event.label.name == 'ai:openhands'
     runs-on: ubuntu-latest
+    environment: automation
     permissions:
       contents: write
       pull-requests: write
