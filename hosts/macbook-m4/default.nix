@@ -5,7 +5,7 @@
 #
 # This file imports darwin modules and configures host-specific settings.
 
-{ pkgs, ... }:
+_:
 
 let
   # User-specific configuration (hostname, identity, etc.)

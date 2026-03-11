@@ -1,12 +1,7 @@
 # Boot failure detection via shell initialization
 # Checks for /run/current-system and provides nix-recover helper function
 
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ lib, ... }:
 
 {
   programs.zsh.interactiveShellInit = lib.mkBefore ''

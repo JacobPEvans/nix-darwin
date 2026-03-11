@@ -3,12 +3,7 @@
 # App Management permission issues during early boot.
 #
 # See: docs/boot-failure/root-cause.md
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 
 let
   bootActivationScript = pkgs.writeShellScript "nix-boot-activation" ''

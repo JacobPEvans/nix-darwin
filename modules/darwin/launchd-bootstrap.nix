@@ -5,12 +5,7 @@
 #
 # See: docs/boot-failure/ for full documentation
 
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ lib, ... }:
 
 {
   system.activationScripts.postActivation.text = lib.mkAfter ''
