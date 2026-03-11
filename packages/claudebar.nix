@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation rec {
   pname = "ClaudeBar";
-  version = "0.3.6";
+  version = "0.4.43";
 
   src = fetchurl {
     url = "https://github.com/tddworks/ClaudeBar/releases/download/v${version}/ClaudeBar-${version}.dmg";
-    hash = "sha256-Z9FX3w7RHpiHa2xNrQmgkc7PxvNY28YYbn/Zxw4UO2s=";
+    hash = "sha256-sdeRvy1omTm7St5IjLRkdoy35jNj5WEQhMbKo4o4BAU=";
   };
 
   nativeBuildInputs = [ undmg ];
