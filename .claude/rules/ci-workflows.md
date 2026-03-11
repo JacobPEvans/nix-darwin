@@ -4,8 +4,8 @@
 
 - **NEVER use `DeterminateSystems/flakehub-cache-action`** — it is a PAID service. We cannot afford it.
 - **NEVER use raw `actions/cache` to tar `/nix/store`** — causes tar extraction errors due to special permissions/hardlinks.
-- **ALWAYS use `DeterminateSystems/magic-nix-cache-action`** for Nix store caching — free, zero-config, uses GitHub Actions built-in cache.
-- `magic-nix-cache-action` requires `id-token: write` permission.
+- **ALWAYS use a versioned `DeterminateSystems/magic-nix-cache-action@vX`** for Nix store caching — free, zero-config, uses GitHub Actions built-in cache.
+- `magic-nix-cache-action` requires `id-token: write` permission. This should be scoped to individual jobs, not the entire workflow.
 
 ## Performance Requirements
 
