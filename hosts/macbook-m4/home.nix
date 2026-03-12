@@ -123,6 +123,9 @@
         # Context7 - for context7@claude-plugins-official MCP server
         export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' '${userConfig.user.name}')"}
 
+        # HuggingFace - for huggingface MCP server and hf CLI (model downloads)
+        export HF_TOKEN=''${HF_TOKEN:-"$(_get_keychain_secret 'HF_TOKEN' '${userConfig.user.name}')"}
+
         unset -f _get_keychain_secret
 
         # --- macOS setup ---
