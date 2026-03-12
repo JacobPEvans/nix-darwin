@@ -538,11 +538,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773282568,
-        "narHash": "sha256-YFE5vM+ZOD1ayC7v1YfVtmfArBu7cpeopdyGtDQ4Ev0=",
+        "lastModified": 1773285114,
+        "narHash": "sha256-Qg4+GgKhO0jCC9be9PL3brSvrEtAhSOwY0qe4a2lZx0=",
         "owner": "JacobPEvans",
         "repo": "nix-home",
-        "rev": "0548954ceb48420e6b4c7081afc47dc74024aee0",
+        "rev": "9301351a4898ffc043052ad8bf8e412435f6e8ca",
         "type": "github"
       },
       "original": {
