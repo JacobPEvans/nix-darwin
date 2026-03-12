@@ -87,7 +87,6 @@
             "git" # Duplicates built-in git via Bash(git:*)
             "github" # Duplicates github@claude-plugins-official plugin
             "cribl" # Project-specific — available via per-project .mcp.json
-            "aws" # Project-specific — available via per-project .mcp.json
             "terraform" # Project-specific — available via per-project .mcp.json
             "cloudflare" # Not actively used — disable until needed
             "exa" # Not actively used — disable until needed
@@ -113,17 +112,29 @@
 
         _get_keychain_secret() {
           # Fetch a secret from the macOS Keychain by service name.
-          # Usage: _get_keychain_secret <service> <account>
-          security find-generic-password -s "$1" -a "$2" -w 2>/dev/null || echo ""
+          # Usage: _get_keychain_secret <service> <account> [keychain-db]
+          # keychain-db: optional path, e.g. automation.keychain-db
+          security find-generic-password -s "$1" -a "$2" -w ''${3:+"$3"} 2>/dev/null || echo ""
         }
 
+        # Keychain identity constants — resolved from userConfig at build time.
+        # Human account: personal secrets in the login keychain.
+        # AI account: automation secrets in a dedicated keychain (see lib/user-config.nix).
+        _KC_USER='${userConfig.user.name}'
+        _KC_AI_ACCOUNT='${userConfig.keychain.aiAccount}'
+        _KC_AI_DB='${userConfig.keychain.aiDb}'
+
         # GitHub - for github@claude-plugins-official MCP server
-        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(_get_keychain_secret 'github-pat' '${userConfig.user.name}')"}
+        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(_get_keychain_secret 'github-pat' "$_KC_USER")"}
 
         # Context7 - for context7@claude-plugins-official MCP server
-        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' '${userConfig.user.name}')"}
+        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' "$_KC_USER")"}
+
+        # HuggingFace - for huggingface MCP server and hf CLI (model downloads)
+        export HF_TOKEN=''${HF_TOKEN:-"$(_get_keychain_secret 'HF_TOKEN' "$_KC_AI_ACCOUNT" "$_KC_AI_DB")"}
 
         unset -f _get_keychain_secret
+        unset _KC_USER _KC_AI_ACCOUNT _KC_AI_DB
 
         # --- macOS setup ---
         source ${./macos-setup.zsh}

@@ -103,6 +103,19 @@ in
   };
 
   # ==========================================================================
+  # macOS Keychain Configuration
+  # ==========================================================================
+  keychain = {
+    # Account name for AI/automation secrets (stored separately from personal credentials)
+    # Secrets are stored in aiDb, not the login keychain, to keep them isolated.
+    # Add secrets with: security add-generic-password -U -s <service> -a <aiAccount> -w "<value>" <aiDb>
+    aiAccount = "ai-cli-coder";
+
+    # Dedicated keychain database for AI/automation secrets
+    aiDb = "automation.keychain-db";
+  };
+
+  # ==========================================================================
   # Nix/NixOS Configuration
   # ==========================================================================
   nix = {
