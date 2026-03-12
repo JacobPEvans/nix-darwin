@@ -118,10 +118,11 @@ _:
       }
 
       # --- Local Inference ---
+      # LM Studio: local LLM inference UI + OpenAI-compatible API server
       {
         name = "lm-studio";
         greedy = true;
-      } # LM Studio: local LLM inference UI + OpenAI-compatible API server
+      }
 
       # --- Google Gemini ---
       {
