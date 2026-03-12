@@ -118,18 +118,25 @@
           security find-generic-password -s "$1" -a "$2" -w ''${3:+"$3"} 2>/dev/null || echo ""
         }
 
+        # Keychain identity constants — defined once, used everywhere below.
+        # Human account: personal secrets stored under the user login keychain.
+        # AI account: automation secrets stored in a dedicated keychain to keep
+        #             them separate from personal credentials.
+        _KC_USER='${userConfig.user.name}'
+        _KC_AI_ACCOUNT='ai-cli-coder'
+        _KC_AI_DB='automation.keychain-db'
+
         # GitHub - for github@claude-plugins-official MCP server
-        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(_get_keychain_secret 'github-pat' '${userConfig.user.name}')"}
+        export GITHUB_PERSONAL_ACCESS_TOKEN=''${GITHUB_PERSONAL_ACCESS_TOKEN:-"$(_get_keychain_secret 'github-pat' "$_KC_USER")"}
 
         # Context7 - for context7@claude-plugins-official MCP server
-        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' '${userConfig.user.name}')"}
+        export CONTEXT7_API_KEY=''${CONTEXT7_API_KEY:-"$(_get_keychain_secret 'CONTEXT7_API_KEY' "$_KC_USER")"}
 
         # HuggingFace - for huggingface MCP server and hf CLI (model downloads)
-        # Account: ai-cli-coder, Keychain: automation.keychain-db
-        # Setup: security add-generic-password -U -s HF_TOKEN -a ai-cli-coder -w "<token>" automation.keychain-db
-        export HF_TOKEN=''${HF_TOKEN:-"$(_get_keychain_secret 'HF_TOKEN' 'ai-cli-coder' 'automation.keychain-db')"}
+        export HF_TOKEN=''${HF_TOKEN:-"$(_get_keychain_secret 'HF_TOKEN' "$_KC_AI_ACCOUNT" "$_KC_AI_DB")"}
 
         unset -f _get_keychain_secret
+        unset _KC_USER _KC_AI_ACCOUNT _KC_AI_DB
 
         # --- macOS setup ---
         source ${./macos-setup.zsh}
