@@ -117,6 +117,12 @@ _:
         greedy = true;
       }
 
+      # --- Local Inference ---
+      {
+        name = "lm-studio";
+        greedy = true;
+      } # LM Studio: local LLM inference UI + OpenAI-compatible API server
+
       # --- Google Gemini ---
       {
         name = "antigravity";
