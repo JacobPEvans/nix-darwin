@@ -25,8 +25,11 @@ patterns_json=$(sops --decrypt "$SOPS_FILE" 2>/dev/null) || {
   exit 0
 }
 
-# Extract patterns array
-mapfile -t patterns < <(echo "$patterns_json" | jq -r '.patterns[]')
+# Extract patterns array (bash 3.2 compatible — mapfile requires bash 4+)
+patterns=()
+while IFS= read -r line; do
+  patterns+=("$line")
+done < <(echo "$patterns_json" | jq -r '.patterns[]')
 
 if (( ${#patterns[@]} == 0 )); then
   exit 0
