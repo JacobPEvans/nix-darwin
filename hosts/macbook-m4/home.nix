@@ -95,7 +95,16 @@
           ]
           (_: {
             disabled = true;
-          });
+          })
+        // {
+          splunk = {
+            command = "doppler-mcp";
+            args = [ "splunk-mcp-connect" ];
+            env = {
+              NODE_TLS_REJECT_UNAUTHORIZED = "0";
+            };
+          };
+        };
     };
 
     # macOS-specific zsh overrides
