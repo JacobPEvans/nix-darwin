@@ -247,3 +247,15 @@ Source: `modules/darwin/common.nix` (overlay block)
 | whisper-cpp | Speech-to-text - fast-moving (CoreML/Metal support) |
 
 ---
+
+## Claude MCP Servers (Host-Specific)
+
+Source: `hosts/macbook-m4/home.nix`
+
+Custom MCP server entries added to `programs.claude.mcpServers` at the host level.
+
+| Server | Command | Description |
+|--------|---------|-------------|
+| splunk | `doppler-mcp splunk-mcp-connect` | Splunk REST API via mcp-remote, secrets injected by Doppler |
+
+---

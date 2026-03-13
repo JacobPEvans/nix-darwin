@@ -95,7 +95,15 @@
           ]
           (_: {
             disabled = true;
-          });
+          })
+        // {
+          splunk = {
+            command = "doppler-mcp";
+            args = [ "splunk-mcp-connect" ];
+            # TLS bypass for self-signed cert is scoped inside splunk-mcp-connect,
+            # not here, to avoid leaking NODE_TLS_REJECT_UNAUTHORIZED to doppler-mcp.
+          };
+        };
     };
 
     # macOS-specific zsh overrides
