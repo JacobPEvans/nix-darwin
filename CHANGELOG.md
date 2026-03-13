@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.1.0...v1.2.0) (2026-03-13)
+
+
+### Features
+
+* add Splunk MCP server to Claude Code mcpServers ([#829](https://github.com/JacobPEvans/nix-darwin/issues/829)) ([f212edd](https://github.com/JacobPEvans/nix-darwin/commit/f212edd3660b7dde9f5bb0e134df6857481996b0))
+* **gc:** add weekly LaunchDaemon to prune old profile generations ([#830](https://github.com/JacobPEvans/nix-darwin/issues/830)) ([d3cac5b](https://github.com/JacobPEvans/nix-darwin/commit/d3cac5b3e8c2e08fa5429a730e146503b48ce291))
+
 ## [1.1.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.0.0...v1.1.0) (2026-03-13)
 
 
