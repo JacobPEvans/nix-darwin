@@ -44,27 +44,24 @@ fi
 
 MOUNT_POINT="/Volumes/${VOLUME_NAME}"
 
-# Already mounted - done
+# Already mounted - nothing to do for mount
 if mount | grep -q " on ${MOUNT_POINT} "; then
-    exit 0
-fi
-
+    : # Volume is already mounted, fall through to quota logic
 # Exists but not mounted - mount it
-if diskutil info "${VOLUME_NAME}" &>/dev/null; then
+elif diskutil info "${VOLUME_NAME}" &>/dev/null; then
     if ! diskutil mount "${VOLUME_NAME}"; then
         echo "Error: Failed to mount volume '${VOLUME_NAME}'" >&2
         exit 1
     fi
-    exit 0
-fi
-
 # Create volume
-if ! diskutil apfs addVolume "${CONTAINER}" APFS "${VOLUME_NAME}"; then
-    echo "Error: Failed to create volume '${VOLUME_NAME}' on container '${CONTAINER}'" >&2
-    exit 1
+else
+    if ! diskutil apfs addVolume "${CONTAINER}" APFS "${VOLUME_NAME}"; then
+        echo "Error: Failed to create volume '${VOLUME_NAME}' on container '${CONTAINER}'" >&2
+        exit 1
+    fi
 fi
 
-# Apply quota if specified
+# Apply quota if specified (always runs, even for existing volumes)
 if [[ -n "$QUOTA" ]]; then
     if ! diskutil apfs setQuota "${VOLUME_NAME}" "${QUOTA}"; then
         echo "Error: Failed to set quota '${QUOTA}' on volume '${VOLUME_NAME}'" >&2
