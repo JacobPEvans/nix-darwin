@@ -27,6 +27,15 @@
       # Default: unlimited
       max-free = 5368709120;
 
+      # Allow jevans to use flake-level nixConfig (extra-substituters, etc.)
+      # Security: equivalent to root for Nix store operations — appropriate for
+      # single-user macOS workstation where jevans already has sudo
+      trusted-users = "root jevans";
+
+      # devenv binary cache — used by nix-ai devShells, avoids building from source
+      extra-substituters = "https://devenv.cachix.org";
+      extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
+
       # -- Defaults left commented for awareness --
       # max-jobs = "auto";           # Parallel build jobs (set by Determinate Nix)
       # keep-build-log = true;       # Retain build logs for debugging
