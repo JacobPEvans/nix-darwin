@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.2.0...v1.3.0) (2026-03-14)
+
+
+### Features
+
+* add APFS volume quota support and AI model volumes ([#832](https://github.com/JacobPEvans/nix-darwin/issues/832)) ([4d0aea3](https://github.com/JacobPEvans/nix-darwin/commit/4d0aea3b6cd6bddc15fc52ae1d9095a3c198f36f))
+
 ## [1.2.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.1.0...v1.2.0) (2026-03-13)
 
 
