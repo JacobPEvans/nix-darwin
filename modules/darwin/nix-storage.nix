@@ -1,4 +1,8 @@
 { lib, pkgs, ... }:
+
+let
+  userConfig = import ../../lib/user-config.nix;
+in
 {
   # ============================================================================
   # Determinate Nix Integration
@@ -27,10 +31,10 @@
       # Default: unlimited
       max-free = 5368709120;
 
-      # Allow jevans to use flake-level nixConfig (extra-substituters, etc.)
+      # Allow the primary user to use flake-level nixConfig (extra-substituters, etc.)
       # Security: equivalent to root for Nix store operations — appropriate for
-      # single-user macOS workstation where jevans already has sudo
-      trusted-users = "root jevans";
+      # single-user macOS workstation where the primary user already has sudo
+      trusted-users = "root ${userConfig.user.name}";
 
       # devenv binary cache — used by nix-ai devShells, avoids building from source
       extra-substituters = "https://devenv.cachix.org";
