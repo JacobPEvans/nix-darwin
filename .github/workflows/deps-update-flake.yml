@@ -1,58 +1,26 @@
-# Automated flake.lock updates with verified commits
+# Custom package updates (source hash bumps via nix-update)
 #
-# Uses JacobPEvans-github-actions App for:
-# - Signed & verified commits via GitHub's REST API
-# - Triggering downstream workflows (CI Gate, Review)
-# - Enabling auto-merge for approved updates
+# Flake input updates (flake.lock) are handled by Renovate's nix manager,
+# which creates individual PRs per input with auto-merge for trusted owners.
+# See renovate.json and renovate-presets.json in JacobPEvans/.github.
 #
-# Triggers:
-# - Daily at noon UTC (schedule)
-# - Instant sync when upstream repos push (repository_dispatch)
-# - Manual (workflow_dispatch)
-#
-# Update Strategy:
-# - Tue/Fri or manual with update_all: Updates ALL flake inputs
-# - Other days: Updates AI-focused inputs (including claude-code for agile updates)
-# - repository_dispatch (ai-instructions-updated): Updates only ai-assistant-instructions (fast sync)
-# - repository_dispatch (upstream-repo-updated): Updates specified flake input (fast sync)
-# - Claude Code Philosophy: Always update when available. Manually research and validate
-#   new versions. Accept updates; revert only if issues discovered during testing.
-name: Update flake.lock
+# This workflow only handles nix-update for packages with pinned source hashes
+# that Renovate cannot manage natively.
+name: Update custom packages
 
 on:
   schedule:
-    - cron: "0 12 * * *"
-  repository_dispatch:
-    types:
-      - ai-instructions-updated
-      - upstream-repo-updated
+    - cron: "0 12 * * 1"
   workflow_dispatch:
-    inputs:
-      update_all:
-        description: "Update ALL inputs (not just AI-focused)"
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   update:
-    name: Update flake inputs
+    name: Update custom packages
     runs-on: ubuntu-latest
     environment: automation
     permissions:
       contents: write
       pull-requests: write
-    env:
-      AI_INPUTS: >-
-        nixpkgs
-        ai-assistant-instructions
-        claude-code-plugins
-        claude-cookbooks
-        claude-plugins-official
-        anthropic-agent-skills
-        superpowers-marketplace
-        nix-ai
-        nix-home
     steps:
       - name: Generate GitHub App Token
         id: app-token
@@ -66,71 +34,21 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Determine inputs to update
-        id: inputs
-        run: ./scripts/workflows/determine-flake-inputs.sh
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          UPDATE_ALL: ${{ inputs.update_all }}
-          DISPATCH_ACTION: ${{ github.event.action }}
-          FLAKE_INPUT_NAME: ${{ github.event.client_payload.flake_input_name }}
-          SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
-
-      - name: Check for existing Renovate PR
-        id: check-renovate
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: ./scripts/workflows/check-renovate-pr.sh
-
       - name: Install Nix
-        if: steps.check-renovate.outputs.skip == 'false'
         uses: DeterminateSystems/determinate-nix-action@v3
 
-      - name: Update all flake.lock files
-        if: steps.check-renovate.outputs.skip == 'false'
-        env:
-          FLAKE_INPUTS: ${{ steps.inputs.outputs.inputs }}
-        run: |
-          if [ -n "$FLAKE_INPUTS" ]; then
-            ./scripts/update-all-flakes.sh --inputs "$FLAKE_INPUTS"
-          else
-            ./scripts/update-all-flakes.sh
-          fi
-
-      - name: Update custom packages
-        if: steps.check-renovate.outputs.skip == 'false'
+      - name: Update claudebar
         run: nix run nixpkgs#nix-update -- --flake --system aarch64-darwin claudebar
 
       - name: Create Pull Request
-        if: steps.check-renovate.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
-          branch: update_flake_lock_action
+          branch: chore/update-custom-packages
           delete-branch: true
-          commit-message: |
-            chore(deps): update flake inputs
-
-            Automated update of Nix flake dependencies.
-          title: "chore(deps): update flake inputs"
+          commit-message: "chore(deps): update custom packages"
+          title: "chore(deps): update custom packages"
           body: |
-            Automated Nix flake dependency update across **all flakes** in the repository.
-
-            ## What Changed
-            - Root flake.lock (darwin, home-manager, nixpkgs, nix-ai, nix-home)
-
-            See the flake.lock diffs below for specific version bumps.
-
-            ## Review Notes
-            - CI validates flake structure and build
-            - AI tool updates managed in nix-ai repo
-            - Always accept updates, manually validate, revert only if issues found
-            - Full dependency updates (darwin, home-manager) run Tue/Fri
-            - Shell environments updated to ensure consistency across development environments
-
-            ---
-            *Created by JacobPEvans-github-actions*
+            Automated update via nix-update.
           labels: dependencies
-          assignees: JacobPEvans
-          reviewers: JacobPEvans
