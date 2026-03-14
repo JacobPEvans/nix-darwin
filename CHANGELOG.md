@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.3.0...v1.4.0) (2026-03-14)
+
+
+### Features
+
+* migrate flake.lock updates to Renovate nix manager ([#835](https://github.com/JacobPEvans/nix-darwin/issues/835)) ([92bbb71](https://github.com/JacobPEvans/nix-darwin/commit/92bbb71e8b960bab4acd0c6f5bda5d20604c7192))
+
 ## [1.3.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.2.0...v1.3.0) (2026-03-14)
 
 
