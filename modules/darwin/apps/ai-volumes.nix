@@ -81,8 +81,6 @@ let
         LaunchOnlyOnce = true;
         UserName = "root";
         GroupName = "wheel";
-        StandardOutPath = "/var/log/${daemonName}.log";
-        StandardErrorPath = "/var/log/${daemonName}.log";
       };
     };
   };

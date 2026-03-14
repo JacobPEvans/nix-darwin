@@ -107,7 +107,7 @@ in
       };
 
       quota = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
+        type = lib.types.nullOr (lib.types.strMatching "^[0-9]+[gGtTmM]$");
         default = null;
         description = "Optional APFS quota for the data volume (e.g., \"50g\").";
         example = "50g";
@@ -153,8 +153,6 @@ in
         LaunchOnlyOnce = true;
         UserName = "root";
         GroupName = "wheel";
-        StandardOutPath = "/var/log/orbstack-volume.log";
-        StandardErrorPath = "/var/log/orbstack-volume.log";
       };
     };
   };
