@@ -34,11 +34,14 @@ in
       # Allow the primary user to use flake-level nixConfig (extra-substituters, etc.)
       # Security: equivalent to root for Nix store operations — appropriate for
       # single-user macOS workstation where the primary user already has sudo
-      trusted-users = "root ${userConfig.user.name}";
+      trusted-users = [
+        "root"
+        userConfig.user.name
+      ];
 
       # devenv binary cache — used by nix-ai devShells, avoids building from source
-      extra-substituters = "https://devenv.cachix.org";
-      extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
+      extra-substituters = [ "https://devenv.cachix.org" ];
+      extra-trusted-public-keys = [ "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=" ];
 
       # -- Defaults left commented for awareness --
       # max-jobs = "auto";           # Parallel build jobs (set by Determinate Nix)
