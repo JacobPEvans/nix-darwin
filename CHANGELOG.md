@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.7.0...v1.8.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* migrate Bash permissions to space format and expand command tools ([#846](https://github.com/JacobPEvans/nix-darwin/issues/846)) ([48d7e81](https://github.com/JacobPEvans/nix-darwin/commit/48d7e811436fc42b458e4411011e41b23b179847))
+
 ## [1.7.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.6.0...v1.7.0) (2026-03-15)
 
 
