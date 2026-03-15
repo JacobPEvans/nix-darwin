@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.6.0...v1.7.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **ci:** migrate copilot-setup-steps to determinate-nix-action@v3 ([#842](https://github.com/JacobPEvans/nix-darwin/issues/842)) ([63d82ef](https://github.com/JacobPEvans/nix-darwin/commit/63d82efed576f6921a68abfb0aa70ccb0f366f2a))
+
 ## [1.6.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.5.0...v1.6.0) (2026-03-15)
 
 
