@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.8.0...v1.9.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **ci:** add pull-requests: write for release-please auto-approval ([#848](https://github.com/JacobPEvans/nix-darwin/issues/848)) ([b9cb5a8](https://github.com/JacobPEvans/nix-darwin/commit/b9cb5a83b6aca2f7536cfd5ead8837e57f25c7b4))
+
 ## [1.8.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.7.0...v1.8.0) (2026-03-15)
 
 
