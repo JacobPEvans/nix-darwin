@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.5.0...v1.6.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **nix:** use list type for determinateNix.customSettings ([#840](https://github.com/JacobPEvans/nix-darwin/issues/840)) ([29ec20e](https://github.com/JacobPEvans/nix-darwin/commit/29ec20e257dfb95c2b7ebd8ae1ee00472c34b96e))
+
 ## [1.5.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.4.0...v1.5.0) (2026-03-14)
 
 
