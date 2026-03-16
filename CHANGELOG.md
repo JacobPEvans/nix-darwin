@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.10.0...v1.11.0) (2026-03-16)
+
+
+### Bug Fixes
+
+* **homebrew:** add greedy flag to microsoft-teams cask ([#853](https://github.com/JacobPEvans/nix-darwin/issues/853)) ([3191d05](https://github.com/JacobPEvans/nix-darwin/commit/3191d0535fbf9e61ae7e3ecdb4b82bbfd6716b7d))
+
 ## [1.10.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.9.0...v1.10.0) (2026-03-15)
 
 
