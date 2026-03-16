@@ -64,7 +64,8 @@ EXEMPT_PACKAGES=(
   # Transitive dependencies from nix-ai/devenv and its sub-inputs (crate2nix, nixd).
   # These are pinned by upstream flakes and cannot be updated from nix-darwin.
   "flake-root"         # Transitive: nix-ai/devenv/nixd — upstream pinned
-  "git-hooks*"         # Transitive: nix-ai/devenv/crate2nix/cachix — upstream pinned (excludes git-hooks-nix)
+  "git-hooks"          # Transitive: nix-ai/devenv/crate2nix/cachix — upstream pinned
+  "git-hooks_*"        # Transitive: nix-ai/devenv/crate2nix/cachix — upstream pinned (suffixed variants)
   "gitignore*"         # Transitive: pre-commit-hooks chains in devenv/crate2nix — upstream pinned
   "nix-test-runner*"   # Transitive: nix-ai/devenv/crate2nix — upstream pinned (last release 2020)
   "nixpkgs_3"          # Transitive: nix-ai/devenv/crate2nix/cachix/nixpkgs — upstream pinned
