@@ -60,6 +60,17 @@ EXEMPT_PACKAGES=(
   "git-hooks-nix"      # Pinned by determinate/nix for pre-commit hooks
   "nixpkgs-23-11"      # Pinned regression test nixpkgs in determinate/nix
   "nixpkgs-regression" # Pinned regression test nixpkgs in determinate/nix
+
+  # Transitive dependencies from nix-ai/devenv and its sub-inputs (crate2nix, nixd).
+  # These are pinned by upstream flakes and cannot be updated from nix-darwin.
+  "flake-root"         # Transitive: nix-ai/devenv/nixd — upstream pinned
+  "git-hooks*"         # Transitive: nix-ai/devenv/crate2nix/cachix — upstream pinned (excludes git-hooks-nix)
+  "gitignore*"         # Transitive: pre-commit-hooks chains in devenv/crate2nix — upstream pinned
+  "nix-test-runner*"   # Transitive: nix-ai/devenv/crate2nix — upstream pinned (last release 2020)
+  "nixpkgs_3"          # Transitive: nix-ai/devenv/crate2nix/cachix/nixpkgs — upstream pinned
+  "nixpkgs_4"          # Transitive: nix-ai/devenv/crate2nix/crate2nix_stable/nixpkgs — upstream pinned
+  "pal-mcp-server"     # Transitive: nix-ai input — update in nix-ai, not here
+  "treefmt-nix*"       # Transitive: nix-ai/devenv/nixd — upstream pinned
 )
 
 # Check if flake.lock exists
