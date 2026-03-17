@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.11.0...v1.12.0) (2026-03-17)
+
+
+### Bug Fixes
+
+* **darwin:** remove Paw defaults write (sandboxed container app) ([#856](https://github.com/JacobPEvans/nix-darwin/issues/856)) ([3abb0fb](https://github.com/JacobPEvans/nix-darwin/commit/3abb0fbb58e4a855acc305446a8181d258c7fb05))
+
 ## [1.11.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.10.0...v1.11.0) (2026-03-16)
 
 
