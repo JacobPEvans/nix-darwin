@@ -3,7 +3,7 @@
 ## Repository Purpose
 
 macOS system configuration managed with nix-darwin and Nix flakes (Determinate Nix).
-Orchestrates system packages, networking, security, and home-manager via three companion repos (nix-ai, nix-home, nix-devenv).
+Orchestrates system packages, networking, security, and home-manager via two companion repos (nix-ai, nix-home).
 
 ## Critical Constraints
 
@@ -93,8 +93,8 @@ cd <branch>
 
 ## Part of a Quartet
 
-| Repo | Scope | Installs via |
-| ---- | ----- | ------------ |
+| Repo | Scope | Used via |
+| ---- | ----- | -------- |
 | **nix-darwin** (this repo) | macOS system config (Dock, Finder, Homebrew, security) | nix-darwin |
 | [nix-ai](https://github.com/JacobPEvans/nix-ai) | AI CLI ecosystem (Claude, Gemini, Copilot, MCP) | home-manager |
 | [nix-devenv](https://github.com/JacobPEvans/nix-devenv) | Reusable dev shells (Terraform, Ansible, K8s, AI/ML) | nix develop |
