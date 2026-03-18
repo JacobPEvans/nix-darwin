@@ -81,8 +81,11 @@
     # Cross-platform home-manager modules (git, zsh, vscode, monitoring, shells)
     nix-home = {
       url = "github:JacobPEvans/nix-home";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+        nixpkgs-unstable.follows = "nixpkgs-unstable";
+      };
     };
 
     # Official Determinate Nix module for nix-darwin
