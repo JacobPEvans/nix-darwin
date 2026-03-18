@@ -426,11 +426,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1773848092,
-        "narHash": "sha256-HsuaW8h1ZkBduOQduuL/gD5Fpd3ov2cZnwvNSggVv5Q=",
+        "lastModified": 1773849117,
+        "narHash": "sha256-dOiz2HAWPIpHYSU4lW0UOmUn4msDZHMYzIERRu8KQmg=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "ee87c7630f731b0d7cab86ebf7827d7f7672a506",
+        "rev": "83e987dceed26b7e2653021d56268a0ef2aef040",
         "type": "github"
       },
       "original": {
@@ -564,11 +564,11 @@
         "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1773846548,
-        "narHash": "sha256-txlCx3+5RoRMSchWdKglShzHnwNMPasIhq9BpBsLRWw=",
+        "lastModified": 1773849030,
+        "narHash": "sha256-d6j7Qi3p0MKkc0B38wcTs9qCDcjCZLV8HpS/MpP7SQQ=",
         "owner": "JacobPEvans",
         "repo": "nix-home",
-        "rev": "6bd03e6ebd8e6580c3d7d2c78ca0465250587374",
+        "rev": "b11b7f040c347dd4115a9ee533d8dc51ad47475b",
         "type": "github"
       },
       "original": {
