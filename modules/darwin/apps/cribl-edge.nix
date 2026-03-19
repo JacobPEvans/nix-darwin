@@ -30,7 +30,7 @@ in
       description = "Paths to grant the cribl user read ACL access to.";
       example = [
         "/var/log"
-        "/Users/jevans/.claude/logs"
+        "/Users/<username>/.claude/logs"
       ];
     };
   };
