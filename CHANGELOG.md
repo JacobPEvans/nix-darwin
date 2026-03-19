@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.12.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.12.0...v1.12.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* add release-please config for manifest mode ([84ed18b](https://github.com/JacobPEvans/nix-darwin/commit/84ed18b8c92816da83577e3441da52e47f4fd024))
+* sync release-please permissions and VERSION ([ba0eb02](https://github.com/JacobPEvans/nix-darwin/commit/ba0eb02830635cbc36ab81f4ee1c15c556e96dd0))
+* update nix-ai flake input to latest ([#860](https://github.com/JacobPEvans/nix-darwin/issues/860)) ([10c6032](https://github.com/JacobPEvans/nix-darwin/commit/10c6032b08cfa47d4dd3f926e173f2df38013b65))
+
 ## [1.12.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.11.0...v1.12.0) (2026-03-17)
 
 
