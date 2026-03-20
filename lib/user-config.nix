@@ -120,9 +120,9 @@ in
   # ==========================================================================
   nix = {
     # Home-manager stateVersion - single source of truth
-    # NixOS 25.05 "Warbler" (released May 2025)
+    # NixOS 25.11 "Vicuna" (released November 2025)
     # Update this when upgrading to a new NixOS stable release
     # Reference: https://nixos.org/blog/announcements/
-    homeManagerStateVersion = "25.05";
+    homeManagerStateVersion = "25.11";
   };
 }
