@@ -121,44 +121,62 @@
         inherit unstablePkgs userConfig;
       };
 
+      # Guard: fail at eval time if stateVersion drifts from nixpkgs branch.
+      # When Renovate bumps nixpkgs-25.11 → nixpkgs-26.05, this assertion fires
+      # with a clear message — the fix is to update lib/user-config.nix.
+      _stateVersionCheck =
+        let
+          expected = "25.11"; # must match nixpkgs URL: nixpkgs-25.11-darwin
+          actual = userConfig.nix.homeManagerStateVersion;
+        in
+        assert
+          expected == actual
+          || builtins.throw ''
+            homeManagerStateVersion mismatch: expected "${expected}" (from nixpkgs branch) but got "${actual}".
+            Update lib/user-config.nix when bumping nixpkgs.
+          '';
+        true;
+
       # Define configuration once, assign to multiple names
-      darwinConfig = darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        specialArgs = { inherit unstablePkgs; };
-        modules = [
-          ./hosts/macbook-m4/default.nix
+      darwinConfig =
+        assert _stateVersionCheck;
+        darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          specialArgs = { inherit unstablePkgs; };
+          modules = [
+            ./hosts/macbook-m4/default.nix
 
-          # Determinate Nix: official module for nix.conf, GC, and determinate-nixd config
-          determinate.darwinModules.default
+            # Determinate Nix: official module for nix.conf, GC, and determinate-nixd config
+            determinate.darwinModules.default
 
-          # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
-          mac-app-util.darwinModules.default
+            # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
+            mac-app-util.darwinModules.default
 
-          # Python package overlay from nix-home (replaces local overlays/python-packages.nix)
-          { nixpkgs.overlays = [ nix-home.overlays.default ]; }
+            # Python package overlay from nix-home (replaces local overlays/python-packages.nix)
+            { nixpkgs.overlays = [ nix-home.overlays.default ]; }
 
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = hmDefaults // {
-              inherit extraSpecialArgs;
-              users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
+            home-manager.darwinModules.home-manager
+            {
+              home-manager = hmDefaults // {
+                inherit extraSpecialArgs;
+                users.${userConfig.user.name} = import ./hosts/macbook-m4/home.nix;
 
-              # Shared modules from external flakes:
-              # - nix-ai: Claude, Gemini, Copilot, MCP servers, marketplace plugins
-              # - nix-home: git, zsh, vscode, direnv, monitoring, tmux, common packages
-              #
-              # NOTE: mac-app-util home-manager module REMOVED - using copyApps instead.
-              # copyApps copies apps to ~/Applications/Home Manager Apps/ with stable paths,
-              # making mac-app-util trampolines redundant for TCC permission persistence.
-              # The darwin-level mac-app-util module is still used for /Applications/Nix Apps/.
-              sharedModules = [
-                nix-ai.homeManagerModules.default
-                nix-home.homeManagerModules.default
-              ];
-            };
-          }
-        ];
-      };
+                # Shared modules from external flakes:
+                # - nix-ai: Claude, Gemini, Copilot, MCP servers, marketplace plugins
+                # - nix-home: git, zsh, vscode, direnv, monitoring, tmux, common packages
+                #
+                # NOTE: mac-app-util home-manager module REMOVED - using copyApps instead.
+                # copyApps copies apps to ~/Applications/Home Manager Apps/ with stable paths,
+                # making mac-app-util trampolines redundant for TCC permission persistence.
+                # The darwin-level mac-app-util module is still used for /Applications/Nix Apps/.
+                sharedModules = [
+                  nix-ai.homeManagerModules.default
+                  nix-home.homeManagerModules.default
+                ];
+              };
+            }
+          ];
+        };
     in
     {
       # Both names point to same config:
