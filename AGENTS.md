@@ -3,7 +3,7 @@
 ## Repository Purpose
 
 macOS system configuration managed with nix-darwin and Nix flakes (Determinate Nix).
-Orchestrates system packages, networking, security, and home-manager via two companion repos (nix-ai, nix-home).
+Orchestrates system packages, networking, security, and home-manager via three companion repos (nix-ai, nix-home, nix-devenv).
 
 ## Critical Constraints
 
