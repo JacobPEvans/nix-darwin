@@ -16,6 +16,8 @@
 
 let
   cfg = config.programs.cribl-edge;
+  path = cfg.installPath;
+  aclPerms = "cribl allow read,readattr,readextattr,readsecurity,list,search";
 in
 {
   options.programs.cribl-edge = {
@@ -51,16 +53,17 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      if [ ! -d "${toString cfg.installPath}/bin" ]; then
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cribl Edge not found at ${toString cfg.installPath}"
+      if [ ! -d "${path}/bin" ]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cribl Edge not found at ${path}"
         echo "  Install via .pkg from https://cribl.io/download/ or Cribl Cloud enrollment"
       fi
 
       ${lib.optionalString (cfg.acls != [ ]) ''
-        ${lib.concatMapStringsSep "\n" (path: ''
-          if [ -e "${path}" ]; then
-            /bin/chmod -a "cribl allow read,readattr,readextattr,readsecurity,list,search" "${path}" 2>/dev/null || true
-            /bin/chmod +a "cribl allow read,readattr,readextattr,readsecurity,list,search" "${path}" 2>&1 || echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set ACL on ${path}"
+        # Remove-then-add ensures idempotency: prevents duplicate ACEs across rebuilds
+        ${lib.concatMapStringsSep "\n" (p: ''
+          if [ -e "${p}" ]; then
+            /bin/chmod -a "${aclPerms}" "${p}" 2>/dev/null || true
+            /bin/chmod +a "${aclPerms}" "${p}" 2>&1 || echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set ACL on ${p}"
           fi
         '') cfg.acls}
         echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Applied Cribl Edge ACLs to ${toString (builtins.length cfg.acls)} path(s)"
@@ -71,18 +74,18 @@ in
       serviceConfig = {
         Label = "com.nix-darwin.cribl-edge";
         ProgramArguments = [
-          "${toString cfg.installPath}/bin/cribl"
+          "${path}/bin/cribl"
           "server"
         ];
         RunAtLoad = true;
         KeepAlive = true;
         UserName = "cribl";
         GroupName = "cribl";
-        WorkingDirectory = toString cfg.installPath;
-        StandardOutPath = "${toString cfg.installPath}/log/cribl-stdout.log";
-        StandardErrorPath = "${toString cfg.installPath}/log/cribl-stderr.log";
+        WorkingDirectory = path;
+        StandardOutPath = "${path}/log/cribl-stdout.log";
+        StandardErrorPath = "${path}/log/cribl-stderr.log";
         EnvironmentVariables = {
-          CRIBL_HOME = toString cfg.installPath;
+          CRIBL_HOME = path;
         };
       };
     };
