@@ -17,7 +17,10 @@
 let
   cfg = config.programs.cribl-edge;
   path = cfg.installPath;
-  aclPerms = "cribl allow read,readattr,readextattr,readsecurity,list,search";
+  user = "cribl";
+  group = "cribl";
+  aclPerms = "${user} allow read,readattr,readextattr,readsecurity,list,search";
+  ts = "$(date '+%Y-%m-%d %H:%M:%S')";
 in
 {
   options.programs.cribl-edge = {
@@ -48,31 +51,34 @@ in
       if [ -f /Library/LaunchDaemons/io.cribl.plist ]; then
         /bin/launchctl bootout system/io.cribl 2>/dev/null || true
         rm -f /Library/LaunchDaemons/io.cribl.plist
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Removed .pkg-installed Cribl plist (Nix manages this service)"
+        echo "${ts} [INFO] Removed .pkg-installed Cribl plist (Nix manages this service)"
       fi
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
       if [ ! -d "${path}/bin" ]; then
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cribl Edge not found at ${path}"
+        echo "${ts} [WARN] Cribl Edge not found at ${path}"
         echo "  Install via .pkg from https://cribl.io/download/ or Cribl Cloud enrollment"
       else
         # The .pkg installer creates everything as root:wheel but the LaunchDaemon
-        # runs as cribl:cribl. Cribl Edge needs write access across the entire install
-        # directory (package.json, config, logs, state, etc.), so chown the whole tree.
-        /usr/sbin/chown -R cribl:cribl "${path}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Verified Cribl Edge directory ownership (cribl:cribl)"
+        # runs as ${user}:${group}. Only chown if ownership has drifted.
+        if [ "$(/usr/bin/stat -f '%Su' "${path}")" != "${user}" ]; then
+          /usr/sbin/chown -R ${user}:${group} "${path}"
+          echo "${ts} [INFO] Fixed Cribl Edge directory ownership → ${user}:${group}"
+        fi
       fi
 
       ${lib.optionalString (cfg.acls != [ ]) ''
         # Remove-then-add ensures idempotency: prevents duplicate ACEs across rebuilds
+        _acl_applied=0
         ${lib.concatMapStringsSep "\n" (p: ''
           if [ -e "${p}" ]; then
             /bin/chmod -a "${aclPerms}" "${p}" 2>/dev/null || true
-            /bin/chmod +a "${aclPerms}" "${p}" 2>&1 || echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to set ACL on ${p}"
+            /bin/chmod +a "${aclPerms}" "${p}" 2>&1 || echo "${ts} [WARN] Failed to set ACL on ${p}"
+            _acl_applied=$((_acl_applied + 1))
           fi
         '') cfg.acls}
-        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Applied Cribl Edge ACLs to ${toString (builtins.length cfg.acls)} path(s)"
+        echo "${ts} [INFO] Applied Cribl Edge ACLs to $_acl_applied of ${toString (builtins.length cfg.acls)} path(s)"
       ''}
     '';
 
@@ -85,8 +91,9 @@ in
         ];
         RunAtLoad = true;
         KeepAlive = true;
-        UserName = "cribl";
-        GroupName = "cribl";
+        ThrottleInterval = 10;
+        UserName = user;
+        GroupName = group;
         WorkingDirectory = path;
         StandardOutPath = "${path}/log/cribl-stdout.log";
         StandardErrorPath = "${path}/log/cribl-stderr.log";
