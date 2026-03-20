@@ -56,6 +56,12 @@ in
       if [ ! -d "${path}/bin" ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cribl Edge not found at ${path}"
         echo "  Install via .pkg from https://cribl.io/download/ or Cribl Cloud enrollment"
+      else
+        # The .pkg installer creates everything as root:wheel but the LaunchDaemon
+        # runs as cribl:cribl. Cribl Edge needs write access across the entire install
+        # directory (package.json, config, logs, state, etc.), so chown the whole tree.
+        /usr/sbin/chown -R cribl:cribl "${path}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Verified Cribl Edge directory ownership (cribl:cribl)"
       fi
 
       ${lib.optionalString (cfg.acls != [ ]) ''
