@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.1...v1.13.2) (2026-03-20)
+
+
+### Bug Fixes
+
+* bump stateVersion to 25.11 with drift assertion ([#877](https://github.com/JacobPEvans/nix-darwin/issues/877)) ([887a41a](https://github.com/JacobPEvans/nix-darwin/commit/887a41acd16da94220c9cfbb1b8bd5bae0ebf3fc))
+
 ## [1.13.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.0...v1.13.1) (2026-03-20)
 
 
