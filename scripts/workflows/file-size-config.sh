@@ -13,7 +13,7 @@ FILE_SIZE_EXTENDED="AGENTS ANTHROPIC-ECOSYSTEM TROUBLESHOOTING"
 
 # Exempt files (no limit)
 # These are reference files that may grow indefinitely
-FILE_SIZE_EXEMPT="RUNBOOK copilot-permissions-allow copilot-permissions-ask copilot-permissions-deny gemini-permissions-allow gemini-permissions-deny"
+FILE_SIZE_EXEMPT="CHANGELOG RUNBOOK copilot-permissions-allow copilot-permissions-ask copilot-permissions-deny gemini-permissions-allow gemini-permissions-deny"
 
 # Export for use by other scripts
 export FILE_SIZE_EXTENDED
