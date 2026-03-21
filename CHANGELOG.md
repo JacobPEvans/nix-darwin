@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.4...v1.13.5) (2026-03-21)
+
+
+### Bug Fixes
+
+* consolidate file-size config into .file-size.yml with shared defaults ([#889](https://github.com/JacobPEvans/nix-darwin/issues/889)) ([a141129](https://github.com/JacobPEvans/nix-darwin/commit/a14112941c77b33bab77abb00d72edce7c806f42))
+
 ## [1.13.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.3...v1.13.4) (2026-03-21)
 
 
