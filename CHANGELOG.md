@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.13.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.3...v1.13.4) (2026-03-21)
+
+
+### Bug Fixes
+
+* consolidate Renovate config and remove broken postUpgradeTasks ([#886](https://github.com/JacobPEvans/nix-darwin/issues/886)) ([d0fe728](https://github.com/JacobPEvans/nix-darwin/commit/d0fe728e278c3b5594e539b38ea35e1f4c327f0c))
+* exempt CHANGELOG.md from file size limit ([#887](https://github.com/JacobPEvans/nix-darwin/issues/887)) ([c071d53](https://github.com/JacobPEvans/nix-darwin/commit/c071d53cf3c35d7b8bce874bff2cc21e1ccb5a43))
+* update flake inputs after nix-ai and nix-home cleanup PRs ([#882](https://github.com/JacobPEvans/nix-darwin/issues/882)) ([0a05872](https://github.com/JacobPEvans/nix-darwin/commit/0a058724ace7d6f192702aa90d99c26bb1f44832))
+* update nix-ai input (v0.2.6 CLI flags + checks split) ([#885](https://github.com/JacobPEvans/nix-darwin/issues/885)) ([7e19da6](https://github.com/JacobPEvans/nix-darwin/commit/7e19da6d768fe680957c5ba15940a82e98c0081a))
+
 ## [1.13.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.2...v1.13.3) (2026-03-20)
 
 
