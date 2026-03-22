@@ -1,12 +1,12 @@
 ---
-description: Update all flake inputs and rebuild nix-darwin
+description: Update all flake inputs and rebuild nix-darwin with issue reporting
 model: haiku
-allowed-tools: Read, Grep, Glob, Bash(nix flake *), Bash(git *), Bash(gh *), Bash(darwin-rebuild *), Bash(sudo darwin-rebuild *)
+allowed-tools: Read, Grep, Glob, Bash(nix flake *), Bash(nix fmt), Bash(git *), Bash(gh *), Bash(darwin-rebuild *), Bash(sudo darwin-rebuild *), AskUserQuestion
 ---
 
 # Flake Rebuild
 
-Update all flake inputs and rebuild nix-darwin.
+Update all flake inputs and rebuild nix-darwin. Reports any warnings or errors encountered.
 
 **IMPORTANT**: This command uses GitHub auto-merge. The PR will automatically merge when all required status checks pass.
 
@@ -101,13 +101,48 @@ Updated nixpkgs and other inputs across:
 - Host configurations"
 ```
 
-### 6. Rebuild nix-darwin
+### 6. Run Quality Checks and Rebuild
+
+Run all checks before rebuilding. Capture any warnings or errors:
 
 ```bash
-sudo darwin-rebuild switch --flake .
+CHECKS_PASSED=1
+
+# Format check
+echo "Running format check..."
+if ! nix fmt > /dev/null 2>&1; then
+  echo "⚠️  Format check found issues"
+  CHECKS_PASSED=0
+fi
+
+# Static analysis
+echo "Running static analysis..."
+if statix check 2>&1 | grep -qi "error\|warning"; then
+  echo "⚠️  Static analysis warnings found"
+fi
+
+# Dead code
+echo "Checking for dead code..."
+deadnix 2>&1 | grep -v "No dead code" | head -5
+
+# Flake validation
+echo "Validating flake..."
+if ! nix flake check > /dev/null 2>&1; then
+  echo "🔴 Flake validation failed"
+  CHECKS_PASSED=0
+fi
+
+# Rebuild
+echo "Building nix-darwin..."
+if sudo darwin-rebuild switch --flake . > /dev/null 2>&1; then
+  echo "✓ Build successful"
+else
+  echo "🔴 Build failed"
+  CHECKS_PASSED=0
+fi
 ```
 
-**On failure**: Report the error but continue to create the PR (the CI will also catch issues).
+**Behavior**: Reports all warnings/errors found. Continues to PR creation regardless (CI will catch critical issues).
 
 ### 7. Push and Create PR with Auto-Merge
 
@@ -143,10 +178,21 @@ Tell the user:
 
 1. What inputs were updated (from the nix flake update output)
 2. The PR URL
-3. That auto-merge is enabled and will merge when checks pass
-4. They can run `git pull` in the main worktree after the PR merges
+3. Any warnings or errors found (from Step 6 output)
+4. That auto-merge is enabled and will merge when checks pass
+5. They can run `git pull` in the main worktree after the PR merges
 
 **DO NOT wait for checks** - auto-merge handles this automatically.
 
 **Note**: The worktree at `~/git/nix-darwin/chore/flake-update-YYYY-MM-DD/` will be automatically
 cleaned up by auto-claude after the PR is merged.
+
+## If Issues Are Found
+
+If Step 6 reports problems:
+
+1. **Minor warnings** (format, linting): Already captured in CI, no action needed pre-merge
+2. **Critical failures** (flake check, build): Check CI logs after PR creation, create a follow-up fix PR if needed
+3. **Unusual issues**: Create a separate plan-mode discussion to diagnose
+
+The CI gate will prevent merge of critical issues anyway.
