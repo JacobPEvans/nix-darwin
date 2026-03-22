@@ -157,10 +157,10 @@ Push the branch:
 git push -u origin HEAD
 ```
 
-Create PR with the `dependencies` label (to skip Claude review), or skip if PR already exists:
+Create PR with the `dependencies` label (to skip Claude review), or skip if an **open** PR already exists:
 
 ```bash
-gh pr view >/dev/null 2>&1 || gh pr create --fill --label dependencies
+gh pr view --json state -q '.state' 2>/dev/null | grep -q OPEN || gh pr create --fill --label dependencies
 ```
 
 Enable auto-merge (this will merge automatically when checks pass):
