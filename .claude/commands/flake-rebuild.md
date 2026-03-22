@@ -108,48 +108,48 @@ Updated nixpkgs and other inputs across:
 
 ### 6. Run Quality Checks and Rebuild
 
-Run all checks before rebuilding. Capture any warnings or errors:
+Run each check below **with full output visible** (do NOT pipe to `/dev/null`).
+For any check that reports issues, **briefly investigate**: read the output,
+identify which files/lines are affected, and note the likely cause.
 
-```bash
-CHECKS_PASSED=1
+Run these checks in order:
 
-# Format check
-echo "Running format check..."
-if ! nix fmt > /dev/null 2>&1; then
-  echo "⚠️  Format check found issues"
-  CHECKS_PASSED=0
-fi
+1. **Format check**: `nix fmt` (prints which files it reformats)
+   - Note any files that were changed
+2. **Static analysis**: `statix check`
+   - Note any warnings with file:line references
+3. **Dead code detection**: `deadnix`
+   - Note any unused bindings with file:line references
+4. **Flake validation**: `nix flake check`
+   - If this fails, read the error output and identify the root cause (eval error, missing input, type mismatch, etc.)
+5. **Rebuild**: `sudo darwin-rebuild switch --flake .`
+   - If this fails, read the last 50 lines of output and identify the failing derivation or activation step
 
-# Static analysis
-echo "Running static analysis..."
-if statix check 2>&1 | grep -qi "error\|warning"; then
-  echo "⚠️  Static analysis warnings found"
-fi
+**Categorize each finding as:**
 
-# Dead code
-echo "Checking for dead code..."
-deadnix 2>&1 | grep -v "No dead code" | head -5
+- **Critical** — blocks the build or flake check (must fix before merge)
+- **Warning** — non-fatal lint/format issue (CI will also catch these)
+- **Info** — unexpected but harmless output worth noting
 
-# Flake validation
-echo "Validating flake..."
-if ! nix flake check > /dev/null 2>&1; then
-  echo "🔴 Flake validation failed"
-  CHECKS_PASSED=0
-fi
+**Always proceed to Step 7** regardless of results.
 
-# Rebuild
-echo "Building nix-darwin..."
-if sudo darwin-rebuild switch --flake . > /dev/null 2>&1; then
-  echo "✓ Build successful"
-else
-  echo "🔴 Build failed"
-  CHECKS_PASSED=0
-fi
-```
+### 7. Present Diagnostic Summary (If Issues Found)
 
-**Behavior**: Reports all warnings/errors found. Continues to PR creation regardless (CI will catch critical issues).
+**If all checks passed with no issues**: Skip this step and proceed directly to Step 8.
 
-### 7. Push and Create PR with Auto-Merge
+**If any issues were found in Step 6**:
+
+1. Present a categorized summary to the user:
+   - Group findings by severity (Critical, Warning, Info)
+   - For each finding, include: the check that found it, the file/line affected, and a brief assessment of what's wrong and likely cause
+
+2. Use `AskUserQuestion` to ask the user how to proceed:
+   - **Option 1: "Create a resolution plan"** — Enter plan mode. Create a plan
+     with specific fixes for each issue, grouped by category. The user reviews
+     the plan before any fixes are implemented.
+   - **Option 2: "Continue to PR"** — Proceed to Step 8. Issues will be noted in the PR description and caught by CI.
+
+### 8. Push and Create PR with Auto-Merge
 
 Push the branch:
 
@@ -169,7 +169,7 @@ Enable auto-merge (this will merge automatically when checks pass):
 gh pr merge --auto --squash --delete-branch
 ```
 
-### 8. Return to Main Worktree
+### 9. Return to Main Worktree
 
 Switch back to the main worktree while waiting for auto-merge:
 
@@ -177,7 +177,7 @@ Switch back to the main worktree while waiting for auto-merge:
 cd ~/git/nix-darwin/main
 ```
 
-### 9. Report Summary
+### 10. Report Summary
 
 Tell the user:
 
@@ -191,13 +191,3 @@ Tell the user:
 
 **Note**: The worktree at `~/git/nix-darwin/chore/flake-update-YYYY-MM-DD/` will be automatically
 cleaned up by auto-claude after the PR is merged.
-
-## If Issues Are Found
-
-If Step 6 reports problems:
-
-1. **Minor warnings** (format, linting): Already captured in CI, no action needed pre-merge
-2. **Critical failures** (flake check, build): Check CI logs after PR creation, create a follow-up fix PR if needed
-3. **Unusual issues**: Create a separate plan-mode discussion to diagnose
-
-The CI gate will prevent merge of critical issues anyway.
