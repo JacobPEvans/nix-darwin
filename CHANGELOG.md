@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.14.0...v1.14.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* **flake-rebuild:** only skip PR creation when an open PR exists ([#898](https://github.com/JacobPEvans/nix-darwin/issues/898)) ([64c5af0](https://github.com/JacobPEvans/nix-darwin/commit/64c5af04ac76fe64b21305c843f20e1aff938f14))
+
 ## [1.14.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.6...v1.14.0) (2026-03-22)
 
 
