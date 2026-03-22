@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.6...v1.14.0) (2026-03-22)
+
+
+### Features
+
+* **flake-rebuild:** add issue investigation and plan generation prompt ([#895](https://github.com/JacobPEvans/nix-darwin/issues/895)) ([cac974f](https://github.com/JacobPEvans/nix-darwin/commit/cac974f55c2ad3070d2bf1d8d34e9bd5081575c3))
+
 ## [1.13.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.5...v1.13.6) (2026-03-22)
 
 
