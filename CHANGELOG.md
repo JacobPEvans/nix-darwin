@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.5...v1.13.6) (2026-03-22)
+
+
+### Bug Fixes
+
+* **flake-rebuild:** clarify command must always execute the rebuild ([#893](https://github.com/JacobPEvans/nix-darwin/issues/893)) ([c0c2960](https://github.com/JacobPEvans/nix-darwin/commit/c0c2960115222eb6522b6f8cd4f2737666d86ced))
+
 ## [1.13.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.13.4...v1.13.5) (2026-03-21)
 
 
