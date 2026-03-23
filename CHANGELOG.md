@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.15.1...v1.16.0) (2026-03-23)
+
+
+### Features
+
+* **homebrew:** enable brew autoupdate with greedy upgrades every 30h ([#904](https://github.com/JacobPEvans/nix-darwin/issues/904)) ([ba3562d](https://github.com/JacobPEvans/nix-darwin/commit/ba3562d868a46811ad40a87464c76e00a2aaabb8))
+
 ## [1.15.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.15.0...v1.15.1) (2026-03-23)
 
 
