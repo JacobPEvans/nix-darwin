@@ -13,7 +13,7 @@ This repository uses a **complementary dependency update strategy** combining:
 
 | Layer | Role | What Updates | When | Auto-merge |
 |-------|------|--------------|------|------------|
-| **Renovate Bot** (Primary) | Proactive updates | Critical infrastructure, AI tools, npm packages | Mon/Thu (critical), Sun/Wed/Fri (AI), Mon (npm) | Yes (patch/minor) |
+| **Renovate Bot** (Primary) | Proactive updates | Critical infrastructure, AI tools, npm packages | Daily 7am (critical/AI), Mon (npm) | Yes (varies by group) |
 | **Custom Workflow** (Fallback) | Safety net | All inputs IF no Renovate PR exists | Tue/Fri (all), daily (AI-focused) | No |
 | **repository_dispatch** | Rapid response | ai-assistant-instructions only | Instant (on push to source) | No |
 | **workflow_dispatch** | Manual | Any inputs | On demand | No |
@@ -34,7 +34,7 @@ It provides native Nix flake support and can scan arbitrary files for package ve
 - ✅ Native Nix flake support (updates `flake.lock`)
 - ✅ Custom regex managers (scans bunx wrappers in `.nix` files)
 - ✅ Flexible grouping (by package type, criticality, schedule)
-- ✅ Auto-merge policies (patch/minor auto-merge, major requires review)
+- ✅ Auto-merge policies (configurable per group, including all-types for trusted inputs)
 - ✅ Node.js LTS constraints (prevents non-LTS versions)
 - ✅ Signed commits via GitHub App
 
@@ -48,8 +48,8 @@ It provides native Nix flake support and can scan arbitrary files for package ve
 
 | Group | Packages | Schedule | Auto-merge |
 |-------|----------|----------|------------|
-| **Critical Infrastructure** | nixpkgs, darwin, home-manager, ai-assistant-instructions | Mon/Thu 3am | No (manual review) |
-| **AI Tools** | claude-code-plugins, llm-agents, etc. | Sun/Wed/Fri 10pm | Yes (patch/minor) |
+| **Critical Infrastructure** | nixpkgs, darwin, home-manager, ai-assistant-instructions | Daily after 7am | No (manual review) |
+| **AI Tools** | claude-code-plugins, nix-ai, anthropics, etc. | Daily after 7am | Yes (all types) |
 | **npm Packages** | cclint, chatgpt-cli, gh-copilot | Monday 10pm | Yes (patch/minor) |
 
 **Auto-merge policy:**
@@ -57,6 +57,7 @@ It provides native Nix flake support and can scan arbitrary files for package ve
 - **Patch updates** (1.2.3 → 1.2.4): Auto-merge after CI passes
 - **Minor updates** (1.2.3 → 1.3.0): Auto-merge after CI passes
 - **Major updates** (1.2.3 → 2.0.0): Manual review required
+  - Exception: **AI Tools** group auto-merges all update types (all packages are JacobPEvans-owned or trusted)
 
 ### Node.js Version Constraints
 
@@ -87,8 +88,8 @@ This prevents upgrading to non-LTS "Current" releases.
 5. **Auto-merge** (if enabled):
    - Waits for all CI checks to pass
    - Requires PR to be up-to-date with base branch
-   - Auto-merges patch/minor updates
-6. **Manual Review** (major updates):
+   - Auto-merges based on group policy (patch/minor for most, all types for AI Tools)
+6. **Manual Review** (when required):
    - User reviews changelog and breaking changes
    - Tests locally if needed: `nix flake update <input> && darwin-rebuild build`
    - Approves and merges manually
