@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.0...v1.16.1) (2026-03-23)
+
+
+### Bug Fixes
+
+* **deps:** update jacobpevans-cc-plugins to register pal-health plugin ([#906](https://github.com/JacobPEvans/nix-darwin/issues/906)) ([f8d4578](https://github.com/JacobPEvans/nix-darwin/commit/f8d4578d7f3c614b5f20aea634b28fe969f2cdde))
+
 ## [1.16.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.15.1...v1.16.0) (2026-03-23)
 
 
