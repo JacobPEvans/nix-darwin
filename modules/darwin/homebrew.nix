@@ -33,6 +33,10 @@
 
 { lib, ... }:
 
+let
+  # 30 hours in seconds — brew autoupdate requires interval in seconds
+  autoupdateInterval = 108000;
+in
 {
   homebrew = {
     enable = true;
@@ -176,14 +180,14 @@
     };
   };
 
-  # Configure brew autoupdate to run every 30 hours with greedy cask upgrades.
-  # This (re)creates the LaunchAgent plist on every darwin-rebuild switch, ensuring
-  # the schedule and flags stay in sync with this configuration.
-  # 108000 seconds = 30 hours
+  # (Re)create the brew autoupdate LaunchAgent plist on every darwin-rebuild switch,
+  # ensuring the schedule and flags stay in sync with this configuration.
+  # Delete first because `brew autoupdate start` exits non-zero if already configured.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring brew autoupdate (every 30h, --upgrade --greedy --cleanup)..."
     if command -v brew &>/dev/null; then
-      brew autoupdate start 108000 --upgrade --greedy --cleanup 2>&1 || true
+      brew autoupdate delete 2>/dev/null || true
+      brew autoupdate start ${toString autoupdateInterval} --upgrade --greedy --cleanup || true
     else
       echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] brew not found — skipping autoupdate configuration"
     fi
