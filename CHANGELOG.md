@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.15.0...v1.15.1) (2026-03-23)
+
+
+### Bug Fixes
+
+* **renovate:** trust ai-tools group for all update types ([#902](https://github.com/JacobPEvans/nix-darwin/issues/902)) ([2dc7a39](https://github.com/JacobPEvans/nix-darwin/commit/2dc7a39a32bdae29f78c57db09d7d7047d8a68f7))
+
 ## [1.15.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.14.1...v1.15.0) (2026-03-23)
 
 
