@@ -58,7 +58,6 @@
       ],
       "groupName": "ai-tools",
       "automerge": true,
-      "matchUpdateTypes": ["minor", "patch"],
       "schedule": ["after 7am every day"]
     },
 
