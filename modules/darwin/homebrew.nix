@@ -5,19 +5,21 @@
 #
 # == Update Philosophy ==
 #
-# Homebrew has NO native background auto-update mechanism. The "passive auto-update"
-# is just a convenience feature that runs `brew update` when you invoke certain
-# commands (if >5 minutes have passed). There is no background daemon.
+# Packages are kept current via `brew autoupdate` (homebrew/autoupdate tap), which
+# runs `brew update && brew upgrade --greedy --cleanup` every 30 hours in the
+# background via a launchd LaunchAgent. The autoupdate plist is (re)created on
+# every `darwin-rebuild switch` via a postActivation script.
 #
 # Our configuration:
 #   - onActivation.autoUpdate = false  → Keeps rebuilds fast (no 45MB index download)
-#   - onActivation.upgrade = true      → Packages updated when you run darwin-rebuild
+#   - onActivation.upgrade = false     → Rebuilds don't run brew upgrade (autoupdate handles it)
+#   - brew autoupdate: every 30h       → Background upgrade with --greedy --cleanup
 #   - Passive auto-update: Enabled     → >5 minutes trigger on command invocation
 #
 # == How Packages Get Updated ==
 #
-# 1. AUTOMATIC: Run `darwin-rebuild switch` - upgrades all packages to latest
-# 2. MANUAL: Run `brew update && brew upgrade` for immediate updates
+# 1. AUTOMATIC: brew autoupdate runs every 30 hours (background launchd agent)
+# 2. MANUAL: Run `brew update && brew upgrade --greedy` for immediate updates
 # 3. RENOVATE: Cannot track homebrew versions (no version info in this config)
 #
 # == Why Renovate Can't Help ==
@@ -27,11 +29,9 @@
 # Renovate's homebrew manager only works with Ruby Formula files.
 #
 # NOTE: nix-darwin does NOT support version pinning for individual homebrew packages.
-# Packages will be upgraded to latest available when `upgrade = true` and you run
-# `darwin-rebuild switch`. To prevent upgrades, set `upgrade = false` or pin the
-# package version manually via `brew pin <package>`.
+# To prevent upgrades for a specific package, pin it via `brew pin <package>`.
 
-_:
+{ lib, ... }:
 
 {
   homebrew = {
@@ -41,12 +41,12 @@ _:
       # Homebrew's passive auto-update still works (triggers on command invocation after >5 minutes).
       autoUpdate = false;
       cleanup = "none"; # Don't remove manually installed packages
-      # Upgrade packages to latest available when darwin-rebuild switch runs.
-      # This is the primary mechanism for keeping homebrew packages current.
-      upgrade = true;
+      # Upgrades handled by brew autoupdate (every 30h) — not during darwin-rebuild.
+      # This keeps rebuilds fast. Run `brew upgrade --greedy` manually for immediate updates.
+      upgrade = false;
     };
     taps = [
-      # "homebrew/cask"   # Example: additional taps
+      "homebrew/autoupdate" # Background auto-update via launchd (brew autoupdate)
     ];
     brews = [
       # CLI tools (only if not available in nixpkgs)
@@ -77,7 +77,7 @@ _:
       # Without this flag, `brew upgrade` silently skips the app because Homebrew
       # assumes the app will update itself. In practice, built-in updaters are
       # unreliable (require the app to be open, can be dismissed, etc.), so greedy
-      # ensures updates land deterministically on every `darwin-rebuild switch`.
+      # ensures updates land deterministically via brew autoupdate.
       # NOTE: ChatGPT and Cursor are in nixpkgs - see home.packages.
       # NOTE: Antigravity and gemini-cli are in homebrew (above).
 
@@ -175,4 +175,17 @@ _:
       "OneDrive" = 823766827;
     };
   };
+
+  # Configure brew autoupdate to run every 30 hours with greedy cask upgrades.
+  # This (re)creates the LaunchAgent plist on every darwin-rebuild switch, ensuring
+  # the schedule and flags stay in sync with this configuration.
+  # 108000 seconds = 30 hours
+  system.activationScripts.postActivation.text = lib.mkAfter ''
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring brew autoupdate (every 30h, --upgrade --greedy --cleanup)..."
+    if command -v brew &>/dev/null; then
+      brew autoupdate start 108000 --upgrade --greedy --cleanup 2>&1 || true
+    else
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] brew not found — skipping autoupdate configuration"
+    fi
+  '';
 }
