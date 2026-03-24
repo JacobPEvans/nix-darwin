@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.2...v1.16.3) (2026-03-24)
+
+
+### Bug Fixes
+
+* scope gitignore to only exclude retrospecting reports, not all skills ([#912](https://github.com/JacobPEvans/nix-darwin/issues/912)) ([a055c94](https://github.com/JacobPEvans/nix-darwin/commit/a055c9488f025cc0db2f82dce1a04c8890c786ff))
+
 ## [1.16.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.1...v1.16.2) (2026-03-24)
 
 
