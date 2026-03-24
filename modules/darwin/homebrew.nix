@@ -188,7 +188,7 @@ in
   # non-zero if already configured.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring brew autoupdate (every 30h, --upgrade --greedy --cleanup)..."
-    _brew_user="''${SUDO_USER:-$(stat -f "%Su" /dev/console 2>/dev/null)}"
+    _brew_user="''${SUDO_USER:-$(stat -f '%Su' /dev/console 2>/dev/null)}"
     if [ -z "$_brew_user" ] || [ "$_brew_user" = "root" ]; then
       echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cannot determine brew user — skipping brew autoupdate configuration"
     elif ! test -x /opt/homebrew/bin/brew; then
