@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.4...v1.16.5) (2026-03-24)
+
+
+### Bug Fixes
+
+* **deps:** add Renovate annotation for ClaudeBar package ([#917](https://github.com/JacobPEvans/nix-darwin/issues/917)) ([b55018c](https://github.com/JacobPEvans/nix-darwin/commit/b55018c70ffab98830cf9523349067068e9ca2bd))
+
 ## [1.16.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.3...v1.16.4) (2026-03-24)
 
 
