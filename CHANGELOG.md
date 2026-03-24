@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.3...v1.16.4) (2026-03-24)
+
+
+### Bug Fixes
+
+* **homebrew:** brew autoupdate LaunchAgent never created on darwin-rebuild ([9256aa3](https://github.com/JacobPEvans/nix-darwin/commit/9256aa3a72adfa4a7b22e278ba86afa69ffc37ee))
+* use full path /opt/homebrew/bin/brew, fall back to stat -f '%Su' /dev/console for user detection. ([9256aa3](https://github.com/JacobPEvans/nix-darwin/commit/9256aa3a72adfa4a7b22e278ba86afa69ffc37ee))
+
 ## [1.16.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.2...v1.16.3) (2026-03-24)
 
 
