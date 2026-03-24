@@ -188,6 +188,8 @@ in
   # non-zero if already configured.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring brew autoupdate (every 30h, --upgrade --greedy --cleanup)..."
+    # /usr/bin/stat: force macOS BSD stat — bare 'stat' resolves to GNU stat (Nix coreutils),
+    # which ignores -f '%Su' and prints the full file report instead of the username.
     _brew_user="''${SUDO_USER:-$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null)}"
     if [ -z "$_brew_user" ] || [ "$_brew_user" = "root" ]; then
       echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cannot determine brew user — skipping brew autoupdate configuration"
