@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.5...v1.16.6) (2026-03-24)
+
+
+### Bug Fixes
+
+* **homebrew:** use /usr/bin/stat to avoid GNU stat in Nix PATH ([#916](https://github.com/JacobPEvans/nix-darwin/issues/916)) ([9ebbce5](https://github.com/JacobPEvans/nix-darwin/commit/9ebbce555196460c99bbc935d322810924d62ec9))
+
 ## [1.16.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.4...v1.16.5) (2026-03-24)
 
 
