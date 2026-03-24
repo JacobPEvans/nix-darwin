@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.1...v1.16.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* gitignore plugin-generated .claude/skills/ directory ([#910](https://github.com/JacobPEvans/nix-darwin/issues/910)) ([739070f](https://github.com/JacobPEvans/nix-darwin/commit/739070f373bfe86fb635013b86162662d16aeb05))
+
 ## [1.16.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.0...v1.16.1) (2026-03-23)
 
 
