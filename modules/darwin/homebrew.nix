@@ -182,18 +182,20 @@ in
 
   # (Re)create the brew autoupdate LaunchAgent plist on every darwin-rebuild switch,
   # ensuring the schedule and flags stay in sync with this configuration.
-  # Runs as $SUDO_USER because brew autoupdate creates a user-level LaunchAgent —
-  # running as root would install the plist for the wrong user.
-  # Delete first because `brew autoupdate start` exits non-zero if already configured.
+  # Runs as the current user (determined by $SUDO_USER or console owner) because brew
+  # autoupdate creates a user-level LaunchAgent — running as root would install the
+  # plist for the wrong user. Delete first because `brew autoupdate start` exits
+  # non-zero if already configured.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Configuring brew autoupdate (every 30h, --upgrade --greedy --cleanup)..."
-    if [ -z "$SUDO_USER" ]; then
-      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] SUDO_USER is not set — skipping brew autoupdate configuration"
-    elif ! sudo -u "$SUDO_USER" sh -c 'command -v brew' &>/dev/null; then
-      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] brew not found for $SUDO_USER — skipping autoupdate configuration"
+    _brew_user="${SUDO_USER:-$(stat -f "%Su" /dev/console 2>/dev/null)}"
+    if [ -z "$_brew_user" ] || [ "$_brew_user" = "root" ]; then
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Cannot determine brew user — skipping brew autoupdate configuration"
+    elif ! test -x /opt/homebrew/bin/brew; then
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] /opt/homebrew/bin/brew not found — skipping autoupdate configuration"
     else
-      sudo -u "$SUDO_USER" brew autoupdate delete 2>/dev/null || true
-      sudo -u "$SUDO_USER" brew autoupdate start ${toString autoupdateInterval} --upgrade --greedy --cleanup || true
+      sudo -u "$_brew_user" /opt/homebrew/bin/brew autoupdate delete 2>/dev/null || true
+      sudo -u "$_brew_user" /opt/homebrew/bin/brew autoupdate start ${toString autoupdateInterval} --upgrade --greedy --cleanup || true
     fi
   '';
 }
