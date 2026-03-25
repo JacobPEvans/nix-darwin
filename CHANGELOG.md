@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.7](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.6...v1.16.7) (2026-03-25)
+
+
+### Bug Fixes
+
+* **security:** add 3-day stabilization to vulnerability alert PRs ([#922](https://github.com/JacobPEvans/nix-darwin/issues/922)) ([ebf5647](https://github.com/JacobPEvans/nix-darwin/commit/ebf56475bdf8202a97eab108a72677659b5825ed))
+
 ## [1.16.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.5...v1.16.6) (2026-03-24)
 
 
