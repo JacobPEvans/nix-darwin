@@ -50,6 +50,7 @@ jobs:
       markdown: ${{ steps.filter.outputs.markdown }}
       claude: ${{ steps.filter.outputs.claude }}
       is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
+      is-flake-lock-change: ${{ steps.detect-flake.outputs.is-flake-lock-change }}
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v4
@@ -83,6 +84,15 @@ jobs:
             echo "is-deps-only=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Detect flake.lock changes
+        id: detect-flake
+        run: |
+          if git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.sha }} 2>/dev/null | grep -q '^flake\.lock$'; then
+            echo "is-flake-lock-change=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-flake-lock-change=false" >> $GITHUB_OUTPUT
+          fi
+
   # ==========================================================================
   # CONDITIONAL CHECKS (call reusable workflows)
   # Performance: Jobs run in parallel when conditions are met
@@ -91,7 +101,7 @@ jobs:
   nix-build:
     name: Nix Build
     needs: changes
-    if: needs.changes.outputs.nix == 'true' && needs.changes.outputs.is-deps-only == 'false'
+    if: needs.changes.outputs.nix == 'true' && (needs.changes.outputs.is-deps-only == 'false' || needs.changes.outputs.is-flake-lock-change == 'true')
     uses: ./.github/workflows/_nix-build.yml
 
   nix-validate:
@@ -118,12 +128,19 @@ jobs:
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
 
+  osv-scan:
+    name: OSV Scan
+    if: always()
+    needs: [changes]
+    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
+    secrets: inherit
+
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-build, nix-validate, markdown-lint, claude-settings, file-size]
+    needs: [changes, nix-build, nix-validate, markdown-lint, claude-settings, file-size, osv-scan]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -133,5 +150,5 @@ jobs:
           # For deps-only commits: All jobs can be skipped
           # For non-Nix changes: nix-build and nix-validate can be skipped
           # For Nix changes: Only validation jobs can be skipped, nix-build must pass
-          allowed-skips: ${{ (needs.changes.outputs.is-deps-only == 'true' && 'nix-build, nix-validate, markdown-lint, claude-settings, file-size') || (needs.changes.outputs.nix == 'false' && 'nix-build, nix-validate, markdown-lint, claude-settings, file-size') || 'nix-validate, markdown-lint, claude-settings, file-size' }}
+          allowed-skips: ${{ (needs.changes.outputs.is-deps-only == 'true' && 'nix-build, nix-validate, markdown-lint, claude-settings, file-size, osv-scan') || (needs.changes.outputs.nix == 'false' && 'nix-build, nix-validate, markdown-lint, claude-settings, file-size, osv-scan') || 'nix-validate, markdown-lint, claude-settings, file-size, osv-scan' }}
           jobs: ${{ toJSON(needs) }}

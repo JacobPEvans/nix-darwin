@@ -61,6 +61,16 @@ else
 fi
 ```
 
+### Security Note
+
+This command is the **approved method** for updating flake inputs. It enforces:
+- Feature branch isolation (never commits to main)
+- Full quality validation (fmt, statix, deadnix, flake check, darwin-rebuild)
+- CI gating via auto-merge (all required status checks must pass)
+
+**WARNING**: Running raw `nix flake update && darwin-rebuild switch` outside this command
+bypasses all security checks. Always use `/flake-rebuild` for flake updates.
+
 ### 3. Update ALL Flake Inputs
 
 **IMPORTANT**: Update the root flake AND all shell/module flakes throughout the repository.
