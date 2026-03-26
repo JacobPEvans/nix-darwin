@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.8](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.7...v1.16.8) (2026-03-26)
+
+
+### Bug Fixes
+
+* **security:** harden CI gate for flake.lock changes on deps-only PRs ([#925](https://github.com/JacobPEvans/nix-darwin/issues/925)) ([0b1d458](https://github.com/JacobPEvans/nix-darwin/commit/0b1d458df2bf07cab32229bec761d8ea781668ef))
+
 ## [1.16.7](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.6...v1.16.7) (2026-03-25)
 
 
