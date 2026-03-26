@@ -3,11 +3,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1774069291,
-        "narHash": "sha256-MCRz9ZsLMsjGINLRiAXR+qQRY5R8M6p54heVm8jh2kY=",
+        "lastModified": 1774474815,
+        "narHash": "sha256-z3e9SnUVTZt16aF1k9VAW4PYPHd25qmrXnMbxLbT2U4=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "7bb21cd7408857a21ee4c6f35246ab1a3b00011d",
+        "rev": "932b3a7f39789169f8c57f75999003c1b324c2bb",
         "type": "github"
       },
       "original": {
@@ -77,6 +77,22 @@
       "original": {
         "owner": "bitwarden",
         "repo": "ai-plugins",
+        "type": "github"
+      }
+    },
+    "browser-use-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774309468,
+        "narHash": "sha256-9f5H5/8a0EoO4qRNczixS0zenvPBhf3wFcSEgPYarRY=",
+        "owner": "browser-use",
+        "repo": "browser-use",
+        "rev": "32e69f3aad9096cc069bad63ca4259afd53e3aaa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "browser-use",
+        "repo": "browser-use",
         "type": "github"
       }
     },
@@ -512,6 +528,7 @@
         "axton-obsidian-visual-skills": "axton-obsidian-visual-skills",
         "bills-claude-skills": "bills-claude-skills",
         "bitwarden-marketplace": "bitwarden-marketplace",
+        "browser-use-skills": "browser-use-skills",
         "cc-dev-tools": "cc-dev-tools",
         "cc-marketplace": "cc-marketplace",
         "claude-code-plugins": [
@@ -541,11 +558,11 @@
         "wakatime": "wakatime"
       },
       "locked": {
-        "lastModified": 1774282609,
-        "narHash": "sha256-XP6vrkd00UVgg+tY6zZvz6/Yh8s3lhvGY3rkA4O681w=",
+        "lastModified": 1774491384,
+        "narHash": "sha256-2zV1F8826AX0hneutvNh5bymMYxz3Xu9T1RwlKry4pM=",
         "owner": "JacobPEvans",
         "repo": "nix-ai",
-        "rev": "27d8df00a22199cb3753ba3e501b2b953b6e0683",
+        "rev": "e5d45ef307ea94c62ec7f8afefaf5e307b832cde",
         "type": "github"
       },
       "original": {
