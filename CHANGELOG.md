@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.9](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.8...v1.16.9) (2026-03-26)
+
+
+### Bug Fixes
+
+* **deps:** update flake inputs and fix gh-aw hash mismatch ([#924](https://github.com/JacobPEvans/nix-darwin/issues/924)) ([a4559b5](https://github.com/JacobPEvans/nix-darwin/commit/a4559b57627f9415c165c5befc5b8b8796e42cb6))
+
 ## [1.16.8](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.7...v1.16.8) (2026-03-26)
 
 
