@@ -8,7 +8,7 @@
 stdenvNoCC.mkDerivation rec {
   pname = "ClaudeBar";
   # renovate: datasource=github-releases depName=tddworks/ClaudeBar
-  version = "0.4.43";
+  version = "0.4.57";
 
   src = fetchurl {
     url = "https://github.com/tddworks/ClaudeBar/releases/download/v${version}/ClaudeBar-${version}.dmg";
