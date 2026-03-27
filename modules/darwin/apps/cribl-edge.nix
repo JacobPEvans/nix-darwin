@@ -6,13 +6,18 @@
 # with a Nix-managed service definition.
 #
 # Cribl Edge itself is installed externally via .pkg (not in any package manager).
-# This module manages: LaunchDaemon lifecycle, ACL-based file permissions.
-# No root execution. No FDA — ACLs only for monitored paths.
+# This module manages: LaunchDaemon lifecycle, ACL-based file permissions, pack deployment.
+# Service runs as user 'cribl'; activation scripts run as root. No FDA — ACLs only for monitored paths.
 #
 # Note: Disabling this module does not automatically remove ACLs from previously
 # configured paths. Run `/bin/chmod -a "cribl allow ..." <path>` manually if needed.
 
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.cribl-edge;
@@ -21,6 +26,57 @@ let
   group = "cribl";
   aclPerms = "${user} allow read,readattr,readextattr,readsecurity,list,search";
   ts = "$(date '+%Y-%m-%d %H:%M:%S')";
+
+  # Build a deploy script per pack — each invocation is idempotent
+  deployPack = pkgs.writeShellApplication {
+    name = "cribl-deploy-pack";
+    runtimeInputs = [ pkgs.jq ];
+    text = ''
+      PACK_NAME="$1"
+      PACK_SRC="$2"
+      CRIBL_PATH="$3"
+      STATUS="unchanged"
+
+      # Validate pack name (activation runs as root — prevent directory traversal)
+      case "$PACK_NAME" in
+        ""|*/*|*..*)
+          echo "Invalid pack name '$PACK_NAME': must be a simple basename" >&2
+          exit 1
+          ;;
+      esac
+
+      TARGET="$CRIBL_PATH/default/$PACK_NAME"
+      MARKER="$TARGET/.nix-store-path"
+
+      # Deploy if store path changed (stage to tmp dir, then atomic mv)
+      if [ ! -f "$MARKER" ] || [ "$(cat "$MARKER" 2>/dev/null)" != "$PACK_SRC" ]; then
+        STAGING="''${TARGET}.tmp.$$"
+        rm -rf "$STAGING" "$TARGET"
+        cp -R "$PACK_SRC" "$STAGING"
+        /usr/sbin/chown -R ${user}:${group} "$STAGING"
+        mv "$STAGING" "$TARGET"
+        echo "$PACK_SRC" > "$MARKER"
+        STATUS="deployed"
+      fi
+
+      # Register in package.json if missing (uses jq --arg to keep $CRIBL_HOME literal)
+      if [ -f "$CRIBL_PATH/package.json" ] && \
+         ! jq -e --arg n "$PACK_NAME" '.dependencies[$n]' "$CRIBL_PATH/package.json" >/dev/null 2>&1; then
+        jq --arg n "$PACK_NAME" --arg v 'file:$CRIBL_HOME/default/'"$PACK_NAME" \
+          '.dependencies |= ((if type == "object" then . else {} end) + {($n): $v})' \
+          "$CRIBL_PATH/package.json" > "$CRIBL_PATH/package.json.tmp"
+        mv "$CRIBL_PATH/package.json.tmp" "$CRIBL_PATH/package.json"
+        /usr/sbin/chown ${user}:${group} "$CRIBL_PATH/package.json"
+        if [ "$STATUS" = "unchanged" ]; then
+          STATUS="registered"
+        else
+          STATUS="$STATUS and registered"
+        fi
+      fi
+
+      echo "$STATUS"
+    '';
+  };
 in
 {
   options.programs.cribl-edge = {
@@ -42,6 +98,26 @@ in
         "/Library/Logs"
         "/Library/Logs/DiagnosticReports"
       ];
+    };
+
+    packs = lib.mkOption {
+      type = lib.types.attrsOf lib.types.package;
+      default = { };
+      description = ''
+        Cribl Edge packs to deploy declaratively.
+        Key = pack name, value = derivation containing pack files.
+        Use fetchzip with extension = "tar.gz" for .crbl files.
+      '';
+      example = lib.literalExpression ''
+        {
+          cc-edge-macos-power = pkgs.fetchzip {
+            url = "https://github.com/JacobPEvans/cc-edge-macos-power/releases/download/v1.0.0/cc-edge-macos-power-v1.0.0.crbl";
+            extension = "tar.gz";
+            hash = "sha256-...";
+            stripRoot = false;
+          };
+        }
+      '';
     };
   };
 
@@ -79,6 +155,23 @@ in
           fi
         '') cfg.acls}
         echo "${ts} [INFO] Applied Cribl Edge ACLs to $_acl_applied of ${toString (builtins.length cfg.acls)} path(s)"
+      ''}
+
+      ${lib.optionalString (cfg.packs != { }) ''
+        _packs_changed=0
+        ${lib.concatStringsSep "\n" (
+          lib.mapAttrsToList (name: src: ''
+            _result=$(${deployPack}/bin/cribl-deploy-pack "${name}" "${src}" "${path}")
+            if [ "$_result" != "unchanged" ]; then
+              _packs_changed=1
+              echo "${ts} [INFO] Cribl Edge pack ${name}: $_result"
+            fi
+          '') cfg.packs
+        )}
+        if [ "$_packs_changed" -eq 1 ]; then
+          /bin/launchctl kickstart -k system/com.nix-darwin.cribl-edge 2>/dev/null || true
+          echo "${ts} [INFO] Restarted Cribl Edge (pack changes detected)"
+        fi
       ''}
     '';
 

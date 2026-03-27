@@ -5,7 +5,7 @@
 #
 # This file imports darwin modules and configures host-specific settings.
 
-_:
+{ pkgs, ... }:
 
 let
   # User-specific configuration (hostname, identity, etc.)
@@ -83,6 +83,14 @@ in
         "/Library/Logs" # system-level application logs
         "/Library/Logs/DiagnosticReports" # crash reports
       ];
+      packs = {
+        cc-edge-macos-power = pkgs.fetchzip {
+          url = "https://github.com/JacobPEvans/cc-edge-macos-power/releases/download/v1.0.0/cc-edge-macos-power-v1.0.0.crbl";
+          extension = "tar.gz";
+          hash = "sha256-fzuekOUHCjxajzozGDhAk1jQHP6bLatTvSfF2fI0afA=";
+          stripRoot = false;
+        };
+      };
     };
   };
 
