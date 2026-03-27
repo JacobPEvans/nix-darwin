@@ -7,7 +7,7 @@
 #
 # Cribl Edge itself is installed externally via .pkg (not in any package manager).
 # This module manages: LaunchDaemon lifecycle, ACL-based file permissions, pack deployment.
-# No root execution. No FDA — ACLs only for monitored paths.
+# Service runs as user 'cribl'; activation scripts run as root. No FDA — ACLs only for monitored paths.
 #
 # Note: Disabling this module does not automatically remove ACLs from previously
 # configured paths. Run `/bin/chmod -a "cribl allow ..." <path>` manually if needed.
@@ -37,15 +37,25 @@ let
       CRIBL_PATH="$3"
       STATUS="unchanged"
 
+      # Validate pack name (activation runs as root — prevent directory traversal)
+      case "$PACK_NAME" in
+        ""|*/*|*..*)
+          echo "Invalid pack name '$PACK_NAME': must be a simple basename" >&2
+          exit 1
+          ;;
+      esac
+
       TARGET="$CRIBL_PATH/default/$PACK_NAME"
       MARKER="$TARGET/.nix-store-path"
 
-      # Deploy if store path changed
+      # Deploy if store path changed (stage to tmp dir, then atomic mv)
       if [ ! -f "$MARKER" ] || [ "$(cat "$MARKER" 2>/dev/null)" != "$PACK_SRC" ]; then
-        rm -rf "$TARGET"
-        cp -R "$PACK_SRC" "$TARGET"
+        STAGING="''${TARGET}.tmp.$$"
+        rm -rf "$STAGING" "$TARGET"
+        cp -R "$PACK_SRC" "$STAGING"
+        /usr/sbin/chown -R ${user}:${group} "$STAGING"
+        mv "$STAGING" "$TARGET"
         echo "$PACK_SRC" > "$MARKER"
-        /usr/sbin/chown -R ${user}:${group} "$TARGET"
         STATUS="deployed"
       fi
 
@@ -53,10 +63,15 @@ let
       if [ -f "$CRIBL_PATH/package.json" ] && \
          ! jq -e --arg n "$PACK_NAME" '.dependencies[$n]' "$CRIBL_PATH/package.json" >/dev/null 2>&1; then
         jq --arg n "$PACK_NAME" --arg v 'file:$CRIBL_HOME/default/'"$PACK_NAME" \
-          '.dependencies[$n] = $v' "$CRIBL_PATH/package.json" > "$CRIBL_PATH/package.json.tmp"
+          '.dependencies |= ((if type == "object" then . else {} end) + {($n): $v})' \
+          "$CRIBL_PATH/package.json" > "$CRIBL_PATH/package.json.tmp"
         mv "$CRIBL_PATH/package.json.tmp" "$CRIBL_PATH/package.json"
         /usr/sbin/chown ${user}:${group} "$CRIBL_PATH/package.json"
-        STATUS="registered"
+        if [ "$STATUS" = "unchanged" ]; then
+          STATUS="registered"
+        else
+          STATUS="$STATUS and registered"
+        fi
       fi
 
       echo "$STATUS"
