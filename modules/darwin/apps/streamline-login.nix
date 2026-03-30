@@ -19,7 +19,6 @@ let
   cfg = config.programs.streamline-login;
   userConfig = import ../../../lib/user-config.nix;
   inherit (userConfig.user) homeDir name;
-  username = name;
   ts = "$(date '+%Y-%m-%d %H:%M:%S')";
 in
 {
@@ -70,7 +69,7 @@ in
     system.activationScripts.postActivation.text = lib.mkAfter ''
       echo "${ts} [INFO] Streamline login items starting..."
       _cleanup_count=0
-      _uid=$(/usr/bin/id -u ${username})
+      _uid=$(/usr/bin/id -u ${name})
 
       # --- Remove unwanted user LaunchAgent plists ---
       ${lib.concatMapStringsSep "\n" (plist: ''
