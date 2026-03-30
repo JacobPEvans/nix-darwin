@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.17.0...v1.18.0) (2026-03-30)
+
+
+### Features
+
+* **cribl-edge:** declarative pack deployment ([#928](https://github.com/JacobPEvans/nix-darwin/issues/928)) ([6fb6ccc](https://github.com/JacobPEvans/nix-darwin/commit/6fb6cccf92ff7e205025ed36eeb1189be9a347d2))
+
 ## [1.17.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.10...v1.17.0) (2026-03-30)
 
 
