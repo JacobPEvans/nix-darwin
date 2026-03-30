@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.10...v1.17.0) (2026-03-30)
+
+
+### Features
+
+* **darwin:** add streamline-login module for updater disabling ([#931](https://github.com/JacobPEvans/nix-darwin/issues/931)) ([89b2a30](https://github.com/JacobPEvans/nix-darwin/commit/89b2a301d701ed3f81543ab6126f0743a44ca30b))
+
 ## [1.16.10](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.9...v1.16.10) (2026-03-30)
 
 
