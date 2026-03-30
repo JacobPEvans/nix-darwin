@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.10](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.9...v1.16.10) (2026-03-30)
+
+
+### Bug Fixes
+
+* **startup:** disable unnecessary Apple LaunchAgents that degrade boot performance ([#930](https://github.com/JacobPEvans/nix-darwin/issues/930)) ([1e833c8](https://github.com/JacobPEvans/nix-darwin/commit/1e833c8d2c6989680a073d32185d12f4af229c9e))
+
 ## [1.16.9](https://github.com/JacobPEvans/nix-darwin/compare/v1.16.8...v1.16.9) (2026-03-26)
 
 
