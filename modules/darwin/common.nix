@@ -24,7 +24,6 @@ in
     ./system-ui.nix
     ./activation-error-tracking.nix
     ./nix-storage.nix
-    ./startup-tuning.nix
   ];
 
   # --- Nixpkgs Configuration ---

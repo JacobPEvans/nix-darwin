@@ -106,12 +106,17 @@ in
         "screenpipe.plist" # Screenpipe auto-start (app stays installed)
       ];
 
-      # User-domain services to disable (updaters, redundant apps)
+      # User-domain services to disable (updaters, redundant apps, broken daemons)
       disableUserServices = [
         "com.google.GoogleUpdater.wake" # Google hourly updater
         "us.zoom.updater" # Zoom hourly updater
         "us.zoom.updater.login.check" # Zoom login check at login
         "com.ollama.ollama" # Redundant — vllm-mlx is primary inference server
+        # Boot-time race condition daemons — crash-loop before dependencies ready,
+        # corrupt WindowServer client dispatch table, cause sustained UI lag/freezes
+        "com.apple.universalaccessd" # No accessibility features enabled
+        "com.apple.macos.studentd" # Classroom daemon, no MDM enrollment
+        "com.apple.passd" # Apple Wallet not used
       ];
 
       # System-domain services to disable
