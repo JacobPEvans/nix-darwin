@@ -84,6 +84,35 @@ in
         "/Library/Logs/DiagnosticReports" # crash reports
       ];
     };
+
+    # --- Streamline Login Items ---
+    # Persistently disable unwanted updaters and remove junk plists.
+    # Edit these lists to add/remove services — enforced on every rebuild.
+    streamline-login = {
+      enable = true;
+
+      # Junk/dead plists to delete from ~/Library/LaunchAgents/
+      removePlists = [
+        "com.google.keystone.agent.plist" # Legacy Google Keystone (empty, replaced by GoogleUpdater)
+        "com.google.keystone.xpcservice.plist" # Legacy Google Keystone (empty)
+        "screenpipe.plist" # Screenpipe auto-start (app stays installed)
+      ];
+
+      # User-domain services to disable (updaters, redundant apps)
+      disableUserServices = [
+        "com.google.GoogleUpdater.wake" # Google hourly updater
+        "us.zoom.updater" # Zoom hourly updater
+        "us.zoom.updater.login.check" # Zoom login check at login
+        "com.ollama.ollama" # Redundant — vllm-mlx is primary inference server
+      ];
+
+      # System-domain services to disable
+      disableSystemServices = [
+        "com.google.GoogleUpdater.wake.system" # Google system updater (hourly)
+        "com.duosecurity.duoappupdater" # Duo updater (every 10 minutes)
+        "us.zoom.ZoomDaemon" # Zoom privileged helper daemon
+      ];
+    };
   };
 
   # --- Energy & Sleep Configuration ---

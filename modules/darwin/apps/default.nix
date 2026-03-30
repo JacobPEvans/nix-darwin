@@ -14,6 +14,7 @@ _:
     ./cribl-edge.nix
     ./orbstack.nix
     ./raycast.nix
+    ./streamline-login.nix
   ];
 
   # OrbStack module is imported but host-specific config (apfsContainer)

@@ -1,0 +1,98 @@
+# Streamline Login Items
+#
+# Persistently disables unwanted LaunchAgents/LaunchDaemons and removes junk
+# plists on every darwin-rebuild. Survives app reinstalls and updates.
+#
+# All configuration is in the host config (hosts/<host>/default.nix) — the
+# one-stop shop for managing which services to disable or remove.
+#
+# Mechanisms:
+#   - removePlists: deletes named plists from ~/Library/LaunchAgents/
+#     (bootout + rm). Use for dead/junk plists that apps may recreate.
+#   - disableUserServices: `launchctl disable gui/<uid>/<label>` — idempotent,
+#     persists across reboots. Service plist stays but won't load.
+#   - disableSystemServices: same for system domain (runs as root).
+
+{ lib, config, ... }:
+
+let
+  cfg = config.programs.streamline-login;
+  userConfig = import ../../../lib/user-config.nix;
+  inherit (userConfig.user) homeDir name;
+  username = name;
+  ts = "$(date '+%Y-%m-%d %H:%M:%S')";
+in
+{
+  options.programs.streamline-login = {
+    enable = lib.mkEnableOption "login item streamlining (disable updaters, remove junk plists)";
+
+    removePlists = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        Plist filenames (not full paths) under ~/Library/LaunchAgents/ to delete
+        on every darwin-rebuild. The service is booted out before removal.
+      '';
+      example = [
+        "com.google.keystone.agent.plist"
+        "screenpipe.plist"
+      ];
+    };
+
+    disableUserServices = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        Service labels to persistently disable in the user launchd domain
+        (gui/<uid>). Idempotent — safe to re-run on every rebuild.
+      '';
+      example = [
+        "com.google.GoogleUpdater.wake"
+        "us.zoom.updater"
+      ];
+    };
+
+    disableSystemServices = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        Service labels to persistently disable in the system launchd domain.
+        Runs as root during activation (standard for nix-darwin).
+      '';
+      example = [
+        "com.google.GoogleUpdater.wake.system"
+        "com.duosecurity.duoappupdater"
+      ];
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    system.activationScripts.postActivation.text = lib.mkAfter ''
+      echo "${ts} [INFO] Streamline login items starting..."
+      _cleanup_count=0
+      _uid=$(/usr/bin/id -u ${username})
+
+      # --- Remove unwanted user LaunchAgent plists ---
+      ${lib.concatMapStringsSep "\n" (plist: ''
+        if [ -f "${homeDir}/Library/LaunchAgents/${plist}" ]; then
+          /bin/launchctl bootout "gui/$_uid/${lib.removeSuffix ".plist" plist}" 2>/dev/null || true
+          rm -f "${homeDir}/Library/LaunchAgents/${plist}"
+          echo "${ts} [INFO] Removed ${plist}"
+          _cleanup_count=$((_cleanup_count + 1))
+        fi
+      '') cfg.removePlists}
+
+      # --- Disable user-domain services ---
+      ${lib.concatMapStringsSep "\n" (svc: ''
+        /bin/launchctl disable "gui/$_uid/${svc}" 2>/dev/null || true
+      '') cfg.disableUserServices}
+
+      # --- Disable system-domain services ---
+      ${lib.concatMapStringsSep "\n" (svc: ''
+        /bin/launchctl disable "system/${svc}" 2>/dev/null || true
+      '') cfg.disableSystemServices}
+
+      echo "${ts} [INFO] Streamline login complete ($_cleanup_count plists removed, ${toString (builtins.length cfg.disableUserServices)} user + ${toString (builtins.length cfg.disableSystemServices)} system services disabled)"
+    '';
+  };
+}
