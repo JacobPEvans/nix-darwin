@@ -24,6 +24,7 @@ in
     ./system-ui.nix
     ./activation-error-tracking.nix
     ./nix-storage.nix
+    ./ws-monitor.nix
   ];
 
   # --- Nixpkgs Configuration ---
