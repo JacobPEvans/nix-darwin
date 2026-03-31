@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.18.1...v1.18.2) (2026-03-31)
+
+
+### Bug Fixes
+
+* **deps:** update all flake inputs and ClaudeBar to 0.4.57 ([#938](https://github.com/JacobPEvans/nix-darwin/issues/938)) ([b234826](https://github.com/JacobPEvans/nix-darwin/commit/b2348269769faa166dd7a194e0c2b2ff04c73f58))
+
 ## [1.18.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.18.0...v1.18.1) (2026-03-31)
 
 
