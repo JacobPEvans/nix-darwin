@@ -18,9 +18,10 @@ let
   };
 in
 {
-  # Ensure log directory exists before launchd tries to open StandardErrorPath
+  # Ensure log directory exists with correct permissions before launchd opens stderr
   system.activationScripts.postActivation.text = lib.mkAfter ''
     /bin/mkdir -p "${logDir}"
+    /bin/chmod 755 "${logDir}"
   '';
 
   # System-level LaunchDaemon — runs as root for full system visibility
