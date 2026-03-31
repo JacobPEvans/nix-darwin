@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.19.0...v1.19.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* **monitoring:** use absolute paths and fix log dir permissions ([baaa6e0](https://github.com/JacobPEvans/nix-darwin/commit/baaa6e0cd5f8d8720d0b54e2f11aa7396d9b4413))
+
 ## [1.19.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.18.2...v1.19.0) (2026-03-31)
 
 
