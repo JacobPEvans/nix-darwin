@@ -103,7 +103,6 @@ in
       removePlists = [
         "com.google.keystone.agent.plist" # Legacy Google Keystone (empty, replaced by GoogleUpdater)
         "com.google.keystone.xpcservice.plist" # Legacy Google Keystone (empty)
-        "screenpipe.plist" # Screenpipe auto-start (app stays installed)
       ];
 
       # User-domain services to disable (updaters, redundant apps, broken daemons)

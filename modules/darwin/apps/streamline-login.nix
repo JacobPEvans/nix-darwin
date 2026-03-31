@@ -34,7 +34,7 @@ in
       '';
       example = [
         "com.google.keystone.agent.plist"
-        "screenpipe.plist"
+        "com.example.unwanted-updater.plist"
       ];
     };
 
