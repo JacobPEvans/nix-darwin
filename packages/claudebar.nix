@@ -8,11 +8,11 @@
 stdenvNoCC.mkDerivation rec {
   pname = "ClaudeBar";
   # renovate: datasource=github-releases depName=tddworks/ClaudeBar
-  version = "0.4.43";
+  version = "0.4.57";
 
   src = fetchurl {
     url = "https://github.com/tddworks/ClaudeBar/releases/download/v${version}/ClaudeBar-${version}.dmg";
-    hash = "sha256-sdeRvy1omTm7St5IjLRkdoy35jNj5WEQhMbKo4o4BAU=";
+    hash = "sha256-YkG9AnVGt8/QkhSj+alBBFNbhgccvy6DRola+CRXA4w=";
   };
 
   nativeBuildInputs = [ undmg ];
