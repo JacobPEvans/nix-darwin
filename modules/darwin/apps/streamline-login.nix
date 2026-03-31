@@ -83,15 +83,15 @@ in
 
       # --- Disable user-domain services ---
       ${lib.concatMapStringsSep "\n" (svc: ''
-        if ! /bin/launchctl disable "gui/$_uid/${svc}" 2>/dev/null; then
-          echo "${ts} [WARN] Failed to disable ${svc}" >&2
+        if ! _err=$(/bin/launchctl disable "gui/$_uid/${svc}" 2>&1); then
+          echo "${ts} [WARN] Failed to disable ${svc}: $_err" >&2
         fi
       '') cfg.disableUserServices}
 
       # --- Disable system-domain services ---
       ${lib.concatMapStringsSep "\n" (svc: ''
-        if ! /bin/launchctl disable "system/${svc}" 2>/dev/null; then
-          echo "${ts} [WARN] Failed to disable system/${svc}" >&2
+        if ! _err=$(/bin/launchctl disable "system/${svc}" 2>&1); then
+          echo "${ts} [WARN] Failed to disable system/${svc}: $_err" >&2
         fi
       '') cfg.disableSystemServices}
 
