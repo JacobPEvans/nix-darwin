@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.19.1...v1.20.0) (2026-04-01)
+
+
+### Features
+
+* **monitoring:** add NVMe disk I/O tracking to ws-monitor ([#944](https://github.com/JacobPEvans/nix-darwin/issues/944)) ([1cfe820](https://github.com/JacobPEvans/nix-darwin/commit/1cfe8205329d6b8ca72fe502cfe96d7ba05120c8))
+
 ## [1.19.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.19.0...v1.19.1) (2026-03-31)
 
 
