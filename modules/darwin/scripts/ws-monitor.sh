@@ -60,6 +60,14 @@ else
   WS_FOOTPRINT="unknown"
 fi
 
+# === DISK I/O (NVMe throughput) ===
+# macOS iostat -d -K outputs: KB/t (avg KB per transfer), tps, MB/s (combined throughput)
+# 1-second sample: second row is the interval delta
+DISK_IO=$(/usr/sbin/iostat -d -K -w 1 -c 2 2>/dev/null | /usr/bin/tail -1 || true)
+DISK_KB_PER_T=$(echo "$DISK_IO" | /usr/bin/awk '{printf "%.0f", $1+0}' || echo 0)
+DISK_TPS=$(echo "$DISK_IO" | /usr/bin/awk '{printf "%.0f", $2+0}' || echo 0)
+DISK_MBS=$(echo "$DISK_IO" | /usr/bin/awk '{printf "%.1f", $3+0}' || echo "0.0")
+
 # === SYSTEM STATE ===
 MEM_FREE=$(/usr/bin/memory_pressure 2>/dev/null | /usr/bin/grep "free percentage" | /usr/bin/grep -oE "[0-9]+%" | /usr/bin/head -1 || echo "unknown")
 SWAP_USED=$(/usr/sbin/sysctl -n vm.swapusage 2>/dev/null | /usr/bin/grep -oE "used = [0-9.]+" | /usr/bin/grep -oE "[0-9.]+" || echo "0")
@@ -92,9 +100,12 @@ jq -nc \
   --arg wsfp "$WS_FOOTPRINT" \
   --arg mem "$MEM_FREE" \
   --arg swap "$SWAP_USED" \
-  '{timestamp:$ts,local_time:$lt,severity:$sev,sync_timeouts:$sync,sync_surfaces:$surf,datagram_clears:$dgram,ping_timeouts:$pings,ping_pids:$ppids,ws_events_total:$ws,sharing_contexts:$share,invalid_window:$inv,conn_debug:$conn,brightness:$bright,gpu_mem:$gpu,ws_footprint:$wsfp,mem_free_pct:$mem,swap_used_mb:$swap}' \
+  --argjson dkbt "$DISK_KB_PER_T" \
+  --argjson dtps "$DISK_TPS" \
+  --arg dmbs "$DISK_MBS" \
+  '{timestamp:$ts,local_time:$lt,severity:$sev,sync_timeouts:$sync,sync_surfaces:$surf,datagram_clears:$dgram,ping_timeouts:$pings,ping_pids:$ppids,ws_events_total:$ws,sharing_contexts:$share,invalid_window:$inv,conn_debug:$conn,brightness:$bright,gpu_mem:$gpu,ws_footprint:$wsfp,mem_free_pct:$mem,swap_used_mb:$swap,disk_kb_per_t:$dkbt,disk_tps:$dtps,disk_mbs:$dmbs}' \
   >> "$LOG_FILE"
 
 if [ "$SEVERITY" != "normal" ]; then
-  echo "$LOCAL_TS [$SEVERITY] sync=$SYNC_TIMEOUTS surfaces=$SYNC_SURFACES pings=$PING_COUNT ws=$WS_TOTAL gpu=$GPU_MEM ws_fp=$WS_FOOTPRINT mem=$MEM_FREE" >&2
+  echo "$LOCAL_TS [$SEVERITY] sync=$SYNC_TIMEOUTS pings=$PING_COUNT ws=$WS_TOTAL disk=${DISK_MBS}MB/s ws_fp=$WS_FOOTPRINT mem=$MEM_FREE" >&2
 fi
