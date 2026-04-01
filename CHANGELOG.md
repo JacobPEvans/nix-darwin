@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.20.0...v1.20.1) (2026-04-01)
+
+
+### Bug Fixes
+
+* **renovate:** remove duplicate automerge from AI tools group ([#937](https://github.com/JacobPEvans/nix-darwin/issues/937)) ([85c5513](https://github.com/JacobPEvans/nix-darwin/commit/85c5513d933426806513b60a99c8b8fc998d0b78))
+
 ## [1.20.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.19.1...v1.20.0) (2026-04-01)
 
 
