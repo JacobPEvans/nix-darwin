@@ -116,6 +116,13 @@ Source: nix-home (`home.packages` via flake input)
 |---------|-------------|
 | mosh | Resilient mobile shell using UDP |
 
+### Visualization & Diagramming
+
+| Package | Description |
+|---------|-------------|
+| d2 | Modern diagram scripting language (D2lang) |
+| mermaid-cli | Mermaid diagram generator CLI (mmdc) |
+
 ### Python
 
 | Package | Description |
