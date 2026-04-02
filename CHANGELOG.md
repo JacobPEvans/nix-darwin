@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.20.1...v1.20.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* remove unused OpenHands AI workflow ([#951](https://github.com/JacobPEvans/nix-darwin/issues/951)) ([e612245](https://github.com/JacobPEvans/nix-darwin/commit/e612245cff36f04d2c64bc56c367177210fd29d1))
+
 ## [1.20.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.20.0...v1.20.1) (2026-04-01)
 
 
