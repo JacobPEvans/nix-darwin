@@ -38,7 +38,6 @@ rules:
       - issue-hygiene.yml
       - issue-sweeper.yml
       - issue-auto-resolve.yml
-      - issue-pipeline.yml
       - next-steps.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
@@ -61,7 +60,6 @@ rules:
       - best-practices.yml
       - code-simplifier.yml
       - issue-auto-resolve.yml
-      - issue-pipeline.yml
       - next-steps.yml
       - post-merge-docs-review.yml
       - post-merge-tests.yml
@@ -73,15 +71,11 @@ rules:
     ignore:
       - _claude-settings.yml
       - _nix-build.yml
-      - ci-auto-claude.yml
-      - ci-eol-check.yml
       - ci-file-length.yml
       - ci-gate.yml
       - ci-markdownlint.yml
       - ci-nix.yml
       - ci-package-staleness.yml
-      - ci-validate-settings.yml
       - ci-validate.yml
       - deps-update-flake.yml
-      - nixos-release-check.yml
       - review-deps.yml
