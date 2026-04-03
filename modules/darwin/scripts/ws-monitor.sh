@@ -10,7 +10,7 @@
 #
 # Log: /var/log/ws-monitor/ws-monitor.jsonl
 # Query: jq 'select(.severity != "normal")' /var/log/ws-monitor/ws-monitor.jsonl
-set -euo pipefail
+set -u
 
 LOG_DIR="/var/log/ws-monitor"
 LOG_FILE="$LOG_DIR/ws-monitor.jsonl"
