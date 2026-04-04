@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.21.1...v1.21.2) (2026-04-04)
+
+
+### Bug Fixes
+
+* correct MANIFEST.md cask upgrade docs and Teams greedy flag ([#958](https://github.com/JacobPEvans/nix-darwin/issues/958)) ([b7cd0fe](https://github.com/JacobPEvans/nix-darwin/commit/b7cd0fe79342f2e9cd2d5378c20522c01930aa8b))
+
 ## [1.21.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.21.0...v1.21.1) (2026-04-04)
 
 
