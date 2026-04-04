@@ -180,9 +180,8 @@ Source: `modules/darwin/homebrew.nix`
 
 ### Casks
 
-All casks that ship a built-in auto-updater use `greedy = true` so that `brew upgrade` (triggered by
-`onActivation.upgrade = true` on `darwin-rebuild switch`) always installs the latest version rather than
-deferring to the app's own updater.
+All casks use `greedy = true` so that `brew upgrade --greedy` (run by `brew autoupdate` every 30 hours
+via LaunchAgent) always installs the latest version rather than deferring to built-in auto-updaters.
 
 | Package | greedy | Description |
 |---------|--------|-------------|
@@ -196,7 +195,7 @@ deferring to the app's own updater.
 | antigravity | yes | Google AI-powered IDE (Gemini 3) |
 | postman | yes | API development environment (moved from nixpkgs — version lag caused schema mismatch) |
 | orbstack | yes | Container/Linux VM runtime — cask for TCC permission stability |
-| microsoft-teams | no | Teams desktop app (not available on Mac App Store; MAU handles updates) |
+| microsoft-teams | yes | Teams desktop app (not available on Mac App Store) |
 
 ### Mac App Store
 
