@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.21.2...v1.21.3) (2026-04-07)
+
+
+### Bug Fixes
+
+* replace renovate annotation with nix-update convention in claudebar ([#964](https://github.com/JacobPEvans/nix-darwin/issues/964)) ([0a435e2](https://github.com/JacobPEvans/nix-darwin/commit/0a435e21a40fdde1e07453c87a7f978cffdfec76))
+
 ## [1.21.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.21.1...v1.21.2) (2026-04-04)
 
 
