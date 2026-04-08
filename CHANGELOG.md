@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.22.0...v1.22.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* update Copilot setup source to ai-workflows ([#968](https://github.com/JacobPEvans/nix-darwin/issues/968)) ([3400d66](https://github.com/JacobPEvans/nix-darwin/commit/3400d66cdfcc896789de256911d02b0a3e4e4e2a))
+
 ## [1.22.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.21.3...v1.22.0) (2026-04-07)
 
 
