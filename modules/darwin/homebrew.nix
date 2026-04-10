@@ -158,6 +158,16 @@ in
         name = "microsoft-teams";
         greedy = true;
       }
+
+      # --- Office Suite (for Claude document-skills) ---
+      # LibreOffice provides the `soffice` CLI that /document-skills:{docx,xlsx,pptx}
+      # use to convert Office docs to PDF. nixpkgs does NOT build libreoffice for
+      # aarch64-darwin, so homebrew is the correct fallback per "nixpkgs first,
+      # then brew" policy. On Linux it ships via nix-home home.packages.
+      {
+        name = "libreoffice";
+        greedy = true;
+      }
     ];
 
     # Mac App Store apps (requires signed into App Store)
