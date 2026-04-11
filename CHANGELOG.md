@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.24.0...v1.25.0) (2026-04-11)
+
+
+### Features
+
+* **zsh:** add custom-auth claude launchers (av-claude, gh-claude-*) ([#978](https://github.com/JacobPEvans/nix-darwin/issues/978)) ([2f2ccd4](https://github.com/JacobPEvans/nix-darwin/commit/2f2ccd4133543453616c1a2bab88ade83c393185))
+
 ## [1.24.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.23.0...v1.24.0) (2026-04-10)
 
 
