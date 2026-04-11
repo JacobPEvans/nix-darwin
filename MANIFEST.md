@@ -57,8 +57,6 @@ Source: `modules/darwin/common.nix`
 | Package | Description |
 |---------|-------------|
 | mas | Mac App Store CLI |
-| whisper-cpp | Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal) |
-| openai-whisper | Original OpenAI Whisper (Python, GPU/CPU, broader model support) |
 
 ---
 
@@ -86,10 +84,8 @@ Source: nix-home (`home.packages` via flake input)
 | pre-commit | Git pre-commit hook framework |
 | shellcheck | Shell script static analysis |
 | shfmt | Shell script formatter |
-| bats | Bash Automated Testing System |
-| lychee | Link checker for markdown and HTML |
+| lychee | Link checker for markdown and HTML (global: pre-commit language: system) |
 | markdownlint-cli2 | Markdown linter |
-| actionlint | GitHub Actions workflow linter |
 
 ### Nix Tooling
 
@@ -118,20 +114,16 @@ Source: nix-home (`home.packages` via flake input)
 
 ### Visualization & Diagramming
 
-| Package | Description |
-|---------|-------------|
-| d2 | Modern diagram scripting language (D2lang) |
-| mermaid-cli | Mermaid diagram generator CLI (mmdc) |
+On-demand via `nix run nixpkgs#d2` and `nix run nixpkgs#mermaid-cli` — not installed globally.
 
 ### Python
 
 | Package | Description |
 |---------|-------------|
-| pyright | Static type checker for Python |
-| python314 | Python 3.14 (bleeding edge) |
-| python312 | Python 3.12 (general development) |
+| pyright | Static type checker for Python (global: IDEs require it in PATH) |
+| python314 | Python 3.14 (primary runtime) |
 | uv | Fast Python package manager (also runs EOL versions) |
-| python3.withPackages | Unified env: cryptography, grip, pipx, pygithub |
+| python3.withPackages | Unified env: cryptography, pygithub + document-skills deps |
 
 ---
 

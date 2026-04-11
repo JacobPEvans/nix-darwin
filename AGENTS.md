@@ -87,9 +87,11 @@ cd <branch>
 
 ### Package placement
 
-- **`environment.systemPackages`**: Core bootstrapping (git, gnupg, vim), macOS-only tools, system services, GUI apps
-- **`home.packages`** (nix-home): User dev tools, linters, CLIs, language runtimes
-- **AI packages** (nix-ai): Claude Code, Gemini, Copilot, MCP servers
+See the `nix-package-placement` rule — lives in
+[ai-assistant-instructions/agentsmd/rules/nix-package-placement.md](https://github.com/JacobPEvans/ai-assistant-instructions/blob/main/agentsmd/rules/nix-package-placement.md)
+and auto-loads via path-scoping when `.nix` / `flake.*` files are in context.
+Contains the full decision matrix for all four repos including homebrew constraints
+and on-demand patterns.
 
 ## Part of a Quartet
 

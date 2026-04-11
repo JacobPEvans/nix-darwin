@@ -61,12 +61,15 @@ in
       # - Homebrew version is required for Gemini 3.1 Pro support
       "gemini-cli"
 
+      # --- AI Agent Tools (homebrew-only; home-manager cannot manage brew formulas) ---
+
       # Block Goose AI agent (https://github.com/block/goose)
       # - Using homebrew as nixpkgs version was >30 days old at time of addition; homebrew actively maintained
       # - Named 'block-goose-cli' to avoid conflict with nixpkgs 'goose' (database migration tool)
       "block-goose-cli"
 
       # Swift native on-device speech recognition (Apple Silicon, requires Xcode build - not in nixpkgs)
+      # Pairs with whisper-cpp + openai-whisper (those are in nix-ai home.packages as Nix derivations)
       "whisperkit-cli"
     ];
     casks = [

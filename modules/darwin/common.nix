@@ -70,12 +70,6 @@ in
     portaudio # Cross-platform audio I/O library
 
     # ========================================================================
-    # AI/ML system services
-    # ========================================================================
-    whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
-    openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
-
-    # ========================================================================
     # GUI applications (system-level, in /Applications/Nix Apps/)
     # ========================================================================
     bitwarden-desktop # Password manager desktop app
