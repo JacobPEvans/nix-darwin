@@ -3,14 +3,17 @@
 #
 # Provides:
 #   av-claude <profile> [claude-args...]   aws-vault exec <profile> -- claude ...
-#   gh-claude-restricted [claude-args...]  claude with GH_PAT_RESTRICTED (subshell-scoped)
-#   gh-claude-private    [claude-args...]  claude with GH_PAT_PRIVATE    (subshell-scoped)
-#   gh-claude-admin      [claude-args...]  claude with GH_PAT_ADMIN      (subshell-scoped)
+#   gh-claude-restricted [claude-args...]  claude with GITHUB_TOKEN from the RESTRICTED tier
+#   gh-claude-private    [claude-args...]  claude with GITHUB_TOKEN from the PRIVATE tier
+#   gh-claude-admin      [claude-args...]  claude with GITHUB_TOKEN from the ADMIN tier
 #
-# The gh-claude-* wrappers run inside a subshell so GITHUB_TOKEN / GH_ENV_MODE
-# set by the underlying gh-* functions (see gh-token-switching.zsh) do NOT
-# leak into the parent shell after claude exits. This preserves the shell's
-# default least-privilege tier.
+# Each gh-claude-* wrapper runs its underlying gh-* function (defined in
+# gh-token-switching.zsh) inside a subshell, so the GITHUB_TOKEN and
+# GH_ENV_MODE exports those functions produce do NOT leak into the parent
+# shell after claude exits. This preserves the shell's default least-privilege
+# tier. The tier names (RESTRICTED / PRIVATE / ADMIN) correspond to the macOS
+# Keychain service names GH_PAT_RESTRICTED / GH_PAT_PRIVATE / GH_PAT_ADMIN
+# from which the underlying gh-* functions read the token.
 
 av-claude() {
   if (( $# == 0 )); then
