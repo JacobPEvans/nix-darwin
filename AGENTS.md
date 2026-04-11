@@ -90,10 +90,10 @@ cd <branch>
 See the `nix-package-placement` rule — lives in
 [ai-assistant-instructions/agentsmd/rules/nix-package-placement.md](https://github.com/JacobPEvans/ai-assistant-instructions/blob/main/agentsmd/rules/nix-package-placement.md)
 and auto-loads via path-scoping when `.nix` / `flake.*` files are in context.
-Contains the full decision matrix for all four repos including homebrew constraints
+Contains the full decision matrix for the nix repos including homebrew constraints
 and on-demand patterns.
 
-## Part of a Quartet
+## Related Repos
 
 | Repo | Scope | Used via |
 | ---- | ----- | -------- |
