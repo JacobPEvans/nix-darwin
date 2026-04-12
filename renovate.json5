@@ -38,7 +38,8 @@
         "NixOS/nixpkgs",
         "nix-darwin/nix-darwin",
         "nix-community/home-manager",
-        "JacobPEvans/ai-assistant-instructions"
+        "JacobPEvans/ai-assistant-instructions",
+        "JacobPEvans/nix-home"
       ],
       "groupName": "critical-infrastructure",
       "schedule": ["after 7am"],

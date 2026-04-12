@@ -4,9 +4,11 @@
 
 **Scope**: All flake inputs from `github:JacobPEvans/nix-*`
 
-**Current inputs** (as of 2026-03-24):
+**Current inputs**:
 - `nix-ai` — AI CLI ecosystem (Claude, Gemini, Copilot, MCP)
 - `nix-home` — Cross-platform home-manager modules (git, zsh, vscode, monitoring)
+- `ai-assistant-instructions` — Shared AI assistant configurations (rules, skills)
+- `claude-code-plugins` — Claude Code plugin marketplace
 
 **Private repos** (explicitly excluded from sync rule):
 - Any repositories marked as private in GitHub are completely ignored
@@ -16,18 +18,28 @@
 
 ### Automated (CI)
 
-- Daily flake update via GitHub Actions (`.github/workflows/deps-update-flake.yml`)
-- Updates all flake inputs automatically
-- Renovate bot assists with dependency PRs
+- **Renovate** — Daily at 7am ET, polls for new versions. JacobPEvans inputs are in
+  GROUP 1 (critical infrastructure) and GROUP 2 (AI tools) in `renovate.json5`.
+- **`deps-update-flake.yml`** — Weekly Monday, updates custom packages (claudebar via nix-update).
+  Flake input updates are handled by Renovate, not this workflow.
 
-### Manual (Development)
+### Immediate (after shipping upstream changes)
 
-**When to update**:
-- After shipping new releases in nix-ai or nix-home
-- When reviewing upstream changes that affect nix-darwin configuration
-- As part of regular maintenance cycles (bi-weekly minimum)
+When you've just merged changes in nix-home, nix-ai, or another JacobPEvans repo and
+need nix-darwin to pick them up immediately — don't wait for Renovate:
 
-**How to update**:
+```bash
+gh workflow run deps-bump-jacobpevans.yml --repo JacobPEvans/nix-darwin
+```
+
+This triggers `.github/workflows/deps-bump-jacobpevans.yml` which:
+1. Runs `nix flake update nix-home nix-ai ai-assistant-instructions claude-code-plugins`
+2. Opens a PR with the updated `flake.lock`
+3. CI validates, then auto-merge (via org Renovate preset) handles the rest
+
+### Manual (full rebuild)
+
+**When to use**: Regular maintenance, or when you also want to validate with a local rebuild.
 
 ```bash
 /flake-rebuild
@@ -53,7 +65,9 @@ the build, the CI gate catches it before merge.
 
 ## Related Files
 
-- `.github/workflows/deps-update-flake.yml` — Daily automated update
+- `.github/workflows/deps-bump-jacobpevans.yml` — Immediate bump of all JacobPEvans inputs (workflow_dispatch)
+- `.github/workflows/deps-update-flake.yml` — Weekly custom package update (claudebar via nix-update)
+- `renovate.json5` — Renovate config with package groups and schedules
 - `flake.nix` — Input declarations
 - `flake.lock` — Current pinned versions (auto-updated)
-- `/flake-rebuild` command — Manual update trigger
+- `/flake-rebuild` command — Manual full update + rebuild trigger
