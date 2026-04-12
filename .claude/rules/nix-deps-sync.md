@@ -29,10 +29,10 @@ When you've just merged changes in nix-home, nix-ai, or another JacobPEvans repo
 need nix-darwin to pick them up immediately — don't wait for Renovate:
 
 ```bash
-gh workflow run deps-bump-jacobpevans.yml --repo JacobPEvans/nix-darwin
+gh workflow run deps-update-flake.yml -f target=jacobpevans --repo JacobPEvans/nix-darwin
 ```
 
-This triggers `.github/workflows/deps-bump-jacobpevans.yml` which:
+This triggers `.github/workflows/deps-update-flake.yml` (target=jacobpevans) which:
 1. Runs `nix flake update nix-home nix-ai ai-assistant-instructions claude-code-plugins`
 2. Opens a PR with the updated `flake.lock`
 3. CI validates, then auto-merge (via org Renovate preset) handles the rest
@@ -65,8 +65,7 @@ the build, the CI gate catches it before merge.
 
 ## Related Files
 
-- `.github/workflows/deps-bump-jacobpevans.yml` — Immediate bump of all JacobPEvans inputs (workflow_dispatch)
-- `.github/workflows/deps-update-flake.yml` — Weekly custom package update (claudebar via nix-update)
+- `.github/workflows/deps-update-flake.yml` — Parameterized: `target=jacobpevans` for immediate input bump, `target=custom` (default/scheduled) for nix-update packages
 - `renovate.json5` — Renovate config with package groups and schedules
 - `flake.nix` — Input declarations
 - `flake.lock` — Current pinned versions (auto-updated)

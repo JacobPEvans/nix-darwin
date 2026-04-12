@@ -1,21 +1,37 @@
-# Custom package updates (source hash bumps via nix-update)
+# Flake dependency updates (on-demand and scheduled)
 #
-# Flake input updates (flake.lock) are handled by Renovate's nix manager,
-# which creates individual PRs per input with auto-merge for trusted owners.
-# See renovate.json and renovate-presets.json in JacobPEvans/.github.
+# Two modes controlled by the `target` input:
 #
-# This workflow only handles nix-update for packages with pinned source hashes
-# that Renovate cannot manage natively.
-name: Update custom packages
+#   jacobpevans  — Bump all JacobPEvans-owned flake inputs to latest.
+#                  Use after shipping changes in upstream repos (nix-home,
+#                  nix-ai, etc.) to pull them into nix-darwin immediately.
+#                  CLI: gh workflow run deps-update-flake.yml -f target=jacobpevans
+#
+#   custom       — Update custom packages with pinned source hashes that
+#                  Renovate cannot manage (currently: claudebar via nix-update).
+#                  Runs weekly on Monday at noon UTC and on manual dispatch.
+#
+# Flake input updates for third-party inputs (nixpkgs, home-manager, etc.)
+# are handled by Renovate's nix manager — see renovate.json5.
+name: Update flake dependencies
 
 on:
   schedule:
     - cron: "0 12 * * 1"
   workflow_dispatch:
+    inputs:
+      target:
+        description: "What to update"
+        required: true
+        default: "custom"
+        type: choice
+        options:
+          - custom
+          - jacobpevans
 
 jobs:
   update:
-    name: Update custom packages
+    name: Update (${{ inputs.target || 'custom' }})
     runs-on: ubuntu-latest
     environment: automation
     permissions:
@@ -37,18 +53,25 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
 
-      - name: Update claudebar
+      - name: Update custom packages
+        if: inputs.target != 'jacobpevans'
         run: nix run nixpkgs#nix-update -- --flake --system aarch64-darwin claudebar
+
+      - name: Update JacobPEvans flake inputs
+        if: inputs.target == 'jacobpevans'
+        run: nix flake update nix-home nix-ai ai-assistant-instructions claude-code-plugins
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
-          branch: chore/update-custom-packages
+          branch: chore/update-${{ inputs.target || 'custom' }}-packages
           delete-branch: true
-          commit-message: "chore(deps): update custom packages"
-          title: "chore(deps): update custom packages"
+          commit-message: "chore(deps): update ${{ inputs.target || 'custom' }} packages"
+          title: "chore(deps): update ${{ inputs.target || 'custom' }} packages"
           body: |
-            Automated update via nix-update.
+            Automated dependency update (${{ inputs.target || 'custom' }}).
+
+            Triggered via `${{ github.event_name }}` on `deps-update-flake.yml`.
           labels: dependencies
