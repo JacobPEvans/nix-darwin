@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.3...v1.27.0) (2026-04-12)
+
+
+### Features
+
+* **cspell:** migrate to shared org-wide dictionary hierarchy ([287c419](https://github.com/JacobPEvans/nix-darwin/commit/287c419c91b35348ffcbe2718f8bfd80f3996add))
+
 ## [1.26.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.2...v1.26.3) (2026-04-12)
 
 
