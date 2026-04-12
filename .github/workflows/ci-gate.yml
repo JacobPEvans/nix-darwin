@@ -61,6 +61,7 @@ jobs:
               - '**.nix'
               - 'flake.lock'
               - 'modules/**'
+              - 'hosts/**'
               - 'scripts/**'
             flake-lock:
               - 'flake.lock'
