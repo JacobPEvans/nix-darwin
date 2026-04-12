@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.2...v1.26.3) (2026-04-12)
+
+
+### Bug Fixes
+
+* **ci:** add hosts/** to nix path filter in ci-gate ([#990](https://github.com/JacobPEvans/nix-darwin/issues/990)) ([3e11f51](https://github.com/JacobPEvans/nix-darwin/commit/3e11f51548e40abfa29f915e05f27399d082f52f))
+
 ## [1.26.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.1...v1.26.2) (2026-04-12)
 
 
