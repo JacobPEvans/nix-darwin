@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.1...v1.26.2) (2026-04-12)
+
+
+### Bug Fixes
+
+* **zsh:** rename 'status' local to 'rc' to avoid zsh read-only special ([#985](https://github.com/JacobPEvans/nix-darwin/issues/985)) ([2f99db3](https://github.com/JacobPEvans/nix-darwin/commit/2f99db33278c3d2c021f1d35598d972d636575ae))
+
 ## [1.26.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.0...v1.26.1) (2026-04-11)
 
 
