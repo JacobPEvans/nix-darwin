@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.0...v1.27.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **deps:** add nix-home to Renovate GROUP 1 + parameterize deps-update-flake ([cb9c1e1](https://github.com/JacobPEvans/nix-darwin/commit/cb9c1e17f7b707a8c0ff1cb90bf6c35549eae1f6))
+
 ## [1.27.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.3...v1.27.0) (2026-04-12)
 
 
