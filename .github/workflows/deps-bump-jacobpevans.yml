@@ -1,0 +1,59 @@
+# Bump all JacobPEvans flake inputs to latest
+#
+# Directly callable workflow that updates every JacobPEvans-owned flake input
+# (nix-home, nix-ai, ai-assistant-instructions, claude-code-plugins) and opens
+# a PR. Use this after shipping changes in upstream repos to pull them into
+# nix-darwin immediately — no need to wait for Renovate's daily schedule.
+#
+# Trigger methods:
+#   - GitHub UI: Actions → "Bump JacobPEvans inputs" → Run workflow
+#   - CLI:       gh workflow run deps-bump-jacobpevans.yml --repo JacobPEvans/nix-darwin
+#   - Claude:    ask Claude to run the bump-jacobpevans workflow
+name: Bump JacobPEvans inputs
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  bump:
+    name: Update JacobPEvans flake inputs
+    runs-on: ubuntu-latest
+    environment: automation
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Update all JacobPEvans inputs
+        run: nix flake update nix-home nix-ai ai-assistant-instructions claude-code-plugins
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          branch: chore/bump-jacobpevans-inputs
+          delete-branch: true
+          commit-message: "chore(deps): bump all JacobPEvans flake inputs"
+          title: "chore(deps): bump all JacobPEvans flake inputs"
+          body: |
+            Automated update of all JacobPEvans-owned flake inputs to latest.
+
+            Triggered via `workflow_dispatch` on `deps-bump-jacobpevans.yml`.
+          labels: dependencies
