@@ -3,11 +3,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1775867735,
-        "narHash": "sha256-QfREms9L7HG6YlDd/eS+4FjdfrbAHWrjGEen+lAUjr8=",
+        "lastModified": 1776054232,
+        "narHash": "sha256-PvuaveKUaUf+7YCP8BXhx/fTumRpkHb3JPAu8h6QbEg=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "9a5408919922ae074948493d30bfd47a330d406e",
+        "rev": "33b022f5734a4014d805c56c6b90b37b30f3f363",
         "type": "github"
       },
       "original": {
@@ -147,11 +147,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1775762303,
-        "narHash": "sha256-NCE3yvf8UlEHfFo7U6VcREmzSqKZ23aNIaJMbK/sepo=",
+        "lastModified": 1775847815,
+        "narHash": "sha256-Ir8bikRS0YSwEE2IGtpHE7G1pe94V38h74ubatyM1GM=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "c5600e0b1e9bb6ddf750cf7441c4d4fffbb7c917",
+        "rev": "9772e13f820002c9730af67a2409702799c7ddc6",
         "type": "github"
       },
       "original": {
@@ -318,6 +318,23 @@
         "url": "https://install.determinate.systems/determinate-nixd/tag/v3.17.3/x86_64-linux"
       }
     },
+    "fabric-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775769065,
+        "narHash": "sha256-986ny/DRchsu+MkZFnmGrWaCPaw+SFYJzY768ZEPtfQ=",
+        "owner": "danielmiessler",
+        "repo": "fabric",
+        "rev": "42311fe04b552f63503667b35f26b9b2ad537f95",
+        "type": "github"
+      },
+      "original": {
+        "owner": "danielmiessler",
+        "ref": "v1.4.444",
+        "repo": "fabric",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -442,11 +459,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1775784484,
-        "narHash": "sha256-oq+Qr/UvD5lmhQZUoE7/KVBF5Zixw0TsDT50v7DBOfs=",
+        "lastModified": 1776054352,
+        "narHash": "sha256-Zj9zyLHVTpCu0Cbd+N7l2/xMCgro5k1Z/XGUMHPLK5U=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "4900422d5ae3878f9a712646db5b467cc37f9998",
+        "rev": "3fe62326db68e1a32fb0069869ff5239ced969d9",
         "type": "github"
       },
       "original": {
@@ -539,6 +556,7 @@
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
         "claude-skills": "claude-skills",
+        "fabric-src": "fabric-src",
         "home-manager": [
           "home-manager"
         ],
@@ -550,6 +568,7 @@
           "nixpkgs"
         ],
         "obsidian-skills": "obsidian-skills",
+        "openai-codex": "openai-codex",
         "pal-mcp-server": [
           "pal-mcp-server"
         ],
@@ -558,11 +577,11 @@
         "wakatime": "wakatime"
       },
       "locked": {
-        "lastModified": 1776001447,
-        "narHash": "sha256-aXlMFJWf3hzIG5GnapE9hmJfcz40qtfOmDOJeV4flko=",
+        "lastModified": 1776054236,
+        "narHash": "sha256-IWtsvbnxWBfB/NS65HOb1Bi2nY1rUQC/mPsevIEJtqY=",
         "owner": "JacobPEvans",
         "repo": "nix-ai",
-        "rev": "6db9d9c752fb155fcbee1f54636919da796a53a0",
+        "rev": "36876559383b4ba0294767ff74324785d8d8e9d8",
         "type": "github"
       },
       "original": {
@@ -582,11 +601,11 @@
         "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1775949080,
-        "narHash": "sha256-q00fB5oC7+5R97wDHTu9LEftfLfY1btaLsbWeAqLlcs=",
+        "lastModified": 1776052163,
+        "narHash": "sha256-gy36AYG3R7rsgvcuFjXNtoMbw8pFf+cp8g4JRnKJbhc=",
         "owner": "JacobPEvans",
         "repo": "nix-home",
-        "rev": "cf182cb42f08864daeb091cbbbcf6c502d28c2f5",
+        "rev": "7ed534d0545fb1c25a70f00546370d8a2117fe67",
         "type": "github"
       },
       "original": {
@@ -700,6 +719,22 @@
       "original": {
         "owner": "kepano",
         "repo": "obsidian-skills",
+        "type": "github"
+      }
+    },
+    "openai-codex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775684930,
+        "narHash": "sha256-4kqtfdHlcg3YXWX1og9b5JuLgnB/3Nj5dFMe4Ryt7No=",
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
+        "rev": "6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
         "type": "github"
       }
     },
