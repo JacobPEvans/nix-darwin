@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.1...v1.27.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* recompile gh-aw workflows with v0.68.1 ([60574fd](https://github.com/JacobPEvans/nix-darwin/commit/60574fdea25ecd0d91ca42a8ab55c59b5085e74f))
+
 ## [1.27.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.0...v1.27.1) (2026-04-12)
 
 
