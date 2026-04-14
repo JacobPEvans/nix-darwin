@@ -7,11 +7,11 @@ tabs -2
 _brew_dir="${TMPDIR:-/tmp}/brew" && mkdir -p "$_brew_dir"
 _brew_stamp="$_brew_dir/daily_$(date +%Y%m%d)"
 if [[ ! -f "$_brew_stamp" ]]; then
-  touch "$_brew_stamp"
-  brew update
+  brew update && touch "$_brew_stamp"
   brew doctor
 fi
-brew outdated --verbose
+HOMEBREW_NO_AUTO_UPDATE=1 brew outdated --verbose
+unset _brew_dir _brew_stamp
 
 # Clean up .DS_Store files in common directories.
 # Single find across all dirs; -exec rm {} + batches args for fewer rm invocations.
