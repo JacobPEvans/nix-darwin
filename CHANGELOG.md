@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.2...v1.27.3) (2026-04-14)
+
+
+### Bug Fixes
+
+* add automation bots to AI Moderator skip-bots ([#1000](https://github.com/JacobPEvans/nix-darwin/issues/1000)) ([4ba9671](https://github.com/JacobPEvans/nix-darwin/commit/4ba9671cd6c8dab9a127f008aafe00efd83501b2))
+
 ## [1.27.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.1...v1.27.2) (2026-04-13)
 
 
