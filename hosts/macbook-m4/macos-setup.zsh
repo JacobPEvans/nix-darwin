@@ -3,10 +3,14 @@
 # Set tabs to 2 spaces
 tabs -2
 
-# Homebrew: update package index on shell start.
-# Runs in the foreground so available updates are visible immediately.
-# Note: onActivation.autoUpdate = false keeps darwin-rebuild fast; this compensates.
-brew update
+# Homebrew: update + doctor once per day; outdated versions on every start.
+_brew_stamp="${TMPDIR:-/tmp}/.brew_daily_$(date +%Y%m%d)"
+if [[ ! -f "$_brew_stamp" ]]; then
+  touch "$_brew_stamp"
+  brew update
+  brew doctor
+fi
+brew outdated --verbose
 
 # Clean up .DS_Store files in common directories.
 # Single find across all dirs; -exec rm {} + batches args for fewer rm invocations.
