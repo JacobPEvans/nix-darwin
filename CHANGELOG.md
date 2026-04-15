@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.3...v1.28.0) (2026-04-15)
+
+
+### Features
+
+* **zsh:** throttle brew update/doctor daily, add outdated check ([#1007](https://github.com/JacobPEvans/nix-darwin/issues/1007)) ([f779505](https://github.com/JacobPEvans/nix-darwin/commit/f779505b8f05e3dd8601644c5965ef6a0ed78d64))
+
 ## [1.27.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.2...v1.27.3) (2026-04-14)
 
 
