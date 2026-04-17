@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.0...v1.29.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **dock:** remove dock spacers ([#1016](https://github.com/JacobPEvans/nix-darwin/issues/1016)) ([3b82879](https://github.com/JacobPEvans/nix-darwin/commit/3b82879623168d556341704f155fa61af7bc616a))
+
 ## [1.29.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.28.1...v1.29.0) (2026-04-17)
 
 
