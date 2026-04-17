@@ -38,7 +38,6 @@ in
       # Development & Tools (after Toggl)
       "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
       "${homeDir}/Applications/Home Manager Apps/Visual Studio Code.app"
-      { spacer = { }; }
 
       # Communication
       "/Applications/Shortwave.app" # AI-powered email client (homebrew cask)
@@ -48,13 +47,11 @@ in
       "/Applications/zoom.us.app" # Manual install - now at system level
       "${homeDir}/Applications/Home Manager Apps/Discord.app" # nixpkgs, copyApps for TCC stability
       "/System/Applications/Messages.app"
-      { spacer = { }; }
 
       # AI Assistants
       "/Applications/Claude.app" # Anthropic Claude desktop app (homebrew cask)
       "${homeDir}/Applications/Gemini.app" # Google Gemini AI assistant
       "/Applications/Antigravity.app" # Google's AI-powered IDE (homebrew cask)
-      { spacer = { }; }
 
       # Browsers
       "/Applications/Safari.app"
