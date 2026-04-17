@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.28.0...v1.28.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* remove cspell spell checker entirely ([#1013](https://github.com/JacobPEvans/nix-darwin/issues/1013)) ([5948239](https://github.com/JacobPEvans/nix-darwin/commit/5948239768e62a6be6857cc5556b97d3a04a93f9))
+
 ## [1.28.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.3...v1.28.0) (2026-04-15)
 
 
