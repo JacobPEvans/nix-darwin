@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.28.1...v1.29.0) (2026-04-17)
+
+
+### Features
+
+* **dock:** add Discord, reorder with spacers, add private local config ([b318721](https://github.com/JacobPEvans/nix-darwin/commit/b3187219add173c501ea1ff8b0ea2d2ed08a3fa9))
+
 ## [1.28.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.28.0...v1.28.1) (2026-04-17)
 
 
