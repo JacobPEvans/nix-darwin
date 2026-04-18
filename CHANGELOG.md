@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.1...v1.29.2) (2026-04-18)
+
+
+### Bug Fixes
+
+* **home-manager:** replace backupFileExtension with backupCommand rm -rf ([#1018](https://github.com/JacobPEvans/nix-darwin/issues/1018)) ([23d5d64](https://github.com/JacobPEvans/nix-darwin/commit/23d5d64eb0f0eed807a6b578961cd99e20f7f6d9))
+
 ## [1.29.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.0...v1.29.1) (2026-04-17)
 
 
