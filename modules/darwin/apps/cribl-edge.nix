@@ -5,12 +5,11 @@
 # which gets overwritten on every upgrade — this module removes it and replaces it
 # with a Nix-managed service definition.
 #
-# Cribl Edge itself is installed externally via .pkg (not in any package manager).
-# This module manages: LaunchDaemon lifecycle, ACL-based file permissions, pack deployment.
-# Service runs as user 'cribl'; activation scripts run as root. No FDA — ACLs only for monitored paths.
+# This module manages: binary installation (via .pkg on every rebuild), LaunchDaemon
+# lifecycle, fleet enrollment config (fresh installs only), and pack deployment.
+# Cribl Cloud manages all runtime configuration after enrollment.
 #
-# Note: Disabling this module does not automatically remove ACLs from previously
-# configured paths. Run `/bin/chmod -a "cribl allow ..." <path>` manually if needed.
+# Service runs as root (temporary — revert user/group to cribl:cribl when ready).
 
 {
   lib,
@@ -22,9 +21,8 @@
 let
   cfg = config.programs.cribl-edge;
   path = cfg.installPath;
-  user = "cribl";
-  group = "cribl";
-  aclPerms = "${user} allow read,readattr,readextattr,readsecurity,list,search";
+  user = "root";
+  group = "wheel";
   ts = "$(date '+%Y-%m-%d %H:%M:%S')";
 
   # Build a deploy script per pack — each invocation is idempotent
@@ -85,19 +83,39 @@ in
     installPath = lib.mkOption {
       type = lib.types.str;
       default = "/opt/cribl";
-      description = "Installation path for Cribl Edge (set by .pkg installer).";
+      description = "Installation path for Cribl Edge.";
     };
 
-    acls = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "Paths to grant the cribl user read ACL access to.";
-      example = [
-        "/var/log"
-        "/var/audit"
-        "/Library/Logs"
-        "/Library/Logs/DiagnosticReports"
-      ];
+    version = lib.mkOption {
+      type = lib.types.str;
+      description = "Cribl Edge version string (e.g., '4.17.0-7e952fa7'). Bump to upgrade.";
+      example = "4.17.0-7e952fa7";
+    };
+
+    cloud = {
+      host = lib.mkOption {
+        type = lib.types.str;
+        description = "Cribl Cloud leader hostname.";
+        example = "main-stoic-kaminsky-d9o9i3r.cribl.cloud";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 4200;
+        description = "Cribl Cloud leader port.";
+      };
+
+      group = lib.mkOption {
+        type = lib.types.str;
+        default = "default_fleet";
+        description = "Fleet group name.";
+      };
+
+      tokenCommand = lib.mkOption {
+        type = lib.types.str;
+        description = "Shell command that outputs the auth token. Only used on fresh installs (when instance.yml does not exist).";
+        example = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
+      };
     };
 
     packs = lib.mkOption {
@@ -132,47 +150,109 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      if [ ! -d "${path}/bin" ]; then
-        echo "${ts} [WARN] Cribl Edge not found at ${path}"
-        echo "  Install via .pkg from https://cribl.io/download/ or Cribl Cloud enrollment"
-      else
-        # The .pkg installer creates everything as root:wheel but the LaunchDaemon
-        # runs as ${user}:${group}. Only chown if ownership has drifted.
-        if [ "$(/usr/bin/stat -f '%Su' "${path}")" != "${user}" ]; then
-          /usr/sbin/chown -R ${user}:${group} "${path}"
-          echo "${ts} [INFO] Fixed Cribl Edge directory ownership → ${user}:${group}"
-        fi
-      fi
+            # ── 1. Download and install the .pkg ──────────────────────────────────────
+            _major="${cfg.version}"
+            _major="''${_major%%-*}"
+            _pkg_url="https://cdn.cribl.io/dl/$_major/cribl-${cfg.version}-darwin-universal.pkg"
+            _pkg="/tmp/cribl-${cfg.version}.pkg"
 
-      ${lib.optionalString (cfg.acls != [ ]) ''
-        # Remove-then-add ensures idempotency: prevents duplicate ACEs across rebuilds
-        _acl_applied=0
-        ${lib.concatMapStringsSep "\n" (p: ''
-          if [ -e "${p}" ]; then
-            /bin/chmod -a "${aclPerms}" "${p}" 2>/dev/null || true
-            /bin/chmod +a "${aclPerms}" "${p}" 2>&1 || echo "${ts} [WARN] Failed to set ACL on ${p}"
-            _acl_applied=$((_acl_applied + 1))
-          fi
-        '') cfg.acls}
-        echo "${ts} [INFO] Applied Cribl Edge ACLs to $_acl_applied of ${toString (builtins.length cfg.acls)} path(s)"
-      ''}
-
-      ${lib.optionalString (cfg.packs != { }) ''
-        _packs_changed=0
-        ${lib.concatStringsSep "\n" (
-          lib.mapAttrsToList (name: src: ''
-            _result=$(${deployPack}/bin/cribl-deploy-pack "${name}" "${src}" "${path}")
-            if [ "$_result" != "unchanged" ]; then
-              _packs_changed=1
-              echo "${ts} [INFO] Cribl Edge pack ${name}: $_result"
+            echo "${ts} [INFO] Installing Cribl Edge ${cfg.version}..."
+            if ! curl -Lso "$_pkg" "$_pkg_url"; then
+              echo "${ts} [ERROR] Failed to download Cribl Edge .pkg" >&2
+              exit 1
             fi
-          '') cfg.packs
-        )}
-        if [ "$_packs_changed" -eq 1 ]; then
-          /bin/launchctl kickstart -k system/com.nix-darwin.cribl-edge 2>/dev/null || true
-          echo "${ts} [INFO] Restarted Cribl Edge (pack changes detected)"
-        fi
-      ''}
+            if curl -Lso "$_pkg.md5" "$_pkg_url.md5"; then
+              _expected=$(awk '{print $1}' "$_pkg.md5")
+              _actual=$(md5 -q "$_pkg")
+              if [ "$_expected" != "$_actual" ]; then
+                echo "${ts} [ERROR] Cribl .pkg checksum mismatch (expected=$_expected actual=$_actual)" >&2
+                rm -f "$_pkg" "$_pkg.md5"
+                exit 1
+              fi
+            else
+              echo "${ts} [WARN] Could not fetch .md5 — skipping checksum verification"
+            fi
+
+            # Stop Nix-managed service before installing
+            /bin/launchctl bootout system/com.nix-darwin.cribl-edge 2>/dev/null || true
+
+            if ! installer -pkg "$_pkg" -target /; then
+              echo "${ts} [ERROR] Cribl .pkg installation failed" >&2
+              rm -f "$_pkg" "$_pkg.md5"
+              exit 1
+            fi
+
+            # Installer auto-starts its own plist — tear it down, Nix manages the service
+            /bin/launchctl bootout system/io.cribl 2>/dev/null || true
+            rm -f /Library/LaunchDaemons/io.cribl.plist "$_pkg" "$_pkg.md5"
+            echo "${ts} [INFO] Cribl Edge ${cfg.version} installed"
+
+            # ── 2. Ownership ──────────────────────────────────────────────────────────
+            /usr/sbin/chown -R ${user}:${group} "${path}"
+
+            # ── 3. Remove cribl user/group ────────────────────────────────────────────
+            if /usr/bin/dscl . -read /Users/cribl >/dev/null 2>&1; then
+              /usr/bin/dscl . -delete /Users/cribl 2>/dev/null || true
+              echo "${ts} [INFO] Removed cribl user (service now runs as root)"
+            fi
+            if /usr/bin/dscl . -read /Groups/cribl >/dev/null 2>&1; then
+              /usr/bin/dscl . -delete /Groups/cribl 2>/dev/null || true
+              echo "${ts} [INFO] Removed cribl group"
+            fi
+
+            # ── 4. Fleet enrollment (fresh installs only) ─────────────────────────────
+            _instance_yml="${path}/local/_system/instance.yml"
+            if [ ! -f "$_instance_yml" ]; then
+              echo "${ts} [INFO] Writing fleet enrollment config..."
+              mkdir -p "${path}/local/_system"
+              _token=$(eval "${cfg.cloud.tokenCommand}") || {
+                echo "${ts} [ERROR] Failed to fetch Cribl auth token" >&2
+                exit 1
+              }
+              cat > "$_instance_yml" <<INSTANCEEOF
+      distributed:
+        mode: managed-edge
+        master:
+          host: ${cfg.cloud.host}
+          port: ${toString cfg.cloud.port}
+          authToken: $_token
+          tls:
+            disabled: false
+        group: ${cfg.cloud.group}
+        tags: []
+      INSTANCEEOF
+              /usr/sbin/chown ${user}:${group} "$_instance_yml"
+              echo "${ts} [INFO] Fleet enrollment config written"
+            fi
+
+            # ── 5. Clean up stale cribl ACLs (one-time, idempotent) ───────────────────
+            _acl="cribl allow read,readattr,readextattr,readsecurity,list,search"
+            for _p in /var/log /var/log/asl /var/log/DiagnosticMessages /var/audit /Library/Logs /Library/Logs/DiagnosticReports; do
+              if [ -e "$_p" ]; then
+                /bin/chmod -a "$_acl" "$_p" 2>/dev/null || true
+              fi
+            done
+
+            # ── 6. Deploy packs ───────────────────────────────────────────────────────
+            ${lib.optionalString (cfg.packs != { }) ''
+              _packs_changed=0
+              ${lib.concatStringsSep "\n" (
+                lib.mapAttrsToList (name: src: ''
+                  _result=$(${deployPack}/bin/cribl-deploy-pack "${name}" "${src}" "${path}")
+                  if [ "$_result" != "unchanged" ]; then
+                    _packs_changed=1
+                    echo "${ts} [INFO] Cribl Edge pack ${name}: $_result"
+                  fi
+                '') cfg.packs
+              )}
+              if [ "$_packs_changed" -eq 1 ]; then
+                echo "${ts} [INFO] Packs updated"
+              fi
+            ''}
+
+            # ── 7. Start service ──────────────────────────────────────────────────────
+            /bin/launchctl kickstart system/com.nix-darwin.cribl-edge 2>/dev/null || true
+            echo "${ts} [INFO] Cribl Edge service started"
     '';
 
     launchd.daemons.cribl-edge = {
