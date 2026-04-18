@@ -102,10 +102,12 @@ sudo mv /etc/conflicting-file /etc/conflicting-file.before-nix-darwin
 
 ### Home-manager activation fails
 
-Ensure backup extension is set in flake.nix:
+`backupCommand = "rm -rf --"` is set in `lib/home-manager-defaults.nix` to handle
+conflicting files. If activation still fails, remove the conflicting path manually:
 
-```nix
-home-manager.backupFileExtension = "backup";
+```bash
+rm -rf ~/.path/to/conflicting/file-or-dir
+darwin-rebuild switch --flake .
 ```
 
 ### "error: attribute 'package-name' missing"
@@ -320,18 +322,15 @@ creates a conflict that blocks home-manager's `linkGeneration` phase.
 
 **Solution**: Fixed in nix-ai `modules/home-manager/ai-cli/claude/plugins.nix` (PR #298):
 
-1. **Pre-linkGeneration Cleanup**: `cleanupMarketplaceDirectories` activation script runs BEFORE
-   `linkGeneration` to detect and move conflicting directories to `.backup` files
-2. **Post-linkGeneration Diff Report**: `reportMarketplaceDiffs` shows what changed between the
-   backed-up directory and new Nix-managed symlink
-3. **Single Backup**: Only one backup is kept (replaces old backups to avoid clutter)
+1. **Pre-checkLinkTargets Cleanup**: `cleanupConflictingDirectorySymlinks` runs BEFORE
+   `checkLinkTargets` to remove real directories and stale symlinks at marketplace paths
+2. **backupCommand**: `rm -rf --` removes any remaining conflicts so HM can place symlinks
 
-**Verification**: After rebuild, check for backup files:
+**Verification**: After rebuild, confirm all marketplace entries are symlinks:
 
 ```bash
-ls -la ~/.claude/plugins/marketplaces/*.backup
-# Review diffs shown during activation
-# Manually delete backups when satisfied
+ls -la ~/.claude/plugins/marketplaces/
+# All entries should show lrwxr-xr-x (symlinks), none drwxr-xr-x (real dirs)
 ```
 
 **Status**: ✅ RESOLVED - Activation now completes successfully past this point
