@@ -74,13 +74,11 @@ sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 
 **Problem**: Existing `~/.zshrc` prevented home-manager from managing it.
 
-**Solution**: Added backup extension in `flake.nix`:
+**Solution**: `home-manager.backupCommand = "rm -rf --"` is set in `lib/home-manager-defaults.nix`.
 
-```nix
-home-manager.backupFileExtension = "backup";
-```
-
-**Why**: Automatically backs up existing files before home-manager takes control (creates `.zshrc.backup`).
+**Why**: Home-manager removes conflicting files/directories so it can place its managed symlinks.
+The Nix store is the source of truth — pre-existing conflicting content is permanently deleted
+(no `.backup` files). Rebuild to restore any HM-managed file.
 
 ### 5. Nix Settings Warnings
 
@@ -134,13 +132,14 @@ home-manager --version
 1. **Clean slate approach**: Started minimal instead of adapting Linux-based config
 2. **Determinate Nix**: Using Determinate installer instead of official Nix
 3. **Documentation disabled**: Cleaner builds, faster compilation
-4. **File backups**: All existing files backed up automatically
+4. **File conflicts**: Conflicting files removed so home-manager can place symlinks
 5. **Single profile initially**: Testing with default profile before adding complexity
 
 ## Lessons Learned
 
 1. **Determinate Nix conflicts** with nix-darwin's Nix management - use `determinateNix.enable = true` (official module handles `nix.enable = false` automatically)
-2. **Always backup files** - home-manager and nix-darwin can clobber existing configs
+2. **Nix is the source of truth** - home-manager removes conflicting files to place symlinks;
+   back up anything important before first rebuild
 3. **Unknown setting warnings are harmless** - forward compatibility doesn't break functionality
 4. **Flakes require git tracking** - all files must be `git add`ed before building
 5. **Permissions matter** - some git objects created by Nix need ownership fixes

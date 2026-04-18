@@ -15,8 +15,11 @@
   # Install user packages to /etc/profiles instead of ~/.nix-profile
   useUserPackages = true;
 
-  # Remove conflicting files so home-manager can place its symlinks.
-  # Nix store is the source of truth — all managed files are recoverable via
-  # `home-manager generations`. No backups, no .backup file pollution.
-  backupCommand = "rm -rf";
+  # Remove conflicting files/directories so home-manager can place its symlinks.
+  # Nix store is the source of truth for all HM-managed files. Pre-existing
+  # conflicting content (files not yet in the Nix store) is permanently deleted
+  # without recovery — this is intentional. Previous HM generations can restore
+  # managed symlinks but cannot restore pre-existing conflicting content.
+  # `--` ensures paths starting with `-` are never treated as flags.
+  backupCommand = "rm -rf --";
 }
