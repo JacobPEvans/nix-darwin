@@ -71,18 +71,18 @@ in
     };
 
     # --- Cribl Edge ---
-    # Log collection agent managed by Cribl Cloud
-    # Installed externally via .pkg — Nix manages the LaunchDaemon and ACLs
+    # Log collection agent managed by Cribl Cloud.
+    # Nix invokes Cribl Cloud's install-edge.sh on every rebuild and manages the LaunchDaemon.
+    # Cribl Cloud manages all runtime configuration after enrollment.
+    # Sensitive values (org ID, workspace ID, token) fetched from Doppler at activation time.
     cribl-edge = {
       enable = true;
-      acls = [
-        "/var/log" # system.log, install.log, wifi.log
-        "/var/log/asl" # Apple System Log archives
-        "/var/log/DiagnosticMessages" # system diagnostics
-        "/var/audit" # BSM audit trail (login, sudo, file access)
-        "/Library/Logs" # system-level application logs
-        "/Library/Logs/DiagnosticReports" # crash reports
-      ];
+      version = "4.17.0-7e952fa7"; # cribl-edge
+      cloud = {
+        orgIdCommand = "doppler secrets get CRIBL_ORG_ID --plain -p iac-conf-mgmt -c prd";
+        workspaceIdCommand = "doppler secrets get CRIBL_WORKSPACE_ID --plain -p iac-conf-mgmt -c prd";
+        tokenCommand = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
+      };
       packs = {
         cc-edge-macos-power = pkgs.fetchzip {
           url = "https://github.com/JacobPEvans/cc-edge-macos-power/releases/download/v1.0.0/cc-edge-macos-power-v1.0.0.crbl";

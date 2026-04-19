@@ -5,12 +5,11 @@
 # which gets overwritten on every upgrade — this module removes it and replaces it
 # with a Nix-managed service definition.
 #
-# Cribl Edge itself is installed externally via .pkg (not in any package manager).
-# This module manages: LaunchDaemon lifecycle, ACL-based file permissions, pack deployment.
-# Service runs as user 'cribl'; activation scripts run as root. No FDA — ACLs only for monitored paths.
+# Installation uses Cribl Cloud's official install-edge.sh endpoint, which handles
+# binary download, .pkg installation, and fleet enrollment in one step.
+# Cribl Cloud manages all runtime configuration after enrollment.
 #
-# Note: Disabling this module does not automatically remove ACLs from previously
-# configured paths. Run `/bin/chmod -a "cribl allow ..." <path>` manually if needed.
+# Service runs as root (temporary — revert serviceUser/serviceGroup to cribl:cribl when ready).
 
 {
   lib,
@@ -21,61 +20,18 @@
 
 let
   cfg = config.programs.cribl-edge;
-  path = cfg.installPath;
-  user = "cribl";
-  group = "cribl";
-  aclPerms = "${user} allow read,readattr,readextattr,readsecurity,list,search";
   ts = "$(date '+%Y-%m-%d %H:%M:%S')";
 
-  # Build a deploy script per pack — each invocation is idempotent
-  deployPack = pkgs.writeShellApplication {
+  activateScript = pkgs.writeShellApplication {
+    name = "cribl-edge-activate";
+    runtimeInputs = [ ];
+    text = builtins.readFile ./scripts/cribl-edge-activate.sh;
+  };
+
+  deployPackScript = pkgs.writeShellApplication {
     name = "cribl-deploy-pack";
     runtimeInputs = [ pkgs.jq ];
-    text = ''
-      PACK_NAME="$1"
-      PACK_SRC="$2"
-      CRIBL_PATH="$3"
-      STATUS="unchanged"
-
-      # Validate pack name (activation runs as root — prevent directory traversal)
-      case "$PACK_NAME" in
-        ""|*/*|*..*)
-          echo "Invalid pack name '$PACK_NAME': must be a simple basename" >&2
-          exit 1
-          ;;
-      esac
-
-      TARGET="$CRIBL_PATH/default/$PACK_NAME"
-      MARKER="$TARGET/.nix-store-path"
-
-      # Deploy if store path changed (stage to tmp dir, then atomic mv)
-      if [ ! -f "$MARKER" ] || [ "$(cat "$MARKER" 2>/dev/null)" != "$PACK_SRC" ]; then
-        STAGING="''${TARGET}.tmp.$$"
-        rm -rf "$STAGING" "$TARGET"
-        cp -R "$PACK_SRC" "$STAGING"
-        /usr/sbin/chown -R ${user}:${group} "$STAGING"
-        mv "$STAGING" "$TARGET"
-        echo "$PACK_SRC" > "$MARKER"
-        STATUS="deployed"
-      fi
-
-      # Register in package.json if missing (uses jq --arg to keep $CRIBL_HOME literal)
-      if [ -f "$CRIBL_PATH/package.json" ] && \
-         ! jq -e --arg n "$PACK_NAME" '.dependencies[$n]' "$CRIBL_PATH/package.json" >/dev/null 2>&1; then
-        jq --arg n "$PACK_NAME" --arg v 'file:$CRIBL_HOME/default/'"$PACK_NAME" \
-          '.dependencies |= ((if type == "object" then . else {} end) + {($n): $v})' \
-          "$CRIBL_PATH/package.json" > "$CRIBL_PATH/package.json.tmp"
-        mv "$CRIBL_PATH/package.json.tmp" "$CRIBL_PATH/package.json"
-        /usr/sbin/chown ${user}:${group} "$CRIBL_PATH/package.json"
-        if [ "$STATUS" = "unchanged" ]; then
-          STATUS="registered"
-        else
-          STATUS="$STATUS and registered"
-        fi
-      fi
-
-      echo "$STATUS"
-    '';
+    text = builtins.readFile ./scripts/cribl-edge-deploy-pack.sh;
   };
 in
 {
@@ -85,19 +41,51 @@ in
     installPath = lib.mkOption {
       type = lib.types.str;
       default = "/opt/cribl";
-      description = "Installation path for Cribl Edge (set by .pkg installer).";
+      description = "Installation path for Cribl Edge.";
     };
 
-    acls = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "Paths to grant the cribl user read ACL access to.";
-      example = [
-        "/var/log"
-        "/var/audit"
-        "/Library/Logs"
-        "/Library/Logs/DiagnosticReports"
-      ];
+    version = lib.mkOption {
+      type = lib.types.str;
+      description = "Cribl Edge version string (e.g., '4.17.0-7e952fa7'). Bump to upgrade.";
+      example = "4.17.0-7e952fa7";
+    };
+
+    serviceUser = lib.mkOption {
+      type = lib.types.str;
+      default = "root";
+      description = "User to run the Cribl Edge service as.";
+    };
+
+    serviceGroup = lib.mkOption {
+      type = lib.types.str;
+      default = "wheel";
+      description = "Group to run the Cribl Edge service as.";
+    };
+
+    cloud = {
+      orgIdCommand = lib.mkOption {
+        type = lib.types.str;
+        description = "Shell command that outputs the Cribl Cloud org ID.";
+        example = "doppler secrets get CRIBL_ORG_ID --plain -p iac-conf-mgmt -c prd";
+      };
+
+      workspaceIdCommand = lib.mkOption {
+        type = lib.types.str;
+        description = "Shell command that outputs the Cribl Cloud workspace ID.";
+        example = "doppler secrets get CRIBL_WORKSPACE_ID --plain -p iac-conf-mgmt -c prd";
+      };
+
+      group = lib.mkOption {
+        type = lib.types.str;
+        default = "default_fleet";
+        description = "Fleet group name.";
+      };
+
+      tokenCommand = lib.mkOption {
+        type = lib.types.str;
+        description = "Shell command that outputs the fleet auth token.";
+        example = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
+      };
     };
 
     packs = lib.mkOption {
@@ -132,36 +120,22 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      if [ ! -d "${path}/bin" ]; then
-        echo "${ts} [WARN] Cribl Edge not found at ${path}"
-        echo "  Install via .pkg from https://cribl.io/download/ or Cribl Cloud enrollment"
-      else
-        # The .pkg installer creates everything as root:wheel but the LaunchDaemon
-        # runs as ${user}:${group}. Only chown if ownership has drifted.
-        if [ "$(/usr/bin/stat -f '%Su' "${path}")" != "${user}" ]; then
-          /usr/sbin/chown -R ${user}:${group} "${path}"
-          echo "${ts} [INFO] Fixed Cribl Edge directory ownership → ${user}:${group}"
-        fi
-      fi
-
-      ${lib.optionalString (cfg.acls != [ ]) ''
-        # Remove-then-add ensures idempotency: prevents duplicate ACEs across rebuilds
-        _acl_applied=0
-        ${lib.concatMapStringsSep "\n" (p: ''
-          if [ -e "${p}" ]; then
-            /bin/chmod -a "${aclPerms}" "${p}" 2>/dev/null || true
-            /bin/chmod +a "${aclPerms}" "${p}" 2>&1 || echo "${ts} [WARN] Failed to set ACL on ${p}"
-            _acl_applied=$((_acl_applied + 1))
-          fi
-        '') cfg.acls}
-        echo "${ts} [INFO] Applied Cribl Edge ACLs to $_acl_applied of ${toString (builtins.length cfg.acls)} path(s)"
-      ''}
+      _org="$(${cfg.cloud.orgIdCommand})"
+      _ws="$(${cfg.cloud.workspaceIdCommand})"
+      _token="$(${cfg.cloud.tokenCommand})"
+      ${activateScript}/bin/cribl-edge-activate \
+        "''${_ws}-''${_org}.cribl.cloud" \
+        "${cfg.cloud.group}" "$_token" \
+        "${cfg.version}" "${cfg.installPath}" \
+        "${cfg.serviceUser}" "${cfg.serviceGroup}"
 
       ${lib.optionalString (cfg.packs != { }) ''
         _packs_changed=0
         ${lib.concatStringsSep "\n" (
           lib.mapAttrsToList (name: src: ''
-            _result=$(${deployPack}/bin/cribl-deploy-pack "${name}" "${src}" "${path}")
+            _result=$(${deployPackScript}/bin/cribl-deploy-pack \
+              "${name}" "${src}" "${cfg.installPath}" \
+              "${cfg.serviceUser}" "${cfg.serviceGroup}")
             if [ "$_result" != "unchanged" ]; then
               _packs_changed=1
               echo "${ts} [INFO] Cribl Edge pack ${name}: $_result"
@@ -169,8 +143,7 @@ in
           '') cfg.packs
         )}
         if [ "$_packs_changed" -eq 1 ]; then
-          /bin/launchctl kickstart -k system/com.nix-darwin.cribl-edge 2>/dev/null || true
-          echo "${ts} [INFO] Restarted Cribl Edge (pack changes detected)"
+          echo "${ts} [INFO] Packs updated"
         fi
       ''}
     '';
@@ -179,19 +152,19 @@ in
       serviceConfig = {
         Label = "com.nix-darwin.cribl-edge";
         ProgramArguments = [
-          "${path}/bin/cribl"
+          "${cfg.installPath}/bin/cribl"
           "server"
         ];
         RunAtLoad = true;
         KeepAlive = true;
         ThrottleInterval = 10;
-        UserName = user;
-        GroupName = group;
-        WorkingDirectory = path;
-        StandardOutPath = "${path}/log/cribl-stdout.log";
-        StandardErrorPath = "${path}/log/cribl-stderr.log";
+        UserName = cfg.serviceUser;
+        GroupName = cfg.serviceGroup;
+        WorkingDirectory = cfg.installPath;
+        StandardOutPath = "${cfg.installPath}/log/cribl-stdout.log";
+        StandardErrorPath = "${cfg.installPath}/log/cribl-stderr.log";
         EnvironmentVariables = {
-          CRIBL_HOME = path;
+          CRIBL_HOME = cfg.installPath;
         };
       };
     };

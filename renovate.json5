@@ -27,6 +27,28 @@
     "enabled": true
   },
 
+  // Custom datasource: Cribl Edge CDN version feed
+  // https://cdn.cribl.io/versions.json → {"version":"4.17.0-7e952fa7",...}
+  "customDatasources": {
+    "cribl-edge": {
+      "defaultRegistryUrlTemplate": "https://cdn.cribl.io/versions.json",
+      "format": "json",
+      "transformTemplates": ["{\"releases\":[{\"version\":value.version}]}"]
+    }
+  },
+
+  // Custom regex manager: track Cribl Edge version in host config
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["hosts/macbook-m4/default\\.nix$"],
+      "matchStrings": ["version = \"(?<currentValue>[^\"]+)\"; # cribl-edge"],
+      "depNameTemplate": "cribl-edge",
+      "datasourceTemplate": "custom.cribl-edge",
+      "versioningTemplate": "loose"
+    }
+  ],
+
   // Package grouping and scheduling strategy
   "packageRules": [
     // GROUP 1: Critical infrastructure (Daily 7am with automerge)
@@ -67,6 +89,16 @@
       "matchManagers": ["github-actions"],
       "groupName": "github-actions",
       "schedule": ["after 7am on Monday"]
+    },
+
+    // GROUP 4: Cribl Edge - Weekly Monday 7am
+    {
+      "description": "Cribl Edge version - weekly at 7am Monday",
+      "matchDatasources": ["custom.cribl-edge"],
+      "groupName": "cribl-edge",
+      "schedule": ["after 7am on Monday"],
+      "commitMessageTopic": "Cribl Edge",
+      "commitMessageExtra": "to {{newVersion}}"
     }
   ],
 
