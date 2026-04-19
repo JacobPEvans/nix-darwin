@@ -29,14 +29,31 @@ SERVICE_GROUP="$7"
 
 TS="$(date '+%Y-%m-%d %H:%M:%S')"
 
-INSTALL_URL="https://${CLOUD_HOST}/init/install-edge.sh?group=${FLEET_GROUP}&token=${TOKEN}&user=${SERVICE_USER}&user_group=${SERVICE_GROUP}&version=${VERSION}"
-
 # Stop Nix-managed service before install
 /bin/launchctl bootout system/com.nix-darwin.cribl-edge 2>/dev/null || true
 
-# Use Cribl Cloud's official install script
+# Use Cribl Cloud's official install script.
+# URL is passed via curl --config stdin (not a command-line arg) to keep the
+# enrollment token out of process listings.
+# Script is downloaded to a temp file first so we can do a basic sanity check
+# before executing. Cribl's install script is dynamically generated per request
+# (embeds enrollment params), so no pre-computed hash is available.
 echo "${TS} [INFO] Installing Cribl Edge ${VERSION}..."
-curl -fsSL "${INSTALL_URL}" | bash -
+_tmpscript=$(mktemp /tmp/cribl-install-XXXXXX.sh)
+trap 'rm -f "$_tmpscript"' EXIT
+curl --config - --output "$_tmpscript" << CURL_EOF
+url = "https://${CLOUD_HOST}/init/install-edge.sh?group=${FLEET_GROUP}&token=${TOKEN}&user=${SERVICE_USER}&user_group=${SERVICE_GROUP}&version=${VERSION}"
+fail
+silent
+show-error
+location
+CURL_EOF
+# Basic sanity: non-empty file with a shell shebang
+if [ ! -s "$_tmpscript" ] || ! head -1 "$_tmpscript" | grep -q '^#!'; then
+  echo "${TS} [ERROR] Downloaded Cribl install script looks invalid" >&2
+  exit 1
+fi
+bash "$_tmpscript"
 
 # Installer drops its own plist — tear it down, Nix manages the service
 /bin/launchctl bootout system/io.cribl 2>/dev/null || true
