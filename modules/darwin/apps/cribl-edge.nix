@@ -120,15 +120,16 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Activation runs as root — run secret-fetch commands in the primary user's
-      # existing launchd session so the macOS Keychain (used by doppler) is
-      # accessible. `su` creates a new session without keychain access;
-      # `launchctl asuser <uid>` runs in the user's live session where the
-      # keychain is already unlocked.
+      # Activation runs as root — fetch secrets in the primary user's live
+      # launchd session with their UID so the macOS Keychain is accessible.
+      # `launchctl asuser <uid>` puts the process in the user's bootstrap/audit
+      # session (required for Keychain), but does NOT change the UID. Pairing
+      # it with `sudo -u <user> -H` drops from root to the user's UID and sets
+      # HOME, which is what Keychain actually uses for access control.
       _uid="$(/usr/bin/id -u ${lib.escapeShellArg config.system.primaryUser})"
-      _org="$(/bin/launchctl asuser "$_uid" /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.orgIdCommand})"
-      _ws="$(/bin/launchctl asuser "$_uid" /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.workspaceIdCommand})"
-      _token="$(/bin/launchctl asuser "$_uid" /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.tokenCommand})"
+      _org="$(/bin/launchctl asuser "$_uid" /usr/bin/sudo -u ${lib.escapeShellArg config.system.primaryUser} -H /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.orgIdCommand})"
+      _ws="$(/bin/launchctl asuser "$_uid" /usr/bin/sudo -u ${lib.escapeShellArg config.system.primaryUser} -H /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.workspaceIdCommand})"
+      _token="$(/bin/launchctl asuser "$_uid" /usr/bin/sudo -u ${lib.escapeShellArg config.system.primaryUser} -H /bin/sh -l -c ${lib.escapeShellArg cfg.cloud.tokenCommand})"
       ${activateScript}/bin/cribl-edge-activate \
         "''${_ws}-''${_org}.cribl.cloud" \
         "${cfg.cloud.group}" "$_token" \
