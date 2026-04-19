@@ -98,8 +98,8 @@ in
       '';
       example = lib.literalExpression ''
         {
-          cc-edge-macos-power = pkgs.fetchzip {
-            url = "https://github.com/JacobPEvans/cc-edge-macos-power/releases/download/v1.0.0/cc-edge-macos-power-v1.0.0.crbl";
+          cc-edge-the-mac-pack-io = pkgs.fetchzip {
+            url = "https://github.com/JacobPEvans/cc-edge-the-mac-pack-io/releases/download/v0.1.0/cc-edge-the-mac-pack-io-v0.1.0.crbl";
             extension = "tar.gz";
             hash = "sha256-...";
             stripRoot = false;
