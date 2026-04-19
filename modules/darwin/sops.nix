@@ -36,13 +36,13 @@ in
     secrets = {
       # Cribl Edge enrollment credentials
       # Source: secrets/cribl-edge.yaml (age-encrypted, committed to git)
-      "cribl/org-id" = rootOnly // {
+      CRIBL_ORG_ID = rootOnly // {
         sopsFile = ../../secrets/cribl-edge.yaml;
       };
-      "cribl/workspace-id" = rootOnly // {
+      CRIBL_WORKSPACE_ID = rootOnly // {
         sopsFile = ../../secrets/cribl-edge.yaml;
       };
-      "cribl/token" = rootOnly // {
+      CRIBL_TOKEN = rootOnly // {
         sopsFile = ../../secrets/cribl-edge.yaml;
       };
     };
@@ -51,9 +51,9 @@ in
     # consumed by the cribl-edge activation script via awk (no shell eval).
     templates."cribl-edge.env" = rootOnly // {
       content = ''
-        CRIBL_ORG_ID=${config.sops.placeholder."cribl/org-id"}
-        CRIBL_WORKSPACE_ID=${config.sops.placeholder."cribl/workspace-id"}
-        CRIBL_TOKEN=${config.sops.placeholder."cribl/token"}
+        CRIBL_ORG_ID=${config.sops.placeholder."CRIBL_ORG_ID"}
+        CRIBL_WORKSPACE_ID=${config.sops.placeholder."CRIBL_WORKSPACE_ID"}
+        CRIBL_TOKEN=${config.sops.placeholder."CRIBL_TOKEN"}
       '';
     };
   };
