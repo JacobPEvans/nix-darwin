@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.0...v1.30.1) (2026-04-19)
+
+
+### Bug Fixes
+
+* **cribl-edge:** use primaryUser for doppler access in activation ([#1023](https://github.com/JacobPEvans/nix-darwin/issues/1023)) ([5d09a5c](https://github.com/JacobPEvans/nix-darwin/commit/5d09a5cac3dced5399e37809d8147300b4bf8cf7))
+
 ## [1.30.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.2...v1.30.0) (2026-04-19)
 
 
