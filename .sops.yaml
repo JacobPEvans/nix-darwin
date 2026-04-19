@@ -4,6 +4,8 @@
 # Edit: sops <file>
 
 creation_rules:
+  - path_regex: ^secrets/.*\.yaml$
+    age: "age1y0jvtlp2ac8fwwvh2nzm88ehye74jlseywjrjcjqll7u8vycsedq788tp9"
   - path_regex: \.sops\.json$
     age: "age1y0jvtlp2ac8fwwvh2nzm88ehye74jlseywjrjcjqll7u8vycsedq788tp9"
   - path_regex: \.sops\.yaml$

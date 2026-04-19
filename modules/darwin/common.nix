@@ -8,6 +8,7 @@ let
 in
 {
   imports = [
+    ./sops.nix
     ./apps
     ./dock
   ]

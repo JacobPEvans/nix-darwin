@@ -5,7 +5,7 @@
 #
 # This file imports darwin modules and configures host-specific settings.
 
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
   # User-specific configuration (hostname, identity, etc.)
@@ -79,9 +79,7 @@ in
       enable = true;
       version = "4.17.0-7e952fa7"; # cribl-edge
       cloud = {
-        orgIdCommand = "doppler secrets get CRIBL_ORG_ID --plain -p iac-conf-mgmt -c prd";
-        workspaceIdCommand = "doppler secrets get CRIBL_WORKSPACE_ID --plain -p iac-conf-mgmt -c prd";
-        tokenCommand = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
+        secretsFile = config.sops.templates."cribl-edge.env".path;
       };
       packs = {
         cc-edge-the-mac-pack-io = pkgs.fetchzip {

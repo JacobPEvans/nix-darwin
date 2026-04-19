@@ -87,6 +87,13 @@
     # Updates tracked by deps-update-flake.yml (daily nix flake update) + Renovate
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
+    # sops-nix: declarative secret management — decrypts age-encrypted secrets
+    # to root-only files in /run/secrets at activation time
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   outputs =
@@ -98,6 +105,7 @@
       nix-ai,
       nix-home,
       determinate,
+      sops-nix,
       ...
     }:
     let
@@ -138,6 +146,9 @@
 
             # Determinate Nix: official module for nix.conf, GC, and determinate-nixd config
             determinate.darwinModules.default
+
+            # sops-nix: decrypts age-encrypted secrets to /run/secrets at activation
+            sops-nix.darwinModules.sops
 
             # mac-app-util: Creates trampolines for system-level apps (/Applications/Nix Apps/)
             mac-app-util.darwinModules.default
