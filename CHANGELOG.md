@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.3...v1.30.4) (2026-04-19)
+
+
+### Bug Fixes
+
+* **cribl-edge:** replace Doppler CLI with sops-nix for root-safe secrets ([75519fb](https://github.com/JacobPEvans/nix-darwin/commit/75519fb3321b7a0a40efdb675095b89e51722b13))
+
 ## [1.30.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.2...v1.30.3) (2026-04-19)
 
 
