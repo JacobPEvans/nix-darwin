@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.2...v1.30.0) (2026-04-19)
+
+
+### Features
+
+* **cribl-edge:** declarative management with Renovate tracking ([#1019](https://github.com/JacobPEvans/nix-darwin/issues/1019)) ([41b2328](https://github.com/JacobPEvans/nix-darwin/commit/41b2328cb0c81c95a27983b01f174fcdbfb4e4fa))
+
 ## [1.29.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.29.1...v1.29.2) (2026-04-18)
 
 
