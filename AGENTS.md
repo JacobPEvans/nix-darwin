@@ -110,4 +110,11 @@ and on-demand patterns.
 
 ## Secrets
 
-Secrets managed via Bitwarden Secrets Manager — never hardcode credentials or tokens.
+**sops-nix** handles secrets that system activation scripts need (e.g. service enrollment
+tokens for LaunchDaemons). Age-encrypted YAML files live in `secrets/` and are committed to
+git. sops-nix decrypts them to root-only files under `/run/secrets/` at activation time.
+The age private key stays at `~/.config/sops/age/keys.txt` and is never committed.
+
+**Doppler** is used for general developer secrets (API keys, service credentials) accessed
+from the user session. Never use Doppler CLI from within nix-darwin activation scripts —
+activation runs as root without Keychain access. Use sops-nix instead.
