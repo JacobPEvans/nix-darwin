@@ -60,6 +60,7 @@
         "NixOS/nixpkgs",
         "nix-darwin/nix-darwin",
         "nix-community/home-manager",
+        "Mic92/sops-nix",
         "JacobPEvans/ai-assistant-instructions",
         "JacobPEvans/nix-home"
       ],

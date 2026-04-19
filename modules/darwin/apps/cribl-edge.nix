@@ -9,6 +9,10 @@
 # binary download, .pkg installation, and fleet enrollment in one step.
 # Cribl Cloud manages all runtime configuration after enrollment.
 #
+# Secrets are provided via sops-nix (modules/darwin/sops.nix), which decrypts
+# age-encrypted credentials to a root-only KEY=value file at activation time.
+# This avoids bridging root activation into the user Keychain.
+#
 # Service runs as root (temporary — revert serviceUser/serviceGroup to cribl:cribl when ready).
 
 {
@@ -33,6 +37,21 @@ let
     runtimeInputs = [ pkgs.jq ];
     text = builtins.readFile ./scripts/cribl-edge-deploy-pack.sh;
   };
+
+  # Read a KEY=value pair from a secrets file without sourcing it (no shell eval).
+  readSecret = ''
+    _read_secret() {
+      _key="$1"
+      /usr/bin/awk -v key="$_key" '
+        index($0, key "=") == 1 {
+          print substr($0, length(key) + 2)
+          found = 1
+          exit
+        }
+        END { if (!found) exit 1 }
+      ' "${lib.escapeShellArg cfg.cloud.secretsFile}"
+    }
+  '';
 in
 {
   options.programs.cribl-edge = {
@@ -63,28 +82,20 @@ in
     };
 
     cloud = {
-      orgIdCommand = lib.mkOption {
+      secretsFile = lib.mkOption {
         type = lib.types.str;
-        description = "Shell command that outputs the Cribl Cloud org ID.";
-        example = "doppler secrets get CRIBL_ORG_ID --plain -p iac-conf-mgmt -c prd";
-      };
-
-      workspaceIdCommand = lib.mkOption {
-        type = lib.types.str;
-        description = "Shell command that outputs the Cribl Cloud workspace ID.";
-        example = "doppler secrets get CRIBL_WORKSPACE_ID --plain -p iac-conf-mgmt -c prd";
+        description = ''
+          Path to a root-readable KEY=value file containing CRIBL_ORG_ID,
+          CRIBL_WORKSPACE_ID, and CRIBL_TOKEN. Use the sops-nix rendered
+          template: config.sops.templates."cribl-edge.env".path
+        '';
+        example = "/run/secrets/rendered/cribl-edge.env";
       };
 
       group = lib.mkOption {
         type = lib.types.str;
         default = "default_fleet";
         description = "Fleet group name.";
-      };
-
-      tokenCommand = lib.mkOption {
-        type = lib.types.str;
-        description = "Shell command that outputs the fleet auth token.";
-        example = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
       };
     };
 
@@ -119,12 +130,27 @@ in
       fi
     '';
 
-    system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Activation runs as root — run secret-fetch commands as the primary user
-      # so tools like doppler find their auth token in the user's home directory.
-      _org="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.orgIdCommand})"
-      _ws="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.workspaceIdCommand})"
-      _token="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.tokenCommand})"
+    # Run at order 1600 — after sops-nix postActivation (mkAfter = 1500) so that
+    # the decrypted secrets file exists before we try to read it.
+    system.activationScripts.postActivation.text = lib.mkOrder 1600 ''
+      _secrets="${lib.escapeShellArg cfg.cloud.secretsFile}"
+      if [ ! -r "$_secrets" ]; then
+        echo "${ts} [ERROR] Cribl secrets file not readable: $_secrets" >&2
+        exit 1
+      fi
+
+      ${readSecret}
+
+      _org="$(_read_secret CRIBL_ORG_ID)" || {
+        echo "${ts} [ERROR] Missing CRIBL_ORG_ID in $_secrets" >&2; exit 1
+      }
+      _ws="$(_read_secret CRIBL_WORKSPACE_ID)" || {
+        echo "${ts} [ERROR] Missing CRIBL_WORKSPACE_ID in $_secrets" >&2; exit 1
+      }
+      _token="$(_read_secret CRIBL_TOKEN)" || {
+        echo "${ts} [ERROR] Missing CRIBL_TOKEN in $_secrets" >&2; exit 1
+      }
+
       ${activateScript}/bin/cribl-edge-activate \
         "''${_ws}-''${_org}.cribl.cloud" \
         "${cfg.cloud.group}" "$_token" \
