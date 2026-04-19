@@ -118,6 +118,18 @@ Full details in [ARCHITECTURE.md](ARCHITECTURE.md).
 | **mac-app-util** | Stable app trampolines to preserve TCC permissions |
 | **[nix-ai](https://github.com/JacobPEvans/nix-ai)** | Shared home-manager modules for AI tools (Claude, Gemini, Copilot, MCP) |
 | **[nix-home](https://github.com/JacobPEvans/nix-home)** | Shared home-manager modules for dev environment (git, zsh, VS Code, tmux) |
+| **sops-nix** | Decrypts age-encrypted secrets to `/run/secrets/` for system services |
+
+## Secrets Management
+
+System-level secrets (used by LaunchDaemons and activation scripts) are managed via
+**[sops-nix](https://github.com/Mic92/sops-nix)**. Encrypted YAML files live in `secrets/`
+and are safe to commit. The age private key (`~/.config/sops/age/keys.txt`) is generated
+once per machine and never committed.
+
+**Doppler** is used for developer credentials accessed in the user session (Terraform state,
+API tokens, etc.). Doppler CLI requires Keychain and cannot be called from activation scripts
+(which run as root). sops-nix handles that boundary.
 
 This repo is the **orchestrator**: it pulls in `nix-ai` and `nix-home` as flake inputs
 and wires their `homeManagerModules.default` into the shared home-manager configuration.
