@@ -72,14 +72,15 @@ in
 
     # --- Cribl Edge ---
     # Log collection agent managed by Cribl Cloud.
-    # Nix installs the .pkg on every rebuild and manages the LaunchDaemon.
+    # Nix invokes Cribl Cloud's install-edge.sh on every rebuild and manages the LaunchDaemon.
     # Cribl Cloud manages all runtime configuration after enrollment.
+    # Sensitive values (org ID, workspace ID, token) fetched from Doppler at activation time.
     cribl-edge = {
       enable = true;
       version = "4.17.0-7e952fa7"; # cribl-edge
       cloud = {
-        host = "main-stoic-kaminsky-d9o9i3r.cribl.cloud";
-        group = "default_fleet";
+        orgIdCommand = "doppler secrets get CRIBL_ORG_ID --plain -p iac-conf-mgmt -c prd";
+        workspaceIdCommand = "doppler secrets get CRIBL_WORKSPACE_ID --plain -p iac-conf-mgmt -c prd";
         tokenCommand = "doppler secrets get CRIBL_TOKEN --plain -p iac-conf-mgmt -c prd";
       };
       packs = {
