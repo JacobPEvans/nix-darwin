@@ -120,10 +120,10 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Activation runs as root — extend PATH to include per-user Nix profiles
+      # Activation runs as root — extend PATH with the primary user's Nix profile
       # so tools like doppler (in home.packages) are resolvable.
-      for _p in /etc/profiles/per-user/*/bin; do PATH="$_p:$PATH"; done
-      export PATH
+      _profile_bin="/etc/profiles/per-user/${config.system.primaryUser}/bin"
+      if [ -d "$_profile_bin" ]; then PATH="$_profile_bin:$PATH"; export PATH; fi
 
       _org="$(${cfg.cloud.orgIdCommand})"
       _ws="$(${cfg.cloud.workspaceIdCommand})"
