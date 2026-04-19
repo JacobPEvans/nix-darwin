@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.1...v1.30.2) (2026-04-19)
+
+
+### Bug Fixes
+
+* **cribl-edge:** run secret-fetch commands as primaryUser ([8db1f73](https://github.com/JacobPEvans/nix-darwin/commit/8db1f73b66161d040aedea1e2f2a0becb3a4060d))
+
 ## [1.30.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.0...v1.30.1) (2026-04-19)
 
 
