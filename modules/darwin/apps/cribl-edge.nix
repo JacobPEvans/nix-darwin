@@ -120,14 +120,11 @@ in
     '';
 
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      # Activation runs as root — extend PATH with the primary user's Nix profile
-      # so tools like doppler (in home.packages) are resolvable.
-      _profile_bin="/etc/profiles/per-user/${config.system.primaryUser}/bin"
-      if [ -d "$_profile_bin" ]; then PATH="$_profile_bin:$PATH"; export PATH; fi
-
-      _org="$(${cfg.cloud.orgIdCommand})"
-      _ws="$(${cfg.cloud.workspaceIdCommand})"
-      _token="$(${cfg.cloud.tokenCommand})"
+      # Activation runs as root — run secret-fetch commands as the primary user
+      # so tools like doppler find their auth token in the user's home directory.
+      _org="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.orgIdCommand}')"
+      _ws="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.workspaceIdCommand}')"
+      _token="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.tokenCommand}')"
       ${activateScript}/bin/cribl-edge-activate \
         "''${_ws}-''${_org}.cribl.cloud" \
         "${cfg.cloud.group}" "$_token" \
