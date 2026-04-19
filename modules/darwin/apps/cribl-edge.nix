@@ -122,9 +122,9 @@ in
     system.activationScripts.postActivation.text = lib.mkAfter ''
       # Activation runs as root — run secret-fetch commands as the primary user
       # so tools like doppler find their auth token in the user's home directory.
-      _org="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.orgIdCommand}')"
-      _ws="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.workspaceIdCommand}')"
-      _token="$(su -l ${config.system.primaryUser} -c '${cfg.cloud.tokenCommand}')"
+      _org="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.orgIdCommand})"
+      _ws="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.workspaceIdCommand})"
+      _token="$(/usr/bin/su -l ${lib.escapeShellArg config.system.primaryUser} -c ${lib.escapeShellArg cfg.cloud.tokenCommand})"
       ${activateScript}/bin/cribl-edge-activate \
         "''${_ws}-''${_org}.cribl.cloud" \
         "${cfg.cloud.group}" "$_token" \
