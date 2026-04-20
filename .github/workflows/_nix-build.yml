@@ -28,11 +28,14 @@ jobs:
             max-jobs = auto
             cores = 0
             http-connections = 50
+            max-substitution-jobs = 64
             connect-timeout = 5
             stalled-download-timeout = 10
             narinfo-cache-positive-ttl = 86400
+            narinfo-cache-negative-ttl = 0
             fallback = false
             auto-optimise-store = false
+            warn-dirty = false
 
       # Restore-only on PRs; saves on main. See .claude/rules/ci-workflows.md.
       - name: Cache Nix Store
