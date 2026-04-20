@@ -44,6 +44,11 @@ jobs:
           gc-max-store-size-macos: 5G
           save: ${{ github.ref == 'refs/heads/main' }}
 
+      # Warn if nixpkgs is not at the Hydra-evaluated channel HEAD — cold builds are slow.
+      # Not a hard failure: channel service may lag briefly; warning is sufficient signal.
+      - name: Verify nixpkgs channel alignment
+        run: ./scripts/workflows/check-nixpkgs-channel.sh
+
       - name: Start Build Timer
         id: build-timer
         run: echo "start=$(date +%s)" >> "$GITHUB_OUTPUT"
