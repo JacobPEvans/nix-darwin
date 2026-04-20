@@ -31,7 +31,7 @@ jobs:
             connect-timeout = 5
             stalled-download-timeout = 10
             narinfo-cache-positive-ttl = 86400
-            fallback = true
+            fallback = false
             auto-optimise-store = false
 
       # Restore-only on PRs; saves on main. See .claude/rules/ci-workflows.md.
