@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.4...v1.30.5) (2026-04-21)
+
+
+### Bug Fixes
+
+* **ci:** add gh-aw-pin-refresh workflow and recompile lock files ([b639ee3](https://github.com/JacobPEvans/nix-darwin/commit/b639ee3c6a6125d3cd5c72642cd2d72b9a9644ab))
+
 ## [1.30.4](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.3...v1.30.4) (2026-04-19)
 
 
