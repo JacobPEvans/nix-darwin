@@ -28,11 +28,14 @@ jobs:
             max-jobs = auto
             cores = 0
             http-connections = 50
+            max-substitution-jobs = 64
             connect-timeout = 5
             stalled-download-timeout = 10
             narinfo-cache-positive-ttl = 86400
-            fallback = true
+            narinfo-cache-negative-ttl = 0
+            fallback = false
             auto-optimise-store = false
+            warn-dirty = false
 
       # Restore-only on PRs; saves on main. See .claude/rules/ci-workflows.md.
       - name: Cache Nix Store
@@ -43,6 +46,11 @@ jobs:
             nix-${{ runner.os }}-
           gc-max-store-size-macos: 5G
           save: ${{ github.ref == 'refs/heads/main' }}
+
+      # Warn if nixpkgs is not at the Hydra-evaluated channel HEAD — cold builds are slow.
+      # Not a hard failure: channel service may lag briefly; warning is sufficient signal.
+      - name: Verify nixpkgs channel alignment
+        run: ./scripts/workflows/check-nixpkgs-channel.sh
 
       - name: Start Build Timer
         id: build-timer
