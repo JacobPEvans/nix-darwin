@@ -32,7 +32,8 @@ on:
 jobs:
   update:
     name: Update (${{ inputs.target || 'custom' }})
-    runs-on: ubuntu-latest
+    # claudebar is an aarch64-darwin package; nix-update must prefetch it on Darwin.
+    runs-on: ${{ (inputs.target || 'custom') == 'jacobpevans' && 'ubuntu-latest' || 'macos-latest' }}
     environment: automation
     permissions:
       contents: write
