@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.7](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.6...v1.30.7) (2026-04-22)
+
+
+### Bug Fixes
+
+* **ci:** guard against nixpkgs binary cache misses ([#1034](https://github.com/JacobPEvans/nix-darwin/issues/1034)) ([9893498](https://github.com/JacobPEvans/nix-darwin/commit/989349809972ebf41a581cbe534066f7cc55935e))
+
 ## [1.30.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.5...v1.30.6) (2026-04-22)
 
 
