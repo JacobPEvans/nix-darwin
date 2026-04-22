@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.6](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.5...v1.30.6) (2026-04-22)
+
+
+### Bug Fixes
+
+* **deps:** update ClaudeBar to 0.4.59 ([#1038](https://github.com/JacobPEvans/nix-darwin/issues/1038)) ([a67eb75](https://github.com/JacobPEvans/nix-darwin/commit/a67eb75e5f57826dbab70e12b83713b9d3b90c93))
+
 ## [1.30.5](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.4...v1.30.5) (2026-04-21)
 
 
