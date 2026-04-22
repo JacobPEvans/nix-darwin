@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-CHANNEL_NAME=$(jq -r '.nodes | to_entries[] | select(.value.original.ref? | test("^nixpkgs-")) | .value.original.ref' flake.lock | head -1)
+CHANNEL_NAME=$(jq -r '.nodes | to_entries[] | select(.value.original.ref? | strings | test("-darwin$")) | .value.original.ref' flake.lock | head -1)
 if [ -z "$CHANNEL_NAME" ]; then
   echo "No nixpkgs channel input found in flake.lock — skipping check"
   exit 0
