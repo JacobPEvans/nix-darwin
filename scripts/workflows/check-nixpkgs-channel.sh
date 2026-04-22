@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-nixpkgs-channel.sh — Warn if nixpkgs flake.lock rev diverges from Hydra channel HEAD.
+# check-nixpkgs-channel.sh — Warn if nixpkgs flake.lock rev diverges from Hydra channel Head.
 #
 # Emits a GitHub Actions ::warning:: annotation when the locked nixpkgs rev is not the
 # Hydra-evaluated channel rev. A mismatch means binary cache coverage may be sparse,
@@ -10,12 +10,18 @@
 
 set -euo pipefail
 
-CHANNEL_URL="https://channels.nixos.org/nixpkgs-25.11-darwin/git-revision"
+CHANNEL_NAME=$(jq -r '.nodes | to_entries[] | select(.value.original.ref? | test("^nixpkgs-")) | .value.original.ref' flake.lock | head -1)
+if [ -z "$CHANNEL_NAME" ]; then
+  echo "No nixpkgs channel input found in flake.lock — skipping check"
+  exit 0
+fi
 
-channel_rev=$(curl -sfL "$CHANNEL_URL" || echo "")
-flake_rev=$(jq -r '
+CHANNEL_URL="https://channels.nixos.org/$CHANNEL_NAME/git-revision"
+
+channel_rev=$(curl --connect-timeout 5 --max-time 15 -sfL "$CHANNEL_URL" || echo "")
+flake_rev=$(jq -r --arg ref "$CHANNEL_NAME" '
   .nodes | to_entries[]
-  | select(.value.original.ref? == "nixpkgs-25.11-darwin")
+  | select(.value.original.ref? == $ref)
   | .value.locked.rev
 ' flake.lock | head -1)
 
@@ -25,7 +31,7 @@ if [ -z "$channel_rev" ]; then
 fi
 
 if [ -z "$flake_rev" ]; then
-  echo "No nixpkgs-25.11-darwin input found in flake.lock — skipping check"
+  echo "No $CHANNEL_NAME input found in flake.lock — skipping check"
   exit 0
 fi
 
