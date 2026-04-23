@@ -124,6 +124,15 @@ in
         internal = true;
       };
     };
+
+    background = {
+      enable = lib.mkEnableOption "OrbStack background runner (starts on boot without UI)";
+      package = lib.mkOption {
+        type = lib.types.str;
+        default = "/opt/homebrew/bin/orb";
+        description = "Path to the 'orb' binary used to start the background engine.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -153,6 +162,20 @@ in
         LaunchOnlyOnce = true;
         UserName = "root";
         GroupName = "wheel";
+      };
+    };
+
+    # Launchd user agent to start OrbStack in background on login
+    launchd.user.agents.orbstack-background = lib.mkIf cfg.background.enable {
+      serviceConfig = {
+        Label = "com.nix-darwin.orbstack-background";
+        ProgramArguments = [
+          cfg.background.package
+          "start"
+        ];
+        RunAtLoad = true;
+        KeepAlive = true;
+        ProcessType = "Background";
       };
     };
   };

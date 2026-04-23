@@ -1,10 +1,13 @@
+tmp*
 result
 ./darwin/result
 **/.direnv
 backup/
 
-# Test GPG signing
-.claude/settings.local.json
+# Packages
+*.dmg
+*.pkg
+*.tgz
 
 # Plugin-generated session reports (runtime output, not source)
 .claude/skills/retrospecting/reports/
@@ -21,6 +24,3 @@ __pycache__/
 
 # Log files
 *.log
-
-# Machine-local private config (not for public git)
-modules/darwin/local.nix
