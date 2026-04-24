@@ -1,11 +1,12 @@
 {
-  stdenv,
+  lib,
+  stdenvNoCC,
   fetchurl,
   xar,
   cpio,
   gzip,
 }:
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "cribl-edge";
   version = "4.17.0-7e952fa7";
 
@@ -31,7 +32,9 @@ stdenv.mkDerivation rec {
   '';
 
   meta = {
-    description = "Cribl Edge";
+    description = "Cribl Edge — streaming observability agent";
+    homepage = "https://cribl.io/cribl-edge/";
+    license = lib.licenses.unfree;
     platforms = [
       "aarch64-darwin"
       "x86_64-darwin"

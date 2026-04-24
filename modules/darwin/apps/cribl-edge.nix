@@ -1,17 +1,21 @@
 # Cribl Edge Service Management
 #
-# Manages the Cribl Edge LaunchDaemon declaratively so it survives .pkg upgrades.
-# The .pkg installer drops its own plist at /Library/LaunchDaemons/io.cribl.plist
-# which gets overwritten on every upgrade — this module removes it and replaces it
-# with a Nix-managed service definition.
+# Manages Cribl Edge as a Nix-built package with a declarative launchd daemon.
+# No .pkg installer, no Cribl Cloud install-edge.sh — the binary comes from
+# packages/cribl-edge.nix and is immutable in the Nix store. Mutable state
+# (config, queues, logs) lives under cfg.dataDir (default /opt/cribl-data).
 #
-# Installation uses Cribl Cloud's official install-edge.sh endpoint, which handles
-# binary download, .pkg installation, and fleet enrollment in one step.
-# Cribl Cloud manages all runtime configuration after enrollment.
+# Fleet enrollment happens at first start via `cribl mode-managed-edge`:
+# if instance.yml doesn't exist in dataDir, the startScript enrolls with
+# Cribl Cloud using CRIBL_ORG_ID / CRIBL_WORKSPACE_ID / CRIBL_TOKEN from the
+# sops-rendered secrets file. Subsequent starts skip enrollment and run
+# `cribl server` directly. After enrollment Cribl Cloud manages all runtime
+# configuration for the edge node.
 #
 # Secrets are provided via sops-nix (modules/darwin/sops.nix), which decrypts
-# age-encrypted credentials to a root-only KEY=value file at activation time.
-# This avoids bridging root activation into the user Keychain.
+# age-encrypted credentials to a root-only (0400) KEY=value file at activation
+# time. The startScript parses this file line-by-line — no `source`, no shell
+# eval — and only exports recognized CRIBL_* keys.
 #
 # Service runs as root (temporary — revert serviceUser/serviceGroup to cribl:cribl when ready).
 
@@ -24,7 +28,6 @@
 
 let
   cfg = config.programs.cribl-edge;
-  ts = "$(date '+%Y-%m-%d %H:%M:%S')";
 
   deployPackScript = pkgs.writeShellApplication {
     name = "cribl-deploy-pack";
@@ -34,40 +37,13 @@ let
 
   startScript = pkgs.writeShellApplication {
     name = "cribl-edge-start";
-    runtimeInputs = [ ];
+    runtimeInputs = [ pkgs.coreutils ];
     text = ''
-      set -a
-      # Source secrets to get CRIBL_ORG_ID, CRIBL_WORKSPACE_ID, CRIBL_TOKEN
-      if [ -r "${cfg.cloud.secretsFile}" ]; then
-        # shellcheck disable=SC1090,SC1091
-        source "${cfg.cloud.secretsFile}"
-      else
-        echo "${ts} [ERROR] Cribl secrets file not readable: ${cfg.cloud.secretsFile}" >&2
-        exit 1
-      fi
-      set +a
-
-      export CRIBL_VOLUME_DIR="${cfg.dataDir}"
-      export CRIBL_HOME="${cfg.package}/opt/cribl"
-
-      mkdir -p "$CRIBL_VOLUME_DIR"
-
-      # Enroll if instance.yml doesn't exist
-      if [ ! -f "$CRIBL_VOLUME_DIR/local/_system/instance.yml" ] && [ ! -f "$CRIBL_VOLUME_DIR/local/edge/instance.yml" ]; then
-        echo "${ts} [INFO] Enrolling Cribl Edge to cloud..."
-        if [ -z "''${CRIBL_WORKSPACE_ID:-}" ] || [ -z "''${CRIBL_ORG_ID:-}" ] || [ -z "''${CRIBL_TOKEN:-}" ]; then
-           echo "${ts} [ERROR] Missing required Cribl secrets for enrollment." >&2
-           exit 1
-        fi
-        
-        # Suppress warnings about running as root when binaries are root
-        ${cfg.package}/opt/cribl/bin/cribl mode-managed-edge \
-          -H "''${CRIBL_WORKSPACE_ID}-''${CRIBL_ORG_ID}.cribl.cloud" \
-          -p 443 -u "$CRIBL_TOKEN" -g "${cfg.cloud.group}" -S true || true
-      fi
-
-      # Start server
-      exec ${cfg.package}/opt/cribl/bin/cribl server
+      exec ${./scripts/cribl-edge-start.sh} \
+        "${cfg.cloud.secretsFile}" \
+        "${cfg.dataDir}" \
+        "${cfg.package}/opt/cribl" \
+        "${cfg.cloud.group}"
     '';
   };
 in
@@ -129,27 +105,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Run pack deployment after activation
-    system.activationScripts.postActivation.text = lib.mkIf (cfg.packs != { }) ''
-      _packs_changed=0
-      # Ensure dataDir exists so we can deploy packs to it
-      mkdir -p "${cfg.dataDir}"
-      /usr/sbin/chown "${cfg.serviceUser}:${cfg.serviceGroup}" "${cfg.dataDir}"
-
-      ${lib.concatStringsSep "\n" (
-        lib.mapAttrsToList (name: src: ''
-          _result=$(${deployPackScript}/bin/cribl-deploy-pack \
-            "${name}" "${src}" "${cfg.dataDir}" \
-            "${cfg.serviceUser}" "${cfg.serviceGroup}")
-          if [ "$_result" != "unchanged" ]; then
-            _packs_changed=1
-            echo "${ts} [INFO] Cribl Edge pack ${name}: $_result"
-          fi
-        '') cfg.packs
+    # Always ensure dataDir + logs subdir exist with correct ownership so the
+    # launchd job can write, whether or not any packs are declared.
+    system.activationScripts.postActivation.text = ''
+      ${./scripts/cribl-edge-activate.sh} "${cfg.dataDir}" "${cfg.serviceUser}:${cfg.serviceGroup}"
+      ${lib.optionalString (cfg.packs != { }) (
+        lib.concatStringsSep "\n" (
+          lib.mapAttrsToList (name: src: ''
+            ${deployPackScript}/bin/cribl-deploy-pack ${name} ${src} ${cfg.dataDir} ${cfg.serviceUser} ${cfg.serviceGroup}
+          '') cfg.packs
+        )
       )}
-      if [ "$_packs_changed" -eq 1 ]; then
-        echo "${ts} [INFO] Packs updated"
-      fi
     '';
 
     launchd.daemons.cribl-edge = {
@@ -162,8 +128,8 @@ in
         UserName = cfg.serviceUser;
         GroupName = cfg.serviceGroup;
         WorkingDirectory = cfg.dataDir;
-        StandardOutPath = "/var/log/cribl-stdout.log";
-        StandardErrorPath = "/var/log/cribl-stderr.log";
+        StandardOutPath = "${cfg.dataDir}/logs/cribl-stdout.log";
+        StandardErrorPath = "${cfg.dataDir}/logs/cribl-stderr.log";
       };
     };
   };

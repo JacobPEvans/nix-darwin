@@ -126,11 +126,16 @@ in
     };
 
     background = {
-      enable = lib.mkEnableOption "OrbStack background runner (starts on boot without UI)";
+      enable = lib.mkEnableOption "OrbStack background runner (starts on user login without UI)";
       package = lib.mkOption {
         type = lib.types.str;
-        default = "/opt/homebrew/bin/orb";
-        description = "Path to the 'orb' binary used to start the background engine.";
+        default =
+          if pkgs.stdenv.hostPlatform.isAarch64 then "/opt/homebrew/bin/orb" else "/usr/local/bin/orb";
+        description = ''
+          Path to the 'orb' binary used to start the background engine.
+          Defaults to the Apple Silicon Homebrew prefix (/opt/homebrew) on arm64
+          and Intel's /usr/local on x86_64.
+        '';
       };
     };
   };
