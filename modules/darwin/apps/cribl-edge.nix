@@ -135,7 +135,7 @@ in
       # Ensure dataDir exists so we can deploy packs to it
       mkdir -p "${cfg.dataDir}"
       /usr/sbin/chown "${cfg.serviceUser}:${cfg.serviceGroup}" "${cfg.dataDir}"
-      
+
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (name: src: ''
           _result=$(${deployPackScript}/bin/cribl-deploy-pack \

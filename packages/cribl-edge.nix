@@ -1,4 +1,10 @@
-{ stdenv, fetchurl, xar, cpio, gzip }:
+{
+  stdenv,
+  fetchurl,
+  xar,
+  cpio,
+  gzip,
+}:
 stdenv.mkDerivation rec {
   pname = "cribl-edge";
   version = "4.17.0-7e952fa7";
@@ -8,7 +14,11 @@ stdenv.mkDerivation rec {
     hash = "sha256-A9oKAVzMCAW3cIcJpYTyu3EXmOrZLA5pPxv3FZyUbLY=";
   };
 
-  nativeBuildInputs = [ xar cpio gzip ];
+  nativeBuildInputs = [
+    xar
+    cpio
+    gzip
+  ];
 
   unpackPhase = ''
     xar -xf $src
@@ -22,6 +32,9 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Cribl Edge";
-    platforms = [ "aarch64-darwin" "x86_64-darwin" ];
+    platforms = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
   };
 }
