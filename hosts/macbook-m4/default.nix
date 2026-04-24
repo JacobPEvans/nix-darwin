@@ -56,6 +56,7 @@ in
       # Previously, nixpkgs installed a symlink to a /nix/store path that changes on
       # every rebuild, forcing TCC re-granting each time.
       package.enable = false;
+      background.enable = true;
       dataVolume = {
         enable = true;
         name = "ContainerData";
@@ -77,7 +78,6 @@ in
     # Sensitive values (org ID, workspace ID, token) fetched from Doppler at activation time.
     cribl-edge = {
       enable = true;
-      version = "4.17.0-7e952fa7"; # cribl-edge
       cloud = {
         secretsFile = config.sops.templates."cribl-edge.env".path;
       };
