@@ -32,8 +32,9 @@ on:
 jobs:
   update:
     name: Update (${{ inputs.target || 'custom' }})
-    # claudebar is an aarch64-darwin package; nix-update must prefetch it on Darwin.
-    runs-on: ${{ (inputs.target || 'custom') == 'jacobpevans' && 'ubuntu-latest' || 'macos-latest' }}
+    # Always macOS: claudebar requires aarch64-darwin for nix-update prefetch,
+    # and nix flake update works fine on Darwin too.
+    runs-on: macos-latest
     environment: automation
     permissions:
       contents: write
@@ -43,7 +44,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
+          client-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
       - name: Checkout repository
@@ -61,6 +62,9 @@ jobs:
       - name: Update JacobPEvans flake inputs
         if: inputs.target == 'jacobpevans'
         run: nix flake update nix-home nix-ai ai-assistant-instructions claude-code-plugins
+
+      - name: Validate flake
+        run: nix flake check --no-build
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
