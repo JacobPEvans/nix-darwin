@@ -573,15 +573,16 @@
           "pal-mcp-server"
         ],
         "superpowers-marketplace": "superpowers-marketplace",
+        "vct-cribl-pack-validator-skills": "vct-cribl-pack-validator-skills",
         "visual-explainer-marketplace": "visual-explainer-marketplace",
         "wakatime": "wakatime"
       },
       "locked": {
-        "lastModified": 1777045158,
-        "narHash": "sha256-ThZ/Rp6rbfZr4UJvWGKUb9WQlMCdO3uObBH8JR0Kb7c=",
+        "lastModified": 1777087020,
+        "narHash": "sha256-+04rstBFFIP45VumVRzoajO7/0SE7UFr8bFbyhgztQs=",
         "owner": "JacobPEvans",
         "repo": "nix-ai",
-        "rev": "195870f69ad79c64339ebfc1c068675daf29646b",
+        "rev": "860f13401e17e91346b8638201604a42ea30d186",
         "type": "github"
       },
       "original": {
@@ -839,6 +840,22 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "vct-cribl-pack-validator-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774484708,
+        "narHash": "sha256-cQEbj7K2HcFlL7vUVFYKsjlgZbzQqbVcAtw2QX7H4WQ=",
+        "owner": "VisiCore",
+        "repo": "vct-cribl-pack-validator",
+        "rev": "eaf3b3f17f77faf6825c587dfdd552f8a9837926",
+        "type": "github"
+      },
+      "original": {
+        "owner": "VisiCore",
+        "repo": "vct-cribl-pack-validator",
         "type": "github"
       }
     },
