@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.9](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.8...v1.30.9) (2026-04-26)
+
+
+### Bug Fixes
+
+* **ci:** fix silent deps-update failures (runner OS bug) ([#1047](https://github.com/JacobPEvans/nix-darwin/issues/1047)) ([95914c7](https://github.com/JacobPEvans/nix-darwin/commit/95914c7fc35d21edc86521dbbe3e1264783688ed))
+
 ## [1.30.8](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.7...v1.30.8) (2026-04-24)
 
 
