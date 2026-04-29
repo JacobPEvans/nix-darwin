@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.31.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.10...v1.31.0) (2026-04-29)
+
+
+### Features
+
+* **darwin:** :sparkles: apple-silicon-tunables for AI inference workloads ([#1056](https://github.com/JacobPEvans/nix-darwin/issues/1056)) ([078a101](https://github.com/JacobPEvans/nix-darwin/commit/078a1018e4b61117a8d8b5eb132d6173099f966f))
+
 ## [1.30.10](https://github.com/JacobPEvans/nix-darwin/compare/v1.30.9...v1.30.10) (2026-04-29)
 
 
