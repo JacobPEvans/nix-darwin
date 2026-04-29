@@ -5,7 +5,12 @@
 # All knobs target native macOS surfaces (sysctl, pmset, mdutil, tmutil,
 # user defaults) — there is no first-class nix-darwin option for any of them.
 
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.system.appleSiliconTunables;
