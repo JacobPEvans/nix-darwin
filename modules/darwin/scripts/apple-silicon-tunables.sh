@@ -36,6 +36,8 @@ if [ -d "${HF_VOLUME}" ]; then
     else
         warn "mdutil -i off ${HF_VOLUME} failed"
     fi
+else
+    warn "HF volume ${HF_VOLUME} is missing or not mounted; skipping mdutil -i off"
 fi
 
 # 4. Time Machine excludes for the AI cache directories. TM_EXCLUDES is a
@@ -49,6 +51,8 @@ if [ -n "${TM_EXCLUDES:-}" ]; then
             else
                 warn "tmutil addexclusion ${_path} failed"
             fi
+        else
+            warn "tmutil exclusion skipped for missing path ${_path}; rerun activation after it is created"
         fi
     done
 fi

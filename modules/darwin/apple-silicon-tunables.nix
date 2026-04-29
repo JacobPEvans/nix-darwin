@@ -48,9 +48,21 @@ in
         "${userConfig.user.homeDir}/.cache/uv"
         "${userConfig.user.homeDir}/.cache/nix-screenpipe"
         "${userConfig.user.homeDir}/.screenpipe/data"
-        "/Volumes/HuggingFace"
+        cfg.huggingfaceVolume
       ];
-      description = "Absolute paths to add to the Time Machine exclusion list.";
+      defaultText = lib.literalExpression ''
+        [
+          "''${userConfig.user.homeDir}/.cache/uv"
+          "''${userConfig.user.homeDir}/.cache/nix-screenpipe"
+          "''${userConfig.user.homeDir}/.screenpipe/data"
+          config.system.appleSiliconTunables.huggingfaceVolume
+        ]
+      '';
+      description = ''
+        Absolute paths to add to the Time Machine exclusion list. The
+        HuggingFace volume default is sourced from huggingfaceVolume so
+        overriding that option keeps the exclusion in sync.
+      '';
     };
 
     appNapDisabledFor = lib.mkOption {
@@ -83,12 +95,14 @@ in
     };
 
     # darwin-rebuild switch: invoke the apply script with the configured knobs.
+    # All values escaped via lib.escapeShellArg — defense against unusual
+    # path characters or future user-configurable option values.
     system.activationScripts.appleSiliconTunables.text = ''
-      WIRED_LIMIT_MB="${toString cfg.wiredLimitMb}" \
-      HF_VOLUME="${cfg.huggingfaceVolume}" \
-      TM_EXCLUDES="${lib.concatStringsSep ":" cfg.timeMachineExcludes}" \
-      APPNAP_BUNDLES="${lib.concatStringsSep ":" cfg.appNapDisabledFor}" \
-      USER_NAME="${userConfig.user.name}" \
+      WIRED_LIMIT_MB=${lib.escapeShellArg (toString cfg.wiredLimitMb)} \
+      HF_VOLUME=${lib.escapeShellArg cfg.huggingfaceVolume} \
+      TM_EXCLUDES=${lib.escapeShellArg (lib.concatStringsSep ":" cfg.timeMachineExcludes)} \
+      APPNAP_BUNDLES=${lib.escapeShellArg (lib.concatStringsSep ":" cfg.appNapDisabledFor)} \
+      USER_NAME=${lib.escapeShellArg userConfig.user.name} \
         ${lib.getExe applyScript} || true
     '';
   };
