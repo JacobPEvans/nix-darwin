@@ -125,6 +125,11 @@ in
     };
   };
 
+  # --- Apple Silicon Tunables ---
+  # Wired-memory ceiling, App Nap, Spotlight + TM excludes for AI caches.
+  # See modules/darwin/apple-silicon-tunables.nix for option semantics.
+  system.appleSiliconTunables.enable = true;
+
   # --- Energy & Sleep Configuration ---
   system.energy = {
     enable = true;

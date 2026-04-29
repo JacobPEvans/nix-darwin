@@ -29,6 +29,7 @@ in
     ./activation-error-tracking.nix
     ./nix-storage.nix
     ./ws-monitor.nix
+    ./apple-silicon-tunables.nix
   ];
 
   # --- Nixpkgs Configuration ---
