@@ -59,12 +59,6 @@
   };
 
   programs = {
-    # Local MLX inference server (vllm-mlx + llama-swap proxy on :11434).
-    # Brings the existing vllm-mlx LaunchAgent under Nix management — without
-    # this, the registry at services.aiStack.models is materialized to nothing
-    # and llama-swap.json drifts from whatever was last activated by hand.
-    mlx.enable = true;
-
     claude = {
       # Disable playwright plugin globally — only useful in specific projects.
       # playwright@claude-skills (skills-only, no MCP) stays enabled.
@@ -100,6 +94,12 @@
           };
         };
     };
+
+    # Local MLX inference server (vllm-mlx + llama-swap proxy on :11434).
+    # Brings the existing vllm-mlx LaunchAgent under Nix management — without
+    # this, the registry at services.aiStack.models is materialized to nothing
+    # and llama-swap.json drifts from whatever was last activated by hand.
+    mlx.enable = true;
 
     # macOS-specific zsh overrides
     # Base zsh config provided by nix-home (sharedModule).
