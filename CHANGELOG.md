@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.31.1...v1.32.0) (2026-05-03)
+
+
+### Features
+
+* **macbook-m4:** enable programs.mlx ([#1061](https://github.com/JacobPEvans/nix-darwin/issues/1061)) ([0ae10a6](https://github.com/JacobPEvans/nix-darwin/commit/0ae10a6d53ff5a5d1255f7e5d84c47cf20bb3a8a))
+
 ## [1.31.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.31.0...v1.31.1) (2026-05-03)
 
 
