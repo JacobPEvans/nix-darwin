@@ -140,7 +140,7 @@ git worktree remove feat/add-<pkg-name>
 git branch -d feat/add-<pkg-name>
 ```
 
-**Note**: auto-claude will automatically clean up merged/closed PR worktrees during its scheduled runs.
+**Note**: After the PR merges, run `/wrap-up` or `/clean_gone` to remove the worktree and the now-merged local branch.
 
 ---
 
