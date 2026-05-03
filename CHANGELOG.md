@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.32.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.32.0...v1.32.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ci:** remove deprecated app-id secret passthrough ([f5b1091](https://github.com/JacobPEvans/nix-darwin/commit/f5b1091a2ca5150c99339b0535b2eb96d44a109b))
+* **claude:** remove dead auto-claude references ([e450461](https://github.com/JacobPEvans/nix-darwin/commit/e450461126f2b0cb1ef953a1a82301da05a8fe72))
+
 ## [1.32.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.31.1...v1.32.0) (2026-05-03)
 
 
