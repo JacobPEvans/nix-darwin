@@ -619,11 +619,11 @@
         "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1777768210,
-        "narHash": "sha256-FywkHHzSsB9T6DR5ZtE5eNfJHbBsrngIrUk4vFBpbi4=",
+        "lastModified": 1777830060,
+        "narHash": "sha256-XHXEldVSkL5uMgMYiZkBeaNSzeS+Q2gQ656ZhwSs95Y=",
         "owner": "JacobPEvans",
         "repo": "nix-home",
-        "rev": "68470475e355830d00054bde4383a2fafcf881f5",
+        "rev": "806e7bc3387d5de51696f288158110ca956bae0b",
         "type": "github"
       },
       "original": {
