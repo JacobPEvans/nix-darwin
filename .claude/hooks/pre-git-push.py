@@ -94,7 +94,7 @@ def main():
         return 0
 
     # Skip darwin-rebuild in CI/automated workflows
-    ci_markers = ["CI", "GITHUB_ACTIONS", "AUTOMATED_WORKFLOW", "AUTO_CLAUDE"]
+    ci_markers = ["CI", "GITHUB_ACTIONS", "AUTOMATED_WORKFLOW"]
     is_automated = any(os.environ.get(marker) for marker in ci_markers)
 
     if is_automated:

@@ -79,7 +79,7 @@ in
     # ========================================================================
     bitwarden-desktop # Password manager desktop app
     raycast # Productivity launcher (replaces Spotlight)
-    swiftbar # Menu bar customization (auto-claude status)
+    swiftbar # Menu bar customization
   ];
 
   # --- Homebrew Configuration ---

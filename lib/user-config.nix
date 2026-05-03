@@ -68,20 +68,9 @@ in
   # ==========================================================================
   # AI Assistant Configuration
   # ==========================================================================
-  # NOTE: Most ai-assistant-instructions content comes from Nix store (flake input).
-  # The local repo path below is ONLY used by autoClaude for autonomous commits.
-  #
-  # Repository uses git worktrees:
-  #   - Main branch: ~/git/ai-assistant-instructions/main/
-  #   - Feature branches: ~/git/ai-assistant-instructions/<branch-name>/
-  # Clone with worktree setup:
-  #   git clone --bare https://github.com/JacobPEvans/ai-assistant-instructions.git ~/git/ai-assistant-instructions
-  #   cd ~/git/ai-assistant-instructions && git worktree add main main
+  # ai-assistant-instructions content comes from the Nix store (flake input);
+  # no local-repo path is needed for runtime use.
   ai = {
-    # Local repo path - ONLY for autoClaude (needs writable git for commits)
-    # All other content (permissions, commands, instruction files) comes from flake input
-    instructionsRepo = "${homeDir}/git/ai-assistant-instructions/main";
-
     # Claude Code settings JSON Schema URL (official schema store)
     # Used by: settings.json $schema, pre-commit hooks, CI validation, activation hooks
     # Single source of truth - reference this everywhere
