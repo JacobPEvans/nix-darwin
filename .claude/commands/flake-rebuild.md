@@ -199,5 +199,5 @@ Tell the user:
 
 **DO NOT wait for checks** - auto-merge handles this automatically.
 
-**Note**: The worktree at `~/git/nix-darwin/chore/flake-update-YYYY-MM-DD/` will be automatically
-cleaned up by auto-claude after the PR is merged.
+**Note**: The worktree at `~/git/nix-darwin/chore/flake-update-YYYY-MM-DD/` should be
+removed manually after the PR is merged (`/wrap-up` or `/clean_gone`).

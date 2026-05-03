@@ -135,9 +135,6 @@ Shell scripts in this repository are tested using **BATS** (Bash Automated Testi
 # Run all shell script tests
 ./tests/run-shell-tests.sh
 
-# Run a specific test file
-bats tests/shell/test_auto_claude_args.bats
-
 # Run tests matching a pattern
 bats tests/shell/test_*.bats
 ```

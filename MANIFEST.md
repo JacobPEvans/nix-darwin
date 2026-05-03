@@ -135,7 +135,7 @@ Source: `modules/darwin/common.nix`
 |---------|-------------|
 | bitwarden-desktop | Password manager desktop app |
 | raycast | Productivity launcher (replaces Spotlight) |
-| swiftbar | Menu bar customization (auto-claude status) |
+| swiftbar | Menu bar customization |
 
 Note: OrbStack installed via Homebrew cask (`greedy = true`) in `modules/darwin/homebrew.nix` for TCC permission stability.
 The `programs.orbstack` module (`modules/darwin/apps/orbstack.nix`) still manages the APFS data volume via launchd.

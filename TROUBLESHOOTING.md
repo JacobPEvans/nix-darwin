@@ -379,9 +379,7 @@ This configuration uses multiple layers to ensure TCC permissions persist:
    `home.packages` (see `hosts/macbook-m4/home.nix`) (not system packages) to get
    stable trampolines
 
-3. **AssociatedBundleIdentifiers**: Auto-claude launchd agents are linked to Ghostty's bundle identifier so they can inherit its TCC permissions
-
-4. **/bin/zsh fallback**: The system shell has a permanent path and can be granted Full Disk Access as a backup
+3. **/bin/zsh fallback**: The system shell has a permanent path and can be granted Full Disk Access as a backup
 
 ### Setting Up TCC Permissions (One-Time)
 
@@ -414,7 +412,6 @@ ls -la /Applications/Nix\ Apps/
 
 - **Trampoline paths are stable**: `~/Applications/Home Manager Trampolines/Ghostty.app` never changes, even when the underlying Nix store path does
 - **TCC stores permissions by path**: Once Ghostty trampoline has Full Disk Access, it persists across rebuilds
-- **Launchd agents inherit permissions**: With `AssociatedBundleIdentifiers`, auto-claude agents inherit Ghostty's TCC permissions
 - **/bin/zsh is immutable**: Apple's system shell path never changes, providing a reliable fallback
 
 ### Troubleshooting TCC Issues
@@ -427,16 +424,6 @@ echo $TERM_PROGRAM
 # Should show: Ghostty
 
 # If using Terminal.app, grant it Full Disk Access or switch to Ghostty
-```
-
-**auto-claude launchd agents fail with permission errors**:
-
-```bash
-# Check if agents have AssociatedBundleIdentifiers
-find ~/Library/LaunchAgents -name 'com.claude.auto-claude-*.plist' -exec plutil -p {} + | grep Associated
-
-# Verify Ghostty trampoline has Full Disk Access
-# System Settings > Privacy & Security > Full Disk Access
 ```
 
 **Permissions revoked after macOS update**:
@@ -468,7 +455,7 @@ gpg --list-keys
 
 ### Invalid BWS Access Token
 
-**Problem**: Auto-claude or other automation fails with BWS error:
+**Problem**: BWS-backed automation fails with:
 
 ```text
 Error: Access token is not in a valid format: Doesn't contain a decryption key
@@ -478,8 +465,7 @@ Error: Access token is not in a valid format: Doesn't contain a decryption key
 
 **Impact**:
 
-- Slack notifications fail silently
-- Headless Claude authentication fails (cron jobs, LaunchAgent automation)
+- Headless Claude authentication fails (LaunchAgent automation)
 - `claude-api-key-helper` script fails
 
 **Solution**:
