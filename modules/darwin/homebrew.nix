@@ -81,7 +81,11 @@ in
     ]
     # Append formulae required by nix-ai's per-agent modules. Currently:
     # qwen-code (Alibaba's CLI agent — see modules/qwen-code in nix-ai).
-    ++ agentBrewFormulae;
+    # `lib.unique` deduplicates in case a formula migrates between the
+    # static list above and nix-ai's exported list during a transition
+    # — `brew bundle` is idempotent but the duplicate noise is worth
+    # eliminating at the Nix layer.
+    ++ lib.unique agentBrewFormulae;
     casks = [
       # GUI applications (only if not available in nixpkgs)
       #
