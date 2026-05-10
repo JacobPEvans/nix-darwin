@@ -169,13 +169,6 @@
 
 * **dock:** add Discord, reorder with spacers, add private local config ([b318721](https://github.com/JacobPEvans/nix-darwin/commit/b3187219add173c501ea1ff8b0ea2d2ed08a3fa9))
 
-## [1.28.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.28.0...v1.28.1) (2026-04-17)
-
-
-### Bug Fixes
-
-* remove cspell spell checker entirely ([#1013](https://github.com/JacobPEvans/nix-darwin/issues/1013)) ([5948239](https://github.com/JacobPEvans/nix-darwin/commit/5948239768e62a6be6857cc5556b97d3a04a93f9))
-
 ## [1.28.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.27.3...v1.28.0) (2026-04-15)
 
 
@@ -203,13 +196,6 @@
 ### Bug Fixes
 
 * **deps:** add nix-home to Renovate GROUP 1 + parameterize deps-update-flake ([cb9c1e1](https://github.com/JacobPEvans/nix-darwin/commit/cb9c1e17f7b707a8c0ff1cb90bf6c35549eae1f6))
-
-## [1.27.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.3...v1.27.0) (2026-04-12)
-
-
-### Features
-
-* **cspell:** migrate to shared org-wide dictionary hierarchy ([287c419](https://github.com/JacobPEvans/nix-darwin/commit/287c419c91b35348ffcbe2718f8bfd80f3996add))
 
 ## [1.26.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.26.2...v1.26.3) (2026-04-12)
 
@@ -319,7 +305,6 @@
 * **ollama:** upgrade to unstable channel and clean up plans ([#573](https://github.com/JacobPEvans/nix-darwin/issues/573)) ([90a6709](https://github.com/JacobPEvans/nix-darwin/commit/90a67094e03edbc84d64b2d7844115455ed0a6fc))
 * optimize CI workflow performance ([#519](https://github.com/JacobPEvans/nix-darwin/issues/519)) ([845e16b](https://github.com/JacobPEvans/nix-darwin/commit/845e16bc69dd9b33efb0cb0079bafa5a58b94f84))
 * package placement audit — move whisper tools to nix-ai, group AI brews ([#981](https://github.com/JacobPEvans/nix-darwin/issues/981)) ([195000b](https://github.com/JacobPEvans/nix-darwin/commit/195000bb93683ddd2eb8e62e0e2f8efdd85665a4))
-* **packages:** add cspell system-wide spell checker ([#707](https://github.com/JacobPEvans/nix-darwin/issues/707)) ([5bd0999](https://github.com/JacobPEvans/nix-darwin/commit/5bd09999bb326c80632f023300378ea467c31ac2))
 * **plugins:** add community plugins and multi-model integrations ([#503](https://github.com/JacobPEvans/nix-darwin/issues/503)) ([48d283f](https://github.com/JacobPEvans/nix-darwin/commit/48d283fe481e7b77c8ef006faf0ad40c9d248db9))
 * release polish — MIT license, README rewrite, and doc cleanup ([#751](https://github.com/JacobPEvans/nix-darwin/issues/751)) ([2c9f33a](https://github.com/JacobPEvans/nix-darwin/commit/2c9f33af8b07ac17fcd026aa6b5d412bf2b5f6ef))
 * remove nodejs and python310 from global packages ([#765](https://github.com/JacobPEvans/nix-darwin/issues/765)) ([024eab9](https://github.com/JacobPEvans/nix-darwin/commit/024eab9d743c68dbb832f6e8654f79d44c43c356))
@@ -612,7 +597,6 @@
 * **nix:** migrate to official determinateNix module with automatic GC ([#792](https://github.com/JacobPEvans/nix-darwin/issues/792)) ([cdc21c6](https://github.com/JacobPEvans/nix-darwin/commit/cdc21c6ca047fc5cbe8fd4e101b286db5051e790))
 * **ollama:** upgrade to unstable channel and clean up plans ([#573](https://github.com/JacobPEvans/nix-darwin/issues/573)) ([90a6709](https://github.com/JacobPEvans/nix-darwin/commit/90a67094e03edbc84d64b2d7844115455ed0a6fc))
 * optimize CI workflow performance ([#519](https://github.com/JacobPEvans/nix-darwin/issues/519)) ([845e16b](https://github.com/JacobPEvans/nix-darwin/commit/845e16bc69dd9b33efb0cb0079bafa5a58b94f84))
-* **packages:** add cspell system-wide spell checker ([#707](https://github.com/JacobPEvans/nix-darwin/issues/707)) ([5bd0999](https://github.com/JacobPEvans/nix-darwin/commit/5bd09999bb326c80632f023300378ea467c31ac2))
 * **packages:** enforce package hierarchy with validation hooks ([e8de606](https://github.com/JacobPEvans/nix-darwin/commit/e8de606b8afbaa07e2c64261fee050dab147e29b))
 * **plugins:** add community plugins and multi-model integrations ([#503](https://github.com/JacobPEvans/nix-darwin/issues/503)) ([48d283f](https://github.com/JacobPEvans/nix-darwin/commit/48d283fe481e7b77c8ef006faf0ad40c9d248db9))
 * release polish — MIT license, README rewrite, and doc cleanup ([#751](https://github.com/JacobPEvans/nix-darwin/issues/751)) ([2c9f33a](https://github.com/JacobPEvans/nix-darwin/commit/2c9f33af8b07ac17fcd026aa6b5d412bf2b5f6ef))
@@ -1004,7 +988,6 @@
 * **ollama:** upgrade to unstable channel and clean up plans ([#573](https://github.com/JacobPEvans/nix-darwin/issues/573)) ([90a6709](https://github.com/JacobPEvans/nix-darwin/commit/90a67094e03edbc84d64b2d7844115455ed0a6fc))
 * **opencode:** replace sugar plugin with enhanced OpenCode integration ([#317](https://github.com/JacobPEvans/nix-darwin/issues/317)) ([e817256](https://github.com/JacobPEvans/nix-darwin/commit/e8172569a131201c98680e6c51d2195047a123bf))
 * optimize CI workflow performance ([#519](https://github.com/JacobPEvans/nix-darwin/issues/519)) ([845e16b](https://github.com/JacobPEvans/nix-darwin/commit/845e16bc69dd9b33efb0cb0079bafa5a58b94f84))
-* **packages:** add cspell system-wide spell checker ([#707](https://github.com/JacobPEvans/nix-darwin/issues/707)) ([5bd0999](https://github.com/JacobPEvans/nix-darwin/commit/5bd09999bb326c80632f023300378ea467c31ac2))
 * **packages:** enforce package hierarchy with validation hooks ([e8de606](https://github.com/JacobPEvans/nix-darwin/commit/e8de606b8afbaa07e2c64261fee050dab147e29b))
 * **plugins:** add community plugins and multi-model integrations ([#503](https://github.com/JacobPEvans/nix-darwin/issues/503)) ([48d283f](https://github.com/JacobPEvans/nix-darwin/commit/48d283fe481e7b77c8ef006faf0ad40c9d248db9))
 * **precommit:** add lychee and comprehensive pre-commit tooling module ([ef9525d](https://github.com/JacobPEvans/nix-darwin/commit/ef9525db7484fc67525aab6b159a9ad54fde94e9))
