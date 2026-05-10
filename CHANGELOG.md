@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.34.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.33.1...v1.34.0) (2026-05-10)
+
+
+### Features
+
+* **homebrew:** add openwebstart cask for iDRAC6 vKVM access ([#1080](https://github.com/JacobPEvans/nix-darwin/issues/1080)) ([e221582](https://github.com/JacobPEvans/nix-darwin/commit/e221582d026b8dcbcc725265320a6e2f89b79e93))
+
 ## [1.33.1](https://github.com/JacobPEvans/nix-darwin/compare/v1.33.0...v1.33.1) (2026-05-07)
 
 
