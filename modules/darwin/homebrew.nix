@@ -191,7 +191,7 @@ in
       # iDRAC6 Virtual Console requires NPAPI Java plugin, dropped by all
       # modern browsers (Chrome 2015, Safari, Firefox, Brave). OpenWebStart
       # runs the .jnlp file that the iDRAC web UI downloads on "Launch Virtual
-      # Console". greedy = true because OpenWebStart has no built-in updater.
+      # Console".
       {
         name = "openwebstart";
         greedy = true;
