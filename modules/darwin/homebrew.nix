@@ -183,7 +183,7 @@ in
       {
         name = "firefox";
         greedy = true;
-      } # Mozilla Firefox browser
+      }
 
       # --- Office Suite (for Claude document-skills) ---
       # LibreOffice provides the `soffice` CLI that /document-skills:{docx,xlsx,pptx}
