@@ -65,7 +65,19 @@ in
     (_: prev: {
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_: pprev: {
+          # pgvector: nativeCheckInputs includes postgresqlTestHook, which is
+          # marked broken on aarch64-darwin. Must use overridePythonAttrs so
+          # buildPythonPackage recomputes nativeBuildInputs without check deps.
           pgvector = pprev.pgvector.overridePythonAttrs (_: {
+            doCheck = false;
+            nativeCheckInputs = [ ];
+          });
+
+          # accelerate: tests require GPU/distributed training infrastructure
+          # (CUDA/MPS) unavailable in the Nix sandbox. They crash with SIGTRAP
+          # (Bus Error) on darwin. accelerate is a runtime dep of open-webui;
+          # its test suite is irrelevant for our use case.
+          accelerate = pprev.accelerate.overridePythonAttrs (_: {
             doCheck = false;
             nativeCheckInputs = [ ];
           });
