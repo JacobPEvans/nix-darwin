@@ -86,12 +86,20 @@
 
 }
 // pkgs.lib.optionalAttrs (darwinConfigurations != { }) {
-  # Evaluate darwinConfigurations to catch import errors, type errors, and assertion failures
-  # Uses .system.drvPath for eval-only (no full build)
-  module-eval = pkgs.runCommand "check-module-eval" { } ''
-    ${pkgs.lib.concatStringsSep "\n" (
-      pkgs.lib.mapAttrsToList (name: cfg: "echo \"${name}: ${cfg.system.drvPath}\"") darwinConfigurations
-    )}
-    touch $out
-  '';
+  # Evaluate darwinConfigurations to catch import errors, type errors, and assertion failures.
+  # Uses unsafeDiscardStringContext on system.drvPath so the check is compatible with
+  # `nix flake check --no-build` (the reusable workflow runs with --no-build to avoid
+  # disk exhaustion on linux runners). Without discarding context, --no-build refuses
+  # to realise the input closure of the referenced .drv and reports "path is not valid".
+  # Module evaluation still happens (catching import/type/assertion errors); only the
+  # string context is dropped so the runCommand output doesn't require realisation.
+  module-eval =
+    let
+      drvPaths = pkgs.lib.concatStringsSep "\n" (
+        pkgs.lib.mapAttrsToList (
+          name: cfg: "${name}: ${builtins.unsafeDiscardStringContext (toString cfg.system.drvPath)}"
+        ) darwinConfigurations
+      );
+    in
+    pkgs.writeText "check-module-eval" drvPaths;
 }
