@@ -20,3 +20,7 @@ jobs:
   validate:
     name: Validate
     uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@main
+    with:
+      # Same rationale as ci-gate.yml — darwinConfigurations checks fail with
+      # --all-systems on the linux runner (platform mismatch).
+      all_systems: false

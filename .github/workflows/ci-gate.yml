@@ -103,6 +103,11 @@ jobs:
     needs: changes
     if: needs.changes.outputs.nix == 'true'
     uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@main
+    with:
+      # darwinConfigurations references in module-eval are platform-specific
+      # (require darwin binaries to build), so --all-systems fails on linux
+      # with "platform mismatch". Evaluate the current system only.
+      all_systems: false
 
   markdown-lint:
     name: Markdown Lint
