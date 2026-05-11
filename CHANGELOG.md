@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.34.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.34.2...v1.34.3) (2026-05-11)
+
+
+### Bug Fixes
+
+* **ci:** opt out of --all-systems for nix-validate ([#1093](https://github.com/JacobPEvans/nix-darwin/issues/1093)) ([8e14a8e](https://github.com/JacobPEvans/nix-darwin/commit/8e14a8e2bf6af1747637f8c051f1cdc0e943f004))
+
 ## [1.34.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.34.1...v1.34.2) (2026-05-11)
 
 
