@@ -58,7 +58,7 @@ in
     # postgresql-test-hook buildable on darwin, gates it behind meta.platforms,
     # or removes it from pgvector's nativeBuildInputs on darwin.
     # Track: https://github.com/NixOS/nixpkgs/issues/xxxxxx (upstream pgvector darwin check)
-    (final: prev: {
+    (_: prev: {
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_: pprev: {
           pgvector = pprev.pgvector.overrideAttrs (_: {
