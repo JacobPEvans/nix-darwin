@@ -37,6 +37,36 @@ in
   nixpkgs.overlays = [
     (import ../../overlays/macos-apps.nix)
     (import ../../overlays/direnv-darwin-fix.nix) # TEMPORARY: NixOS/nix#6065
+
+    # TEMPORARY: pgvector check phase is broken on aarch64-darwin.
+    #
+    # WHAT: pgvector lists postgresql-test-hook as a nativeBuildInput for its
+    # check phase. postgresql-test-hook is Linux-specific PostgreSQL build
+    # machinery and is marked broken on aarch64-darwin.
+    #
+    # WHY: open-webui (pulled in by nix-ai) depends on pgvector at runtime only.
+    # The test suite is irrelevant on darwin, but the broken nativeBuildInput
+    # causes the entire derivation — and everything that depends on it — to fail
+    # evaluation. This blocks darwin-rebuild switch and nix flake check.
+    #
+    # HOW: pythonPackagesExtensions lets us patch a single Python package without
+    # touching the rest of the Python package set. overrideAttrs { doCheck = false; }
+    # drops the check phase entirely, which removes postgresql-test-hook from the
+    # dependency graph. Runtime behavior is unaffected.
+    #
+    # WHEN TO REMOVE: when nixpkgs-25.11-darwin ships a fix that either marks
+    # postgresql-test-hook buildable on darwin, gates it behind meta.platforms,
+    # or removes it from pgvector's nativeBuildInputs on darwin.
+    # Track: https://github.com/NixOS/nixpkgs/issues/xxxxxx (upstream pgvector darwin check)
+    (final: prev: {
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (_: pprev: {
+          pgvector = pprev.pgvector.overrideAttrs (_: {
+            doCheck = false;
+          });
+        })
+      ];
+    })
   ];
 
   # --- User Configuration ---
