@@ -40,29 +40,34 @@ in
 
     # TEMPORARY: pgvector check phase is broken on aarch64-darwin.
     #
-    # WHAT: pgvector lists postgresql-test-hook as a nativeBuildInput for its
-    # check phase. postgresql-test-hook is Linux-specific PostgreSQL build
-    # machinery and is marked broken on aarch64-darwin.
+    # WHAT: pgvector lists postgresql-test-hook in nativeCheckInputs.
+    # postgresql-test-hook is Linux-specific PostgreSQL build machinery and is
+    # marked meta.broken = true on aarch64-darwin. Because buildPythonPackage
+    # merges nativeCheckInputs into nativeBuildInputs before overrideAttrs can
+    # intercept, simply setting doCheck = false via overrideAttrs does NOT remove
+    # the broken dependency — it is already baked into nativeBuildInputs.
     #
     # WHY: open-webui (pulled in by nix-ai) depends on pgvector at runtime only.
-    # The test suite is irrelevant on darwin, but the broken nativeBuildInput
+    # The test suite is irrelevant on darwin, but the broken nativeCheckInput
     # causes the entire derivation — and everything that depends on it — to fail
     # evaluation. This blocks darwin-rebuild switch and nix flake check.
     #
-    # HOW: pythonPackagesExtensions lets us patch a single Python package without
-    # touching the rest of the Python package set. overrideAttrs { doCheck = false; }
-    # drops the check phase entirely, which removes postgresql-test-hook from the
-    # dependency graph. Runtime behavior is unaffected.
+    # HOW: overridePythonAttrs re-runs buildPythonPackage from scratch with the
+    # overridden arguments, so setting nativeCheckInputs = [] removes all check
+    # dependencies BEFORE they are merged into nativeBuildInputs. postgresql-test-hook
+    # is never evaluated; the broken-package guard never fires.
+    # pythonPackagesExtensions propagates this override to all Python package sets.
+    # Runtime behavior is unaffected — pgvector still installs correctly.
     #
-    # WHEN TO REMOVE: when nixpkgs-25.11-darwin ships a fix that either marks
-    # postgresql-test-hook buildable on darwin, gates it behind meta.platforms,
-    # or removes it from pgvector's nativeBuildInputs on darwin.
-    # Track: https://github.com/NixOS/nixpkgs/issues/xxxxxx (upstream pgvector darwin check)
+    # WHEN TO REMOVE: when nixpkgs-25.11-darwin ships a fix (postgresql-test-hook
+    # marked broken only on linux, or guarded by meta.platforms, or pgvector uses
+    # lib.optionals stdenv.isLinux for the hook). Monitor nixpkgs pgvector package.
     (_: prev: {
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_: pprev: {
-          pgvector = pprev.pgvector.overrideAttrs (_: {
+          pgvector = pprev.pgvector.overridePythonAttrs (_: {
             doCheck = false;
+            nativeCheckInputs = [ ];
           });
         })
       ];
