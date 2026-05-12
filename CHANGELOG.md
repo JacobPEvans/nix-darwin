@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.34.3...v1.35.0) (2026-05-12)
+
+
+### Features
+
+* **homebrew:** add firefox cask and add to dock ([#1091](https://github.com/JacobPEvans/nix-darwin/issues/1091)) ([84b328e](https://github.com/JacobPEvans/nix-darwin/commit/84b328e6b273b69311bd8402566a0116f631cc9a))
+
 ## [1.34.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.34.2...v1.34.3) (2026-05-11)
 
 
