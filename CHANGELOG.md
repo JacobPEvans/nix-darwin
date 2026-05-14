@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.35.2...v1.35.3) (2026-05-14)
+
+
+### Bug Fixes
+
+* **flake:** scope checks to x86_64-linux; restore --all-systems default ([#1101](https://github.com/JacobPEvans/nix-darwin/issues/1101)) ([1d90ff9](https://github.com/JacobPEvans/nix-darwin/commit/1d90ff9365c3c773f943866f3a0defdbd3d37649))
+
 ## [1.35.2](https://github.com/JacobPEvans/nix-darwin/compare/v1.35.1...v1.35.2) (2026-05-14)
 
 
