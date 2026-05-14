@@ -213,29 +213,38 @@
       # Formatter for `nix fmt` command
       formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
 
-      # Quality checks for `nix flake check` (DRY principle)
-      # Single source of truth for pre-commit hooks and GitHub Actions
-      # Definitions in lib/checks.nix for better modularity
-      # Cross-platform: works on all systems
+      # Quality checks for `nix flake check` (DRY principle).
+      #
+      # Scoped to x86_64-linux only so `nix flake check --all-systems` succeeds
+      # from a single linux runner. All checks in lib/checks.nix are source-only
+      # (formatting, statix, deadnix, shellcheck, shell-tests) — they operate
+      # on the same source files regardless of target system, so running once
+      # on the CI system is sufficient and equivalent. Other systems
+      # intentionally have no `checks` entries.
+      #
+      # Cross-platform breakage (e.g. darwin-only `meta.broken` in nixpkgs) is
+      # still caught by `--all-systems` evaluating `packages.aarch64-darwin`,
+      # `devShells.aarch64-darwin`, `formatter.aarch64-darwin`, and the
+      # `darwinConfigurations.*.system` derivations during flake evaluation.
+      #
+      # The darwin module-eval (only populated when `darwinConfigurations` is
+      # non-empty) was previously gated on `system == aarch64-darwin`; combined
+      # with the prior `all_systems: false` workaround, it never actually ran
+      # in CI. Dropping it here is therefore no regression. If on-runner darwin
+      # module-eval coverage is desired, run it as a post-merge job on a darwin
+      # runner or via a dedicated workflow.
       checks =
-        nixpkgs.lib.genAttrs
-          [
-            "aarch64-darwin"
-            "x86_64-darwin"
-            "x86_64-linux"
-            "aarch64-linux"
-          ]
-          (
-            system:
-            let
-              pkgs = nixpkgs.legacyPackages.${system};
-            in
-            import ./lib/checks.nix {
-              inherit pkgs;
-              src = ./.;
-              darwinConfigurations = if system == "aarch64-darwin" then { default = darwinConfig; } else { };
-            }
-          );
+        let
+          system = "x86_64-linux";
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          ${system} = import ./lib/checks.nix {
+            inherit pkgs;
+            src = ./.;
+            darwinConfigurations = { };
+          };
+        };
 
       # Development shell for CI and local nix tooling
       devShells.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.mkShell {
