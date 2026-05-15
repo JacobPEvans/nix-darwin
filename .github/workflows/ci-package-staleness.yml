@@ -21,8 +21,11 @@ permissions:
 jobs:
   check-staleness:
     name: Verify package freshness
-    # Self-hosted RunsOn runner — see terraform-runs-on/docs/migration-guide.md
-    runs-on: "runs-on=${{ github.run_id }}/runner=2cpu-linux-x64"
+    # Fork-PR security guard: same-repo PRs and workflow_dispatch runs use
+    # RunsOn; only fork PRs fall back to ubuntu-latest (github-hosted) so
+    # fork-author code never touches our self-hosted runners. See ci-gate.yml
+    # header for the full rationale.
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout code
