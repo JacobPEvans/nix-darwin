@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.0](https://github.com/JacobPEvans/nix-darwin/compare/v1.35.3...v1.36.0) (2026-05-15)
+
+
+### Features
+
+* **ci:** migrate Linux CI to self-hosted RunsOn runners ([#1104](https://github.com/JacobPEvans/nix-darwin/issues/1104)) ([7f9d8d7](https://github.com/JacobPEvans/nix-darwin/commit/7f9d8d7578807c266ad008183488e8acf08e8e13))
+
 ## [1.35.3](https://github.com/JacobPEvans/nix-darwin/compare/v1.35.2...v1.35.3) (2026-05-14)
 
 
