@@ -39,9 +39,17 @@ jobs:
   # ==========================================================================
   # CHANGE DETECTION
   # ==========================================================================
+  # Fork-PR security guard:
+  # nix-darwin is a PUBLIC repository, so `pull_request` from fork branches
+  # would otherwise execute fork-author-controlled code on our self-hosted
+  # RunsOn runners (and the underlying AWS account). The `runs-on:` expression
+  # routes same-repo PRs to RunsOn and falls back to `ubuntu-latest`
+  # (github-hosted, ephemeral, sandboxed) for fork PRs. Reusable workflow
+  # calls below carry the same expression through `runner_label`.
+  # Pattern reference: runs-on.com/configuration/job-labels (Fork PRs).
   changes:
     name: Detect Changes
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
     permissions:
       contents: read
       pull-requests: read
@@ -103,12 +111,19 @@ jobs:
     needs: changes
     if: needs.changes.outputs.nix == 'true'
     uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@main
+    with:
+      # Linux `nix flake check --all-systems` needs more disk/RAM for
+      # darwin-source substitution; m7+c7 family with s3-cache fits.
+      # Fork PRs fall back to ubuntu-latest (see header comment on `changes`).
+      runner_label: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/cpu=4/ram=16/family=m7+c7/extras=s3-cache', github.run_id) || 'ubuntu-latest' }}
 
   markdown-lint:
     name: Markdown Lint
     needs: changes
     if: needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_markdown-lint.yml@main
+    with:
+      runner_label: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
 
   claude-settings:
     name: Claude Settings
@@ -121,6 +136,8 @@ jobs:
     needs: changes
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
+    with:
+      runner_label: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
@@ -129,7 +146,7 @@ jobs:
     name: Merge Gate
     needs: [changes, nix-build, nix-validate, markdown-lint, claude-settings, file-size]
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
